@@ -3,6 +3,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+external/
 build/
 develop-eggs/
 dist/
@@ -16,6 +17,7 @@ sdist/
 var/
 wheels/
 *.egg-info/
+reponeedle.egg-info/
 .installed.cfg
 *.egg
 .pytest_cache/
@@ -28,3 +30,4 @@ htmlcov/
 env/
 venv/
 ENV/
+

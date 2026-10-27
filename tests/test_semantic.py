@@ -24,3 +24,4 @@ def test_semantic_empty():
     index = SubwordSemanticIndex().fit([])
     scores = index.score("test")
     assert len(scores) == 0
+

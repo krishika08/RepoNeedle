@@ -34,3 +34,4 @@ We welcome contributions from the retrieval, software engineering, and AI agent 
 - Write unit tests for any new router, graph algorithm, or tokenizer feature.
 - Maintain typing annotations.
 - Keep dependencies lightweight (pure standard ML stack: `numpy`, `scipy`, `networkx`, `pydantic`).
+

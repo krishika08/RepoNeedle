@@ -38,3 +38,4 @@ def test_skeleton_generation():
     assert "def method_one" in skeleton
     assert "def method_two" in skeleton
     assert tokens < len(content.splitlines()) * 10
+

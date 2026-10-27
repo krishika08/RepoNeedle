@@ -198,3 +198,4 @@ class StaticHybridBaseline:
             candidate_count=len(self.docs),
             explanation=f"Static Hybrid selected {len(selected)} files.",
         )
+

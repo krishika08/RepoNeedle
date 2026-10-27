@@ -1,0 +1,154 @@
+{
+  "Full RepoNeedle": {
+    "Overall_MRR": 0.9166666865348816,
+    "MRR_95_CI": [
+      0.7916666865348816,
+      1.0
+    ],
+    "Dev_MRR (N=8)": 1.0,
+    "HeldOut_MRR (N=4)": 0.75,
+    "Recall@1": 0.5277777777777778,
+    "Recall@3": 1.0,
+    "IrrelevantTokens@4k": 581.0,
+    "SelectiveAccuracy": 1.0,
+    "Task_MRR": {
+      "trace2code": 1.0,
+      "code2test": 1.0,
+      "edit2ripple": 0.8333333333333334,
+      "comment2context": 0.8333333333333334
+    }
+  },
+  "Ablation: No Router": {
+    "Overall_MRR": 0.743055522441864,
+    "MRR_95_CI": [
+      0.569444477558136,
+      0.9031250476837158
+    ],
+    "Dev_MRR (N=8)": 0.84375,
+    "HeldOut_MRR (N=4)": 0.5416666865348816,
+    "Recall@1": 0.375,
+    "Recall@3": 0.875,
+    "IrrelevantTokens@4k": 700.3333333333334,
+    "SelectiveAccuracy": 1.0,
+    "Task_MRR": {
+      "trace2code": 0.8333333333333334,
+      "code2test": 0.7777777777777778,
+      "edit2ripple": 0.5277777777777778,
+      "comment2context": 0.8333333333333334
+    }
+  },
+  "Ablation: No Abstainer": {
+    "Overall_MRR": 0.9166666865348816,
+    "MRR_95_CI": [
+      0.7916666865348816,
+      1.0
+    ],
+    "Dev_MRR (N=8)": 1.0,
+    "HeldOut_MRR (N=4)": 0.75,
+    "Recall@1": 0.5277777777777778,
+    "Recall@3": 1.0,
+    "IrrelevantTokens@4k": 807.4,
+    "SelectiveAccuracy": 0.0,
+    "Task_MRR": {
+      "trace2code": 1.0,
+      "code2test": 1.0,
+      "edit2ripple": 0.8333333333333334,
+      "comment2context": 0.8333333333333334
+    }
+  },
+  "Ablation: No Skeletons": {
+    "Overall_MRR": 0.9166666865348816,
+    "MRR_95_CI": [
+      0.7916666865348816,
+      1.0
+    ],
+    "Dev_MRR (N=8)": 1.0,
+    "HeldOut_MRR (N=4)": 0.75,
+    "Recall@1": 0.5277777777777778,
+    "Recall@3": 1.0,
+    "IrrelevantTokens@4k": 581.0,
+    "SelectiveAccuracy": 1.0,
+    "Task_MRR": {
+      "trace2code": 1.0,
+      "code2test": 1.0,
+      "edit2ripple": 0.8333333333333334,
+      "comment2context": 0.8333333333333334
+    }
+  },
+  "Baseline: Static Hybrid": {
+    "Overall_MRR": 0.743055522441864,
+    "MRR_95_CI": [
+      0.569444477558136,
+      0.9031250476837158
+    ],
+    "Dev_MRR (N=8)": 0.84375,
+    "HeldOut_MRR (N=4)": 0.5416666865348816,
+    "Recall@1": 0.375,
+    "Recall@3": 0.875,
+    "IrrelevantTokens@4k": 926.7333333333333,
+    "SelectiveAccuracy": 0.0,
+    "Task_MRR": {
+      "trace2code": 0.8333333333333334,
+      "code2test": 0.7777777777777778,
+      "edit2ripple": 0.5277777777777778,
+      "comment2context": 0.8333333333333334
+    }
+  },
+  "Baseline: BM25 Only": {
+    "Overall_MRR": 0.8194444179534912,
+    "MRR_95_CI": [
+      0.6666666865348816,
+      0.9583333134651184
+    ],
+    "Dev_MRR (N=8)": 0.9375,
+    "HeldOut_MRR (N=4)": 0.5833333730697632,
+    "Recall@1": 0.4166666666666667,
+    "Recall@3": 0.861111111111111,
+    "IrrelevantTokens@4k": 693.6,
+    "SelectiveAccuracy": 0.3333333333333333,
+    "Task_MRR": {
+      "trace2code": 1.0,
+      "code2test": 0.7777777777777778,
+      "edit2ripple": 0.6666666666666666,
+      "comment2context": 0.8333333333333334
+    }
+  },
+  "Baseline: Dense Semantic Only": {
+    "Overall_MRR": 0.7708333134651184,
+    "MRR_95_CI": [
+      0.6041666865348816,
+      0.9166666865348816
+    ],
+    "Dev_MRR (N=8)": 0.78125,
+    "HeldOut_MRR (N=4)": 0.75,
+    "Recall@1": 0.375,
+    "Recall@3": 0.8333333333333334,
+    "IrrelevantTokens@4k": 926.7333333333333,
+    "SelectiveAccuracy": 0.0,
+    "Task_MRR": {
+      "trace2code": 1.0,
+      "code2test": 0.8333333333333334,
+      "edit2ripple": 0.5833333333333334,
+      "comment2context": 0.6666666666666666
+    }
+  },
+  "Baseline: RepoMap Only": {
+    "Overall_MRR": 0.39431214332580566,
+    "MRR_95_CI": [
+      0.2486640214920044,
+      0.5768684148788452
+    ],
+    "Dev_MRR (N=8)": 0.4484127163887024,
+    "HeldOut_MRR (N=4)": 0.28611111640930176,
+    "Recall@1": 0.08333333333333333,
+    "Recall@3": 0.40277777777777773,
+    "IrrelevantTokens@4k": 926.7333333333333,
+    "SelectiveAccuracy": 0.0,
+    "Task_MRR": {
+      "trace2code": 0.5555555555555555,
+      "code2test": 0.12169312169312169,
+      "edit2ripple": 0.2888888888888889,
+      "comment2context": 0.611111111111111
+    }
+  }
+}

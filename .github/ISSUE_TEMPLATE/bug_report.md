@@ -27,3 +27,4 @@ If applicable, add screenshots or terminal logs.
 - OS: [e.g. Windows / Linux / macOS]
 - RepoNeedle Version: [e.g. 0.1.0]
 - Python Version: [e.g. 3.12]
+

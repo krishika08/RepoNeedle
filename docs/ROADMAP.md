@@ -33,3 +33,4 @@ This roadmap is grounded in empirical limitations observed during benchmark eval
 - [ ] **SWE-bench / OpenHands / Cline Integration**: MCP (Model Context Protocol) server wrapping RepoNeedle for one-click installation into coding assistants.
 - [ ] **Disk-Backed Inverted Indexing**:
   - Add optional embedded DuckDB / SQLite backing for giant monorepos (> 100,000 files).
+

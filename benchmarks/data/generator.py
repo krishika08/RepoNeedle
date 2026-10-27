@@ -792,3 +792,4 @@ def generate_benchmark_samples() -> List[BenchmarkSample]:
         ),
     ]
     return samples
+

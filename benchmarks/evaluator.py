@@ -93,3 +93,4 @@ class RetrievalEvaluator:
             "tokens_used": float(total_tokens),
             "budget_utilization": float(total_tokens) / max(1, budget_tokens),
         }
+

@@ -34,3 +34,4 @@ def test_bm25_no_match():
     index = BM25Index().fit(docs)
     scores = index.score("completely unrelated query zzzqqq")
     assert scores[0] == 0.0
+

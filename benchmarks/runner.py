@@ -231,3 +231,4 @@ class BenchmarkRunner:
             )
 
         console.print(table)
+

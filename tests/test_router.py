@@ -41,3 +41,4 @@ def test_classify_comment2context():
     query = Query(text="Add support for HTTP/2 streaming and multipart upload.")
     task, _ = router.classify_intent(query)
     assert task == TaskType.COMMENT2CONTEXT
+

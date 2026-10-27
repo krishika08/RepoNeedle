@@ -1,0 +1,18 @@
+{
+  "payload_reduction": {
+    "full_characters": 8255,
+    "skeleton_characters": 1252,
+    "full_bpe_tokens": 3030,
+    "skeleton_bpe_tokens": 442,
+    "actual_token_reduction_pct": 85.4125412541254
+  },
+  "latency_benchmark": {
+    "iterations": 100,
+    "corpus_files": 33,
+    "mean_latency_ms": 0.635178001539316,
+    "std_latency_ms": 0.09794159095705626,
+    "p50_latency_ms": 0.6132499984232709,
+    "p95_latency_ms": 0.8411500224610791,
+    "p99_latency_ms": 1.0054269997635858
+  }
+}

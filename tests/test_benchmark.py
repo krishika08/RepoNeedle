@@ -37,3 +37,4 @@ def test_evaluate_budgeted_packing():
     assert res["coverage"] == 1.0
     assert res["irrelevant_tokens"] == 150.0
     assert res["tokens_used"] == 250.0
+

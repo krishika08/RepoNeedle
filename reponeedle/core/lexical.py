@@ -145,3 +145,4 @@ class BM25Index:
             scores = scores / max_score
 
         return scores
+

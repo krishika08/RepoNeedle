@@ -32,3 +32,4 @@ def test_no_abstention_on_confident_match():
     abstained, conf, reason = abstainer.evaluate_abstention("FlaskApp index", scores)
     assert abstained is False
     assert conf >= 0.35
+

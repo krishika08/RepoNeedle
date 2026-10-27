@@ -39,3 +39,4 @@ def test_engine_empty_corpus():
     res = engine.retrieve("any query")
     assert res.abstained
     assert len(res.selected_files) == 0
+

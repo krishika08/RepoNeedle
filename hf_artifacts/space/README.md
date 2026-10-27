@@ -20,3 +20,4 @@ Interactive demonstration of **RepoNeedle**: Token-Budget-Aware, Workflow-Adapti
 - **Calibrated Abstention**: Inspect selective retrieval decisions on out-of-repo and counterfactual queries.
 - **Baseline Comparison**: Compare RepoNeedle against classical BM25, RepoMap PageRank, and Dense Semantic search.
 - **Token Budget Packing**: Inspect full files vs. structural skeletons packed under strict token budgets.
+

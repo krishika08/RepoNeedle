@@ -333,3 +333,4 @@ class RepoNeedleEngine:
             explanation=f"Retrieved {len(selected)} files ({total_tokens_used}/{eff_budget} tokens). Task: {inferred_task.value}. {reason}",
             execution_time_ms=exec_time,
         )
+
