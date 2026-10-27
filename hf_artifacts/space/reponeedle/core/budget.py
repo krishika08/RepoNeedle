@@ -72,7 +72,11 @@ class BudgetOptimizer:
             # Fallback regex-based skeleton
             for line in lines:
                 stripped = line.strip()
-                if stripped.startswith(("class ", "def ", "async def ", "@", "import ", "from ", "public ", "private ", "export ")):
+                if stripped.startswith((
+                    "class ", "def ", "async def ", "@", "import ", "from ",
+                    "public ", "private ", "protected ", "export ", "interface ",
+                    "type ", "func ", "package ", "pub ", "fn ", "impl ", "struct ", "use "
+                )):
                     skeleton_lines.append(line)
                 elif query_set and any(q in stripped.lower() for q in query_set if len(q) > 2):
                     skeleton_lines.append(line)

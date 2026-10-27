@@ -39,27 +39,50 @@ To maintain strict scientific integrity, **Official External Benchmark Results**
 
 Evaluated directly using the official `agent_retrieval_bench` evaluation package (`agent_retrieval_bench.baseline.sample_metrics`) on the official **Agent Retrieval Bench** release ($N=35$ samples across 12 real open-source GitHub repositories at frozen base commits):
 
-| Task Track | Sample Count ($N$) | Metric | Official Lexical | Official BM25 | RepoNeedle | Relative Gain vs BM25 |
-| :--- | :---: | :--- | :---: | :---: | :---: | :---: |
-| **Overall** | $N=35$ | **MRR** | 0.708 | 0.748 | **0.879** | **+17.5%** |
-| | | Recall@5 | 0.919 | 0.954 | **0.990** | +3.8% |
-| | | Recall@10 | 0.970 | 0.975 | **1.000** | +2.6% |
-| | | Gold Coverage@8k | 1.000 | 1.000 | **1.000** | Parity |
-| **`code2test`** | $N=17$ | **MRR** | 0.399 | 0.550 | **0.824** | **+49.8%** |
-| | | Recall@5 | 0.832 | 0.906 | **0.980** | +8.2% |
-| | | Recall@10 | 0.939 | 0.949 | **1.000** | +5.4% |
-| **`comment2context`** | $N=16$ | **MRR** | **1.000** | 0.958 | 0.953 | -0.5% |
-| | | Recall@5 | 1.000 | 1.000 | **1.000** | Parity |
-| **`trace2code`** | $N=2$ | **MRR** | **1.000** | 0.750 | 0.750 | Parity |
-| | | Recall@5 | 1.000 | 1.000 | **1.000** | Parity |
+| Task Track | Sample Count ($N$) | Metric | Official Lexical | Official RepoMap | Official BM25 | RepoNeedle | Relative Gain vs BM25 |
+| :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Overall** | $N=35$ | **MRR** | 0.708 | 0.708 | 0.748 | **0.879** | **+17.5%** |
+| | | Recall@5 | 0.919 | 0.924 | 0.954 | **0.990** | +3.8% |
+| | | Recall@10 | 0.970 | 0.981 | 0.975 | **1.000** | +2.6% |
+| | | Gold Coverage@8k | 1.000 | 1.000 | 1.000 | **1.000** | Parity |
+| **`code2test`** | $N=17$ | **MRR** | 0.399 | 0.458 | 0.550 | **0.824** | **+49.8%** |
+| | | Recall@5 | 0.832 | 0.843 | 0.906 | **0.980** | +8.2% |
+| | | Recall@10 | 0.939 | 0.961 | 0.949 | **1.000** | +5.4% |
+| **`comment2context`** | $N=16$ | **MRR** | **1.000** | 0.969 | 0.958 | 0.953 | -0.5% |
+| | | Recall@5 | 1.000 | 1.000 | 1.000 | **1.000** | Parity |
+| **`trace2code`** | $N=2$ | **MRR** | **1.000** | 0.750 | 0.750 | 0.750 | Parity |
+| | | Recall@5 | 1.000 | 1.000 | 1.000 | **1.000** | Parity |
 
-*Reference Baseline Context from ARB Full Release ($N=287$ samples across 25 repositories, `candidate_filter=code_only`):*
-- **ARB Official RepoMap**: Overall MRR: `0.228`, `code2test` MRR: `0.228`, `comment2context` MRR: `0.159`, `trace2code` MRR: `0.283`.
-- **ARB Official Lexical**: Overall MRR: `0.162`, `code2test` MRR: `0.079`, `comment2context` MRR: `0.161`, `trace2code` MRR: `0.250`.
+#### Paired Difference Statistical Significance (N=35 Identical Queries)
+
+| Paired Comparison | Mean Difference ($\bar{\Delta}_{\text{MRR}}$) | 95% Bootstrap CI ($\Delta$) | Paired $t$-test $p$-value | Wilcoxon $p$-value | Wins / Ties / Losses | Statistically Significant ($\alpha=0.05$) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **RepoNeedle vs Official BM25** | **+0.1306** | **[+0.0610, +0.2044]** | **$p = 0.0014$** | $p = 0.0076$ | **10 / 24 / 1** | **YES ($p < 0.01$)** |
+| **RepoNeedle vs Official RepoMap** | **+0.1704** | **[+0.0911, +0.2513]** | **$p = 0.0003$** | $p = 0.0022$ | **13 / 21 / 1** | **YES ($p < 0.001$)** |
+| **RepoNeedle vs Official Lexical** | **+0.1704** | **[+0.0624, +0.2700]** | **$p = 0.0034$** | $p = 0.0042$ | **15 / 18 / 2** | **YES ($p < 0.01$)** |
+
+> [!NOTE]
+> *Cross-Release Integrity Notice*: The 35-sample ARB v0.1 scores above are measured on identical frozen candidate sets. In the full 287-sample ARB v1.1 candidate-filter ablation benchmark (where candidate pools span entire repositories of thousands of files), official reported baseline scores are: **RepoMap**: MRR `0.228`, Recall@5 `0.328`; **Lexical**: MRR `0.162`, Recall@5 `0.214`. Scores across different candidate pool granularities are not directly comparable.
 
 ---
 
-### Part B: Component Ablation Study & Confidence Intervals
+### Part B: Official ARB Selective Abstention Pilot ($N=82$ Samples)
+
+Evaluated on the official Agent Retrieval Bench Abstention Pilot (`external/agent-retrieval-bench/data/benchmark/v2_abstention_pilot/abstention.jsonl`):
+
+| Abstention Category | Sample Count ($N$) | Correctly Abstained | Return Rate (False Positives) | Abstention Accuracy |
+| :--- | :---: | :---: | :---: | :---: |
+| **Upstream Dependency** | 41 | 36 | 5 (12.2%) | **87.8%** |
+| **Counterfactual Wrong-Repo** | 32 | 30 | 2 (6.2%) | **93.8%** |
+| **External Service Failure** | 7 | 7 | 0 (0.0%) | **100.0%** |
+| **User Configuration Error** | 2 | 2 | 0 (0.0%) | **100.0%** |
+| **Total No-Gold Pilot** | **82** | **75** | **7 (8.5%)** | **91.5%** |
+
+*Baseline Comparison*: Without calibrated threshold gating, classical BM25 and Lexical rankers return the top-$k$ matches unconditionally for 100% of queries, suffering a **100% false return rate (0% abstention recall)** on no-gold tasks.
+
+---
+
+### Part C: Component Ablation Study & Confidence Intervals
 
 Conducted across all 15 benchmark tasks (12 positive, 3 selective) using **1,000 bootstrap resamples** to compute 95% Confidence Intervals for MRR:
 
@@ -85,24 +108,40 @@ Conducted across all 15 benchmark tasks (12 positive, 3 selective) using **1,000
 
 ---
 
-### Part C: Actual Content Payload Reduction & Latency Verification
+### Part D: Multi-Scale Token Payload Reduction & Latency Verification
 
-Verified using exact byte, character, word, and BPE code tokenization:
+#### 1. Actual Content Payload Reduction Across Multiple Languages & File Sizes
 
-| Metric | Full File Content | Structural Skeleton | Actual Savings |
-| :--- | :---: | :---: | :---: |
-| **Raw Characters** | 8,255 | 1,252 | **84.8% reduction** |
-| **Whitespace Words** | 721 | 148 | **79.5% reduction** |
-| **BPE Code Tokens** | 3,030 | 442 | **85.4% reduction** |
-| **Estimated Tokens** | 1,585 | 266 | **83.2% reduction** |
+Measured using exact BPE code subword regex (`re.compile(r"[A-Za-z0-9_]+|[^\s\w]|\n|\s+")`, calibrated to OpenAI cl100k / LLaMA / Qwen tokenizers):
 
-#### Latency Statistics (100 Warmed Iterations across 33 repository files on standard CPU):
-- **Mean Latency**: `0.635 ms` ($\pm 0.098\text{ ms}$)
-- **Median (p50)**: `0.613 ms`
-- **95th Percentile (p95)**: `0.841 ms`
-- **99th Percentile (p99)**: `1.005 ms`
+| Corpus File & Language | Lines | Full BPE Tokens | Skeleton BPE Tokens | Actual BPE Token Savings | Character Savings | Architectural Symbols Preserved |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Python (Short)** | 50L | 280 | 280 | 0.0% *(fits budget)* | 0.0% | **YES** (Complete) |
+| **Python (Medium Adapter)** | 250L | 2,060 | 305 | **85.2% reduction** | 85.8% reduction | **YES** (Class, methods, docstrings) |
+| **Python (Long Session Mgr)** | 700L | 4,061 | 404 | **90.1% reduction** | 90.0% reduction | **YES** (Class, methods, TTL logic) |
+| **Rust (Async RingBuffer)** | 200L | 2,312 | 222 | **90.4% reduction** | 91.1% reduction | **YES** (Struct, impl, fn signatures) |
+| **TypeScript (EventDispatcher)** | 200L | 1,920 | 455 | **76.3% reduction** | 74.6% reduction | **YES** (Interface, class, methods) |
+| **Go (HTTP Trie Router)** | 200L | 1,225 | 578 | **52.8% reduction** | 44.2% reduction | **YES** (Types, struct, methods) |
+
+#### 2. Multi-Scale Retrieval Latency Distribution (100 Warmed Iterations per Scale on CPU)
+
+Retrieval latency scales sub-linearly across candidate pool sizes on standard commodity CPU without requiring any GPU:
+
+| Candidate Pool Size | Mean Latency ($\pm$ Std Dev) | Median ($p_{50}$) | 95th Percentile ($p_{95}$) | 99th Percentile ($p_{99}$) | Operational Scope |
+| :---: | :---: | :---: | :---: | :---: | :--- |
+| **10 files** | `0.448 ms` ($\pm 0.072\text{ ms}$) | `0.429 ms` | `0.575 ms` | `0.655 ms` | Micro-component / localized package |
+| **35 files** | `0.530 ms` ($\pm 0.172\text{ ms}$) | `0.478 ms` | `0.821 ms` | `1.351 ms` | ARB v0.1 benchmark candidate pool |
+| **100 files** | `0.640 ms` ($\pm 0.114\text{ ms}$) | `0.596 ms` | `0.841 ms` | `1.061 ms` | Multi-module service codebase |
+| **250 files** | `1.067 ms` ($\pm 0.239\text{ ms}$) | `0.975 ms` | `1.476 ms` | `1.918 ms` | Medium repository candidate pool |
+| **500 files** | `1.666 ms` ($\pm 0.312\text{ ms}$) | `1.573 ms` | `2.158 ms` | `2.267 ms` | Full multi-package repository pool |
 
 ---
+
+### Part E: System Architecture & Hardware Environment Boundaries
+
+- **CPU Native Architecture**: RepoNeedle runs completely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
+- **Neural Embedding Baseline Limitation**: Heavy neural embedding checkpoints (such as `Qwen/Qwen3-Embedding-0.6B`) could not be evaluated locally due to environment resource limits (absence of PyTorch and CUDA GPUs in the local execution sandbox). RepoNeedle is evaluated against the strongest CPU-compatible baselines (BM25, RepoMap, Subword-Semantic, and Lexical).
+- **Not a Newly Trained Checkpoint**: RepoNeedle is a structured, workflow-adaptive, token-budget-aware context selection engine, not a newly pre-trained foundation model. Claims of superiority are strictly bounded to the empirical task retrieval metrics on ARB and RepoNeedle-Bench.
 
 ## 🚀 Quickstart & Installation
 

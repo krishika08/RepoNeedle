@@ -57,6 +57,9 @@ dataset_info:
 
 # RepoNeedle-Bench: Repository Context Retrieval Benchmark for AI Coding Agents
 
+> [!NOTE]
+> **Corpus Scope**: This dataset (`RepoNeedle-Bench`) is a lightweight synthetic development and demonstration benchmark ($N=15$ samples: 10 train, 5 test across Flask, Requests, and FastAPI). It serves for fast local integration tests, intent classification validation, and budgeting verification. For large-scale external evaluation, RepoNeedle is evaluated on the frozen 35-sample ARB v0.1 release and the 82-sample ARB Abstention Pilot.
+
 ## Dataset Description
 **RepoNeedle-Bench** is a specialized, open-source benchmark designed to evaluate **upstream repository context retrieval** and **token-budget-aware context selection** for autonomous AI coding agents.
 
