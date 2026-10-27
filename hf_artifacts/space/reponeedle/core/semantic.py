@@ -172,3 +172,4 @@ class SubwordSemanticIndex:
         # Clip to [0, 1]
         scores = np.clip(scores, 0.0, 1.0)
         return scores
+

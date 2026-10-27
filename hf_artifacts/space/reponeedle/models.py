@@ -75,3 +75,4 @@ class BudgetConfig(BaseModel):
     skeleton_token_cap: int = 350
     density_exponent: float = 0.75
     abstention_threshold: float = 0.12
+

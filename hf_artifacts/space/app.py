@@ -187,6 +187,10 @@ def run_reponeedle_demo(repo_name: str, task_mode: str, budget: int, query: str)
 
 
 def build_interface():
+    if gr is None:
+        print("Note: Gradio is not installed in the local environment. Interface definition requires 'gradio'.")
+        return None
+
     theme = gr.themes.Soft(primary_hue="blue")
     with gr.Blocks(theme=theme, title="RepoNeedle Playground") as demo:
         gr.Markdown(

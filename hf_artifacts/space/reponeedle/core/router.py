@@ -105,3 +105,4 @@ class WorkflowRouter:
                 "structural": 0.20,
                 "workflow_boost": 0.0,
             }
+
