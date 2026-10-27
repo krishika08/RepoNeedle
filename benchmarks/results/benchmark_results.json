@@ -1,0 +1,162 @@
+{
+  "BM25": {
+    "MRR": 0.8194444444444445,
+    "Recall@1": 0.4166666666666667,
+    "Recall@3": 0.861111111111111,
+    "nDCG@3": 0.7841024253109437,
+    "BCC@2k": 1.0,
+    "BCC@4k": 1.0,
+    "BCC@8k": 1.0,
+    "IrrelevantTokens@4k": 693.6,
+    "SelectiveAccuracy": 0.3333333333333333,
+    "AvgLatencyMs": 0.14552666689269245,
+    "HeldOutMRR": 0.5833333333333333,
+    "HeldOutBCC@4k": 1.0,
+    "TaskBreakdown": {
+      "trace2code": {
+        "MRR": 1.0,
+        "BCC@4k": 1.0
+      },
+      "code2test": {
+        "MRR": 0.7777777777777778,
+        "BCC@4k": 1.0
+      },
+      "edit2ripple": {
+        "MRR": 0.6666666666666666,
+        "BCC@4k": 1.0
+      },
+      "comment2context": {
+        "MRR": 0.8333333333333334,
+        "BCC@4k": 1.0
+      }
+    }
+  },
+  "RepoMap": {
+    "MRR": 0.39431216931216934,
+    "Recall@1": 0.08333333333333333,
+    "Recall@3": 0.40277777777777773,
+    "nDCG@3": 0.3139589454104187,
+    "BCC@2k": 1.0,
+    "BCC@4k": 1.0,
+    "BCC@8k": 1.0,
+    "IrrelevantTokens@4k": 926.7333333333333,
+    "SelectiveAccuracy": 0.0,
+    "AvgLatencyMs": 0.03493999829515815,
+    "HeldOutMRR": 0.2861111111111111,
+    "HeldOutBCC@4k": 1.0,
+    "TaskBreakdown": {
+      "trace2code": {
+        "MRR": 0.5555555555555555,
+        "BCC@4k": 1.0
+      },
+      "code2test": {
+        "MRR": 0.12169312169312169,
+        "BCC@4k": 1.0
+      },
+      "edit2ripple": {
+        "MRR": 0.2888888888888889,
+        "BCC@4k": 1.0
+      },
+      "comment2context": {
+        "MRR": 0.611111111111111,
+        "BCC@4k": 1.0
+      }
+    }
+  },
+  "DenseSemantic": {
+    "MRR": 0.7708333333333334,
+    "Recall@1": 0.375,
+    "Recall@3": 0.8333333333333334,
+    "nDCG@3": 0.7314120773542134,
+    "BCC@2k": 1.0,
+    "BCC@4k": 1.0,
+    "BCC@8k": 1.0,
+    "IrrelevantTokens@4k": 926.7333333333333,
+    "SelectiveAccuracy": 0.0,
+    "AvgLatencyMs": 0.6318066657210389,
+    "HeldOutMRR": 0.75,
+    "HeldOutBCC@4k": 1.0,
+    "TaskBreakdown": {
+      "trace2code": {
+        "MRR": 1.0,
+        "BCC@4k": 1.0
+      },
+      "code2test": {
+        "MRR": 0.8333333333333334,
+        "BCC@4k": 1.0
+      },
+      "edit2ripple": {
+        "MRR": 0.5833333333333334,
+        "BCC@4k": 1.0
+      },
+      "comment2context": {
+        "MRR": 0.6666666666666666,
+        "BCC@4k": 1.0
+      }
+    }
+  },
+  "StaticHybrid": {
+    "MRR": 0.7430555555555557,
+    "Recall@1": 0.375,
+    "Recall@3": 0.875,
+    "nDCG@3": 0.7460490642551528,
+    "BCC@2k": 1.0,
+    "BCC@4k": 1.0,
+    "BCC@8k": 1.0,
+    "IrrelevantTokens@4k": 926.7333333333333,
+    "SelectiveAccuracy": 0.0,
+    "AvgLatencyMs": 0.6498733341383437,
+    "HeldOutMRR": 0.5416666666666666,
+    "HeldOutBCC@4k": 1.0,
+    "TaskBreakdown": {
+      "trace2code": {
+        "MRR": 0.8333333333333334,
+        "BCC@4k": 1.0
+      },
+      "code2test": {
+        "MRR": 0.7777777777777778,
+        "BCC@4k": 1.0
+      },
+      "edit2ripple": {
+        "MRR": 0.5277777777777778,
+        "BCC@4k": 1.0
+      },
+      "comment2context": {
+        "MRR": 0.8333333333333334,
+        "BCC@4k": 1.0
+      }
+    }
+  },
+  "RepoNeedle": {
+    "MRR": 0.9166666666666666,
+    "Recall@1": 0.5277777777777778,
+    "Recall@3": 1.0,
+    "nDCG@3": 0.9355245321275764,
+    "BCC@2k": 1.0,
+    "BCC@4k": 1.0,
+    "BCC@8k": 1.0,
+    "IrrelevantTokens@4k": 581.0,
+    "SelectiveAccuracy": 1.0,
+    "AvgLatencyMs": 0.7983866574553152,
+    "HeldOutMRR": 0.75,
+    "HeldOutBCC@4k": 1.0,
+    "TaskBreakdown": {
+      "trace2code": {
+        "MRR": 1.0,
+        "BCC@4k": 1.0
+      },
+      "code2test": {
+        "MRR": 1.0,
+        "BCC@4k": 1.0
+      },
+      "edit2ripple": {
+        "MRR": 0.8333333333333334,
+        "BCC@4k": 1.0
+      },
+      "comment2context": {
+        "MRR": 0.8333333333333334,
+        "BCC@4k": 1.0
+      }
+    }
+  }
+}

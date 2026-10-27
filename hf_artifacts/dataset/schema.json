@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RepoNeedleBenchSample",
+  "description": "Schema for RepoNeedle-Bench evaluation instances.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique sample identifier."
+    },
+    "repo_name": {
+      "type": "string",
+      "description": "Repository origin identifier (e.g. pallets/flask, psf/requests, tiangolo/fastapi)."
+    },
+    "task_type": {
+      "type": "string",
+      "enum": ["code2test", "comment2context", "trace2code", "edit2ripple", "selective"],
+      "description": "Workflow retrieval category."
+    },
+    "query": {
+      "type": "string",
+      "description": "Input query, issue comment, traceback, or code fragment."
+    },
+    "gold_files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ground truth repository file paths required to resolve the task."
+    },
+    "anchor_files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Anchor or modified source files for ripple/impact tasks."
+    },
+    "budget_tokens": {
+      "type": "integer",
+      "default": 4000,
+      "description": "Context token budget constraint."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable task summary."
+    },
+    "is_held_out_repo": {
+      "type": "boolean",
+      "description": "Whether the repository is part of the held-out evaluation split."
+    }
+  },
+  "required": ["id", "repo_name", "task_type", "query", "gold_files", "budget_tokens"]
+}
