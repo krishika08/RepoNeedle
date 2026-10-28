@@ -26,12 +26,14 @@ class BM25Index:
         path_weight: float = 2.5,
         symbol_weight: float = 2.0,
         body_weight: float = 1.0,
+        decouple_symbols: bool = True,
     ):
         self.k1 = k1
         self.b = b
         self.path_weight = path_weight
         self.symbol_weight = symbol_weight
         self.body_weight = body_weight
+        self.decouple_symbols = decouple_symbols
         
         self.tokenizer = CodeTokenizer()
         self.docs: List[FileDoc] = []
@@ -81,7 +83,7 @@ class BM25Index:
             for t in body_tokens:
                 weighted_counts[t] = weighted_counts.get(t, 0.0) + self.body_weight
 
-            effective_len = sum(weighted_counts.values())
+            effective_len = max(1.0, float(len(body_tokens) + len(path_tokens))) if self.decouple_symbols else sum(weighted_counts.values())
             doc_lengths_list.append(effective_len)
             self.doc_term_freqs.append(weighted_counts)
 

@@ -256,19 +256,21 @@ class RepoNeedleEngine:
             # Documented fixed static fusion: equal weighting among active signals, zero task boost
             inferred_task = TaskType.COMMENT2CONTEXT
             metadata = {}
-            active_signals = sum([ablation.enable_lexical, ablation.enable_semantic, ablation.enable_graph])
+            use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
+            active_signals = sum([ablation.enable_lexical, ablation.enable_semantic, use_pr])
             base_w = 1.0 / max(1, active_signals)
             weights = {
                 "lexical": base_w if ablation.enable_lexical else 0.0,
                 "semantic": base_w if ablation.enable_semantic else 0.0,
-                "structural": base_w if ablation.enable_graph else 0.0,
+                "structural": base_w if use_pr else 0.0,
                 "workflow_boost": 0.0,
             }
 
         # 2. Base Signal Scoring (Factors A, B, C)
         lex_scores = self.lexical_index.score(query_obj.text) if ablation.enable_lexical else np.zeros(num_docs, dtype=np.float32)
         sem_scores = self.semantic_index.score(query_obj.text) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
-        struct_scores = self.repo_graph.pagerank_scores if ablation.enable_graph else np.zeros(num_docs, dtype=np.float32)
+        use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
+        struct_scores = self.repo_graph.pagerank_scores if use_pr else np.zeros(num_docs, dtype=np.float32)
 
         workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
@@ -318,26 +320,29 @@ class RepoNeedleEngine:
         )
         fused_scores = np.maximum(0.0, fused_scores)
 
-        # 4b. Relevance-Aware Graph Diffusion (Candidate D / E)
+        # 4b. Relevance-Aware Graph Diffusion (Candidate D / E / Recovered Bounded)
         if ablation.enable_graph_diffusion and len(self.repo_graph.graph) > 0:
             combined_hits = (lex_scores + sem_scores) if (ablation.enable_lexical and ablation.enable_semantic) else (lex_scores if ablation.enable_lexical else sem_scores)
             if len(combined_hits) > 0 and float(np.max(combined_hits)) > 0:
                 top_seed_indices = np.argsort(combined_hits)[::-1][:5]
                 diffused_boost = np.zeros(num_docs, dtype=np.float32)
+                max_deg = getattr(ablation, "max_diffusion_degree", 25)
                 for s_idx in top_seed_indices:
                     seed_path = self.docs[s_idx].path
                     seed_val = float(combined_hits[s_idx])
                     if seed_val > 0 and seed_path in self.repo_graph.graph:
-                        # Diffuse along successors (dependencies / callees)
-                        for succ in self.repo_graph.graph.successors(seed_path):
-                            if succ in self.repo_graph.path_to_idx:
-                                n_idx = self.repo_graph.path_to_idx[succ]
-                                diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.25))
-                        # Diffuse along predecessors (callers / importers)
-                        for pred in self.repo_graph.graph.predecessors(seed_path):
-                            if pred in self.repo_graph.path_to_idx:
-                                n_idx = self.repo_graph.path_to_idx[pred]
-                                diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.20))
+                        seed_deg = self.repo_graph.graph.degree(seed_path)
+                        if seed_deg <= max_deg:
+                            # Diffuse along successors (dependencies / callees)
+                            for succ in self.repo_graph.graph.successors(seed_path):
+                                if succ in self.repo_graph.path_to_idx and self.repo_graph.graph.degree(succ) <= max_deg:
+                                    n_idx = self.repo_graph.path_to_idx[succ]
+                                    diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.25))
+                            # Diffuse along predecessors (callers / importers)
+                            for pred in self.repo_graph.graph.predecessors(seed_path):
+                                if pred in self.repo_graph.path_to_idx and self.repo_graph.graph.degree(pred) <= max_deg:
+                                    n_idx = self.repo_graph.path_to_idx[pred]
+                                    diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.20))
                 fused_scores = fused_scores + 0.15 * diffused_boost
 
         # 4c. Documentation Distractor Filter (Candidate C / D / E)

@@ -99,6 +99,10 @@ class AblationConfig(BaseModel):
     doc_filter_penalty: float = 0.5
     enable_graph_diffusion: bool = False
     enable_polyglot_symbols: bool = False
+    # Stage 3.9 Recovered Factors:
+    enable_pagerank_fusion: bool = False
+    max_diffusion_degree: int = 25
+    decouple_bm25_symbols: bool = True
 
     @classmethod
     def candidate_a(cls) -> "AblationConfig":
@@ -168,6 +172,41 @@ class AblationConfig(BaseModel):
             enable_doc_filter=True,
             enable_graph_diffusion=True,
             enable_polyglot_symbols=True,
+        )
+
+    @classmethod
+    def candidate_f(cls) -> "AblationConfig":
+        """Candidate F: Candidate E with audited polyglot graph diffusion."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            enable_graph_diffusion=True,
+            enable_polyglot_symbols=True,
+            enable_pagerank_fusion=True,
+            max_diffusion_degree=999999,
+            decouple_bm25_symbols=False,
+        )
+
+    @classmethod
+    def candidate_recovered(cls) -> "AblationConfig":
+        """Stage 3.9 Recovered Candidate: Decoupled BM25 + Subword + DocFilter + Bounded Diffusion, NO PageRank."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            doc_filter_penalty=0.5,
+            enable_graph_diffusion=True,
+            max_diffusion_degree=25,
+            enable_polyglot_symbols=True,
+            enable_pagerank_fusion=False,
+            decouple_bm25_symbols=True,
         )
 
     @classmethod

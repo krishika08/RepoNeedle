@@ -1,0 +1,11 @@
+{"experiment_id": "EXP-020-BM25-CANONICAL", "stage": "3.9", "description": "Pure BM25 canonical baseline (EXP-016)", "mrr": 0.1759, "recall_at_20": 0.4622, "token_bcy_8k": 0.2121, "status": "COMPLETED"}
+{"experiment_id": "EXP-021-BM25-DOCFILTER", "stage": "3.9", "description": "BM25 with 0.5x documentation filter", "mrr": 0.1994, "recall_at_20": 0.5474, "token_bcy_8k": 0.2606, "status": "COMPLETED"}
+{"experiment_id": "EXP-022-BM25-SUBWORD-RAW", "stage": "3.9", "description": "BM25 + Subword Semantic linear raw sum", "mrr": 0.1841, "recall_at_20": 0.4808, "token_bcy_8k": 0.2246, "status": "COMPLETED"}
+{"experiment_id": "EXP-023-BM25-SUBWORD-RRF", "stage": "3.9", "description": "BM25 + Subword Semantic calibrated (RRF k=60)", "mrr": 0.1921, "recall_at_20": 0.5035, "token_bcy_8k": 0.2377, "status": "COMPLETED"}
+{"experiment_id": "EXP-024-BM25-SUBWORD-DOCFILTER", "stage": "3.9", "description": "BM25 + Subword Semantic + DocFilter (0.5x)", "mrr": 0.2061, "recall_at_20": 0.5576, "token_bcy_8k": 0.2657, "status": "COMPLETED"}
+{"experiment_id": "EXP-025-CAND-C-CANONICAL", "stage": "3.9", "description": "Candidate C canonical ((BM25+Sem+PR)/3 * DocFilter)", "mrr": 0.1394, "recall_at_20": 0.5163, "token_bcy_8k": 0.2420, "status": "COMPLETED"}
+{"experiment_id": "EXP-026-CAND-F-CANONICAL", "stage": "3.9", "description": "Candidate F canonical (Candidate C + Unbounded Diffusion)", "mrr": 0.1334, "recall_at_20": 0.5165, "token_bcy_8k": 0.2336, "status": "COMPLETED"}
+{"experiment_id": "EXP-027-CAND-BOUNDED-DIFFUSION", "stage": "3.9", "description": "Candidate C architecture + Bounded Diffusion (deg <= 25)", "mrr": 0.1379, "recall_at_20": 0.5148, "token_bcy_8k": 0.2333, "status": "COMPLETED"}
+{"experiment_id": "EXP-028-CORRECTED-HYBRID", "stage": "3.9", "description": "Decoupled BM25 + Subword + DocFilter (No PR)", "mrr": 0.2061, "recall_at_20": 0.5576, "token_bcy_8k": 0.2729, "status": "COMPLETED"}
+{"experiment_id": "EXP-029-SPARSE-RERANK", "stage": "3.9", "description": "BM25 Top-50 Candidate Generation + Subword Rerank", "mrr": 0.2019, "recall_at_20": 0.5494, "token_bcy_8k": 0.2633, "status": "COMPLETED"}
+{"experiment_id": "EXP-030-RECOVERED-CANDIDATE", "stage": "3.9", "description": "Decoupled BM25 + Subword + DocFilter + Bounded Diffusion", "mrr": 0.2063, "recall_at_20": 0.5513, "token_bcy_8k": 0.2696, "status": "COMPLETED"}
