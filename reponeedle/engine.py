@@ -68,12 +68,18 @@ class RepoNeedleEngine:
         """
         Fits all internal indices on the document collection.
         """
-        self.docs = docs
-        self.path_to_doc = {d.path: d for d in docs}
-        self.lexical_index.fit(docs)
-        self.semantic_index.fit(docs)
-        self.repo_graph.fit(docs)
-        self.abstainer.fit(docs)
+        # Deduplicate docs by path (preserving latest content)
+        deduped: Dict[str, FileDoc] = {}
+        for d in docs:
+            deduped[d.path] = d
+        clean_docs = list(deduped.values())
+
+        self.docs = clean_docs
+        self.path_to_doc = deduped
+        self.lexical_index.fit(clean_docs)
+        self.semantic_index.fit(clean_docs)
+        self.repo_graph.fit(clean_docs)
+        self.abstainer.fit(clean_docs)
 
     @classmethod
     def from_documents(

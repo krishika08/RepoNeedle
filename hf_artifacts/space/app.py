@@ -130,12 +130,13 @@ def run_reponeedle_demo(repo_name: str, task_mode: str, budget: int, query: str)
     # Decision summary
     if res.abstained:
         status_md = (
-            f"### 🛑 Decision: **ABSTAINED**\n\n"
+            f"### 🛑 Decision: **ABSTAINED (Experimental Heuristic)**\n\n"
             f"- **Confidence Score**: `{res.confidence_score:.3f}` (Below threshold)\n"
             f"- **Inferred Task**: `{res.task_type.value}`\n"
-            f"- **Tokens Consumed**: `0 / {budget}` (**100% Budget Saved!**)\n"
+            f"- **Tokens Consumed**: `0 / {budget}`\n"
             f"- **Latency**: `{elapsed_ms:.2f} ms`\n\n"
-            f"> **Diagnostic Explanation**: {res.explanation}"
+            f"> **Diagnostic Explanation**: {res.explanation}\n\n"
+            f"> ⚠️ *Note: Heuristic selective abstention is experimental and achieved 0% on official ARB v2 selective benchmarks.*"
         )
         rn_rows = []
         file_preview = "System abstained from context retrieval to prevent context window dilution."
@@ -196,7 +197,8 @@ def build_interface():
         gr.Markdown(
             "# 🪡 RepoNeedle Playground\n"
             "### Token-Budget-Aware, Workflow-Adaptive Repository Context Retrieval for AI Coding Agents\n"
-            "RepoNeedle finds the exact repository files needed for coding tasks under strict context-token constraints."
+            "RepoNeedle finds repository context files needed for coding tasks under strict context-token constraints.\n\n"
+            "> **Research Preview**: Evaluated on Agent Retrieval Bench (ARB v2). Demonstrates specialized strength on regression-test discovery (`code2test`) and high-density budget packing at 4k/8k tokens. Selective abstention is experimental."
         )
 
         with gr.Row():
@@ -259,4 +261,5 @@ def build_interface():
 
 if __name__ == "__main__":
     app = build_interface()
-    app.launch()
+    if app is not None:
+        app.launch()

@@ -16,8 +16,8 @@ Interactive demonstration of **RepoNeedle**: Token-Budget-Aware, Workflow-Adapti
 
 ### Features
 - **Live Retrieval**: Execute real-time retrieval across repository snapshots.
-- **Workflow-Adaptive Routing**: Automatic intent detection for `trace2code`, `code2test`, `edit2ripple`, `comment2context`, and `selective`.
-- **Calibrated Abstention**: Inspect selective retrieval decisions on out-of-repo and counterfactual queries.
-- **Baseline Comparison**: Compare RepoNeedle against classical BM25, RepoMap PageRank, and Dense Semantic search.
+- **Workflow-Adaptive Routing**: Automatic intent detection for `trace2code`, `code2test`, `edit2ripple`, and `comment2context`.
+- **Experimental Selective Abstention**: Inspect selective retrieval heuristics (Note: experimental; achieved 0.0% on official ARB v2 no-gold benchmarks).
+- **Baseline Comparison**: Compare RepoNeedle against classical BM25 and RepoMap PageRank under identical constraints.
 - **Token Budget Packing**: Inspect full files vs. structural skeletons packed under strict token budgets.
 

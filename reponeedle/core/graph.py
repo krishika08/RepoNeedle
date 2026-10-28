@@ -150,6 +150,16 @@ class RepoGraph:
                     self.graph.add_edge(doc.path, target_path)
 
         # Build bidirectional test <-> target linkages
+        # Precompute target stems: O(N) instead of O(N^2)
+        stem_to_paths: Dict[str, List[str]] = {}
+        for other_path, o_idx in self.path_to_idx.items():
+            if not self.docs[o_idx].is_test:
+                o_base = os.path.basename(other_path.replace("\\", "/").lower())
+                o_stem = o_base[:-3] if o_base.endswith(".py") else o_base
+                if o_stem not in stem_to_paths:
+                    stem_to_paths[o_stem] = []
+                stem_to_paths[o_stem].append(other_path)
+
         for doc in docs:
             if doc.is_test:
                 tested_targets: Set[str] = set()
@@ -169,12 +179,14 @@ class RepoGraph:
                 elif stem.endswith("_test"):
                     stem = stem[:-5]
 
-                for other_path, o_idx in self.path_to_idx.items():
-                    if not self.docs[o_idx].is_test:
-                        o_base = os.path.basename(other_path.replace("\\", "/").lower())
-                        o_stem = o_base[:-3] if o_base.endswith(".py") else o_base
-                        if o_stem == stem or stem in o_stem:
-                            tested_targets.add(other_path)
+                # Fast O(1) exact match lookup
+                if stem in stem_to_paths:
+                    tested_targets.update(stem_to_paths[stem])
+                elif len(stem) >= 4:
+                    # Suffix / substring fallback on precomputed stems
+                    for o_stem, paths in stem_to_paths.items():
+                        if stem in o_stem:
+                            tested_targets.update(paths)
 
                 self.test_to_target_map[doc.path] = tested_targets
                 for t in tested_targets:

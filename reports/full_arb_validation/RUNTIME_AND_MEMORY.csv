@@ -1,0 +1,6 @@
+Component,Mean_ms,Std_ms,Median_ms,p95_ms,p99_ms
+Index Build (Per Corpus),8622.889,3573.203,10471.243,11484.811,11551.526
+RepoNeedle Query Latency,317.730,319.241,142.415,827.170,997.620
+BM25 Query Latency,994.356,304.642,1158.323,1245.967,1305.733
+RepoMap Query Latency,157.474,78.220,192.055,239.777,250.125
+Lexical Query Latency,884.061,272.919,1005.181,1150.288,1156.617

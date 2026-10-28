@@ -1,0 +1,16 @@
+{
+  "total_subsets": 5,
+  "total_samples": 427,
+  "positive_samples": 345,
+  "selective_samples": 82,
+  "unique_ids": 427,
+  "unique_corpora": 271,
+  "task_breakdown": {
+    "code2test": 106,
+    "comment2context": 80,
+    "trace2code": 101,
+    "edit2ripple": 58,
+    "abstention": 82
+  },
+  "repository_count": 25
+}

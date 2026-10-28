@@ -29,11 +29,16 @@ class SelectiveAbstainer:
         for doc in docs:
             # Add path tokens
             for t in self.tokenizer.tokenize_path(doc.path):
-                self.repo_vocabulary.add(t)
+                self.repo_vocabulary.add(t.lower())
             # Add symbol tokens
             for s in doc.symbols:
                 for t in self.tokenizer.tokenize_text(s):
-                    self.repo_vocabulary.add(t)
+                    self.repo_vocabulary.add(t.lower())
+            # Add content identifiers if doc.content is present
+            if doc.content:
+                for t in self.tokenizer.tokenize_text(doc.content[:3000]):
+                    if len(t) > 2:
+                        self.repo_vocabulary.add(t.lower())
 
         return self
 
