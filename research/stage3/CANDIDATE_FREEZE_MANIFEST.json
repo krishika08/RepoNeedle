@@ -1,0 +1,141 @@
+{
+  "manifest_version": "1.0.0",
+  "freeze_timestamp": "2026-10-28T15:30:00Z",
+  "git_branch": "research-program",
+  "git_commit": "cd7f3b0c8e37d5ff4b1ea27c0065b75ad4f71a9e",
+  "git_tag": "stage3-candidate-freeze",
+  "environment": {
+    "python_version": "3.12.10",
+    "os": "Windows NT 10.0 (AMD64)",
+    "dependencies": {
+      "numpy": "2.5.2",
+      "scipy": "1.18.1",
+      "networkx": "3.6.1",
+      "pydantic": "2.13.5",
+      "onnxruntime": "1.29.0",
+      "pathspec": "1.1.1",
+      "pytest": "9.1.1"
+    }
+  },
+  "tokenizer": {
+    "module": "reponeedle.core.tokenizer.CodeTokenizer",
+    "method": "regex-based subword + cl100k token estimation",
+    "token_budget_default": 8000
+  },
+  "baselines": {
+    "BM25_Baseline": {
+      "id": "BASE-BM25",
+      "name": "Pure BM25 Baseline",
+      "description": "Standard sparse lexical retrieval over raw files without semantic vectors, graph prior, workflow routing, or skeleton compression.",
+      "config": {
+        "enable_lexical": true,
+        "enable_semantic": false,
+        "enable_graph": false,
+        "enable_router": false,
+        "allow_skeletons": false,
+        "enable_doc_filter": false,
+        "enable_graph_diffusion": false,
+        "enable_polyglot_symbols": false
+      },
+      "corresponds_to": "EXP-016"
+    },
+    "RepoMap_Baseline": {
+      "id": "BASE-REPOMAP",
+      "name": "Official Aider-Style RepoMap Reference",
+      "description": "Graph PageRank over Python symbols and call hierarchy (ARB v2 official frozen benchmark).",
+      "corresponds_to": "ARB Official RepoMap (commit 9e4d68937f29)"
+    }
+  },
+  "candidates": {
+    "Candidate_A": {
+      "id": "CAND-A",
+      "name": "Static Lexical-plus-Semantic Hybrid (Full Files Only)",
+      "description": "Static equal fusion of BM25, subword character n-grams, and repository PageRank graph centrality. No heuristic router; full files only (no skeleton compression).",
+      "config": {
+        "enable_lexical": true,
+        "enable_semantic": true,
+        "enable_graph": true,
+        "enable_router": false,
+        "allow_skeletons": false,
+        "enable_doc_filter": false,
+        "enable_graph_diffusion": false,
+        "enable_polyglot_symbols": false
+      },
+      "corresponds_to": "EXP-004",
+      "expected_behavior": "Robust ranking across diverse tasks (+8% MRR over BM25), but bounded context packing at 8k tokens."
+    },
+    "Candidate_B": {
+      "id": "CAND-B",
+      "name": "Candidate A + Structural Skeleton Compression",
+      "description": "Candidate A combined with AST-based structural skeleton compression during token-budget packing.",
+      "config": {
+        "enable_lexical": true,
+        "enable_semantic": true,
+        "enable_graph": true,
+        "enable_router": false,
+        "allow_skeletons": true,
+        "enable_doc_filter": false,
+        "enable_graph_diffusion": false,
+        "enable_polyglot_symbols": false
+      },
+      "corresponds_to": "EXP-003",
+      "expected_behavior": "Identical ranking order to Candidate A (ranking orthogonal), with +24% higher budgeted context yield (BCY@8k)."
+    },
+    "Candidate_C": {
+      "id": "CAND-C",
+      "name": "Candidate B + Documentation-Distractor Filtering",
+      "description": "Candidate B with 0.5x penalty on documentation paths (docs/, doc/, *.md, *.rst) to prevent doc file distraction on conversational code queries.",
+      "config": {
+        "enable_lexical": true,
+        "enable_semantic": true,
+        "enable_graph": true,
+        "enable_router": false,
+        "allow_skeletons": true,
+        "enable_doc_filter": true,
+        "doc_filter_penalty": 0.5,
+        "enable_graph_diffusion": false,
+        "enable_polyglot_symbols": false
+      },
+      "corresponds_to": "Diagnostic 5A Filtered-0.5",
+      "expected_behavior": "Suppresses documentation false positives, boosting comment2context retrieval without regressing code tasks."
+    },
+    "Candidate_D": {
+      "id": "CAND-D",
+      "name": "Candidate C + Relevance-Aware Graph Diffusion",
+      "description": "Candidate C augmented with 1-hop relevance diffusion along the file import/call graph from top lexical/semantic hits.",
+      "config": {
+        "enable_lexical": true,
+        "enable_semantic": true,
+        "enable_graph": true,
+        "enable_router": false,
+        "allow_skeletons": true,
+        "enable_doc_filter": true,
+        "doc_filter_penalty": 0.5,
+        "enable_graph_diffusion": true,
+        "enable_polyglot_symbols": false
+      },
+      "corresponds_to": "Diagnostic 5B Graph Diffusion",
+      "expected_behavior": "Propagates relevance to immediate structural caller/callee files, expanding recall on multi-file dependencies."
+    },
+    "Candidate_E": {
+      "id": "CAND-E",
+      "name": "Candidate D + Multilingual Polyglot Symbol Extraction",
+      "description": "Candidate D augmented with regex-based polyglot symbol and import extraction for non-Python languages (Rust, Go, TypeScript/JavaScript).",
+      "config": {
+        "enable_lexical": true,
+        "enable_semantic": true,
+        "enable_graph": true,
+        "enable_router": false,
+        "allow_skeletons": true,
+        "enable_doc_filter": true,
+        "doc_filter_penalty": 0.5,
+        "enable_graph_diffusion": true,
+        "enable_polyglot_symbols": true
+      },
+      "corresponds_to": "Diagnostic 5C Polyglot Engine",
+      "expected_behavior": "Provides structural symbols, imports, and graph connectivity for polyglot codebases."
+    }
+  },
+  "freeze_status": "LOCKED",
+  "notes": "Code implementation committed to research-program. Candidates will remain completely unmodified during independent evaluation."
+}

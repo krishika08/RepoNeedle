@@ -1,0 +1,306 @@
+[
+  {
+    "instance_id": "CB-HELD-001__django__django-12345",
+    "repo": "django/django",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "QuerySet.filter() fails when combining multiple Q objects with boolean negation: TypeError: Cannot combine non-Q object into query where tree in add_q.",
+    "gold_files": [
+      "django/db/models/sql/query.py",
+      "django/db/models/query_utils.py"
+    ],
+    "gold_blocks": [
+      "Query.add_q",
+      "Q._combine"
+    ],
+    "doc_count": 5
+  },
+  {
+    "instance_id": "CB-HELD-002__sympy__sympy-15201",
+    "repo": "sympy/sympy",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "Matrix.eigenvects raises ValueError('Eigenvector computation returned empty nullspace') on singular symbolic matrices with multiple zero eigenvalues.",
+    "gold_files": [
+      "sympy/matrices/eigen.py",
+      "sympy/matrices/solvers.py"
+    ],
+    "gold_blocks": [
+      "MatrixEigen.eigenvects",
+      "nullspace"
+    ],
+    "doc_count": 5
+  },
+  {
+    "instance_id": "CB-HELD-003__scikit-learn__scikit-learn-10531",
+    "repo": "scikit-learn/scikit-learn",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "compute_class_weight produces NaN weights or ZeroDivisionError when balanced class_weight is requested on subsets missing a class label.",
+    "gold_files": [
+      "sklearn/utils/class_weight.py",
+      "sklearn/linear_model/_logistic.py"
+    ],
+    "gold_blocks": [
+      "compute_class_weight",
+      "LogisticRegression.fit"
+    ],
+    "doc_count": 4
+  },
+  {
+    "instance_id": "CB-HELD-004__astropy__astropy-14182",
+    "repo": "astropy/astropy",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "astropy.time.Time fails to convert high-precision Barycentric Dynamical Time (TDB) to python datetime without loss of precision.",
+    "gold_files": [
+      "astropy/time/core.py",
+      "astropy/time/formats.py"
+    ],
+    "gold_blocks": [
+      "Time.to_datetime",
+      "TimeFormat.to_datetime"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-005__matplotlib__matplotlib-20512",
+    "repo": "matplotlib/matplotlib",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "Setting logarithmic yscale on Axes with non-positive values raises ValueError instead of masking invalid data.",
+    "gold_files": [
+      "lib/matplotlib/axes/_axes.py",
+      "lib/matplotlib/scale.py"
+    ],
+    "gold_blocks": [
+      "Axes.set_yscale",
+      "LogScale.__init__"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-006__sphinx-doc__sphinx-8595",
+    "repo": "sphinx-doc/sphinx",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "autodoc fails to import nested class attributes in python packages with relative import references.",
+    "gold_files": [
+      "sphinx/ext/autodoc.py",
+      "sphinx/builders/html.py"
+    ],
+    "gold_blocks": [
+      "Documenter.import_object",
+      "StandaloneHTMLBuilder.build"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-007__psf__requests-3179",
+    "repo": "psf/requests",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "Session.send() loses authentication headers on cross-domain redirect chains.",
+    "gold_files": [
+      "requests/sessions.py",
+      "requests/adapters.py"
+    ],
+    "gold_blocks": [
+      "Session.send",
+      "HTTPAdapter.send"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-008__mwaskom__seaborn-2389",
+    "repo": "mwaskom/seaborn",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "CategoricalPlotter fails with KeyError when x variable contains empty categorical categories with observed=False.",
+    "gold_files": [
+      "seaborn/categorical.py",
+      "seaborn/relational.py"
+    ],
+    "gold_blocks": [
+      "CategoricalPlotter.establish_variables",
+      "lineplot"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-009__pydata__xarray-4094",
+    "repo": "pydata/xarray",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "Dataset.to_netcdf raises encoding error when serializing multi-index coordinates containing nullable integers.",
+    "gold_files": [
+      "xarray/core/dataset.py",
+      "xarray/core/netcdf.py"
+    ],
+    "gold_blocks": [
+      "Dataset.to_netcdf",
+      "dump_to_netcdf"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-010__pallets__flask-4029",
+    "repo": "pallets/flask",
+    "partition": "held_out",
+    "language": "python",
+    "problem_statement": "Blueprint.register crashes with EndpointPrefixError when nested blueprint name overlaps parent app prefix.",
+    "gold_files": [
+      "src/flask/blueprints.py",
+      "src/flask/app.py"
+    ],
+    "gold_blocks": [
+      "Blueprint.register",
+      "Flask.add_url_rule"
+    ],
+    "doc_count": 3
+  },
+  {
+    "instance_id": "CB-HELD-011__google__guava-5412",
+    "repo": "google/guava",
+    "partition": "held_out",
+    "language": "java",
+    "problem_statement": "ImmutableList.of throws NullPointerException when null element passed; should support safe nullable builder option.",
+    "gold_files": [
+      "guava/src/com/google/common/collect/ImmutableList.java",
+      "guava/src/com/google/common/collect/SingletonImmutableList.java"
+    ],
+    "gold_blocks": [
+      "ImmutableList.of",
+      "SingletonImmutableList.<init>"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-HELD-012__facebook__react-21045",
+    "repo": "facebook/react",
+    "partition": "held_out",
+    "language": "javascript",
+    "problem_statement": "Invalid hook call error message should provide diagnostic component stack trace when called outside rendering context.",
+    "gold_files": [
+      "packages/react/src/ReactHooks.js",
+      "packages/react-reconciler/src/ReactFiberHooks.js"
+    ],
+    "gold_blocks": [
+      "resolveDispatcher",
+      "useState"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-HELD-013__golang__go-45120",
+    "repo": "golang/go",
+    "partition": "held_out",
+    "language": "go",
+    "problem_statement": "net/http: Transport.RoundTrip deadlocks when server closes persistent connection during TLS handshake.",
+    "gold_files": [
+      "src/net/http/transport.go",
+      "src/net/http/server.go"
+    ],
+    "gold_blocks": [
+      "Transport.RoundTrip",
+      "Server.ListenAndServe"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-HELD-014__BurntSushi__ripgrep-1920",
+    "repo": "BurntSushi/ripgrep",
+    "partition": "held_out",
+    "language": "rust",
+    "problem_statement": "ripgrep crashes with BrokenPipe when piping matched output to head on Windows command prompt.",
+    "gold_files": [
+      "crates/core/search.rs",
+      "crates/printer/src/standard.rs"
+    ],
+    "gold_blocks": [
+      "Searcher.search_path",
+      "StandardPrinter.print_match"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-REPL-001__pytest-dev__pytest-7230",
+    "repo": "pytest-dev/pytest",
+    "partition": "replication",
+    "language": "python",
+    "problem_statement": "AssertionRewritingHook raises ModuleNotFoundError when rewriting packages imported via zipimport.",
+    "gold_files": [
+      "src/_pytest/assertion/rewrite.py",
+      "src/_pytest/runner.py"
+    ],
+    "gold_blocks": [
+      "AssertionRewritingHook.find_spec",
+      "runtestprotocol"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-REPL-002__gin-gonic__gin-2840",
+    "repo": "gin-gonic/gin",
+    "partition": "replication",
+    "language": "go",
+    "problem_statement": "Context.JSON crashes with panic when rendering circular struct reference in response data.",
+    "gold_files": [
+      "context.go",
+      "routergroup.go"
+    ],
+    "gold_blocks": [
+      "Context.JSON",
+      "RouterGroup.GET"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-REPL-003__tokio-rs__tokio-3912",
+    "repo": "tokio-rs/tokio",
+    "partition": "replication",
+    "language": "rust",
+    "problem_statement": "mpsc channel panics when sender dropped across multi-threaded runtime boundary during shutdown.",
+    "gold_files": [
+      "tokio/src/sync/mpsc/mod.rs",
+      "tokio/src/runtime/task/mod.rs"
+    ],
+    "gold_blocks": [
+      "channel",
+      "Task.spawn"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-REPL-004__vitejs__vite-8920",
+    "repo": "vitejs/vite",
+    "partition": "replication",
+    "language": "typescript",
+    "problem_statement": "createServer encounters EADDRINUSE crash when port occupied by zombie node process without fallback.",
+    "gold_files": [
+      "packages/vite/src/node/server/index.ts",
+      "packages/vite/src/node/plugins/css.ts"
+    ],
+    "gold_blocks": [
+      "createServer",
+      "cssPlugin"
+    ],
+    "doc_count": 2
+  },
+  {
+    "instance_id": "CB-REPL-005__spring-projects__spring-boot-28100",
+    "repo": "spring-projects/spring-boot",
+    "partition": "replication",
+    "language": "java",
+    "problem_statement": "SpringApplication.run fails with BeanDefinitionOverrideException when two configuration classes declare duplicate auto-configuration beans.",
+    "gold_files": [
+      "spring-boot-project/spring-boot/src/main/java/org/springframework/boot/SpringApplication.java",
+      "spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationImportSelector.java"
+    ],
+    "gold_blocks": [
+      "SpringApplication.run",
+      "AutoConfigurationImportSelector.selectImports"
+    ],
+    "doc_count": 2
+  }
+]

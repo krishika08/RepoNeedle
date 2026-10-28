@@ -145,9 +145,13 @@ class BudgetOptimizer:
 
             # 2. If full file is too large but skeletons are permitted
             elif allow_skel:
-                skeleton_content, skeleton_tokens = self.generate_skeleton(
-                    doc.content, doc.path, query_terms
-                )
+                if doc.metadata and "skeleton_content" in doc.metadata and "skeleton_token_count" in doc.metadata:
+                    skeleton_content = doc.metadata["skeleton_content"]
+                    skeleton_tokens = doc.metadata["skeleton_token_count"]
+                else:
+                    skeleton_content, skeleton_tokens = self.generate_skeleton(
+                        doc.content, doc.path, query_terms
+                    )
                 if skeleton_tokens <= tokens_remaining:
                     selected.append(
                         ScoredFile(
