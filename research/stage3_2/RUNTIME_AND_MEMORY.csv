@@ -1,0 +1,10 @@
+Scale,Files,LOC,Configuration,Index Time (s),Traced Python Heap (MB),Process Working Set RSS (MB),Cold Query Latency (ms),Warm Median p50 (ms),Warm p95 Latency (ms),Throughput (QPS)
+Micro Fixture (Synthetic Django),5,70,BASE-BM25,0.3043,3.45,80.1,0.60,0.18,0.54,5713
+Micro Fixture (Synthetic Django),5,70,CAND-A (Static Hybrid Full),0.0378,0.48,80.6,0.74,0.52,0.63,1925
+Micro Fixture (Synthetic Django),5,70,CAND-C (Primary Track A),0.0374,0.48,80.7,0.64,0.55,1.62,1819
+Medium Real Repo (pallets/click),133,14670,BASE-BM25,5.0398,34.10,97.0,2.74,1.88,2.74,532
+Medium Real Repo (pallets/click),133,14670,CAND-A (Static Hybrid Full),5.3212,34.09,101.5,1.99,1.87,2.71,534
+Medium Real Repo (pallets/click),133,14670,CAND-C (Primary Track A),5.4884,34.09,103.1,14.04,11.78,13.68,85
+Large Real Repo (caddyserver/caddy),250,22995,BASE-BM25,5.7733,45.10,107.0,4.55,2.95,3.94,339
+Large Real Repo (caddyserver/caddy),250,22995,CAND-A (Static Hybrid Full),5.8006,45.10,108.7,2.71,2.30,3.94,435
+Large Real Repo (caddyserver/caddy),250,22995,CAND-C (Primary Track A),5.9998,45.10,110.3,3.18,3.04,7.33,329

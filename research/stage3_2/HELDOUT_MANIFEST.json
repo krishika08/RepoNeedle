@@ -1,0 +1,51 @@
+{
+  "manifest_version": "2.0.0",
+  "audit_date": "2026-10-28T16:05:00Z",
+  "provenance_standard": "ContextBench-Derived Micro-Evaluation Suite",
+  "git_branch": "research-program",
+  "frozen_candidate_commit": "cd7f3b0c8e37d5ff4b1ea27c0065b75ad4f71a9e",
+  "frozen_candidate_tag": "stage3-candidate-freeze",
+  "held_out_partition": {
+    "sample_count": 14,
+    "unique_repositories": 14,
+    "sha256": "8a71ef08412b1d6435bc299e2e28328731519d5c4146a8c4fa569a7428f5cda1",
+    "repositories": [
+      "django/django",
+      "sympy/sympy",
+      "scikit-learn/scikit-learn",
+      "astropy/astropy",
+      "matplotlib/matplotlib",
+      "sphinx-doc/sphinx",
+      "psf/requests",
+      "mwaskom/seaborn",
+      "pydata/xarray",
+      "pallets/flask",
+      "google/guava",
+      "facebook/react",
+      "golang/go",
+      "BurntSushi/ripgrep"
+    ]
+  },
+  "replication_partition": {
+    "sample_count": 5,
+    "unique_repositories": 5,
+    "sha256": "4b61834927cb89110b98a31e8b2bcf1b4f4946761596e2794ebf32b84a919b12",
+    "repositories": [
+      "pytest-dev/pytest",
+      "gin-gonic/gin",
+      "tokio-rs/tokio",
+      "vitejs/vite",
+      "spring-projects/spring-boot"
+    ]
+  },
+  "frozen_candidates": [
+    "BASE-BM25",
+    "BASE-REPOMAP",
+    "CAND-A",
+    "CAND-B",
+    "CAND-C",
+    "CAND-D",
+    "CAND-E"
+  ],
+  "pre_test_status": "LOCKED"
+}

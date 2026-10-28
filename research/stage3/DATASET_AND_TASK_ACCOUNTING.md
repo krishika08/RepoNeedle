@@ -71,3 +71,4 @@
 2. **Gold Context Seclusion**: `gold_files` and `gold_blocks` were NEVER provided to the retrieval index, router, or budget optimizer.
 3. **Metric Calculation**: Gold labels were compared strictly post-hoc against ranked file paths (`set(ranked_paths).intersection(set(gold_files))`).
 4. **Audit Finding**: **ZERO DATA LEAKAGE DETECTED**. Retrieval was 100% blind to ground truth targets.
+

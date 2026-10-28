@@ -61,3 +61,4 @@ class OnnxDenseEmbeddingBaseline:
    $$\text{Status} = \mathbf{INCOMPLETE\_UNVERIFIED\_SIMULATION}$$
 2. **Public Removal**: Remove all latency, memory, and retrieval claims attributed to ONNX neural models from `STAGE3_DECISION_REPORT.md` and `README.md`.
 3. **True Production Architecture**: Reaffirm that Track A's core architecture is the deterministic, zero-dependency **Static Hybrid (Candidate C)**: BM25 Lexical + Native Subword N-Gram Semantic Vectors + Graph Centrality + Structural Skeletons.
+
