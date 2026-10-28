@@ -1,0 +1,12 @@
+System ID,System Name,Evaluation Type,Corpus Type,Sample Count,Overall MRR,Recall@5,Recall@10,Recall@20,BCY@4k,BCY@8k,BCY@16k,BCY@32k,Mean Latency (ms)
+BASE-BM25,Pure BM25 Baseline (EXP-016),Development/Regression,Full Repo Corpus (25 repos),345,0.1705,0.1877,0.3162,0.4467,0.1478,0.1964,0.3152,0.4308,4.91
+BASE-REPOMAP,Aider-Style RepoMap Reference,Development/Regression,Full Repo Corpus (25 repos),345,0.2140,0.3185,0.4786,0.6306,0.2024,0.3788,0.5235,0.6166,180.20
+CAND-A,Static Hybrid Full Only (EXP-004),Development/Regression,Full Repo Corpus (25 repos),345,0.1842,0.2097,0.3215,0.4750,0.1681,0.2261,0.3258,0.4653,6.20
+CAND-B,Static Hybrid w/ Skeletons (EXP-003),Development/Regression,Full Repo Corpus (25 repos),345,0.1842,0.2097,0.3215,0.4750,0.2068,0.2804,0.4043,0.5339,9.53
+CAND-C,Candidate B + Doc Filter 0.5x,Development/Regression,Full Repo Corpus (25 repos),345,0.2040,0.2514,0.3802,0.5516,0.2215,0.3015,0.4280,0.5516,9.85
+CAND-D,Candidate C + Graph Diffusion,Development/Regression,Full Repo Corpus (25 repos),345,0.2040,0.2512,0.3798,0.5502,0.2215,0.3015,0.4280,0.5502,10.45
+CAND-E,Candidate D + Polyglot Symbols,Development/Regression,Full Repo Corpus (25 repos),345,0.2052,0.2528,0.3815,0.5518,0.2224,0.3022,0.4291,0.5518,11.12
+CAND-C (code2test),Candidate C on code2test,Development/Regression,Full Repo Corpus,106,0.1073,0.1415,0.2642,0.4091,0.1582,0.2415,0.3585,0.4091,8.90
+CAND-C (comment2context),Candidate C on comment2context,Development/Regression,Full Repo Corpus,80,0.2036,0.2250,0.3125,0.3604,0.2250,0.2688,0.3500,0.3604,7.45
+CAND-C (trace2code),Candidate C on trace2code,Development/Regression,Full Repo Corpus,101,0.2787,0.3663,0.5545,0.8036,0.3168,0.4455,0.6139,0.8036,12.10
+CAND-C (edit2ripple),Candidate C on edit2ripple,Development/Regression,Full Repo Corpus,58,0.2510,0.3103,0.4655,0.6293,0.2759,0.4483,0.5862,0.6293,11.35
