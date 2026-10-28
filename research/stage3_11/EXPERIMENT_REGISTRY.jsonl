@@ -1,0 +1,4 @@
+{"experiment_id": "EXP-038-STAGE3_11-ALIGNMENT", "stage": "3.11", "target": "ARB-v2-345", "verified_samples": 345, "status": "VERIFIED"}
+{"experiment_id": "EXP-039-STAGE3_11-RECONCILE", "stage": "3.11", "systems": 7, "metrics": ["MRR", "Recall@5", "Recall@10", "Recall@20", "Precision@5", "BCY@8k"], "status": "VERIFIED"}
+{"experiment_id": "EXP-040-STAGE3_11-HOLM-FIX", "stage": "3.11", "correction": "Enforce monotonicity and step-down stopping rule", "c11_c09_mrr_p_adj": 0.076972, "status": "CORRECTED"}
+{"experiment_id": "EXP-041-STAGE3_11-REPOMAP-P5", "stage": "3.11", "issue": "Missing Precision@5 in v1_1 details", "true_p5": 0.091, "status": "RESOLVED"}
