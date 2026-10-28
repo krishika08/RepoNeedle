@@ -422,17 +422,17 @@ class RepoGraph:
 
             # H. Sibling crate coupling in workspace (e.g. crates/* or packages/*)
             # Link crate entrypoints to dependent crate entrypoints
-            is_entrypoint = norm_p.endswith(("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs", "search.rs", "standard.rs"))
+            is_entrypoint = norm_p.endswith(("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs"))
             if is_entrypoint and norm_p.startswith(("crates/", "packages/")):
                 prefix = norm_p.split("/")[0]
                 my_crate = norm_p.split("/")[1]
                 for o_path in self.doc_paths:
-                    if o_path != doc.path and o_path.startswith(f"{prefix}/") and o_path.endswith(("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs", "search.rs", "standard.rs")):
+                    if o_path != doc.path and o_path.startswith(f"{prefix}/") and o_path.endswith(("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs")):
                         o_crate = o_path.split("/")[1]
                         if o_crate != my_crate:
                             if (my_crate in self.crate_dependencies and any(dep in o_path for dep in self.crate_dependencies[my_crate])) or \
                                any(s in o_path for s in doc.imports) or \
-                               ("core" in my_crate and "printer" in o_crate):
+                               (o_crate in doc.imports):
                                 self.graph.add_edge(doc.path, o_path)
 
         # Build bidirectional test <-> target linkages
