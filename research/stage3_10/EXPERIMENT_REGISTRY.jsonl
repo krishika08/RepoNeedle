@@ -1,0 +1,7 @@
+{"experiment_id": "EXP-031-ARB-EVALUATOR-PIN", "stage": "3.10", "commit_sha": "9e4d68937f29d5967afd62f4f6a24c1478298133", "description": "Pinned official ARB repository and verified PR #3 deterministic RepoMap", "status": "VERIFIED"}
+{"experiment_id": "EXP-032-BM25-CANONICAL", "stage": "3.10", "system": "BASE-BM25", "mrr": 0.1759, "recall_at_20": 0.4622, "token_bcy_8k": 0.2121, "status": "COMPLETED"}
+{"experiment_id": "EXP-033-CONFIG-09-CORRECTED", "stage": "3.10", "system": "CONFIG-09", "mrr": 0.2061, "recall_at_20": 0.5576, "token_bcy_8k": 0.2729, "status": "COMPLETED"}
+{"experiment_id": "EXP-034-CONFIG-10-SPARSE", "stage": "3.10", "system": "CONFIG-10", "mrr": 0.2019, "recall_at_20": 0.5494, "token_bcy_8k": 0.2633, "status": "COMPLETED"}
+{"experiment_id": "EXP-035-CONFIG-11-DIFFUSION", "stage": "3.10", "system": "CONFIG-11", "mrr": 0.2063, "recall_at_20": 0.5513, "token_bcy_8k": 0.2696, "status": "COMPLETED"}
+{"experiment_id": "EXP-036-REPOMAP-PINNED", "stage": "3.10", "system": "BASE-REPOMAP", "mrr": 0.2293, "recall_at_20": 0.6599, "token_bcy_8k": 0.3177, "status": "COMPLETED"}
+{"experiment_id": "EXP-037-CONTEXTBENCH-GATE", "stage": "3.10", "target": "Contextbench/ContextBench", "result": "BLOCKED_NETWORK_POLICY_403", "status": "BLOCKED / PRELIMINARY"}
