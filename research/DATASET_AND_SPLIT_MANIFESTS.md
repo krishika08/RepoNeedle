@@ -140,3 +140,4 @@ class RepoNeedleContextBenchAdapter:
    - 50 legitimate solvable queries formulated with abstract or conversational descriptions to measure false abstention.
 4. **Tier 4: Exotic Domain Negatives ($N=20$)**:
    - 20 queries from specialized compiler and hardware description repos to verify cross-domain calibration.
+

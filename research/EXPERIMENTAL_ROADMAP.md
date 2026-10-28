@@ -90,3 +90,4 @@ Guided directly by Stage 1 failure evidence, Stage 3 develops and evaluates targ
    - Compute repository-clustered bootstrap confidence intervals.
    - Check against all pre-declared decision rules.
    - Publish complete, unhedged results.
+

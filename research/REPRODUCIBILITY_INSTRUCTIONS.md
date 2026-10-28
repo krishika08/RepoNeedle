@@ -104,3 +104,4 @@ When running an experiment in `research/`:
 2. Record Git commit SHA and parameter settings.
 3. Save per-sample predictions to `research/experiments/<exp_id>/predictions.jsonl`.
 4. Append aggregate results and statistical significance tests to [`research/EXPERIMENT_REGISTRY.jsonl`](file:///F:/RepoNeedle/research/EXPERIMENT_REGISTRY.jsonl).
+

@@ -101,3 +101,4 @@ With Stage 1 complete and all foundational governance documents established, the
    - Ablation of `SubwordSemantic` (testing if character $n$-grams help or hurt).
    - Factorial combination of router and graph interactions.
 3. Evaluate the exact impact on MRR, Recall@20, and BCY@8k to inform Stage 3 architectural changes.
+

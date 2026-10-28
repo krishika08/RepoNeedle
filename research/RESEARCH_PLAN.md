@@ -110,3 +110,4 @@ A new system candidate $C$ is deemed a **genuine empirical improvement** over ba
 5. **Cost & Latency Bounding**:
    - For Track A: Query latency $p_{95} \le 500\text{ ms}$, RAM $\le 250\text{ MB}$.
    - For Track B: Latency and VRAM must be reported, and the candidate must reside on the empirical Pareto frontier.
+

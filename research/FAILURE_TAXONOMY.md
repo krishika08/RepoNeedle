@@ -92,3 +92,4 @@ Out of 82 selective abstention queries:
 | `pytest-dev/pytest` | 7 | Python | 0.1445 | 0.1628 | **0.1748** | 0.1190 | **0.3333** | Dynamic test fixtures defeat static AST |
 | `vuejs/core` | 6 | TypeScript | **0.1447** | 0.0540 | 0.0363 | **0.5833** | **0.5833** | RepoNeedle leads 2.7x on TypeScript |
 | `astral-sh/ruff` | 6 | Rust | 0.0017 | 0.0436 | **0.0897** | 0.0000 | **0.3333** | Macro-generated AST symbols unparsed |
+

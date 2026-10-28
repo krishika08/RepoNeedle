@@ -40,3 +40,4 @@
    - Never claim RepoNeedle beat RepoMap conclusively; empirical difference on MRR (+0.0148) is statistically insignificant ($p = 0.4089$), and RepoMap wins decisively on tail recall.
 3. **Requirement for Independent Verification**:
    - No architectural change tuned on ARB v2 may be claimed as state-of-the-art until independently validated on the held-out benchmark suite ($N \ge 200$ across $\ge 50$ repositories).
+

@@ -58,3 +58,4 @@ for repo, s in sorted_repos:
     rn_r = sum(s['rn_r20'])/tot
     rm_r = sum(s['rm_r20'])/tot
     print(f"{repo:25s} N={tot:3d} | RN MRR: {rn_m:.4f} | RM MRR: {rm_m:.4f} | BM MRR: {bm_m:.4f} | RN R@20: {rn_r:.4f} | RM R@20: {rm_r:.4f}")
+

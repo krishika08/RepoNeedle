@@ -102,3 +102,4 @@ Every experiment requires a three-step sign-off before being incorporated into m
 1. **Preregistration**: Log hypothesis, target metrics, and configuration in `research/EXPERIMENT_REGISTRY.jsonl`.
 2. **Automated Verification**: Run regression tests (`pytest -v`) and verify that all 34 existing robustness tests pass.
 3. **Audit Trail**: Record raw predictions, bootstrap CIs, hardware timings, and failure taxonomy updates.
+

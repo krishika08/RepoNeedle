@@ -76,3 +76,4 @@ Every metric below has been verified directly by independent re-calculation from
 Because ARB v2 has been inspected, diagnosed, and used to calibrate initial thresholds during the v0.1.0 cycle, **ARB v2 is formally designated as the existing development/regression benchmark**. 
 
 Future architectural choices, hyperparameter adjustments, or model integrations tuned using ARB v2 must **not** claim unbiased generalization until tested on an independent, previously untouched held-out repository collection.
+

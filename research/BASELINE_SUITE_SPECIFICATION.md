@@ -120,3 +120,4 @@ To establish a comprehensive, unassailable empirical benchmark, RepoNeedle defin
 ### Family 12: Maximum-Quality Neural Graph Architectures (Track B Candidates)
 - **Architecture**: Graph Neural Network (GNN) or Graph-Augmented Transformer operating over the code dependency graph combined with dense bi-encoder embeddings.
 - **Objective**: Push upper bound on both MRR and Recall@20; evaluate against Qwen3-Embedding-8B.
+

@@ -136,3 +136,4 @@ To maintain uncompromising scientific integrity throughout the research program:
    - An automated script will verify that no held-out task IDs, repository names, or commit hashes appear in the training corpora or prompt routing caches.
 4. **Historical Immutability**:
    - Once a held-out benchmark is evaluated, its results are permanently logged in the experiment registry. If results are unsatisfactory, the benchmark cannot be reused as a "fresh" test set for subsequent iterations.
+
