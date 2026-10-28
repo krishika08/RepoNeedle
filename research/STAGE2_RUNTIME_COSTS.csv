@@ -1,0 +1,8 @@
+experiment_id,name,index_build_ms,peak_memory_mb,mean_latency_ms,median_latency_ms,p95_latency_ms,mean_packed_tokens,allow_skeletons
+EXP-016,Pure BM25 Baseline,6803.62,37.09,4.91,4.23,8.4,7977.1,False
+EXP-024,Pure Semantic Baseline,6357.1,34.1,6.36,5.82,10.0,7981.7,False
+EXP-028,Pure Graph Baseline,5967.58,34.1,3.03,2.78,4.68,7955.0,False
+EXP-008,Lexical + Semantic Static,6378.98,34.09,11.58,10.59,17.32,7975.3,False
+EXP-004,Static Hybrid (A+B+C),9529.48,34.09,12.29,11.69,20.2,7975.3,False
+EXP-002,Full RepoNeedle w/o Skel,8225.89,34.09,12.19,11.82,20.59,7978.0,False
+EXP-001,Full RepoNeedle Anchor (All),8328.32,34.09,96.92,69.45,320.45,7983.4,True

@@ -89,11 +89,12 @@ class RepoNeedleEngine:
         cls,
         docs: List[FileDoc],
         budget_config: Optional[BudgetConfig] = None,
+        ablation_config: Optional[AblationConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Instantiates engine from an in-memory list of FileDoc instances.
         """
-        return cls(docs=docs, budget_config=budget_config)
+        return cls(docs=docs, budget_config=budget_config, ablation_config=ablation_config)
 
     @classmethod
     def from_directory(
@@ -190,7 +191,7 @@ class RepoNeedleEngine:
             if len(docs) >= max_files:
                 break
 
-        return cls(docs=docs, budget_config=budget_config)
+        return cls(docs=docs, budget_config=budget_config, ablation_config=ablation_config)
 
     def retrieve(
         self,
