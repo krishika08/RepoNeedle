@@ -8,6 +8,7 @@
 **Historical Baseline Tag**: `v0.1.0-baseline` (`8e00425a1b32d2948bbda1810416b0df470a273e`)  
 **Official ContextBench Acquisition Status**: **BLOCKED (OUTBOUND NETWORK RESTRICTION)**  
 **Independent Generalization Claim Status**: **PRELIMINARY EVIDENCE ONLY**  
+**Final Preregistered Verdict**: **BLOCKED / PRELIMINARY**  
 
 ---
 
@@ -15,15 +16,25 @@
 
 Stage 3.3 was executed to replace the micro-evaluation with a complete, authoritative evaluation using the official ContextBench benchmark ([arXiv:2602.05892](https://arxiv.org/abs/2602.05892), 1,136 tasks across 66 repositories).
 
+### Targeted Official Release Endpoint:
+- **Hugging Face Dataset**: `https://huggingface.co/datasets/Contextbench/ContextBench`
+- **Target Parquet URL**: `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/data/full.parquet?download=true`
+- **Expected SHA-256 Checksum**: `2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8`
+
 ### Sequential Acquisition Protocol Audit:
 All official acquisition channels were tested in strict compliance with security policies:
-1. **Official GitHub README**: `https://raw.githubusercontent.com/EuniAI/ContextBench/main/README.md` $\to$ `HTTP Error 403: Forbidden: Request ... not allowed by policy`.
-2. **Direct Git Remote**: `git ls-remote https://github.com/EuniAI/ContextBench.git` $\to$ `fatal: SEC_E_UNTRUSTED_ROOT (0x80090325)` (TLS proxy certificate rejection) and `HTTP 403`.
-3. **Hugging Face `datasets` Interface**: Target `Contextbench/ContextBench` $\to$ `HTTP Error 403: Forbidden`.
-4. **Direct Parquet URLs**: Both `default` and `contextbench_verified` Parquet endpoints returned `HTTP 403: Forbidden`.
-5. **Official GitHub Pages**: `https://euniai.github.io/ContextBench/` $\to$ `HTTP 403: Forbidden`.
+1. **Target Public Parquet Download**:
+   - Python `urllib.request` $\to$ `HTTP Error 403: Forbidden: Request to GET /datasets/Contextbench/ContextBench/resolve/main/data/full.parquet on huggingface.co not allowed by policy`.
+   - `curl.exe` $\to$ Proxy tunnel established (`200 OK`), then `curl: (60) schannel: SEC_E_UNTRUSTED_ROOT (0x80090325)` (TLS proxy certificate rejection).
+   - PowerShell `Invoke-WebRequest` $\to$ `The remote name could not be resolved: 'huggingface.co'`.
+2. **Local Filesystem Audit**:
+   - An exhaustive search across `F:\RepoNeedle`, `C:\Users\krish\Downloads`, and `C:\Users\krish\.cache` confirmed that **zero `.parquet` files** exist on local disk.
+3. **Official GitHub README**: `https://raw.githubusercontent.com/EuniAI/ContextBench/main/README.md` $\to$ `HTTP Error 403: Forbidden: Request ... not allowed by policy`.
+4. **Direct Git Remote**: `git ls-remote https://github.com/EuniAI/ContextBench.git` $\to$ `fatal: SEC_E_UNTRUSTED_ROOT (0x80090325)` and `HTTP 403`.
+5. **Hugging Face `datasets` Interface**: Direct API queries to `https://huggingface.co/api/datasets/Contextbench/ContextBench` $\to$ `HTTP Error 403: Forbidden`.
+6. **Official GitHub Pages**: `https://euniai.github.io/ContextBench/` $\to$ `HTTP Error 403: Forbidden`.
 
-In strict compliance with project guidelines, **no security bypass was attempted, no private credentials were used, and no fabricated substitute dataset was generated**. Official data acquisition is formally designated as **BLOCKED**.
+In strict compliance with project guidelines, **no security bypass was attempted, no private credentials were used, and no fabricated substitute dataset was generated**. Official data acquisition remains **BLOCKED**.
 
 ---
 
@@ -96,7 +107,7 @@ To resolve the limitation of the micro-evaluation (where tiny repositories never
 
 ## 5. Deliverables Created in `research/stage3_3/`
 
-1. `DATASET_PROVENANCE.md`: Exhaustive protocol audit documenting deterministic TLS/403 network policy blockers.
+1. `DATASET_PROVENANCE.md`: Exhaustive protocol audit documenting deterministic TLS/403 network policy blockers and full.parquet verification.
 2. `OVERLAP_AND_SPLIT_AUDIT.md`: Cross-reference partitioning 66 ContextBench codebases into Held-Out, Replication, and Excluded.
 3. `TASK_ACCOUNTING.csv`: Granular row-by-row accounting of tasks, repositories, languages, and exclusion rationales.
 4. `CONTEXTBENCH_RESULTS.csv`: Aggregated File-level and Block-level ContextBench metrics across partitions.
@@ -110,8 +121,9 @@ To resolve the limitation of the micro-evaluation (where tiny repositories never
 
 ---
 
-## 6. Strategic Recommendations
+## 6. Strategic Recommendations and Long-Term Program Directive
 
-1. **Preserve Frozen State**: Keep `v0.1.0-baseline` (`8e00425`) and `stage3-candidate-freeze` (`cd7f3b0`) intact.
-2. **Withhold Public Release Claims**: Maintain the freeze on public Hugging Face and PyPI releases until the complete 1,136-task benchmark can be evaluated in an environment with authorized network access and container runtimes.
-3. **Consolidate Track A for Local Coding Agents**: RepoNeedle Candidate C provides an in-process, deterministic retrieval engine with sub-15ms execution, high MRR (0.9286), and proven skeleton/filter budget efficiency, immediately suitable for local agent context construction.
+1. **Retain Formal Verdict**: The verdict remains strictly **BLOCKED / PRELIMINARY**. No claim of complete ContextBench validation or generalized superiority may be published until the official dataset is accessible and independently verified.
+2. **Preserve Frozen State**: Keep `v0.1.0-baseline` (`8e00425`) and `stage3-candidate-freeze` (`cd7f3b0`) intact. Do not alter frozen candidates based on final-test results.
+3. **Withhold Public Release Claims**: Maintain the freeze on public Hugging Face and PyPI releases until the complete 1,136-task benchmark can be evaluated in an environment with authorized network and container execution environments.
+4. **Consolidate Track A for Local Coding Agents**: RepoNeedle Candidate C provides an in-process, deterministic retrieval engine with sub-15ms execution, high MRR (0.9286), and proven skeleton/filter budget efficiency, immediately suitable for local agent context construction.

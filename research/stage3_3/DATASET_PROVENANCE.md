@@ -14,6 +14,8 @@ The official ContextBench benchmark ([arXiv:2602.05892](https://arxiv.org/abs/26
 - **Official Repository**: `https://github.com/EuniAI/ContextBench`
 - **Official Documentation**: `https://euniai.github.io/ContextBench/`
 - **Official Hugging Face Dataset**: `https://huggingface.co/datasets/Contextbench/ContextBench`
+- **Public Full Parquet Endpoint**: `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/data/full.parquet?download=true`
+- **Expected Full Parquet SHA-256**: `2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8`
 - **Documented Configurations**:
   - `default`: Full benchmark consisting of 1,136 tasks across 66 repositories.
   - `contextbench_verified`: High-confidence subset consisting of 500 tasks across verified repositories.
@@ -60,18 +62,30 @@ In accordance with Stage 3.3 instructions, the official documented acquisition c
     Body: Request to GET /api/datasets/Contextbench/ContextBench on huggingface.co not allowed by policy
     ```
 
-### Protocol 4: Direct Parquet Distribution URLs
+### Protocol 4: Direct Parquet Distribution URLs & User-Specified Download Endpoint
 - **Documented Parquet Endpoints Tested**:
-  1. `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/default/train.parquet`
-  2. `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/contextbench_verified/train.parquet`
-- **Result**: Both endpoints returned `HTTP Error 403: Forbidden`:
-  ```
-  HTTPError code: 403 url: https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/default/train.parquet
-  Body: Request to GET /datasets/Contextbench/ContextBench/resolve/main/default/train.parquet on huggingface.co not allowed by policy
-
-  HTTPError code: 403 url: https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/contextbench_verified/train.parquet
-  Body: Request to GET /datasets/Contextbench/ContextBench/resolve/main/contextbench_verified/train.parquet on huggingface.co not allowed by policy
-  ```
+  1. `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/data/full.parquet?download=true` (Target official 1,136-task release)
+     - Expected SHA-256: `2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8`
+  2. `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/default/train.parquet`
+  3. `https://huggingface.co/datasets/Contextbench/ContextBench/resolve/main/contextbench_verified/train.parquet`
+- **Result Across Clients**:
+  - **Python `urllib.request`**:
+    ```
+    HTTPError code: 403
+    HTTPError read: Request to GET /datasets/Contextbench/ContextBench/resolve/main/data/full.parquet on huggingface.co not allowed by policy
+    ```
+  - **`curl.exe`**:
+    ```
+    CONNECT huggingface.co:443 HTTP/1.1 -> 200 OK (Tunnel established)
+    schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - The certificate chain was issued by an authority that is not trusted.
+    curl: (60) schannel: SEC_E_UNTRUSTED_ROOT
+    ```
+  - **PowerShell `Invoke-WebRequest`**:
+    ```
+    Invoke-WebRequest : The remote name could not be resolved: 'huggingface.co'
+    ```
+  - **Local Filesystem Audit**:
+    An exhaustive search across `F:\RepoNeedle`, `C:\Users\krish\Downloads`, and `C:\Users\krish\.cache` confirmed that exactly **0 matching `.parquet` files** exist on local disk.
 
 ### Protocol 5: Official GitHub Pages Documentation
 - **Target URL**: `https://euniai.github.io/ContextBench/`
@@ -99,5 +113,8 @@ The Stage 3.3 directives explicitly mandate:
 ## 4. Official Provenance Determination
 
 $$\mathbf{ACQUISITION\ STATUS:}\quad \text{BLOCKED}$$
+$$\mathbf{GENERALIZATION\ EVALUATION\ STATUS:}\quad \text{PRELIMINARY\ (LOCAL\ REPOSITORIES\ ONLY)}$$
 
-Because the execution environment strictly prohibits outbound network access to `github.com`, `raw.githubusercontent.com`, `huggingface.co`, and `euniai.github.io`, the official ContextBench dataset (`default` 1,136 tasks and `contextbench_verified` 500 tasks) cannot be physically downloaded in this session.
+Because the execution environment strictly prohibits outbound network access to `github.com`, `raw.githubusercontent.com`, `huggingface.co`, and `euniai.github.io`, the official ContextBench dataset (`data/full.parquet`, SHA-256 `2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8`) cannot be physically downloaded in this session.
+
+Until authorized network connectivity or a verified local copy of `data/full.parquet` is supplied, the formal verdict remains **BLOCKED / PRELIMINARY**.
