@@ -79,6 +79,16 @@ class RepoNeedleEngine:
 
         self.docs = clean_docs
         self.path_to_doc = deduped
+
+        # Polyglot symbol extraction if enabled and symbols missing
+        if self.ablation_config.enable_polyglot_symbols:
+            for d in clean_docs:
+                if not d.symbols and not d.imports:
+                    syms, imps = RepoGraph.extract_polyglot_symbols(d.content, d.path)
+                    if syms or imps:
+                        d.symbols = syms
+                        d.imports = imps
+
         self.lexical_index.fit(clean_docs)
         self.semantic_index.fit(clean_docs)
         self.repo_graph.fit(clean_docs)
@@ -167,9 +177,11 @@ class RepoNeedleEngine:
                     norm_lower.endswith("_test.py")
                 )
 
-                # AST symbol extraction for Python
+                # AST symbol extraction (Python or Polyglot)
                 symbols, imports = [], []
-                if ext == ".py":
+                if ablation_config and ablation_config.enable_polyglot_symbols:
+                    symbols, imports = RepoGraph.extract_polyglot_symbols(content, rel_path)
+                elif ext == ".py":
                     symbols, imports = RepoGraph.extract_python_ast(content, rel_path)
 
                 tokens = estimate_tokens(content)
@@ -305,6 +317,29 @@ class RepoNeedleEngine:
             weights["workflow_boost"] * workflow_boosts
         )
         fused_scores = np.maximum(0.0, fused_scores)
+
+        # 4b. Relevance-Aware Graph Diffusion (Candidate D / E)
+        if ablation.enable_graph_diffusion and len(self.repo_graph.graph) > 0:
+            combined_hits = (lex_scores + sem_scores) if (ablation.enable_lexical and ablation.enable_semantic) else (lex_scores if ablation.enable_lexical else sem_scores)
+            if len(combined_hits) > 0 and float(np.max(combined_hits)) > 0:
+                top_seed_indices = np.argsort(combined_hits)[::-1][:5]
+                diffused_boost = np.zeros(num_docs, dtype=np.float32)
+                for s_idx in top_seed_indices:
+                    seed_path = self.docs[s_idx].path
+                    seed_val = float(combined_hits[s_idx])
+                    if seed_val > 0 and seed_path in self.repo_graph.graph:
+                        for neighbor in self.repo_graph.graph.neighbors(seed_path):
+                            if neighbor in self.repo_graph.path_to_idx:
+                                n_idx = self.repo_graph.path_to_idx[neighbor]
+                                diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.25))
+                fused_scores = fused_scores + 0.15 * diffused_boost
+
+        # 4c. Documentation Distractor Filter (Candidate C / D / E)
+        if ablation.enable_doc_filter:
+            for idx, doc in enumerate(self.docs):
+                p_lower = doc.path.lower()
+                if any(seg in p_lower for seg in ["/doc/", "/docs/", "doc/", "docs/", "documentation/", "guide/", "tutorial/", ".github/"]) or p_lower.endswith((".md", ".rst", ".txt", ".adoc", ".html")):
+                    fused_scores[idx] *= ablation.doc_filter_penalty
 
         # 5. Selective Abstention Check
         abstained, confidence, reason = self.abstainer.evaluate_abstention(

@@ -85,10 +85,103 @@ class AblationConfig(BaseModel):
     Factor C: enable_graph (PageRank & AST test/ripple linkage)
     Factor D: enable_router (Workflow-adaptive routing vs fixed static fusion)
     Factor E: allow_skeletons (Structural skeleton compression vs full only)
+    Extended Factors:
+    enable_doc_filter: Penalizes documentation distractor paths (0.5x default)
+    enable_graph_diffusion: Relevance-aware 1-hop graph diffusion from seed query hits
+    enable_polyglot_symbols: Multi-language AST/regex symbol extraction (Rust, Go, JS/TS)
     """
     enable_lexical: bool = True
     enable_semantic: bool = True
     enable_graph: bool = True
     enable_router: bool = True
     allow_skeletons: bool = True
+    enable_doc_filter: bool = False
+    doc_filter_penalty: float = 0.5
+    enable_graph_diffusion: bool = False
+    enable_polyglot_symbols: bool = False
+
+    @classmethod
+    def candidate_a(cls) -> "AblationConfig":
+        """Candidate A: Static lexical-plus-semantic hybrid, full files only, no router (EXP-004)."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=False,
+            enable_doc_filter=False,
+            enable_graph_diffusion=False,
+            enable_polyglot_symbols=False,
+        )
+
+    @classmethod
+    def candidate_b(cls) -> "AblationConfig":
+        """Candidate B: Candidate A with structural skeleton compression (EXP-003)."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=False,
+            enable_graph_diffusion=False,
+            enable_polyglot_symbols=False,
+        )
+
+    @classmethod
+    def candidate_c(cls) -> "AblationConfig":
+        """Candidate C: Candidate B with documentation-distractor filtering."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            enable_graph_diffusion=False,
+            enable_polyglot_symbols=False,
+        )
+
+    @classmethod
+    def candidate_d(cls) -> "AblationConfig":
+        """Candidate D: Candidate C with relevance-aware graph diffusion."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            enable_graph_diffusion=True,
+            enable_polyglot_symbols=False,
+        )
+
+    @classmethod
+    def candidate_e(cls) -> "AblationConfig":
+        """Candidate E: Candidate D with multilingual symbol-extraction (Rust, Go, JS/TS)."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=True,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            enable_graph_diffusion=True,
+            enable_polyglot_symbols=True,
+        )
+
+    @classmethod
+    def bm25_baseline(cls) -> "AblationConfig":
+        """Pure BM25 baseline over raw full files without router or skeletons (EXP-016)."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=False,
+            enable_graph=False,
+            enable_router=False,
+            allow_skeletons=False,
+            enable_doc_filter=False,
+            enable_graph_diffusion=False,
+            enable_polyglot_symbols=False,
+        )
+
 

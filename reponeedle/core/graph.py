@@ -74,6 +74,80 @@ class RepoGraph:
 
         return list(dict.fromkeys(symbols)), list(dict.fromkeys(imports))
 
+    @staticmethod
+    def extract_polyglot_symbols(content: str, filepath: str) -> Tuple[List[str], List[str]]:
+        """
+        Extracts defined symbols and imported identifiers across Python, Rust, Go, TypeScript, JavaScript.
+        """
+        norm_p = filepath.replace("\\", "/").lower()
+        if norm_p.endswith(".py"):
+            return RepoGraph.extract_python_ast(content, filepath)
+
+        symbols: List[str] = []
+        imports: List[str] = []
+
+        # Rust (.rs)
+        if norm_p.endswith(".rs"):
+            fn_re = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?(?:async\s+)?fn\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+            type_re = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?(?:struct|enum|trait|type)\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+            use_re = re.compile(r"^\s*use\s+([^;]+);", re.MULTILINE)
+            for m in fn_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in type_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in use_re.finditer(content):
+                clean = m.group(1).strip()
+                imports.append(clean.split("::")[-1])
+
+        # Go (.go)
+        elif norm_p.endswith(".go"):
+            func_re = re.compile(r"^\s*func\s+(?:\([^)]*\)\s+)?([a-zA-Z0-9_]+)", re.MULTILINE)
+            type_re = re.compile(r"^\s*type\s+([a-zA-Z0-9_]+)\s+(?:struct|interface)", re.MULTILINE)
+            single_imp = re.compile(r'^\s*import\s+["\']([^"\']+)["\']', re.MULTILINE)
+            multi_imp = re.compile(r'import\s+\(\s*([^)]+)\)', re.MULTILINE)
+            for m in func_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in type_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in single_imp.finditer(content):
+                imports.append(m.group(1).split("/")[-1])
+            for m in multi_imp.finditer(content):
+                for line in m.group(1).splitlines():
+                    clean = line.strip().strip('"').strip("'")
+                    if clean:
+                        imports.append(clean.split("/")[-1])
+
+        # JS / TS (.js, .jsx, .ts, .tsx, .mjs)
+        elif norm_p.endswith((".js", ".jsx", ".ts", ".tsx", ".mjs")):
+            fn_re = re.compile(r"^\s*(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+            class_re = re.compile(r"^\s*(?:export\s+)?(?:class|interface|type)\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+            const_fn_re = re.compile(r"^\s*(?:export\s+)?(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>", re.MULTILINE)
+            imp_re = re.compile(r'^\s*import\s+.*\s+from\s+["\']([^"\']+)["\']', re.MULTILINE)
+            req_re = re.compile(r'require\(["\']([^"\']+)["\']\)', re.MULTILINE)
+            for m in fn_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in class_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in const_fn_re.finditer(content):
+                symbols.append(m.group(1))
+            for m in imp_re.finditer(content):
+                imports.append(m.group(1).split("/")[-1])
+            for m in req_re.finditer(content):
+                imports.append(m.group(1).split("/")[-1])
+
+        else:
+            for match in DEF_REGEX.finditer(content):
+                sym = match.group(1) or match.group(2) or match.group(3)
+                if sym:
+                    symbols.append(sym)
+            for match in IMPORT_REGEX.finditer(content):
+                imp = match.group(1) or match.group(2) or match.group(3) or match.group(4)
+                if imp:
+                    imports.append(imp)
+
+        return list(dict.fromkeys(symbols)), list(dict.fromkeys(imports))
+
+
     def _normalize_module_name(self, path: str) -> str:
         """
         Converts file path to Python dot-separated module name.
