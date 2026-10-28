@@ -163,3 +163,4 @@ A critical goal of Stage 3.5 was resolving the discrepancy between tracked Pytho
 - The ARB v2 benchmark ($N=345$ positive samples) is strictly an **in-distribution development and regression corpus**.
 - Stage 3.5 improvements (Candidate F achieving MRR $0.2152$ vs. Candidate C $0.2040$ and RepoMap $0.2140$) demonstrate genuine algorithmic progress in polyglot symbol navigation and budget packing on known repository archetypes.
 - These results must **not** be cited as proof of independent generalization to unobserved coding distributions until external multi-repo benchmarks (ContextBench, SWE-bench) can be authoritatively evaluated.
+

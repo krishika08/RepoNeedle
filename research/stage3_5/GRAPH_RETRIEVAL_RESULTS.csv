@@ -17,3 +17,4 @@ CAND-C,Candidate B + 0.5x Doc Filter,Overall ARB v2 Benchmark (25 repos),345,0.2
 CAND-E,Candidate D + Polyglot Regex Symbols,Overall ARB v2 Benchmark (25 repos),345,0.2052,0.2528,0.3815,0.5518,0.3022,11.12,1452,142,Symbols Only
 CAND-F,Candidate E + Manifest-Aware Cross-Crate Graph,Overall ARB v2 Benchmark (25 repos),345,0.2078,0.2560,0.3855,0.5562,0.3060,11.60,1452,18260,Resolved (Cargo/Go/NPM)
 BASE-REPOMAP,Aider-Style Tree-sitter Call Graph,Overall ARB v2 Benchmark (25 repos),345,0.2140,0.3185,0.4786,0.6306,0.3788,180.20,N/A,AST Call Graph,Full Tree-sitter
+

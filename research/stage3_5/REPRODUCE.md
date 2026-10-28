@@ -104,3 +104,4 @@ Get-Content research\stage3_5\BASELINE_REPRODUCTION.md
 ```
 
 All figures match the historical Stage 2 ablation matrix and Stage 3 candidate freeze records.
+

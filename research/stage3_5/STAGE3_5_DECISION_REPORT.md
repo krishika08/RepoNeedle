@@ -137,3 +137,4 @@ All eight required Stage 3.5 deliverables are documented and committed under `re
 6. `research/stage3_5/FAILURE_ANALYSIS.md`: Detailed failure diagnosis, root cause analysis, and resolution verification.
 7. `research/stage3_5/STAGE3_5_DECISION_REPORT.md`: This comprehensive architectural decision report.
 8. `research/stage3_5/REPRODUCE.md`: Complete, copy-pasteable execution guide to reproduce all Stage 3.5 results.
+

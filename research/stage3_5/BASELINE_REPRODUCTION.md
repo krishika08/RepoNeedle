@@ -62,3 +62,4 @@ Candidate C applies structural skeleton compression and a mild $0.5\times$ penal
    - The primary driver of this gap is RepoMap's cross-file AST call graph, which successfully bridges module boundaries (as evidenced in the `BurntSushi/ripgrep` failure).
 4. **Experimental Governance Note**:
    - All ARB v2 samples were used during Stage 1 and Stage 2 research. These numbers serve strictly as regression and development benchmarks to guide improvements, and will not be claimed as independent generalization evidence.
+
