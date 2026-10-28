@@ -1,0 +1,8 @@
+Repository,Total Corpus Files,System ID,System Name,Recall@8k,Precision@8k,Files Packed,Full Files,Skeleton Files,Tokens Used,Core Code Files,Test Files,Doc Distractor Files
+pallets/click,133,BASE-BM25,Pure BM25 Baseline,0.0000,0.0000,10,10,0,7977,2,2,6
+pallets/click,133,BASE-REPOMAP,Aider-Style RepoMap Reference,0.0000,0.0000,21,21,0,8000,-1,19,3
+pallets/click,133,CAND-A,Static Hybrid Full Files,0.0000,0.0000,9,9,0,7970,1,1,7
+pallets/click,133,CAND-B,Candidate A + Skeletons,0.5000,0.0909,11,6,5,7971,5,1,5
+pallets/click,133,CAND-C,Candidate B + Doc Filter 0.5x,0.5000,0.1250,8,7,1,7970,4,2,2
+pallets/click,133,CAND-D,Candidate C + Graph Diffusion,0.5000,0.1250,8,7,1,7970,4,2,2
+pallets/click,133,CAND-E,Candidate D + Polyglot Symbols,0.5000,0.1667,6,5,1,7978,5,1,0

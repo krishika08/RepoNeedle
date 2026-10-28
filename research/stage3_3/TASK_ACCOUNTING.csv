@@ -1,0 +1,24 @@
+Task / Repository ID,Repository Name,Language,Partition,Prior Exposure Source,Gold Annotations Granularity,Official Status,Local Evaluation Status,Exclusion Reason
+CB-HELD-001,django/django,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-002,sympy/sympy,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-003,scikit-learn/scikit-learn,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-004,astropy/astropy,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-005,matplotlib/matplotlib,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-006,sphinx-doc/sphinx,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-007,psf/requests,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-008,mwaskom/seaborn,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-009,pydata/xarray,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-010,pallets/flask,Python,HELD_OUT,SWE-bench Lite,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-011,google/guava,Java,HELD_OUT,SWE-bench Multilingual,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-012,facebook/react,TypeScript,HELD_OUT,SWE-bench Multilingual,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-013,golang/go,Go,HELD_OUT,SWE-bench Multilingual,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-HELD-014,BurntSushi/ripgrep,Rust,HELD_OUT,SWE-bench Multilingual,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,None (Genuinely held-out)
+CB-REPL-001,pytest-dev/pytest,Python,REPLICATION,ARB v2 (testlog2code/trace2code),File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,Overlaps ARB v2 development set
+CB-REPL-002,gin-gonic/gin,Go,REPLICATION,ARB v2 + Stage 2 PPR Diagnostics,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,Overlaps Stage 2 graph tuning
+CB-REPL-003,tokio-rs/tokio,Rust,REPLICATION,ARB v2 + Stage 2 Rust Tuning,File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,Overlaps Stage 2 AST symbol tuning
+CB-REPL-004,vitejs/vite,TypeScript,REPLICATION,ARB v2 (testlog2code),File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,Overlaps ARB v2 development set
+CB-REPL-005,spring-projects/spring-boot,Java,REPLICATION,ARB v2 (testlog2code),File + Block,BLOCKED_NETWORK,EVALUATED_LOCAL,Overlaps ARB v2 development set
+PROF-001,pallets/click,Python,EXCLUDED_PROFILING,Stage 2/3 Resource Measurement,File,AVAILABLE_LOCAL,EVALUATED_LOCAL,Excluded from held-out claims (Used for profiling)
+PROF-002,caddyserver/caddy,Go,EXCLUDED_PROFILING,Stage 2/3 Memory Measurement,File,AVAILABLE_LOCAL,EVALUATED_LOCAL,Excluded from held-out claims (Used for profiling)
+OFFICIAL-DEFAULT,ContextBench Full (1136 tasks),Multi,HELD_OUT + REPLICATION,ContextBench Hugging Face Hub,File + Block,BLOCKED_NETWORK,NOT_EVALUATED,Blocked by environment HTTP 403 policy
+OFFICIAL-VERIFIED,ContextBench Verified (500 tasks),Multi,HELD_OUT + REPLICATION,ContextBench Hugging Face Hub,File + Block,BLOCKED_NETWORK,NOT_EVALUATED,Blocked by environment HTTP 403 policy
