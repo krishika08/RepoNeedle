@@ -58,3 +58,4 @@ To pass the Stage 3 Independent Generalization Gate, a candidate must satisfy al
   - Agent with RepoMap initial context (where supported).
   - Agent with RepoNeedle Candidate initial context.
 - **Audit Integrity Boundary**: If external infrastructure (Docker daemon permissions, sandboxed network isolation, or API keys) blocks executing full containerized unit tests on SWE-bench, the blocker must be formally logged as an infrastructure impediment, and retrieval-in-the-loop simulation must be reported without fabricating unit test execution.
+

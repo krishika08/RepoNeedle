@@ -61,3 +61,4 @@ This audit forensicly investigates and reconciles two critical baseline discrepa
 1. **Canonical RepoMap Metric**: Always compare against the full 345-sample official figure of **MRR = 0.2140** and **Recall@20 = 0.6306**.
 2. **Matched Baselines**: When evaluating RepoNeedle candidates on new benchmarks (ContextBench, SWE-bench Lite), evaluate the baseline BM25 and RepoMap implementations under **identical document definitions, query inputs, and candidate pools**.
 3. **No Cherry-Picking**: Historical figures are preserved in documentation; all future statistical claims must reference the matched baseline table.
+

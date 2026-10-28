@@ -1,5 +1,5 @@
-Agent Mode,Description,Instance Count,Context Sufficiency Rate,Mean Exploratory Tool Calls,Mean Context Tokens,Mean Total Prompt Tokens,Simulated Patch Resolution Rate,Mean Retrieval Latency (ms),Docker Execution Status,Infrastructure Blocker Reason
-NO-RETRIEVAL,Baseline Agent (No Prior Context),11,0.0000,3.36,0.0,428.5,0.0000,0.00,BLOCKED,Docker daemon unavailable on Windows sandbox environment; unit test execution container blocked
-BM25,Agent + BM25 Sparse Retrieval,11,0.9091,0.18,153.6,200.3,0.9091,0.27,BLOCKED,Docker daemon unavailable on Windows sandbox environment; unit test execution container blocked
-REPOMAP,Agent + Aider RepoMap Reference,11,1.0000,0.00,157.9,182.7,1.0000,0.03,BLOCKED,Docker daemon unavailable on Windows sandbox environment; unit test execution container blocked
-REPONEEDLE-CAND-C,Agent + RepoNeedle Candidate C,11,1.0000,0.00,157.9,182.7,1.0000,0.64,BLOCKED,Docker daemon unavailable on Windows sandbox environment; unit test execution container blocked
+Agent Mode,Description,Instance Count,Context Sufficiency Rate,Mean Exploratory Tool Calls,Mean Context Tokens,Mean Total Prompt Tokens,Physical Patch Resolution Rate,Physical Test Harness Execution,Docker Infrastructure Status,Audit Finding
+NO-RETRIEVAL,Baseline Agent (No Initial Context),11,0.0000,3.36,0.0,428.5,UNVERIFIED,NOT_EXECUTED,BLOCKED,Docker daemon unavailable on Windows host; physical test execution blocked
+BM25,Agent + BM25 Sparse Retrieval,11,0.9091,0.18,153.6,200.3,UNVERIFIED,NOT_EXECUTED,BLOCKED,Docker daemon unavailable on Windows host; physical test execution blocked
+REPOMAP,Agent + Aider RepoMap Reference,11,1.0000,0.00,157.9,182.7,UNVERIFIED,NOT_EXECUTED,BLOCKED,Docker daemon unavailable on Windows host; physical test execution blocked
+REPONEEDLE-CAND-C,Agent + RepoNeedle Candidate C,11,1.0000,0.00,157.9,182.7,UNVERIFIED,NOT_EXECUTED,BLOCKED,Docker daemon unavailable on Windows host; physical test execution blocked
