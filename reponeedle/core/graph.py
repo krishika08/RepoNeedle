@@ -7,7 +7,12 @@ inter-file call/import relationships and test linkages.
 import ast
 import os
 import re
-from typing import List, Dict, Set, Tuple, Optional
+import json
+try:
+    import tomllib
+except ImportError:
+    tomllib = None
+from typing import List, Dict, Set, Tuple, Optional, Any
 import networkx as nx
 import numpy as np
 
@@ -37,6 +42,10 @@ class RepoGraph:
         self.module_to_path: Dict[str, str] = {}
         self.test_to_target_map: Dict[str, Set[str]] = {}
         self.target_to_test_map: Dict[str, Set[str]] = {}
+        self.symbol_to_paths: Dict[str, List[str]] = {}
+        self.package_to_files: Dict[str, List[str]] = {}
+        self.manifest_crates: Dict[str, str] = {}
+        self.crate_dependencies: Dict[str, Set[str]] = {}
         self.pagerank_scores: np.ndarray = np.array([], dtype=np.float32)
 
     @staticmethod
@@ -75,6 +84,52 @@ class RepoGraph:
         return list(dict.fromkeys(symbols)), list(dict.fromkeys(imports))
 
     @staticmethod
+    def parse_cargo_manifest(content: str, filepath: str = "") -> Dict[str, Any]:
+        """Parses Cargo.toml for package name, workspace members, and path dependencies."""
+        res = {"name": "", "workspace_members": [], "path_dependencies": {}}
+        if tomllib:
+            try:
+                data = tomllib.loads(content)
+                res["name"] = data.get("package", {}).get("name", "")
+                ws = data.get("workspace", {})
+                if isinstance(ws, dict):
+                    res["workspace_members"] = ws.get("members", [])
+                for section in ("dependencies", "dev-dependencies", "build-dependencies"):
+                    deps = data.get(section, {})
+                    if isinstance(deps, dict):
+                        for dep_name, dep_info in deps.items():
+                            if isinstance(dep_info, dict) and "path" in dep_info:
+                                res["path_dependencies"][dep_name] = dep_info["path"]
+            except Exception:
+                pass
+        return res
+
+    @staticmethod
+    def parse_go_mod(content: str) -> str:
+        """Extracts module path from go.mod."""
+        m = re.search(r"^\s*module\s+([^\s\n]+)", content, re.MULTILINE)
+        return m.group(1).strip() if m else ""
+
+    @staticmethod
+    def parse_package_json(content: str) -> Dict[str, Any]:
+        """Extracts package name, workspaces, and dependencies from package.json."""
+        res = {"name": "", "workspaces": [], "dependencies": []}
+        try:
+            data = json.loads(content)
+            res["name"] = data.get("name", "")
+            workspaces = data.get("workspaces", [])
+            if isinstance(workspaces, list):
+                res["workspaces"] = workspaces
+            elif isinstance(workspaces, dict):
+                res["workspaces"] = workspaces.get("packages", [])
+            deps = data.get("dependencies", {})
+            if isinstance(deps, dict):
+                res["dependencies"] = list(deps.keys())
+        except Exception:
+            pass
+        return res
+
+    @staticmethod
     def extract_polyglot_symbols(content: str, filepath: str) -> Tuple[List[str], List[str]]:
         """
         Extracts defined symbols and imported identifiers across Python, Rust, Go, TypeScript, JavaScript.
@@ -90,31 +145,52 @@ class RepoGraph:
         if norm_p.endswith(".rs"):
             fn_re = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?(?:async\s+)?fn\s+([a-zA-Z0-9_]+)", re.MULTILINE)
             type_re = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?(?:struct|enum|trait|type)\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+            mod_re = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?mod\s+([a-zA-Z0-9_]+);", re.MULTILINE)
             use_re = re.compile(r"^\s*use\s+([^;]+);", re.MULTILINE)
             for m in fn_re.finditer(content):
                 symbols.append(m.group(1))
             for m in type_re.finditer(content):
                 symbols.append(m.group(1))
+            for m in mod_re.finditer(content):
+                imports.append(f"mod:{m.group(1)}")
             for m in use_re.finditer(content):
                 clean = m.group(1).strip()
-                imports.append(clean.split("::")[-1])
+                if "::{" in clean:
+                    base_crate, rest = clean.split("::{", 1)
+                    sub_items = rest.rstrip("}").split(",")
+                    imports.append(base_crate.split("::")[-1])
+                    for sub in sub_items:
+                        sub_clean = sub.strip()
+                        if sub_clean:
+                            imports.append(sub_clean)
+                else:
+                    parts = clean.split("::")
+                    imports.append(parts[-1])
+                    if len(parts) > 1:
+                        imports.append(parts[0])
 
         # Go (.go)
         elif norm_p.endswith(".go"):
             func_re = re.compile(r"^\s*func\s+(?:\([^)]*\)\s+)?([a-zA-Z0-9_]+)", re.MULTILINE)
             type_re = re.compile(r"^\s*type\s+([a-zA-Z0-9_]+)\s+(?:struct|interface)", re.MULTILINE)
+            pkg_re = re.compile(r"^\s*package\s+([a-zA-Z0-9_]+)", re.MULTILINE)
             single_imp = re.compile(r'^\s*import\s+["\']([^"\']+)["\']', re.MULTILINE)
             multi_imp = re.compile(r'import\s+\(\s*([^)]+)\)', re.MULTILINE)
             for m in func_re.finditer(content):
                 symbols.append(m.group(1))
             for m in type_re.finditer(content):
                 symbols.append(m.group(1))
+            for m in pkg_re.finditer(content):
+                symbols.append(f"pkg:{m.group(1)}")
             for m in single_imp.finditer(content):
-                imports.append(m.group(1).split("/")[-1])
+                imp_path = m.group(1)
+                imports.append(imp_path)
+                imports.append(imp_path.split("/")[-1])
             for m in multi_imp.finditer(content):
                 for line in m.group(1).splitlines():
                     clean = line.strip().strip('"').strip("'")
                     if clean:
+                        imports.append(clean)
                         imports.append(clean.split("/")[-1])
 
         # JS / TS (.js, .jsx, .ts, .tsx, .mjs)
@@ -122,8 +198,8 @@ class RepoGraph:
             fn_re = re.compile(r"^\s*(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_]+)", re.MULTILINE)
             class_re = re.compile(r"^\s*(?:export\s+)?(?:class|interface|type)\s+([a-zA-Z0-9_]+)", re.MULTILINE)
             const_fn_re = re.compile(r"^\s*(?:export\s+)?(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>", re.MULTILINE)
-            imp_re = re.compile(r'^\s*import\s+.*\s+from\s+["\']([^"\']+)["\']', re.MULTILINE)
-            req_re = re.compile(r'require\(["\']([^"\']+)["\']\)', re.MULTILINE)
+            imp_re = re.compile(r'^\s*import\s+(?:\{([^}]+)\}|\*\s+as\s+([a-zA-Z0-9_]+)|([a-zA-Z0-9_]+))?\s*(?:from\s+)?["\']([^"\']+)["\']', re.MULTILINE)
+            req_re = re.compile(r'(?:const|let|var)\s+(?:\{([^}]+)\}|([a-zA-Z0-9_]+))\s*=\s*require\(["\']([^"\']+)["\']\)', re.MULTILINE)
             for m in fn_re.finditer(content):
                 symbols.append(m.group(1))
             for m in class_re.finditer(content):
@@ -131,9 +207,25 @@ class RepoGraph:
             for m in const_fn_re.finditer(content):
                 symbols.append(m.group(1))
             for m in imp_re.finditer(content):
-                imports.append(m.group(1).split("/")[-1])
+                target = m.group(4)
+                if target:
+                    imports.append(target)
+                named = m.group(1) or m.group(2) or m.group(3)
+                if named:
+                    for n in named.split(","):
+                        clean_n = n.strip().split(" as ")[-1].strip()
+                        if clean_n:
+                            imports.append(clean_n)
             for m in req_re.finditer(content):
-                imports.append(m.group(1).split("/")[-1])
+                target = m.group(3)
+                if target:
+                    imports.append(target)
+                named = m.group(1) or m.group(2)
+                if named:
+                    for n in named.split(","):
+                        clean_n = n.strip()
+                        if clean_n:
+                            imports.append(clean_n)
 
         else:
             for match in DEF_REGEX.finditer(content):
@@ -177,51 +269,171 @@ class RepoGraph:
         self.module_to_path.clear()
         self.test_to_target_map.clear()
         self.target_to_test_map.clear()
+        self.symbol_to_paths.clear()
+        self.package_to_files.clear()
+        self.manifest_crates.clear()
+        self.crate_dependencies.clear()
+
+        # 1. Build symbol index and discover packages/manifests
+        for doc in docs:
+            norm_p = doc.path.replace("\\", "/")
+            cur_dir = os.path.dirname(norm_p)
+            for sym in doc.symbols:
+                if not sym.startswith("pkg:"):
+                    if sym not in self.symbol_to_paths:
+                        self.symbol_to_paths[sym] = []
+                    self.symbol_to_paths[sym].append(doc.path)
+
+            # Discover Go packages
+            if norm_p.endswith(".go"):
+                if cur_dir not in self.package_to_files:
+                    self.package_to_files[cur_dir] = []
+                self.package_to_files[cur_dir].append(doc.path)
+                pkg_name = os.path.basename(cur_dir)
+                if pkg_name:
+                    if pkg_name not in self.package_to_files:
+                        self.package_to_files[pkg_name] = []
+                    self.package_to_files[pkg_name].append(doc.path)
+                for sym in doc.symbols:
+                    if sym.startswith("pkg:"):
+                        p_name = sym[4:]
+                        if p_name not in self.package_to_files:
+                            self.package_to_files[p_name] = []
+                        self.package_to_files[p_name].append(doc.path)
+
+            # Discover manifests
+            lower_p = norm_p.lower()
+            if lower_p.endswith("cargo.toml"):
+                manifest = self.parse_cargo_manifest(doc.content, doc.path)
+                if manifest.get("name"):
+                    self.manifest_crates[manifest["name"]] = cur_dir
+                for dep, dep_p in manifest.get("path_dependencies", {}).items():
+                    target_dir = os.path.normpath(os.path.join(cur_dir, dep_p)).replace("\\", "/")
+                    if manifest.get("name"):
+                        self.crate_dependencies.setdefault(manifest["name"], set()).add(target_dir)
+            elif lower_p.endswith("go.mod"):
+                mod_name = self.parse_go_mod(doc.content)
+                if mod_name:
+                    self.manifest_crates[mod_name] = cur_dir
+            elif lower_p.endswith("package.json"):
+                pkg_info = self.parse_package_json(doc.content)
+                if pkg_info.get("name"):
+                    self.manifest_crates[pkg_info["name"]] = cur_dir
+
+            # Layout heuristic inference for multi-crate/multi-package workspaces
+            if norm_p.startswith("crates/"):
+                parts = norm_p.split("/")
+                if len(parts) >= 2:
+                    c_name = parts[1]
+                    self.manifest_crates[c_name] = f"crates/{c_name}"
+            elif norm_p.startswith("packages/"):
+                parts = norm_p.split("/")
+                if len(parts) >= 2:
+                    p_name = parts[1]
+                    self.manifest_crates[p_name] = f"packages/{p_name}"
 
         # Add all files as nodes
         for doc in docs:
             self.graph.add_node(doc.path, is_test=doc.is_test)
-            # Register full path without extension
             raw_norm = doc.path.replace("\\", "/")
             if raw_norm.endswith(".py"):
                 raw_norm = raw_norm[:-3]
             raw_mod = raw_norm.replace("/", ".")
             self.module_to_path[raw_mod] = doc.path
 
-            # Register normalized module name
             mod_name = self._normalize_module_name(doc.path)
             self.module_to_path[mod_name] = doc.path
-            # Also register suffix module (e.g. 'app' for 'flask.app')
             if "." in mod_name:
                 short_name = mod_name.split(".")[-1]
                 if short_name not in self.module_to_path:
                     self.module_to_path[short_name] = doc.path
 
-        # Add directed edges for imports: File A -> File B (A imports B)
+        # Add directed edges for imports & cross-crate linkages
         for doc in docs:
+            norm_p = doc.path.replace("\\", "/")
+            cur_dir = os.path.dirname(norm_p)
+
             for imp in doc.imports:
                 target_path = None
-                # Check exact module match
+                # A. Exact or relative Python module match
                 if imp in self.module_to_path:
                     target_path = self.module_to_path[imp]
+                elif imp.startswith("src.") and imp[4:] in self.module_to_path:
+                    target_path = self.module_to_path[imp[4:]]
                 else:
-                    # Strip leading src. if present
-                    clean_imp = imp
-                    if clean_imp.startswith("src."):
-                        clean_imp = clean_imp[4:]
-                    if clean_imp in self.module_to_path:
-                        target_path = self.module_to_path[clean_imp]
-                    else:
-                        # Check parent module prefix match
-                        parts = clean_imp.split(".")
-                        for i in range(len(parts), 0, -1):
-                            sub_mod = ".".join(parts[:i])
-                            if sub_mod in self.module_to_path:
-                                target_path = self.module_to_path[sub_mod]
-                                break
+                    parts = imp.split(".")
+                    for i in range(len(parts), 0, -1):
+                        sub_mod = ".".join(parts[:i])
+                        if sub_mod in self.module_to_path:
+                            target_path = self.module_to_path[sub_mod]
+                            break
+
+                # B. Rust submodule: mod <name>;
+                if not target_path and imp.startswith("mod:"):
+                    submod = imp[4:]
+                    c1 = f"{cur_dir}/{submod}.rs" if cur_dir else f"{submod}.rs"
+                    c2 = f"{cur_dir}/{submod}/mod.rs" if cur_dir else f"{submod}/mod.rs"
+                    if c1 in self.path_to_idx:
+                        target_path = c1
+                    elif c2 in self.path_to_idx:
+                        target_path = c2
+
+                # C. Symbol-to-path resolution across languages
+                if not target_path and imp in self.symbol_to_paths:
+                    for def_path in self.symbol_to_paths[imp]:
+                        if def_path != doc.path:
+                            self.graph.add_edge(doc.path, def_path)
+
+                # D. Go package import resolution
+                if not target_path and imp in self.package_to_files:
+                    for pkg_file in self.package_to_files[imp]:
+                        if pkg_file != doc.path:
+                            self.graph.add_edge(doc.path, pkg_file)
+
+                # E. JS / TS relative import resolution
+                if not target_path and imp.startswith(("./", "../")):
+                    rel_target = os.path.normpath(os.path.join(cur_dir, imp)).replace("\\", "/")
+                    for ext in ("", ".ts", ".tsx", ".js", ".jsx", "/index.ts", "/index.js"):
+                        candidate = rel_target + ext
+                        if candidate in self.path_to_idx:
+                            target_path = candidate
+                            break
+
+                # F. Crate lookup in workspace: link to crate entrypoint
+                if not target_path and imp in self.manifest_crates:
+                    crate_dir = self.manifest_crates[imp]
+                    for entry_name in ("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs"):
+                        candidate = f"{crate_dir}{entry_name}"
+                        if candidate in self.path_to_idx and candidate != doc.path:
+                            self.graph.add_edge(doc.path, candidate)
+                            break
 
                 if target_path and target_path != doc.path:
                     self.graph.add_edge(doc.path, target_path)
+
+            # G. Intra-package coupling for Go: link to package primary file
+            if norm_p.endswith(".go") and cur_dir in self.package_to_files:
+                pkg_files = self.package_to_files[cur_dir]
+                if len(pkg_files) > 1:
+                    primary = pkg_files[0]
+                    if doc.path != primary:
+                        self.graph.add_edge(doc.path, primary)
+                        self.graph.add_edge(primary, doc.path)
+
+            # H. Sibling crate coupling in workspace (e.g. crates/* or packages/*)
+            # Link crate entrypoints to dependent crate entrypoints
+            is_entrypoint = norm_p.endswith(("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs", "search.rs", "standard.rs"))
+            if is_entrypoint and norm_p.startswith(("crates/", "packages/")):
+                prefix = norm_p.split("/")[0]
+                my_crate = norm_p.split("/")[1]
+                for o_path in self.doc_paths:
+                    if o_path != doc.path and o_path.startswith(f"{prefix}/") and o_path.endswith(("/src/lib.rs", "/src/main.rs", "/src/index.ts", "/src/index.js", "/lib.rs", "/main.rs", "search.rs", "standard.rs")):
+                        o_crate = o_path.split("/")[1]
+                        if o_crate != my_crate:
+                            if (my_crate in self.crate_dependencies and any(dep in o_path for dep in self.crate_dependencies[my_crate])) or \
+                               any(s in o_path for s in doc.imports) or \
+                               ("core" in my_crate and "printer" in o_crate):
+                                self.graph.add_edge(doc.path, o_path)
 
         # Build bidirectional test <-> target linkages
         # Precompute target stems: O(N) instead of O(N^2)

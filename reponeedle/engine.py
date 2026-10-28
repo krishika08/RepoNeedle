@@ -328,10 +328,16 @@ class RepoNeedleEngine:
                     seed_path = self.docs[s_idx].path
                     seed_val = float(combined_hits[s_idx])
                     if seed_val > 0 and seed_path in self.repo_graph.graph:
-                        for neighbor in self.repo_graph.graph.neighbors(seed_path):
-                            if neighbor in self.repo_graph.path_to_idx:
-                                n_idx = self.repo_graph.path_to_idx[neighbor]
+                        # Diffuse along successors (dependencies / callees)
+                        for succ in self.repo_graph.graph.successors(seed_path):
+                            if succ in self.repo_graph.path_to_idx:
+                                n_idx = self.repo_graph.path_to_idx[succ]
                                 diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.25))
+                        # Diffuse along predecessors (callers / importers)
+                        for pred in self.repo_graph.graph.predecessors(seed_path):
+                            if pred in self.repo_graph.path_to_idx:
+                                n_idx = self.repo_graph.path_to_idx[pred]
+                                diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.20))
                 fused_scores = fused_scores + 0.15 * diffused_boost
 
         # 4c. Documentation Distractor Filter (Candidate C / D / E)

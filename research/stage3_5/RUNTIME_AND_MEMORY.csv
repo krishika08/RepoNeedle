@@ -1,0 +1,7 @@
+Repository Scale,Architecture Status,Total Files,Total Lines,Process RSS (MB),Traced Python Heap (MB),Index Heap Delta (MB),Cold Index Time (s),Warm Query p50 (ms),Warm Query p95 (ms),Under 100MB Ceiling
+"Micro Fixture (Synthetic Django)",Stage 3.4 Baseline,5,70,83.2,4.12,3.80,0.35,0.55,0.72,PASSED
+"Micro Fixture (Synthetic Django)",Stage 3.5 Optimized,5,70,81.7,3.48,3.23,0.26,0.52,0.85,PASSED
+"Medium Repo (pallets/click)",Stage 3.4 Baseline,133,14670,118.4,52.10,18.60,6.20,42.10,51.30,FAILED (+18.4 MB)
+"Medium Repo (pallets/click)",Stage 3.5 Optimized,133,14670,98.6,34.22,5.94,3.97,35.65,37.37,PASSED
+"Large Repo (caddyserver/caddy)",Stage 3.4 Baseline,250,22995,142.8,78.45,28.30,8.50,12.40,16.80,FAILED (+42.8 MB)
+"Large Repo (caddyserver/caddy)",Stage 3.5 Optimized,250,22995,103.1,45.22,7.61,4.64,4.38,5.47,FAILED (+3.1 MB)
