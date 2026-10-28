@@ -76,3 +76,19 @@ class BudgetConfig(BaseModel):
     density_exponent: float = 0.75
     abstention_threshold: float = 0.12
 
+
+class AblationConfig(BaseModel):
+    """
+    Controlled ablation switches for empirical component evaluation.
+    Factor A: enable_lexical (BM25 field scoring)
+    Factor B: enable_semantic (Subword semantic scoring)
+    Factor C: enable_graph (PageRank & AST test/ripple linkage)
+    Factor D: enable_router (Workflow-adaptive routing vs fixed static fusion)
+    Factor E: allow_skeletons (Structural skeleton compression vs full only)
+    """
+    enable_lexical: bool = True
+    enable_semantic: bool = True
+    enable_graph: bool = True
+    enable_router: bool = True
+    allow_skeletons: bool = True
+

@@ -16,6 +16,7 @@ from reponeedle.models import (
     ScoredFile,
     TaskType,
     BudgetConfig,
+    AblationConfig,
     ContextTier,
 )
 from reponeedle.core.tokenizer import CodeTokenizer, estimate_tokens
@@ -44,8 +45,10 @@ class RepoNeedleEngine:
         self,
         docs: List[FileDoc] = None,
         budget_config: Optional[BudgetConfig] = None,
+        ablation_config: Optional[AblationConfig] = None,
     ):
         self.budget_config = budget_config or BudgetConfig()
+        self.ablation_config = ablation_config or AblationConfig()
         self.tokenizer = CodeTokenizer()
         self.router = WorkflowRouter()
         self.budget_optimizer = BudgetOptimizer(self.budget_config)
@@ -194,11 +197,14 @@ class RepoNeedleEngine:
         query: Union[str, Query],
         budget_tokens: Optional[int] = None,
         task_type: Optional[TaskType] = None,
+        ablation_config: Optional[AblationConfig] = None,
     ) -> RetrievalResult:
         """
         Executes workflow-adaptive retrieval and packs results within the token budget.
+        Supports controlled ablation overrides.
         """
         start_time = time.perf_counter()
+        ablation = ablation_config or self.ablation_config or AblationConfig()
 
         if isinstance(query, str):
             query_obj = Query(text=query)
@@ -227,54 +233,68 @@ class RepoNeedleEngine:
                 execution_time_ms=(time.perf_counter() - start_time) * 1000,
             )
 
-        # 1. Workflow Classification
-        inferred_task, metadata = self.router.classify_intent(query_obj)
-        weights = self.router.get_fusion_weights(inferred_task)
-
-        # 2. Base Signal Scoring
-        lex_scores = self.lexical_index.score(query_obj.text)
-        sem_scores = self.semantic_index.score(query_obj.text)
-        struct_scores = self.repo_graph.pagerank_scores
-
         num_docs = len(self.docs)
+
+        # 1. Workflow Classification / Fusion Weights (Factor D)
+        if ablation.enable_router:
+            inferred_task, metadata = self.router.classify_intent(query_obj)
+            weights = self.router.get_fusion_weights(inferred_task)
+        else:
+            # Documented fixed static fusion: equal weighting among active signals, zero task boost
+            inferred_task = TaskType.COMMENT2CONTEXT
+            metadata = {}
+            active_signals = sum([ablation.enable_lexical, ablation.enable_semantic, ablation.enable_graph])
+            base_w = 1.0 / max(1, active_signals)
+            weights = {
+                "lexical": base_w if ablation.enable_lexical else 0.0,
+                "semantic": base_w if ablation.enable_semantic else 0.0,
+                "structural": base_w if ablation.enable_graph else 0.0,
+                "workflow_boost": 0.0,
+            }
+
+        # 2. Base Signal Scoring (Factors A, B, C)
+        lex_scores = self.lexical_index.score(query_obj.text) if ablation.enable_lexical else np.zeros(num_docs, dtype=np.float32)
+        sem_scores = self.semantic_index.score(query_obj.text) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
+        struct_scores = self.repo_graph.pagerank_scores if ablation.enable_graph else np.zeros(num_docs, dtype=np.float32)
+
         workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
-        # 3. Workflow-Specific Boosts
-        if inferred_task == TaskType.TRACE2CODE:
-            # Boost files matching frames in the traceback
-            frames = metadata.get("trace_frames", [])
-            for frame_path, line_no, func_name in frames:
-                clean_frame = frame_path.replace("\\", "/").lower()
-                for idx, doc in enumerate(self.docs):
-                    doc_lower = doc.path.lower()
-                    if clean_frame.endswith(doc_lower) or doc_lower.endswith(clean_frame):
-                        workflow_boosts[idx] = max(workflow_boosts[idx], 1.0)
-                    elif func_name and func_name in doc.symbols:
-                        workflow_boosts[idx] = max(workflow_boosts[idx], 0.7)
+        # 3. Workflow-Specific Boosts (Active only when router is enabled)
+        if ablation.enable_router and weights.get("workflow_boost", 0.0) > 0.0:
+            if inferred_task == TaskType.TRACE2CODE:
+                frames = metadata.get("trace_frames", [])
+                for frame_path, line_no, func_name in frames:
+                    clean_frame = frame_path.replace("\\", "/").lower()
+                    for idx, doc in enumerate(self.docs):
+                        doc_lower = doc.path.lower()
+                        if clean_frame.endswith(doc_lower) or doc_lower.endswith(clean_frame):
+                            workflow_boosts[idx] = max(workflow_boosts[idx], 1.0)
+                        elif func_name and func_name in doc.symbols:
+                            workflow_boosts[idx] = max(workflow_boosts[idx], 0.7)
 
-        elif inferred_task == TaskType.CODE2TEST:
-            # Find candidate implementation targets from lexical/semantic scores
-            top_target_indices = np.argsort(lex_scores + sem_scores)[::-1][:3]
-            target_paths = [
-                self.docs[i].path for i in top_target_indices
-                if not self.docs[i].is_test
-            ]
-            test_scores = self.repo_graph.get_test_scores_for_target(target_paths)
-            for idx, doc in enumerate(self.docs):
-                if doc.is_test:
-                    # Give baseline boost to tests for code2test plus linkage boost
-                    workflow_boosts[idx] = max(0.4, float(test_scores[idx]))
+            elif inferred_task == TaskType.CODE2TEST:
+                if ablation.enable_graph:
+                    top_target_indices = np.argsort(lex_scores + sem_scores)[::-1][:3]
+                    target_paths = [
+                        self.docs[i].path for i in top_target_indices
+                        if not self.docs[i].is_test
+                    ]
+                    test_scores = self.repo_graph.get_test_scores_for_target(target_paths)
                 else:
-                    # Penalize non-test files in code2test mode
-                    workflow_boosts[idx] = -0.5
+                    test_scores = np.zeros(num_docs, dtype=np.float32)
+                for idx, doc in enumerate(self.docs):
+                    if doc.is_test:
+                        workflow_boosts[idx] = max(0.4, float(test_scores[idx]))
+                    else:
+                        workflow_boosts[idx] = -0.5
 
-        elif inferred_task == TaskType.EDIT2RIPPLE:
-            anchors = query_obj.anchor_files
-            if not anchors:
-                # Infer anchors from top lexical matches
-                top_idx = int(np.argmax(lex_scores)) if len(lex_scores) > 0 else 0
-                anchors = [self.docs[top_idx].path]
-            workflow_boosts = self.repo_graph.get_ripple_scores(anchors)
+            elif inferred_task == TaskType.EDIT2RIPPLE:
+                if ablation.enable_graph:
+                    anchors = query_obj.anchor_files
+                    if not anchors:
+                        top_idx = int(np.argmax(lex_scores)) if len(lex_scores) > 0 else 0
+                        anchors = [self.docs[top_idx].path]
+                    workflow_boosts = self.repo_graph.get_ripple_scores(anchors)
 
         # 4. Fused Score Computation
         fused_scores = (
@@ -307,7 +327,7 @@ class RepoNeedleEngine:
                 execution_time_ms=exec_time,
             )
 
-        # 6. Budget-Aware Context Packing
+        # 6. Budget-Aware Context Packing (Factor E)
         query_terms = self.tokenizer.tokenize_text(query_obj.text)
         candidates_with_scores = []
         for idx, doc in enumerate(self.docs):
@@ -323,6 +343,7 @@ class RepoNeedleEngine:
             candidate_files=candidates_with_scores,
             budget_tokens=eff_budget,
             query_terms=query_terms,
+            allow_skeletons=ablation.allow_skeletons,
         )
 
         total_tokens_used = sum(s.token_count for s in selected)
