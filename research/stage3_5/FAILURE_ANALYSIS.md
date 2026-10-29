@@ -1,3 +1,14 @@
+> [!WARNING]
+> **HISTORICAL AUDIT NOTICE — INVALIDATED RESULT & SUPERSEDED ARCHITECTURE (STAGES 3.6–3.14)**  
+> **Status: INVALIDATED CLAIMS REGARDING CANDIDATE F ADVANTAGE**  
+> While the qualitative analysis of manifest awareness in polyglot repos remains a useful diagnostic concept, the claims presenting Candidate F as a high-performing or winning architecture (e.g. MRR 0.2152) and the memory comparisons are historically superseded.  
+> Candidate F suffered catastrophic rank collapse (MRR 0.1334) under full-corpus polyglot execution due to supernode PageRank dilution.  
+>  
+> For full forensic root-cause analysis and canonical numbers, see:  
+> - [`research/stage3_13/CANONICAL_LINEAGE_AUDIT.md`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_LINEAGE_AUDIT.md)  
+> - [`research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv)  
+> - [`research/stage3_14/HISTORICAL_ERRATA.md`](file:///F:/RepoNeedle/research/stage3_14/HISTORICAL_ERRATA.md)  
+
 # REPONEEDLE STAGE 3.5: COMPREHENSIVE FAILURE & SYSTEM ANALYSIS
 
 **Document Version**: Stage 3.5 Final  

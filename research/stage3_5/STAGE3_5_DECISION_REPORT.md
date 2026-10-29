@@ -1,3 +1,17 @@
+> [!WARNING]
+> **HISTORICAL AUDIT NOTICE — INVALIDATED RESULT & SUPERSEDED ARCHITECTURE (STAGES 3.6–3.14)**  
+> **Status: INVALIDATED & SUPERSEDED**  
+> The claims in this document presenting **Candidate F** as the winning production architecture (MRR 0.2152 vs RepoMap 0.2140) have been **formally invalidated**.  
+> Subsequent rigorous audits in Stages 3.6 through 3.13 established that:  
+> 1. **RepoMap Reference Artifact**: The `0.2140` MRR reported for `BASE-REPOMAP` was an unmeasured, hardcoded static reference constant; the true pinned official RepoMap (`9e4d689`) achieves **MRR 0.2293**, **Recall@20 0.6599**, and **Token BCY@8k 0.3177**.  
+> 2. **Candidate F Rank Collapse**: Candidate F scores in Stage 3.5 relied on uncoupled synthetic Stage 2 lookup artifacts. When evaluated end-to-end on the complete polyglot corpus, Candidate F collapsed to **MRR 0.1334** due to supernode PageRank dilution and uncoupled token length penalties.  
+> 3. **Canonical Status**: The canonical winner of the RepoNeedle research programme on ARB v2 is **CONFIG-09** (MRR 0.2061), with **CONFIG-10** (MRR 0.2019) proven statistically equivalent within $\Delta = \pm 0.015$ ($p = 5.12 \times 10^{-12}$).  
+>  
+> For full forensic root-cause analysis, canonical recomputations, and errata ledger, see:  
+> - [`research/stage3_13/CANONICAL_LINEAGE_AUDIT.md`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_LINEAGE_AUDIT.md)  
+> - [`research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv)  
+> - [`research/stage3_14/HISTORICAL_ERRATA.md`](file:///F:/RepoNeedle/research/stage3_14/HISTORICAL_ERRATA.md)  
+
 # REPONEEDLE STAGE 3.5: ARCHITECTURAL DECISION & SYSTEM REPORT
 
 **Author**: RepoNeedle Research & Engineering Team  

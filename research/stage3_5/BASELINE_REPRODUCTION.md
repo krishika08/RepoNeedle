@@ -1,3 +1,16 @@
+> [!WARNING]
+> **HISTORICAL AUDIT NOTICE — INVALIDATED RESULT & SUPERSEDED ARCHITECTURE (STAGES 3.6–3.14)**  
+> **Status: SUPERSEDED BASELINE ASSUMPTIONS**  
+> The baseline figures and external comparisons in this report cite the Stage 3.5 static reference values (such as `BASE-REPOMAP` MRR 0.2140 and `CAND-C` 0.2040 calculated under uncoupled Stage 2 synthetic lookups).  
+> Subsequent audits in Stages 3.6 through 3.13 established that:  
+> 1. Pinned official RepoMap (`9e4d689`) achieves **MRR 0.2293**, **Recall@20 0.6599**, and **Token BCY@8k 0.3177**.  
+> 2. Canonical Candidate C under true full-corpus execution achieves **MRR 0.1399** and **Recall@20 0.5105**.  
+>  
+> For full forensic root-cause analysis and canonical numbers, see:  
+> - [`research/stage3_13/CANONICAL_LINEAGE_AUDIT.md`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_LINEAGE_AUDIT.md)  
+> - [`research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv)  
+> - [`research/stage3_14/HISTORICAL_ERRATA.md`](file:///F:/RepoNeedle/research/stage3_14/HISTORICAL_ERRATA.md)  
+
 # REPONEEDLE STAGE 3.5: BASELINE REPRODUCTION AND RECONCILIATION
 
 **Document ID**: `STAGE3.5-BASE-001`  

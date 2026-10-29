@@ -1,0 +1,8 @@
+system_id,configuration_key,description,query_count,mrr,recall_at_1,recall_at_5,recall_at_10,recall_at_20,precision_at_5,precision_at_10,precision_at_20,token_bcy_at_8k,latency_p50_ms,latency_p95_ms
+BASE-BM25,CONFIG-01,"Official BM25 Baseline (Okapi k1=1.5, b=0.75)",345,0.1759,0.0478,0.1990,0.3234,0.4622,0.0568,0.0455,0.0326,0.2121,15.40,414.44
+CONFIG-09,CONFIG-09,Corrected Hybrid: Decoupled BM25 + Subword + DocFilter (No PR),345,0.2061,0.0473,0.2512,0.3767,0.5576,0.0725,0.0536,0.0390,0.2729,23.20,474.22
+CONFIG-10,CONFIG-10,Sparse Top-50 Retrieval + Subword Reranking,345,0.2019,0.0473,0.2459,0.3776,0.5494,0.0713,0.0533,0.0386,0.2633,15.45,414.66
+CONFIG-11,CONFIG-11,Recovered Candidate: CONFIG-09 + Bounded Graph Diffusion,345,0.2063,0.0473,0.2541,0.3825,0.5513,0.0730,0.0542,0.0386,0.2696,23.30,476.02
+CAND-C,CONFIG-06,Candidate C Canonical (PageRank Contaminated),345,0.1394,0.0130,0.2068,0.3196,0.5163,0.0545,0.0443,0.0358,0.2420,23.61,482.19
+CAND-F,CONFIG-07,Candidate F Canonical (Unbounded Graph Diffusion),345,0.1334,0.0087,0.1824,0.3345,0.5165,0.0510,0.0455,0.0364,0.2336,24.02,485.14
+BASE-REPOMAP,BASE-REPOMAP,Version-Pinned Official RepoMap Reference (commit 9e4d689),345,0.2293,0.0725,0.3337,0.5110,0.6599,0.0186,0.0139,0.0087,0.3177,180.20,180.20

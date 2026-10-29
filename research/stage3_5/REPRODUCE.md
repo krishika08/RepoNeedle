@@ -1,3 +1,13 @@
+> [!WARNING]
+> **HISTORICAL AUDIT NOTICE — INVALIDATED RESULT & SUPERSEDED ARCHITECTURE (STAGES 3.6–3.14)**  
+> **Status: SUPERSEDED REPRODUCTION GUIDE**  
+> Running the scripts described below produces synthetic lookup evaluations and compares against an unmeasured, hardcoded RepoMap reference. The claim of Candidate F MRR 0.2152 has been formally invalidated.  
+>  
+> For canonical reproduction instructions and data, see:  
+> - [`research/stage3_13/CANONICAL_LINEAGE_AUDIT.md`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_LINEAGE_AUDIT.md)  
+> - [`research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv)  
+> - [`research/stage3_14/HISTORICAL_ERRATA.md`](file:///F:/RepoNeedle/research/stage3_14/HISTORICAL_ERRATA.md)  
+
 # REPONEEDLE STAGE 3.5: EXPERIMENTAL REPRODUCTION GUIDE
 
 This guide provides step-by-step instructions to reproduce all Stage 3.5 experiments, metrics, and CSV deliverables on Windows using PowerShell and Python 3.11+.
