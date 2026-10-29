@@ -1,0 +1,5 @@
+system_id,evaluation_scope,query_count,mrr,recall_at_5,recall_at_10,recall_at_20_fractional,hit_at_20_binary,precision_at_5,bcy_at_8k
+BASE-BM25,Full Repository Corpus (N=345),345,0.1735,0.1986,0.3118,0.4549,0.5304,0.0568,0.0493
+CAND-C,Full Repository Corpus (N=345),345,0.1399,0.2111,0.3196,0.5105,0.6000,0.0557,0.0188
+CAND-F,Full Repository Corpus (N=345),345,0.1351,0.1824,0.3316,0.5078,0.6029,0.0504,0.0159
+BASE-REPOMAP,Full Repository Corpus (N=345),345,0.2293,0.3337,0.5110,0.6599,0.7478,0.0186,0.0652

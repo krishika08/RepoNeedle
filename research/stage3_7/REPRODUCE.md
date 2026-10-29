@@ -33,22 +33,33 @@ git rev-parse "v0.1.0-baseline^{commit}" "stage3-candidate-freeze^{commit}"
 
 ## 2. Automated Regression Unit Tests
 
-Execute the full suite of regression unit tests covering the metric contract, mathematical definitions, character vs token budget packing, and clustered bootstrap statistics:
+Execute the full suite of regression unit tests covering the metric contract, mathematical definitions, character vs token budget packing, tag immutability, shortcut excision, and fail-closed audit checks:
 
 ```powershell
-python -m pytest tests/test_stage3_7_metrics.py -v
+python -m pytest tests/test_stage3_7_metrics.py tests/test_stage3_7_fail_closed_audit.py -v
 ```
-- Expected output: `9 passed in ~50s`
+- Expected output: `16 passed` (9 metric tests + 7 fail-closed audit tests).
 
 To run the complete RepoNeedle unit test suite:
 ```powershell
 python -m pytest tests/
 ```
-- Expected output: `59 passed` (50 baseline tests + 9 Stage 3.7 tests).
+- Expected output: `117 passed`.
 
 ---
 
-## 3. Reconciling the Stage 3.5 vs. Stage 3.6 Discrepancies
+## 3. Regenerating Canonical Stage 3.7 Evaluation Results
+
+To deterministically recompute the canonical evaluation aggregates and per-query JSONL records:
+
+```powershell
+python research/stage3_7/generate_canonical_stage3_7.py
+```
+- Generates `research/stage3_7/CANONICAL_RESULTS.csv` and `research/stage3_7/PER_QUERY_RESULTS.jsonl` (345 queries x 4 systems = 1,380 evaluations).
+
+---
+
+## 4. Reconciling the Stage 3.5 vs. Stage 3.6 Discrepancies
 
 To inspect the exact macro metrics across all 4 systems from the authoritative dataset `research/stage3_6/PER_QUERY_RESULTS.csv`, execute:
 
@@ -79,7 +90,7 @@ BASE-REPOMAP    | MRR: 0.2293 | R@5: 0.3337 | R@20: 0.6599 | CharCov@8k: 0.0652 
 
 ---
 
-## 4. Re-Running the Statistical Audit
+## 5. Re-Running the Statistical Audit
 
 To verify the Wilcoxon signed-rank and repository-clustered bootstrap results:
 
@@ -91,7 +102,7 @@ python research/stage3_6/compute_paired_statistics.py
 
 ---
 
-## 5. Artifact Checksum Verification
+## 6. Artifact Checksum Verification
 
 Verify that all research artifacts match their recorded SHA-256 hashes:
 
