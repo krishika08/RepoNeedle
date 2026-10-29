@@ -1,83 +1,64 @@
-# REPONEEDLE STAGE 3.10: EXACT REPRODUCTION GUIDE
+# RepoNeedle Stage 3.10 — Reproduction Guide
 
-This guide provides instructions to reproduce all Stage 3.10 canonical results, evaluator audits, statistical tests, and performance benchmarks.
+This document describes how to independently reproduce the Stage 3.10 Class-to-Test Invocation Graph research results and verify all invariants.
 
----
+## 1. Prerequisites & Environment
 
-## 1. PRE-FLIGHT ENVIRONMENT & WORKSPACE CHECK
+- Windows OS (or Linux / macOS with compatible Python 3.12+ environment)
+- Python 3.12+
+- Pytest and dependencies installed:
+  ```bash
+  pip install pytest scipy numpy
+  ```
 
-Verify the repository state and frozen baseline tags:
+## 2. Verify Frozen Tags and Starting State
+
+Verify that the frozen reference tags remain untouched before running any evaluations:
+
 ```bash
 git checkout research-program
-git rev-parse HEAD
-# Ensure tags are intact:
-git tag -l -n1
-# Expected tags:
-#   v0.1.0-baseline
-#   stage3-candidate-freeze
+git rev-parse v0.1.0-baseline
+# Expected: 8e0042553a14b6e3c6cf5b35823c4da84181a8e9
+
+git rev-parse stage3-candidate-freeze
+# Expected: cd7f3b01e28695f9a9357e0815069e0eae85baca
 ```
 
----
+## 3. Run Targeted Class-to-Test Unit Tests
 
-## 2. REPRODUCING THE OFFICIAL ARB EVALUATOR AUDIT
+Execute the 10 targeted Stage 3.10 unit tests verifying AST parsing, evidence priority, generic symbol suppression, and rank-preservation invariants:
 
-To inspect the upstream ARB repository revision and verify the deterministic RepoMap PR #3 commit:
 ```bash
-cd external/agent-retrieval-bench
-git rev-parse HEAD
-# Expected: 9e4d68937f29d5967afd62f4f6a24c1478298133
-git log -1 f0cc9be --oneline
-# Expected: f0cc9be Prevent hash-seed drift in RepoMap evaluation (#3)
+pytest tests/test_stage3_10_class_to_test.py -v
 ```
 
-Run the official evaluation audit report generator:
+Execute the full regression test suite (143 tests):
+
 ```bash
-python research/stage3_10/ARB_EVALUATOR_AUDIT.md
+pytest
 ```
 
----
+## 4. Run the Full 345-Query ARB v2 Canonical Evaluation
 
-## 3. REPRODUCING THE CANONICAL COMPARISON & STATISTICAL TESTS
+To reproduce the four evaluation arms (`CONTROL-CASCADE`, `TEST-GRAPH`, `DEGREE-CONTROL`, `GRAPH-ABLATION`) across all 218 snapshots and 345 queries:
 
-Run the unified Stage 3.10 canonical benchmark generator:
 ```bash
-python research/stage3_10/generate_canonical_results.py
+python research/stage3_10/evaluate_stage3_10.py
 ```
-Outputs produced:
-- `research/stage3_10/CANONICAL_RESULTS.csv` (7 systems $	imes$ full metric suite)
-- `research/stage3_10/PER_QUERY_RESULTS.csv` (345 queries $	imes$ 7 systems)
-- `research/stage3_10/PER_TASK_RESULTS.csv` (4-track breakdown)
-- `research/stage3_10/PER_REPOSITORY_RESULTS.csv` (25-repository breakdown)
-- `research/stage3_10/PAIRED_STATISTICAL_TESTS.csv` (Holm's step-down multiplicity correction and bootstrap CIs)
 
----
+This will generate:
+- `research/stage3_10/PER_QUERY_RESULTS.csv` (all 345 queries with per-arm metrics)
+- `research/stage3_10/PER_TASK_RESULTS.csv` (task-stratified breakdown)
+- `research/stage3_10/PER_REPOSITORY_RESULTS.csv` (repository-stratified breakdown)
+- `research/stage3_10/GRAPH_EDGE_DIAGNOSTICS.csv` (graph structure, edge counts, unresolved references)
+- `research/stage3_10/stage3_10_evaluation_summary.json` (aggregate metrics, bootstrap intervals, Wilcoxon test)
 
-## 4. REPRODUCING CODE LEAKAGE AUDIT
+## 5. Verify Invariants and Integrity
 
-To scan the codebase for hardcoded benchmark strings or synthetic shortcuts:
+Run the verification test suite:
+
 ```bash
-python research/stage3_10/run_leakage_audit.py
+pytest tests/test_stage3_10_verification.py -v
 ```
-Output:
-- `research/stage3_10/LEAKAGE_AND_SPECIAL_CASE_AUDIT.md` (0 hits verified)
 
----
-
-## 5. REPRODUCING RUNTIME & MEMORY PROFILING
-
-To profile process RSS via Windows PSAPI and query latency percentiles across small, medium, and large repositories:
-```bash
-python research/stage3_9/audit_runtime_and_memory.py
-```
-Output produced:
-- `research/stage3_10/RUNTIME_MEMORY_RESULTS.csv`
-
----
-
-## 6. RUNNING UNIT & REGRESSION TESTS
-
-Execute the full pytest suite:
-```bash
-python -m pytest tests/ -v
-```
-All 71 tests must pass.
+All assertions must pass cleanly.

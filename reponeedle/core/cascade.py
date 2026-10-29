@@ -35,6 +35,9 @@ class CascadedRanker:
         test_discovery: bool = True,
         doc_filter_penalty: float = 0.5,
         graph_weight: float = 0.25,
+        enable_class_to_test: bool = False,
+        enable_degree_matched_control: bool = False,
+        class_to_test_weight: float = 0.35,
     ):
         self.top_k_preserve = top_k_preserve
         self.enable_graph_expansion = enable_graph_expansion
@@ -43,6 +46,9 @@ class CascadedRanker:
         self.test_discovery = test_discovery
         self.doc_filter_penalty = doc_filter_penalty
         self.graph_weight = graph_weight
+        self.enable_class_to_test = enable_class_to_test
+        self.enable_degree_matched_control = enable_degree_matched_control
+        self.class_to_test_weight = class_to_test_weight
 
     def rank(
         self,
@@ -139,6 +145,10 @@ class CascadedRanker:
                 if self.test_discovery:
                     self._apply_test_discovery(seed_p, seed_score, eligible_set, path_to_idx, docs, graph_boost)
 
+                # D. Class-to-Test Invocation Linkage (Stage 3.10)
+                if self.enable_class_to_test:
+                    self._apply_class_to_test_invocation(seed_p, seed_score, eligible_set, path_to_idx, docs, repo_graph, graph_boost)
+
         # 4. Score Fusion for Ranks >= K
         # Normalizes signals and applies doc filter penalty
         rerank_scores = {}
@@ -233,3 +243,53 @@ class CascadedRanker:
                 if idx in eligible_set:
                     graph_boost[idx] = max(graph_boost[idx], float(seed_score * 0.35))
 
+
+    def _apply_class_to_test_invocation(
+        self,
+        seed_path: str,
+        seed_score: float,
+        eligible_set: Set[int],
+        path_to_idx: Dict[str, int],
+        docs: List[FileDoc],
+        repo_graph: Any,
+        graph_boost: np.ndarray,
+    ):
+        """
+        Propagates relevance between production files and test files via evidence-backed
+        class and method invocation relationships.
+        """
+        if not repo_graph:
+            return
+
+        if self.enable_degree_matched_control:
+            prod_to_tests = getattr(repo_graph, "degree_matched_prod_to_test", {})
+            test_to_prods = getattr(repo_graph, "degree_matched_test_to_prod", {})
+        else:
+            prod_to_tests = getattr(repo_graph, "prod_to_test_invocations", {})
+            test_to_prods = getattr(repo_graph, "test_to_prod_invocations", {})
+
+        # If seed is production file, find test files that invoke it
+        if seed_path in prod_to_tests:
+            target_tests = prod_to_tests[seed_path]
+            out_deg = max(1, len(target_tests))
+            for test_p in target_tests:
+                if test_p in path_to_idx:
+                    t_idx = path_to_idx[test_p]
+                    if t_idx in eligible_set:
+                        in_deg = max(1, len(test_to_prods.get(test_p, {seed_path})))
+                        norm_factor = 1.0 / math.sqrt(out_deg * in_deg) if self.degree_normalized else 1.0
+                        boost = seed_score * self.class_to_test_weight * norm_factor
+                        graph_boost[t_idx] = max(graph_boost[t_idx], float(boost))
+
+        # If seed is test file, find production files whose classes it exercises
+        if seed_path in test_to_prods:
+            target_prods = test_to_prods[seed_path]
+            out_deg = max(1, len(target_prods))
+            for prod_p in target_prods:
+                if prod_p in path_to_idx:
+                    p_idx = path_to_idx[prod_p]
+                    if p_idx in eligible_set:
+                        in_deg = max(1, len(prod_to_tests.get(prod_p, {seed_path})))
+                        norm_factor = 1.0 / math.sqrt(out_deg * in_deg) if self.degree_normalized else 1.0
+                        boost = seed_score * self.class_to_test_weight * norm_factor
+                        graph_boost[p_idx] = max(graph_boost[p_idx], float(boost))

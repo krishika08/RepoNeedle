@@ -1,0 +1,46 @@
+{
+  "stage": "3.10",
+  "stage_title": "Class-to-Test Invocation Graph Research",
+  "timestamp": "2026-10-29T17:58:00+05:30",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "architecture": "AMD64",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "git_provenance": {
+    "branch": "research-program",
+    "starting_commit": "110ff88d7f16c796fc24b55c569ceb2345d514ce",
+    "frozen_tags": {
+      "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+      "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+    }
+  },
+  "experimental_parameters": {
+    "candidate_universe": "unconstrained_full_corpus",
+    "query_count": 345,
+    "snapshot_count": 218,
+    "top_k_preserve": 3,
+    "class_to_test_weight": 0.35,
+    "degree_normalization": true,
+    "package_fencing": true,
+    "test_discovery": true,
+    "tie_breaking": "path_ascending_deterministic",
+    "random_seed": 42,
+    "bootstrap_replicates": 10000
+  },
+  "file_hashes_sha256": {
+    "research/stage3_10/evaluate_stage3_10.py": "719f4969a6a58f9b778abc23b0966430dc1a46c1fa1d388ab01d255afa62ae99",
+    "research/stage3_10/PER_QUERY_RESULTS.csv": "8a6ca945594f0b5febd03f747cd4dcd9fb8af5f38be5ae4cbf16ccf0e9e79a63",
+    "research/stage3_10/PER_TASK_RESULTS.csv": "9e248a72a3a1f819b2a49c3adb385ab5551c307ae6d58f210df4f4fd78f5d496",
+    "research/stage3_10/PER_REPOSITORY_RESULTS.csv": "664339af2865ca6a9039882d65cded8510bb4649ab9c454fc549963a22c87ccb",
+    "research/stage3_10/GRAPH_EDGE_DIAGNOSTICS.csv": "f1cfadd7329e9e59097779e0a14687d8829efd40b6b1f8fa5691f643f471b6a5",
+    "research/stage3_10/stage3_10_evaluation_summary.json": "79ec4178fffdc8bbe4710353a87d3d2e7c34a77f92280da50af68873976ab1f5",
+    "research/stage3_10/EXPERIMENT_REGISTRY.jsonl": "a212d94bdbf4a9d2e1043505f3a55206732f020102eafd6eab686e4b6b6d891a",
+    "reponeedle/core/graph.py": "bed12b4bb1de4e00a0f284ae42f7d88b2e953df5cdbe300e93988e52537cffdf",
+    "reponeedle/core/cascade.py": "32e4e08e9755d3293f17afcfae5811b7efd6b124bad981ede6f5dff576213fd4",
+    "tests/test_stage3_10_class_to_test.py": "a396d2d1db823470c6c57b433fcf2bbda50b8ff6179828866f2abbdd23b43c82",
+    "external/agent-retrieval-bench/data/corpus/v2_selective_mixed/corpus_manifest.jsonl": "f7bc6131f40b9527911adc0d7f974b3c2329a37fc2d823b0379daa301b0aa28b"
+  }
+}

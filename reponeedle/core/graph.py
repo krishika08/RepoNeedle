@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 """
 AST parsing and repository dependency graph engine.
 Constructs directed dependency graphs, calculates structural centrality, and resolves
@@ -47,6 +50,15 @@ class RepoGraph:
         self.manifest_crates: Dict[str, str] = {}
         self.crate_dependencies: Dict[str, Set[str]] = {}
         self.pagerank_scores: np.ndarray = np.array([], dtype=np.float32)
+        # Stage 3.10: Class-to-Test Invocation Linkage
+        self.enable_class_to_test: bool = False
+        self.enable_degree_matched_control: bool = False
+        self.invocation_edges: List[Dict[str, Any]] = []
+        self.prod_to_test_invocations: Dict[str, Set[str]] = {}
+        self.test_to_prod_invocations: Dict[str, Set[str]] = {}
+        self.degree_matched_prod_to_test: Dict[str, Set[str]] = {}
+        self.degree_matched_test_to_prod: Dict[str, Set[str]] = {}
+        self.unresolved_diagnostics: List[Dict[str, Any]] = []
 
     @staticmethod
     def extract_python_ast(content: str, filepath: str) -> Tuple[List[str], List[str]]:
@@ -273,6 +285,12 @@ class RepoGraph:
         self.package_to_files.clear()
         self.manifest_crates.clear()
         self.crate_dependencies.clear()
+        self.invocation_edges.clear()
+        self.prod_to_test_invocations.clear()
+        self.test_to_prod_invocations.clear()
+        self.degree_matched_prod_to_test.clear()
+        self.degree_matched_test_to_prod.clear()
+        self.unresolved_diagnostics.clear()
 
         # 1. Build symbol index and discover packages/manifests
         for doc in docs:
@@ -480,6 +498,9 @@ class RepoGraph:
                         self.target_to_test_map[t] = set()
                     self.target_to_test_map[t].add(doc.path)
 
+        # Stage 3.10: Class-to-Test Invocation Linkage
+        self._extract_class_to_test_linkages(docs)
+
         # Compute PageRank for structural centrality
         if self.num_docs > 0:
             try:
@@ -558,3 +579,252 @@ class RepoGraph:
                     scores[self.path_to_idx[t]] = 1.0
 
         return scores
+
+    def _extract_class_to_test_linkages(self, docs: List[FileDoc]):
+        """
+        Extracts evidence-backed class-to-test invocation relationships across
+        Python, Rust, Go, TypeScript/JavaScript.
+        """
+        GENERIC_NAMES = {
+            "Config", "Options", "State", "Context", "Base", "Error", "Item",
+            "Entry", "Node", "Handler", "Client", "Response", "Request",
+            "Builder", "Helper", "Result", "Event", "Manager", "Data",
+            "Value", "Info", "Model", "Service", "Session", "Task", "App",
+            "Engine", "Parser", "Server", "Type", "Param", "Params"
+        }
+
+        # 1. Catalog production classes, types, and methods
+        prod_classes: Dict[str, List[Tuple[str, List[str]]]] = {}
+        class_to_defining_files: Dict[str, Set[str]] = {}
+
+        for doc in docs:
+            if doc.is_test:
+                continue
+            norm_p = doc.path.replace("\\", "/").lower()
+            content = doc.content
+
+            # A. Python
+            if norm_p.endswith(".py"):
+                if "class " not in content and "def " not in content:
+                    continue
+                try:
+                    tree = ast.parse(content, filename=doc.path)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.ClassDef):
+                            cname = node.name
+                            methods = [
+                                n.name for n in node.body
+                                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                            ]
+                            prod_classes.setdefault(cname, []).append((doc.path, methods))
+                            class_to_defining_files.setdefault(cname, set()).add(doc.path)
+                except Exception:
+                    for m in re.finditer(r"^\s*class\s+([a-zA-Z0-9_]+)", content, re.MULTILINE):
+                        cname = m.group(1)
+                        prod_classes.setdefault(cname, []).append((doc.path, []))
+                        class_to_defining_files.setdefault(cname, set()).add(doc.path)
+
+            # B. Rust
+            elif norm_p.endswith(".rs"):
+                struct_re = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?(?:struct|enum|trait)\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+                impl_re = re.compile(r"^\s*impl(?:\s*<[^>]*>)?\s+([a-zA-Z0-9_]+)\s*\{([^}]*)\}", re.DOTALL)
+                for m in struct_re.finditer(content):
+                    cname = m.group(1)
+                    prod_classes.setdefault(cname, []).append((doc.path, []))
+                    class_to_defining_files.setdefault(cname, set()).add(doc.path)
+                for m in impl_re.finditer(content):
+                    cname = m.group(1)
+                    body = m.group(2)
+                    methods = re.findall(r"fn\s+([a-zA-Z0-9_]+)", body)
+                    prod_classes.setdefault(cname, []).append((doc.path, methods))
+                    class_to_defining_files.setdefault(cname, set()).add(doc.path)
+
+            # C. Go
+            elif norm_p.endswith(".go"):
+                type_re = re.compile(r"^\s*type\s+([a-zA-Z0-9_]+)\s+(?:struct|interface)", re.MULTILINE)
+                method_re = re.compile(r"^\s*func\s+\(\s*[^)]*\*?\s*([a-zA-Z0-9_]+)\s*\)\s*([a-zA-Z0-9_]+)", re.MULTILINE)
+                for m in type_re.finditer(content):
+                    cname = m.group(1)
+                    prod_classes.setdefault(cname, []).append((doc.path, []))
+                    class_to_defining_files.setdefault(cname, set()).add(doc.path)
+                for m in method_re.finditer(content):
+                    cname = m.group(1)
+                    mname = m.group(2)
+                    prod_classes.setdefault(cname, []).append((doc.path, [mname]))
+                    class_to_defining_files.setdefault(cname, set()).add(doc.path)
+
+            # D. JS / TS
+            elif norm_p.endswith((".ts", ".tsx", ".js", ".jsx", ".mjs")):
+                class_re = re.compile(r"^\s*(?:export\s+)?(?:class|interface)\s+([a-zA-Z0-9_]+)", re.MULTILINE)
+                for m in class_re.finditer(content):
+                    cname = m.group(1)
+                    prod_classes.setdefault(cname, []).append((doc.path, []))
+                    class_to_defining_files.setdefault(cname, set()).add(doc.path)
+
+        # 2. Inspect test files for invocations
+        for doc in docs:
+            if not doc.is_test:
+                continue
+            norm_p = doc.path.replace("\\", "/").lower()
+            content = doc.content
+
+            detected_calls: Set[Tuple[str, str, str]] = set()
+
+            # A. Python
+            if norm_p.endswith(".py"):
+                try:
+                    tree = ast.parse(content, filename=doc.path)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.Call):
+                            if isinstance(node.func, ast.Name):
+                                if node.func.id in prod_classes:
+                                    detected_calls.add((node.func.id, "", "DIRECT_CLASS_CONSTRUCTION"))
+                            elif isinstance(node.func, ast.Attribute):
+                                if node.func.attr in prod_classes:
+                                    detected_calls.add((node.func.attr, "", "IMPORTED_MODULE_CALL"))
+                                else:
+                                    detected_calls.add(("", node.func.attr, "DIRECT_METHOD_CALL"))
+                        elif isinstance(node, ast.ImportFrom):
+                            for alias in node.names:
+                                if alias.name in prod_classes:
+                                    detected_calls.add((alias.name, "", "CLASS_IMPORT"))
+                except Exception:
+                    for m in re.finditer(r"\b([A-Z][a-zA-Z0-9_]+)\(", content):
+                        if m.group(1) in prod_classes:
+                            detected_calls.add((m.group(1), "", "DIRECT_CLASS_CONSTRUCTION"))
+                    for m in re.finditer(r"\.([a-z0-9_]+)\(", content):
+                        detected_calls.add(("", m.group(1), "DIRECT_METHOD_CALL"))
+
+            # B. Rust
+            elif norm_p.endswith(".rs"):
+                for m in re.finditer(r"\b([A-Z][a-zA-Z0-9_]*)::(?:new|default|from)\b|\b([A-Z][a-zA-Z0-9_]*)\s*\{", content):
+                    cname = m.group(1) or m.group(2)
+                    if cname in prod_classes:
+                        detected_calls.add((cname, "", "DIRECT_CLASS_CONSTRUCTION"))
+                for m in re.finditer(r"\.([a-z0-9_]+)\(", content):
+                    detected_calls.add(("", m.group(1), "DIRECT_METHOD_CALL"))
+                for m in re.finditer(r"use\s+.*::([A-Z][a-zA-Z0-9_]*)\b", content):
+                    if m.group(1) in prod_classes:
+                        detected_calls.add((m.group(1), "", "CLASS_IMPORT"))
+
+            # C. Go
+            elif norm_p.endswith(".go"):
+                for m in re.finditer(r"&(?:[a-zA-Z0-9_]+\.)?([A-Z][a-zA-Z0-9_]*)\s*\{|\b(?:New|Make)([A-Z][a-zA-Z0-9_]*)\b", content):
+                    cname = m.group(1) or m.group(2)
+                    if cname in prod_classes:
+                        detected_calls.add((cname, "", "DIRECT_CLASS_CONSTRUCTION"))
+                for m in re.finditer(r"\.([A-Z][a-zA-Z0-9_]*)\(", content):
+                    detected_calls.add(("", m.group(1), "DIRECT_METHOD_CALL"))
+
+            # D. JS/TS
+            elif norm_p.endswith((".ts", ".tsx", ".js", ".jsx", ".mjs")):
+                for m in re.finditer(r"\bnew\s+([A-Z][a-zA-Z0-9_]*)\b", content):
+                    cname = m.group(1)
+                    if cname in prod_classes:
+                        detected_calls.add((cname, "", "DIRECT_CLASS_CONSTRUCTION"))
+                for m in re.finditer(r"\b([A-Z][a-zA-Z0-9_]*)\.([a-zA-Z0-9_]+)\(", content):
+                    cname = m.group(1)
+                    mname = m.group(2)
+                    if cname in prod_classes:
+                        detected_calls.add((cname, mname, "DIRECT_METHOD_CALL"))
+
+            # 3. Disambiguate and link candidate calls
+            for cname, mname, ev_type in detected_calls:
+                target_paths = set()
+                conf = 1.0
+
+                if cname:
+                    defining_files = class_to_defining_files.get(cname, set())
+                    if len(defining_files) == 1:
+                        target_paths = defining_files
+                        conf = 1.0 if ev_type == "DIRECT_CLASS_CONSTRUCTION" else 0.90
+                    elif len(defining_files) > 1:
+                        if cname in GENERIC_NAMES or len(defining_files) > 3:
+                            matching_imports = set()
+                            for df in defining_files:
+                                mod_name = self._normalize_module_name(df)
+                                if any(imp == mod_name or imp.endswith(mod_name) or imp in df for imp in doc.imports):
+                                    matching_imports.add(df)
+                            if len(matching_imports) == 1:
+                                target_paths = matching_imports
+                                conf = 0.85
+                                ev_type = "IMPORTED_MODULE_CALL"
+                            else:
+                                self.unresolved_diagnostics.append({
+                                    "test_path": doc.path,
+                                    "class_name": cname,
+                                    "candidate_count": len(defining_files),
+                                    "candidates": sorted(list(defining_files))[:5],
+                                    "reason": "AMBIGUOUS_GENERIC_CLASS_WITHOUT_QUALIFYING_IMPORT",
+                                })
+                        else:
+                            matching_dir = {df for df in defining_files if os.path.dirname(df.replace("\\", "/")) == os.path.dirname(doc.path.replace("\\", "/"))}
+                            if len(matching_dir) == 1:
+                                target_paths = matching_dir
+                                conf = 0.80
+                            else:
+                                matching_imports = {df for df in defining_files if any(imp in df for imp in doc.imports)}
+                                if len(matching_imports) == 1:
+                                    target_paths = matching_imports
+                                    conf = 0.80
+                                else:
+                                    self.unresolved_diagnostics.append({
+                                        "test_path": doc.path,
+                                        "class_name": cname,
+                                        "candidate_count": len(defining_files),
+                                        "candidates": sorted(list(defining_files))[:5],
+                                        "reason": "MULTI_FILE_DEFINITION_UNRESOLVED",
+                                    })
+
+                elif mname and len(mname) > 3 and mname not in ("get", "set", "run", "init", "exec", "call", "close", "read", "write", "test", "main", "start", "stop"):
+                    classes_with_method = []
+                    for cls_name, pairs in prod_classes.items():
+                        for p, methods in pairs:
+                            if mname in methods:
+                                classes_with_method.append((cls_name, p))
+                    if len(classes_with_method) == 1:
+                        cname, p = classes_with_method[0]
+                        target_paths = {p}
+                        conf = 0.75
+                        ev_type = "DIRECT_METHOD_CALL"
+
+                # Record resolved edges with evidence priority
+                ev_prio = {"DIRECT_CLASS_CONSTRUCTION": 4, "DIRECT_METHOD_CALL": 3, "IMPORTED_MODULE_CALL": 2, "CLASS_IMPORT": 1}
+                for t_path in target_paths:
+                    if t_path != doc.path:
+                        existing = [e for e in self.invocation_edges if e["test_path"] == doc.path and e["prod_path"] == t_path and e["class_name"] == cname]
+                        if existing:
+                            if ev_prio.get(ev_type, 0) > ev_prio.get(existing[0]["evidence_type"], 0):
+                                existing[0]["evidence_type"] = ev_type
+                                existing[0]["confidence"] = conf
+                                if mname: existing[0]["method_name"] = mname
+                        else:
+                            self.invocation_edges.append({
+                                "test_path": doc.path,
+                                "prod_path": t_path,
+                                "class_name": cname,
+                                "method_name": mname,
+                                "evidence_type": ev_type,
+                                "confidence": conf,
+                                "is_ambiguous": False,
+                            })
+                        self.prod_to_test_invocations.setdefault(t_path, set()).add(doc.path)
+                        self.test_to_prod_invocations.setdefault(doc.path, set()).add(t_path)
+
+                        if self.enable_class_to_test:
+                            self.graph.add_edge(t_path, doc.path, edge_type="class_to_test", confidence=conf)
+                            self.graph.add_edge(doc.path, t_path, edge_type="test_to_class", confidence=conf)
+
+        # 4. Construct degree-matched control graph
+        all_test_nodes = sorted(list(self.test_to_prod_invocations.keys()))
+        all_prod_nodes = sorted(list(self.prod_to_test_invocations.keys()))
+        if all_test_nodes and all_prod_nodes:
+            rng = np.random.RandomState(42)
+            for p, tests in self.prod_to_test_invocations.items():
+                k = min(len(tests), len(all_test_nodes))
+                matched_tests = set(rng.choice(all_test_nodes, size=k, replace=False))
+                self.degree_matched_prod_to_test[p] = matched_tests
+            for t, prods in self.test_to_prod_invocations.items():
+                k = min(len(prods), len(all_prod_nodes))
+                matched_prods = set(rng.choice(all_prod_nodes, size=k, replace=False))
+                self.degree_matched_test_to_prod[t] = matched_prods
