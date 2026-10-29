@@ -1,8 +1,8 @@
 # Stage 3.8: Complete Reproduction Guide
 
 **Document ID**: `STAGE3-8-REPRO-001`  
-**Stage**: Stage 3.8 — Reproducibility Lock, Metric Reconciliation, and Evidence Audit  
-**Date**: October 28, 2026  
+**Stage**: Stage 3.8 — Independent Metric Verification and Retrieval Root-Cause Investigation  
+**Date**: October 2026  
 **Status**: Step-by-Step Verifiable Reproduction Guide  
 **Workspace**: `F:\RepoNeedle`  
 **Branch**: `research-program`  
@@ -38,25 +38,27 @@ Execute the Stage 3.8 unit test suite covering hand-calculated fixtures, dataset
 ```powershell
 python -m pytest tests/test_stage3_8_reproducibility.py -v
 ```
-- Expected output: `8 passed in ~0.3s`
+- Expected output: `8 passed`
 
 Execute the full RepoNeedle test suite across all subsystems:
 ```powershell
 python -m pytest tests/
 ```
-- Expected output: `67 passed` (50 base + 9 Stage 3.7 + 8 Stage 3.8).
+- Expected output: `117 passed`.
 
 ---
 
-## 3. Re-Generating Canonical Predictions
+## 3. Independent Metric Verification & Diagnostics Generation
 
-To re-generate `research/stage3_8/CANONICAL_PER_QUERY_RESULTS.csv` from source predictions and compute canonical token-budgeted BCY:
+To execute the clean-room independent metric verifier (zero project imports) and regenerate `research/stage3_8/PER_QUERY_DIAGNOSTICS.csv`:
 
 ```powershell
-python research/stage3_8/build_canonical_results.py
+python research/stage3_8/independent_metric_verifier.py
 ```
 - Expected output:
-  `[DONE] Wrote 1380 canonical records to F:\RepoNeedle\research\stage3_8\CANONICAL_PER_QUERY_RESULTS.csv in ~35s.`
+  - Validates 345 positive instances $\times$ 4 systems = 1,380 rows.
+  - Generates `research/stage3_8/PER_QUERY_DIAGNOSTICS.csv`.
+  - Recomputes full-rank MRR, rank-20 cutoff MRR, fractional Recall@5/10/20, binary Hit@20, independent Precision@5, and token BCY@8k.
 
 ---
 
@@ -99,24 +101,25 @@ print('R@20 Point Delta:', round(np.mean(diff_r20), 4))
 print('R@20 95% Clustered CI: [', round(np.percentile(boot_r20, 2.5), 4), ',', round(np.percentile(boot_r20, 97.5), 4), ']')
 "
 ```
-Expected output:
-```
-R@20 Point Delta: 0.0529
-R@20 95% Clustered CI: [ -0.0091 , 0.1689 ]
-```
+- Expected Output:
+  `R@20 Point Delta: +0.0529`
+  `R@20 95% Clustered CI: [-0.0091, 0.1689]`
 
 ---
 
-## 5. Artifact Hash Verification
+## 5. Artifact Verification
 
-Verify SHA-256 hashes for all Stage 3.8 artifacts:
+Verify that all Stage 3.8 research deliverables exist and are non-empty:
 
 ```powershell
-python -c "
-import hashlib
-from pathlib import Path
-for p in sorted(list(Path('research/stage3_8').glob('*.csv')) + list(Path('research/stage3_8').glob('*.md'))):
-    c = p.read_bytes()
-    print(f'{p.name:<35} | {len(c.splitlines()):<5} lines | {hashlib.sha256(c).hexdigest()}')
-"
+Get-ChildItem research\stage3_8 | Select-Object Name, Length
 ```
+- Key files required:
+  - `STAGE3_8_DECISION_REPORT.md`
+  - `INDEPENDENT_METRIC_VERIFICATION.md`
+  - `RANKING_FAILURE_ANALYSIS.md`
+  - `GRAPH_DAMAGE_ANALYSIS.md`
+  - `PER_QUERY_DIAGNOSTICS.csv`
+  - `HYPOTHESIS_REGISTER.csv`
+  - `REPRODUCE.md`
+  - `independent_metric_verifier.py`
