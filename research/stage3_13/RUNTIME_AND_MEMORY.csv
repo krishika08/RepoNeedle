@@ -1,0 +1,4 @@
+repository,scale,docs_count,isolated_baseline_interpreter_rss_mb,isolated_incremental_index_rss_mb,isolated_process_rss_mb,isolated_peak_working_set_mb,isolated_traced_heap_mb,batch_cumulative_rss_mb,indexing_time_ms,query_latency_warm_p50_ms,query_latency_warm_mean_ms
+pallets/click,Small (~133 files),133,66.3,46.3,112.7,123.3,11.6,969.5,118.4,5.4,6.8
+caddyserver/caddy,Medium (~555 files),555,66.3,131.7,198.0,283.3,26.0,982.6,542.1,8.5,11.2
+etcd-io/etcd,Large (~1435 files),1435,66.3,297.8,364.1,654.4,65.9,971.1,1845.6,14.8,38.4

@@ -1,0 +1,39 @@
+{
+  "stage": "3.13",
+  "stage_title": "Canonical Reproducibility and Evidence Reconciliation",
+  "timestamp": "2026-10-30T00:10:00+05:30",
+  "git_provenance": {
+    "branch": "research-program",
+    "head_commit": "275f0ae",
+    "anchor_commits": {
+      "stage_3_5": "4f78cc3658dfb5e338a5458579d38d5d7ef416e8",
+      "stage_3_12": "275f0ae509c6c2dec1b7ad74b5c7c6fbed8e851e"
+    },
+    "frozen_tags": {
+      "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+      "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+    }
+  },
+  "reconciliation_verdict": "RECONCILED",
+  "reconciliation_summary": {
+    "total_queries_reconciled": 345,
+    "total_snapshots": 218,
+    "systems_audited": [
+      "BASE-BM25",
+      "CAND-C",
+      "CAND-F",
+      "CONTROL-CASCADE",
+      "ARM-101",
+      "ARM-111",
+      "BASE-REPOMAP"
+    ],
+    "key_findings": [
+      "Candidate F Stage 3.5 score (0.2152) relied on candidate filtering (tests_only) and synthetic ripgrep bypass; true unconstrained MRR is 0.1338.",
+      "RepoMap Stage 3.5 score (0.2140) was an unmeasured hardcoded reference constant; live official RepoMap achieves 0.2293 MRR.",
+      "Recall@20 of 0.5652 in Stage 3.5 was binary Hit@20 (195/345); true fractional recall is 0.5083.",
+      "Universal sub-100MB claim refuted; fresh process memory scales from 112.7MB (Click) to 364.1MB (Etcd); cumulative batch runner retained 971MB.",
+      "Test suite count increased from 44 to 171 tests due to 121 tests added across Stages 3.6-3.12 for integrity, cascade, graph, and factorial verification.",
+      "ARM-101 (MRR 0.2078) and ARM-111 (MRR 0.2061) are proven statistically superior to CONTROL-CASCADE (0.1897, p < 1e-10) and Candidate F (0.1338, p < 1e-15)."
+    ]
+  }
+}

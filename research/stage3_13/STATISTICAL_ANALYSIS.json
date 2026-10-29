@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "num_queries": 345,
+    "bootstrap_replicates": 10000,
+    "seed": 42
+  },
+  "pairwise_comparisons": {
+    "ARM-101 vs CONTROL-CASCADE": {
+      "comparison": "ARM-101 vs CONTROL-CASCADE",
+      "mean_diff": 0.01806,
+      "ci_95_lower": 0.00931,
+      "ci_95_upper": 0.02735,
+      "wilcoxon_w": 1245.0,
+      "raw_p_value": 4.99857616835585e-16,
+      "wins": 129,
+      "losses": 18,
+      "ties": 198,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "ARM-111 vs CONTROL-CASCADE": {
+      "comparison": "ARM-111 vs CONTROL-CASCADE",
+      "mean_diff": 0.01634,
+      "ci_95_lower": 0.00736,
+      "ci_95_upper": 0.02591,
+      "wilcoxon_w": 2092.0,
+      "raw_p_value": 5.768447010048335e-11,
+      "wins": 121,
+      "losses": 27,
+      "ties": 197,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "CONTROL-CASCADE vs CAND-F": {
+      "comparison": "CONTROL-CASCADE vs CAND-F",
+      "mean_diff": 0.05593,
+      "ci_95_lower": 0.03518,
+      "ci_95_upper": 0.07664,
+      "wilcoxon_w": 14300.0,
+      "raw_p_value": 4.013004098603243e-14,
+      "wins": 232,
+      "losses": 99,
+      "ties": 14,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "CONTROL-CASCADE vs CAND-C": {
+      "comparison": "CONTROL-CASCADE vs CAND-C",
+      "mean_diff": 0.04959,
+      "ci_95_lower": 0.03093,
+      "ci_95_upper": 0.06817,
+      "wilcoxon_w": 12203.0,
+      "raw_p_value": 3.5690768818167964e-17,
+      "wins": 244,
+      "losses": 81,
+      "ties": 20,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "ARM-101 vs BASE-BM25": {
+      "comparison": "ARM-101 vs BASE-BM25",
+      "mean_diff": 0.03262,
+      "ci_95_lower": 0.02218,
+      "ci_95_upper": 0.04373,
+      "wilcoxon_w": 3604.0,
+      "raw_p_value": 6.414723694499325e-31,
+      "wins": 250,
+      "losses": 23,
+      "ties": 72,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "ARM-101 vs BASE-REPOMAP": {
+      "comparison": "ARM-101 vs BASE-REPOMAP",
+      "mean_diff": -0.02149,
+      "ci_95_lower": -0.05276,
+      "ci_95_upper": 0.00965,
+      "wilcoxon_w": 22223.5,
+      "raw_p_value": 0.05589822324059729,
+      "wins": 140,
+      "losses": 178,
+      "ties": 27,
+      "holm_adjusted_p_value": 0.055898,
+      "significant_at_05": false
+    },
+    "BASE-REPOMAP vs CAND-F": {
+      "comparison": "BASE-REPOMAP vs CAND-F",
+      "mean_diff": 0.09548,
+      "ci_95_lower": 0.07048,
+      "ci_95_upper": 0.12256,
+      "wilcoxon_w": 12996.0,
+      "raw_p_value": 2.8125769772199558e-15,
+      "wins": 223,
+      "losses": 101,
+      "ties": 21,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    }
+  }
+}
