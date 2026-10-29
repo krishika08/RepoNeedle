@@ -1,0 +1,54 @@
+{
+  "stage": "3.10.1",
+  "stage_title": "Reproducibility Reconciliation Gate",
+  "timestamp": "2026-10-29T18:18:00+05:30",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "architecture": "AMD64",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "git_provenance": {
+    "branch": "research-program",
+    "head_commit": "21d2586b71e09f8bfa59acef0f9189f8cc4daaa3",
+    "stage_3_5_anchor_commit": "4f78cc3658dfb5e338a5458579d38d5d7ef416e8",
+    "frozen_tags": {
+      "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+      "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+    }
+  },
+  "audited_verdict": "PASS - RECONCILED",
+  "reconciliation_summary": {
+    "total_canonical_queries": 345,
+    "total_corpus_snapshots": 218,
+    "systems_compared": [
+      "BASE-BM25",
+      "CAND-C",
+      "CAND-F",
+      "CONTROL-CASCADE",
+      "TEST-GRAPH",
+      "DEGREE-CONTROL",
+      "BASE-REPOMAP"
+    ],
+    "primary_delta_test_vs_control": 0.00149,
+    "primary_wilcoxon_p_value": 0.000964,
+    "repomap_lead_over_test_graph": 0.03953
+  },
+  "file_hashes_sha256": {
+    "research/stage3_10_1/generate_reconciliation_artifacts.py": "1fc0214dd1f7a3645b440947e7221ffe2b153822b36a781c5861a0ec80c97d80",
+    "research/stage3_10_1/CANONICAL_PER_QUERY_RESULTS.csv": "2e4cf917f1eba71d5d879c6c6e3088f12593eef9ccae535c5af9f3a0d8ff052e",
+    "research/stage3_10_1/CANONICAL_PER_TASK_RESULTS.csv": "be85e22b8ced4e84206e47432d9a9e1e167451ed0033f983d96de1fba3a24b4e",
+    "research/stage3_10_1/CANONICAL_PER_REPOSITORY_RESULTS.csv": "8e800406428fb40ddba9166eeec38eef288a2224e1c253df739afcc9950b7e28",
+    "research/stage3_10_1/REPRODUCTION_MATRIX.csv": "c3a42fa10a0ec479b0b612a5e76de2a2921e64c84eccd70b0c75d605ee538e3c",
+    "research/stage3_10_1/statistical_tests.json": "fd9a9d01a0e6276906483ca333fca4967c4f63d5e7fa6ac066a161b0d5e0f536",
+    "research/stage3_10_1/RECONCILIATION_REPORT.md": "3f646ed03f8ad1389668fb803908f3a7061db32859fa69889ca30660968cda58",
+    "research/stage3_10_1/EVALUATION_CONTRACT_COMPARISON.md": "e111fdefc06fe0c19b3773766247a27a2272d55458688901c7b1f6492858cf8c",
+    "research/stage3_10_1/METRIC_VALIDATION.md": "3fe5b931d0744178bf7266ebd327ab0808a9a00815fc729ca0a76aba68e7fb55",
+    "research/stage3_10_1/STATISTICAL_ANALYSIS.md": "770aa425bb72e20f93c859fcefe461dfc2e4f423849cd308c57d774320b634af",
+    "tests/test_stage3_10_1_metric_validation.py": "f6109edbbb0160bcbd614587c024053fe5686ee1b7081538c0901016ad0d8be2",
+    "research/stage3_10/PER_QUERY_RESULTS.csv": "8a6ca945594f0b5febd03f747cd4dcd9fb8af5f38be5ae4cbf16ccf0e9e79a63",
+    "research/stage3_5/GRAPH_RETRIEVAL_RESULTS.csv": "fc4b0002bafb6b557f22771d78768b8ba94ced0b1f09f9a4658a7d568f55873f",
+    "external/agent-retrieval-bench/data/corpus/v2_selective_mixed/corpus_manifest.jsonl": "f7bc6131f40b9527911adc0d7f974b3c2329a37fc2d823b0379daa301b0aa28b"
+  }
+}

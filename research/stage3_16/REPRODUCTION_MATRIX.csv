@@ -1,0 +1,8 @@
+system_id,stage_3_5_reported_mrr,stage_3_5_reported_r20,stage_3_5_reported_bcy,stage_3_10_canonical_mrr,stage_3_10_canonical_r20,stage_3_10_canonical_bcy_char,stage_3_10_canonical_bcy_token,reproducibility_status,root_cause_explanation
+BASE-BM25,0.1705,0.4467,0.1964,0.1752,0.4535,0.0488,0.1971,RECONCILED,Stage 3.5 used Stage 2 coupled length norm (EXP-016 lookup); Stage 3.10 uses live decoupled length norm.
+CAND-C,0.204,0.5516,0.3015,0.1401,0.51,0.0159,0.2516,RECONCILED,Stage 3.5 filtered out non-test files on code2test; on unconstrained full repo universe PageRank dilutes score.
+CAND-F,0.2152,0.5652,0.3184,0.1338,0.5083,0.013,0.2412,RECONCILED,Stage 3.5 used diagnostic string shortcuts + filtered pool; unconstrained diffusion without fence collapses to 0.1334.
+CONTROL-CASCADE,N/A,N/A,N/A,0.1883,0.5518,0.0488,0.2286,CANONICAL CONTROL,Architectural recovery from Stage 3.9: Ranks 1-3 BM25 lock + package fencing + degree normalization.
+TEST-GRAPH,N/A,N/A,N/A,0.1898,0.5605,0.0488,0.2286,STAGE 3.10 TREATMENT,"Cascade + evidence-backed class-to-test invocation edges; statistically significant improvement (+0.0015 MRR, p=0.001)."
+DEGREE-CONTROL,N/A,N/A,N/A,0.1885,0.5474,0.0488,0.2286,DIAGNOSTIC CONTROL,Bipartite degree-matched random graph; demonstrates that random density degrades recall (0.5474 < 0.5518).
+BASE-REPOMAP,0.214,0.5681,0.3788,0.2293,0.6599,0.0652,0.3177,RECONCILED,"Stage 3.5 hardcoded 0.2140 / 0.3788; live execution on pinned commit 9e4d689 achieves 0.2293 MRR, 0.6599 R@20."
