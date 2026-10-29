@@ -1,0 +1,28 @@
+{
+  "audit_document_id": "STAGE3.9.1-AUD-001",
+  "date": "2026-10-29",
+  "branch": "research-program",
+  "starting_head_sha": "064e619d1bb2bf707fd356435ec9dd2831cde571",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "win32",
+  "runtime_seconds": 2551.04,
+  "frozen_tags": {
+    "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+    "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+  },
+  "evaluation_scope": {
+    "query_count": 345,
+    "corpora_count": 218,
+    "configurations_evaluated": 7,
+    "total_tall_records": 2415,
+    "top3_preservation_violations": 0
+  },
+  "artifacts_verified": {
+    "evaluate_cascade_ablation_py": "d61bf8b7287e2f3220d4b9c0040b1a196861c0927ed087f27e12e4234662dc28",
+    "cascade_py": "183231fda1c53e07352daf9878c9704d187861254f76cd7702c10e09171c492a",
+    "cascade_ablations_csv": "43f309a9c9ffa95a74f149527a06af6f7456c67eb4b5728b0d3d0583bbcdacd9",
+    "per_query_cascade_results_csv": "7e2f02bb340a6d0d5716d180fd313efddc5cebe502fc2ba3d0618ad3d1ea0de3",
+    "independent_recomputation_csv": "d30cbbd2c8a3068a8c45a1d4c413c9f0777d6dd06d91b61c2b5e1238dab940a1",
+    "canonical_metrics_csv": "dbd5f6a2f78d2fa2471701055fe1201cf48f2c760f73613bbe34754b307490e4"
+  }
+}
