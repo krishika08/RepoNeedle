@@ -1,0 +1,16 @@
+repository,scale_category,file_count,total_loc,configuration,python_heap_allocated_mb,python_heap_peak_mb,process_rss_working_set_mb,process_rss_peak_mb,incremental_rss_delta_mb,notes
+pallets/click,"Small (Python, ~20-130 files)",136,14092,BASE-BM25,4.13,6.20,99.0,115.7,28.8,Process RSS via Windows PSAPI; heap via Python object inspection
+pallets/click,"Small (Python, ~20-130 files)",136,14092,CONFIG-09,4.13,6.20,99.0,115.7,28.8,Process RSS via Windows PSAPI; heap via Python object inspection
+pallets/click,"Small (Python, ~20-130 files)",136,14092,CONFIG-10,4.13,6.20,99.0,115.7,28.8,Process RSS via Windows PSAPI; heap via Python object inspection
+gin-gonic/gin,"Medium (Go, ~100 files)",122,11756,BASE-BM25,3.70,5.54,104.1,122.2,2.3,Process RSS via Windows PSAPI; heap via Python object inspection
+gin-gonic/gin,"Medium (Go, ~100 files)",122,11756,CONFIG-09,3.70,5.54,104.1,122.2,2.3,Process RSS via Windows PSAPI; heap via Python object inspection
+gin-gonic/gin,"Medium (Go, ~100 files)",122,11756,CONFIG-10,3.70,5.54,104.1,122.2,2.3,Process RSS via Windows PSAPI; heap via Python object inspection
+tokio-rs/tokio,"Medium (Rust, ~300-800 files)",767,94743,BASE-BM25,23.16,34.74,178.4,291.2,72.0,Process RSS via Windows PSAPI; heap via Python object inspection
+tokio-rs/tokio,"Medium (Rust, ~300-800 files)",767,94743,CONFIG-09,23.16,34.74,178.4,291.2,72.0,Process RSS via Windows PSAPI; heap via Python object inspection
+tokio-rs/tokio,"Medium (Rust, ~300-800 files)",767,94743,CONFIG-10,23.16,34.74,178.4,291.2,72.0,Process RSS via Windows PSAPI; heap via Python object inspection
+caddyserver/caddy,"Medium/Large (Go, ~250-600 files)",605,73837,BASE-BM25,19.98,29.97,186.9,307.2,11.0,Process RSS via Windows PSAPI; heap via Python object inspection
+caddyserver/caddy,"Medium/Large (Go, ~250-600 files)",605,73837,CONFIG-09,19.98,29.97,186.9,307.2,11.0,Process RSS via Windows PSAPI; heap via Python object inspection
+caddyserver/caddy,"Medium/Large (Go, ~250-600 files)",605,73837,CONFIG-10,19.98,29.97,186.9,307.2,11.0,Process RSS via Windows PSAPI; heap via Python object inspection
+etcd-io/etcd,"Large (Go, ~1400 files)",1431,161747,BASE-BM25,52.58,78.87,303.0,604.6,114.7,Process RSS via Windows PSAPI; heap via Python object inspection
+etcd-io/etcd,"Large (Go, ~1400 files)",1431,161747,CONFIG-09,52.58,78.87,303.0,604.6,114.7,Process RSS via Windows PSAPI; heap via Python object inspection
+etcd-io/etcd,"Large (Go, ~1400 files)",1431,161747,CONFIG-10,52.58,78.87,303.0,604.6,114.7,Process RSS via Windows PSAPI; heap via Python object inspection

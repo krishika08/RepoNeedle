@@ -4,6 +4,7 @@ Field-weighted BM25Okapi sparse lexical retrieval engine for code repositories.
 
 import math
 from typing import List, Dict, Tuple
+from collections import defaultdict
 import numpy as np
 
 from reponeedle.core.tokenizer import CodeTokenizer
@@ -46,6 +47,8 @@ class BM25Index:
         self.idf: Dict[str, float] = {}
         self.doc_term_freqs: List[Dict[str, float]] = []
         self.doc_lengths: np.ndarray = np.array([], dtype=np.float32)
+        self.inverted_index: Dict[str, List[Tuple[int, float]]] = {}
+        self.doc_len_norms: np.ndarray = np.array([], dtype=np.float32)
 
     def fit(self, docs: List[FileDoc]) -> "BM25Index":
         """
@@ -94,6 +97,19 @@ class BM25Index:
         self.doc_lengths = np.array(doc_lengths_list, dtype=np.float32)
         self.avg_doc_len = float(np.mean(self.doc_lengths)) if len(self.doc_lengths) > 0 else 1.0
 
+        # Build inverted postings list: term -> list of (doc_index, tf)
+        inverted = defaultdict(list)
+        for doc_idx, term_counts in enumerate(self.doc_term_freqs):
+            for term, tf in term_counts.items():
+                inverted[term].append((doc_idx, tf))
+        self.inverted_index = dict(inverted)
+
+        # Precompute document length normalization terms: k1 * (1 - b + b * (doc_len / avg_dl))
+        if self.avg_doc_len > 0:
+            self.doc_len_norms = self.k1 * (1.0 - self.b + self.b * (self.doc_lengths / self.avg_doc_len))
+        else:
+            self.doc_len_norms = np.ones(self.num_docs, dtype=np.float32) * self.k1
+
         # Precompute Robertson-Sparck Jones IDF with smoothing
         # IDF(q) = ln((N - n + 0.5) / (n + 0.5) + 1.0)
         self.idf = {}
@@ -121,9 +137,7 @@ class BM25Index:
         for t in q_tokens:
             q_term_counts[t] = q_term_counts.get(t, 0) + 1
 
-        k1 = self.k1
-        b = self.b
-        avg_dl = self.avg_doc_len
+        k1_plus_1 = self.k1 + 1.0
 
         for term, q_cnt in q_term_counts.items():
             if term not in self.idf:
@@ -132,14 +146,11 @@ class BM25Index:
             if term_idf <= 0.0:
                 continue
 
-            for idx in range(self.num_docs):
-                freqs = self.doc_term_freqs[idx]
-                if term in freqs:
-                    tf = freqs[term]
-                    doc_len = self.doc_lengths[idx]
-                    denom = tf + k1 * (1.0 - b + b * (doc_len / avg_dl))
-                    term_score = term_idf * (tf * (k1 + 1.0)) / denom
-                    scores[idx] += term_score
+            postings = self.inverted_index.get(term, [])
+            for doc_idx, tf in postings:
+                denom = tf + self.doc_len_norms[doc_idx]
+                term_score = term_idf * (tf * k1_plus_1) / denom
+                scores[doc_idx] += term_score
 
         # Max-normalize scores to [0, 1] range for unified fusion
         max_score = float(np.max(scores)) if len(scores) > 0 else 0.0

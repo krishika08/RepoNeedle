@@ -103,6 +103,8 @@ class AblationConfig(BaseModel):
     enable_pagerank_fusion: bool = False
     max_diffusion_degree: int = 25
     decouple_bm25_symbols: bool = True
+    # Stage 3.12 Cascaded Reranking:
+    candidate_pool_size: Optional[int] = None
 
     @classmethod
     def candidate_a(cls) -> "AblationConfig":
@@ -207,6 +209,42 @@ class AblationConfig(BaseModel):
             enable_polyglot_symbols=True,
             enable_pagerank_fusion=False,
             decouple_bm25_symbols=True,
+        )
+
+    @classmethod
+    def config_09(cls) -> "AblationConfig":
+        """Stage 3.9/3.10 Winning Quality Hybrid: Decoupled BM25 + Subwords + DocFilter (No PR, No Graph Diffusion)."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=False,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            doc_filter_penalty=0.5,
+            enable_graph_diffusion=False,
+            enable_polyglot_symbols=True,
+            enable_pagerank_fusion=False,
+            decouple_bm25_symbols=True,
+            candidate_pool_size=None,
+        )
+
+    @classmethod
+    def config_10(cls, pool_size: int = 50) -> "AblationConfig":
+        """Stage 3.10/3.12 Sparse Cascaded Reranker: BM25 Top-K Candidate Generation + Subword Reranking."""
+        return cls(
+            enable_lexical=True,
+            enable_semantic=True,
+            enable_graph=False,
+            enable_router=False,
+            allow_skeletons=True,
+            enable_doc_filter=True,
+            doc_filter_penalty=0.5,
+            enable_graph_diffusion=False,
+            enable_polyglot_symbols=True,
+            enable_pagerank_fusion=False,
+            decouple_bm25_symbols=True,
+            candidate_pool_size=pool_size,
         )
 
     @classmethod

@@ -268,7 +268,14 @@ class RepoNeedleEngine:
 
         # 2. Base Signal Scoring (Factors A, B, C)
         lex_scores = self.lexical_index.score(query_obj.text) if ablation.enable_lexical else np.zeros(num_docs, dtype=np.float32)
-        sem_scores = self.semantic_index.score(query_obj.text) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
+
+        # Sparse candidate pool for cascaded reranking (CONFIG-10)
+        cand_indices = None
+        if ablation.candidate_pool_size is not None and ablation.candidate_pool_size > 0:
+            if num_docs > ablation.candidate_pool_size:
+                cand_indices = np.argsort(-lex_scores)[: ablation.candidate_pool_size]
+
+        sem_scores = self.semantic_index.score(query_obj.text, candidate_indices=cand_indices) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
         use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
         struct_scores = self.repo_graph.pagerank_scores if use_pr else np.zeros(num_docs, dtype=np.float32)
 
@@ -319,6 +326,12 @@ class RepoNeedleEngine:
             weights["workflow_boost"] * workflow_boosts
         )
         fused_scores = np.maximum(0.0, fused_scores)
+
+        # In sparse cascaded reranking (CONFIG-10), retain only candidates from the top-k pool
+        if cand_indices is not None:
+            cand_mask = np.zeros(num_docs, dtype=bool)
+            cand_mask[cand_indices] = True
+            fused_scores[~cand_mask] = 0.0
 
         # 4b. Relevance-Aware Graph Diffusion (Candidate D / E / Recovered Bounded)
         if ablation.enable_graph_diffusion and len(self.repo_graph.graph) > 0:
@@ -405,6 +418,6 @@ class RepoNeedleEngine:
             budget_tokens=eff_budget,
             candidate_count=num_docs,
             explanation=f"Retrieved {len(selected)} files ({total_tokens_used}/{eff_budget} tokens). Task: {inferred_task.value}. {reason}",
-            execution_time_ms=exec_time,
+            execution_time_ms=(time.perf_counter() - start_time) * 1000,
         )
 

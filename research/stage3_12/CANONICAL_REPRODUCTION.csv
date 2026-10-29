@@ -1,0 +1,5 @@
+system_id,configuration_id,description,query_count,mrr,recall_at_1,recall_at_5,recall_at_10,recall_at_20,precision_at_5_untruncated,token_bcy_at_8k,scoring_latency_p50_ms,e2e_latency_p50_ms,e2e_latency_p95_ms,statistical_status
+BASE-BM25,CONFIG-01,"Official BM25 Baseline (Okapi k1=1.5, b=0.75, coupled length)",345,0.1759,0.0478,0.1990,0.3234,0.4622,0.0568,0.2121,0.14,15.40,414.44,CANONICAL_BASELINE
+CONFIG-09,CONFIG-09,Corrected Hybrid: Decoupled BM25 + Subword Semantic + DocFilter (No PR),345,0.2061,0.0473,0.2512,0.3767,0.5576,0.0725,0.2729,0.62,23.20,474.22,VERIFIED_IMPROVEMENT_OVER_BM25 (Holm p=0.00063)
+CONFIG-10,CONFIG-10,Sparse Top-50 Candidate Retrieval + Sliced Subword Reranking,345,0.2019,0.0473,0.2459,0.3776,0.5494,0.0713,0.2633,0.67,15.45,414.66,"PARITY_WITH_CONFIG_09 (diff -0.0042, p=0.297)"
+BASE-REPOMAP,BASE-REPOMAP,"Version-Pinned Official RepoMap Reference (commit 9e4d689, AST PageRank)",345,0.2293,0.0725,0.3337,0.5110,0.6599,0.0910,0.3177,N/A,180.20,180.20,BENCHMARK_LEADER (180.2ms is static literature scalar)
