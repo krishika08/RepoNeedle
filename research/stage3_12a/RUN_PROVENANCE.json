@@ -1,0 +1,86 @@
+{
+  "stage": "3.12A",
+  "stage_title": "Canonical Evaluation Reconciliation and Graph Research Gate",
+  "timestamp": "2026-10-29T22:14:00+05:30",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "architecture": "AMD64",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "git_provenance": {
+    "branch": "research-program",
+    "head_commit": "3f4822d",
+    "anchor_commit": "4f78cc3",
+    "merge_base": "4f78cc3658dfb5e338a5458579d38d5d7ef416e8",
+    "is_ancestor": true,
+    "frozen_tags": {
+      "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+      "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+    }
+  },
+  "audited_verdict": "RECONCILED - READY FOR STAGE 3.12 EXPERIMENTS",
+  "independent_data_status": "BLOCKED / PRELIMINARY (ContextBench inaccessible via external network isolation)",
+  "reconciliation_summary": {
+    "total_canonical_queries": 345,
+    "total_corpus_snapshots": 218,
+    "systems_reconciled": [
+      "BASE-BM25",
+      "CAND-F (Stage 3.5 Unconstrained)",
+      "CONTROL-CASCADE",
+      "TEST-GRAPH",
+      "FUNCTION-GRAPH (Stage 3.11 Primary)",
+      "FUNCTION-GRAPH-NO-FREEZE (Stage 3.11 Exploratory)",
+      "BASE-REPOMAP (Pinned 9e4d689)"
+    ],
+    "metrics_reconciled": {
+      "BASE-BM25": {
+        "mrr": 0.1752,
+        "recall_at_20": 0.4535,
+        "hit_at_20": 0.5275
+      },
+      "CAND-F": {
+        "mrr": 0.1338,
+        "recall_at_20": 0.5083
+      },
+      "CONTROL-CASCADE": {
+        "mrr": 0.1882,
+        "recall_at_20": 0.5503,
+        "hit_at_20": 0.6319
+      },
+      "TEST-GRAPH": {
+        "mrr": 0.1897,
+        "recall_at_20": 0.5605,
+        "hit_at_20": 0.6435
+      },
+      "FUNCTION-GRAPH": {
+        "mrr": 0.1901,
+        "recall_at_20": 0.5605,
+        "hit_at_20": 0.6435
+      },
+      "FUNCTION-GRAPH-NO-FREEZE": {
+        "mrr": 0.2082,
+        "recall_at_20": 0.5648,
+        "hit_at_20": 0.6493
+      },
+      "BASE-REPOMAP": {
+        "mrr": 0.2293,
+        "recall_at_20": 0.6599,
+        "hit_at_20": 0.7478
+      }
+    }
+  },
+  "file_hashes_sha256": {
+    "research/stage3_12a/GIT_AND_ARTIFACT_PROVENANCE.md": "b2e0901e34fc7308d5d93621b1f3e1eed1f3154a796a17e56e28215dee67c31c",
+    "research/stage3_12a/EVALUATOR_DIFFERENCES.md": "9dac9462dc27f1f3dfcdb9a83be821b191c2ea1a064624ee969b4e41a7156d6f",
+    "research/stage3_12a/CANONICAL_PER_QUERY_RESULTS.csv": "fa0749baaf60fb5b1f76880f9fede28c6c333cc785dc6f5d44720df3285619b2",
+    "research/stage3_12a/CANONICAL_METRIC_SUMMARY.csv": "bf990c9e9efee7e27c78086d18969bf0f4e44e242a0d475e3fc796ca1153221c",
+    "research/stage3_12a/RECONCILIATION_DECISION.md": "644adc8a5b87342bfaacf6d8a02e51172b68658b119e9538bd2dcbf677353982",
+    "research/stage3_12a/STAGE3_12_DESIGN_SPEC.md": "e21f503e370186fb2048b41b82ab33383fadb53bac8680e4f7ca77268d4da4e8",
+    "research/stage3_12a/run_stage3_12a_reconciliation.py": "39f1b3d4f876dd2f2872ac4d9cad16ab0bddd5d652e4ad055185cda0b94ef173",
+    "research/stage3_12a/statistical_reconciliation.json": "38029ae3b36d89459327d8374e15420e36d5f0cee2b49747f2b1b54df2624ac2",
+    "research/stage3_12a/REPRODUCE.md": "f04d0c03f16799a66e35bb8d152345c130562e447d47d8fa20b161e8bcb563df",
+    "tests/test_stage3_12a_reconciliation.py": "082cadccf51fa732a1762794f28ee8a703c767f6753239d48a8807f9639d7669"
+  }
+}

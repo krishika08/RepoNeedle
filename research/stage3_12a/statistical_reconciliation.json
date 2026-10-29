@@ -1,0 +1,66 @@
+{
+  "FUNCTION-GRAPH vs. CONTROL-CASCADE": {
+    "mean_delta": 0.001892,
+    "wins": 38,
+    "losses": 24,
+    "ties": 283,
+    "wilcoxon_w": 507.5,
+    "p_value": 0.001007566236815416,
+    "query_bootstrap_95ci": [
+      0.000785,
+      0.003205
+    ],
+    "cluster_bootstrap_95ci": [
+      1.3e-05,
+      0.003229
+    ]
+  },
+  "FUNCTION-GRAPH-NO-FREEZE vs. CONTROL-CASCADE": {
+    "mean_delta": 0.019998,
+    "wins": 139,
+    "losses": 23,
+    "ties": 183,
+    "wilcoxon_w": 1475.5,
+    "p_value": 1.0077213855644913e-17,
+    "query_bootstrap_95ci": [
+      0.010995,
+      0.029571
+    ],
+    "cluster_bootstrap_95ci": [
+      0.011734,
+      0.02974
+    ]
+  },
+  "BASE-REPOMAP vs. FUNCTION-GRAPH": {
+    "mean_delta": 0.039165,
+    "wins": 192,
+    "losses": 136,
+    "ties": 17,
+    "wilcoxon_w": 21308.5,
+    "p_value": 0.0009714763663187145,
+    "query_bootstrap_95ci": [
+      0.006818,
+      0.071674
+    ],
+    "cluster_bootstrap_95ci": [
+      -0.004316,
+      0.090983
+    ]
+  },
+  "CAND-F vs. CONTROL-CASCADE": {
+    "mean_delta": -0.054426,
+    "wins": 97,
+    "losses": 234,
+    "ties": 14,
+    "wilcoxon_w": 14595.5,
+    "p_value": 1.457609081504397e-13,
+    "query_bootstrap_95ci": [
+      -0.075404,
+      -0.034114
+    ],
+    "cluster_bootstrap_95ci": [
+      -0.102534,
+      0.0101
+    ]
+  }
+}
