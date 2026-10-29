@@ -1,0 +1,377 @@
+{
+  "metadata": {
+    "num_queries": 345,
+    "bootstrap_replicates": 10000,
+    "anchor_reference": "ARM-101-BASE",
+    "control_baseline": "CONTROL-CASCADE",
+    "seed": 42
+  },
+  "repository_grouped_cv": {
+    "fold_0": {
+      "val_repos": [
+        "gin-gonic/gin"
+      ],
+      "train_query_count": 257,
+      "val_query_count": 88,
+      "val_mrr": {
+        "BASE-BM25": 0.3138,
+        "CONTROL-CASCADE": 0.3287,
+        "ARM-101-BASE": 0.3405,
+        "ARM-111-UNIFORM": 0.339,
+        "LANG-CALIBRATED": 0.3405,
+        "STRUCTURAL-ROLE": 0.3403,
+        "COMBINED-LANG-ROLE": 0.3405,
+        "DEGREE-THRESHOLD-15": 0.3403,
+        "BASE-REPOMAP": 0.2956
+      }
+    },
+    "fold_1": {
+      "val_repos": [
+        "clap-rs/clap",
+        "etcd-io/etcd",
+        "python/mypy",
+        "scrapy/scrapy",
+        "spring-projects/spring-boot",
+        "tox-dev/tox"
+      ],
+      "train_query_count": 280,
+      "val_query_count": 65,
+      "val_mrr": {
+        "BASE-BM25": 0.1378,
+        "CONTROL-CASCADE": 0.1542,
+        "ARM-101-BASE": 0.1904,
+        "ARM-111-UNIFORM": 0.1905,
+        "LANG-CALIBRATED": 0.1904,
+        "STRUCTURAL-ROLE": 0.1904,
+        "COMBINED-LANG-ROLE": 0.1904,
+        "DEGREE-THRESHOLD-15": 0.1904,
+        "BASE-REPOMAP": 0.2528
+      }
+    },
+    "fold_2": {
+      "val_repos": [
+        "caddyserver/caddy",
+        "eslint/eslint",
+        "microsoft/playwright",
+        "mockito/mockito",
+        "pytest-dev/pytest",
+        "tokio-rs/tokio"
+      ],
+      "train_query_count": 281,
+      "val_query_count": 64,
+      "val_mrr": {
+        "BASE-BM25": 0.1651,
+        "CONTROL-CASCADE": 0.1796,
+        "ARM-101-BASE": 0.2063,
+        "ARM-111-UNIFORM": 0.203,
+        "LANG-CALIBRATED": 0.206,
+        "STRUCTURAL-ROLE": 0.2063,
+        "COMBINED-LANG-ROLE": 0.2063,
+        "DEGREE-THRESHOLD-15": 0.2063,
+        "BASE-REPOMAP": 0.2458
+      }
+    },
+    "fold_3": {
+      "val_repos": [
+        "astral-sh/ruff",
+        "fastapi/fastapi",
+        "huggingface/diffusers",
+        "huggingface/transformers",
+        "ipython/ipython",
+        "numpy/numpy"
+      ],
+      "train_query_count": 281,
+      "val_query_count": 64,
+      "val_mrr": {
+        "BASE-BM25": 0.1213,
+        "CONTROL-CASCADE": 0.1319,
+        "ARM-101-BASE": 0.146,
+        "ARM-111-UNIFORM": 0.1468,
+        "LANG-CALIBRATED": 0.1459,
+        "STRUCTURAL-ROLE": 0.146,
+        "COMBINED-LANG-ROLE": 0.1459,
+        "DEGREE-THRESHOLD-15": 0.146,
+        "BASE-REPOMAP": 0.1731
+      }
+    },
+    "fold_4": {
+      "val_repos": [
+        "HypothesisWorks/hypothesis",
+        "pallets/click",
+        "pydantic/pydantic",
+        "pypa/pip",
+        "vitejs/vite",
+        "vuejs/core"
+      ],
+      "train_query_count": 281,
+      "val_query_count": 64,
+      "val_mrr": {
+        "BASE-BM25": 0.0864,
+        "CONTROL-CASCADE": 0.1026,
+        "ARM-101-BASE": 0.1063,
+        "ARM-111-UNIFORM": 0.1013,
+        "LANG-CALIBRATED": 0.1037,
+        "STRUCTURAL-ROLE": 0.1063,
+        "COMBINED-LANG-ROLE": 0.1037,
+        "DEGREE-THRESHOLD-15": 0.1063,
+        "BASE-REPOMAP": 0.1538
+      }
+    }
+  },
+  "comparisons_vs_arm101_base": {
+    "BASE-BM25": {
+      "system_name": "BASE-BM25",
+      "mean_delta_mrr": -0.03262,
+      "ci_95_lower": -0.04345,
+      "ci_95_upper": -0.02204,
+      "wilcoxon_w": 3651.5,
+      "raw_p_value": 3.7380066867633576e-31,
+      "wins": 23,
+      "losses": 252,
+      "ties": 70,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "CONTROL-CASCADE": {
+      "system_name": "CONTROL-CASCADE",
+      "mean_delta_mrr": -0.01806,
+      "ci_95_lower": -0.02746,
+      "ci_95_upper": -0.00937,
+      "wilcoxon_w": 1273.0,
+      "raw_p_value": 2.894637433361983e-16,
+      "wins": 19,
+      "losses": 130,
+      "ties": 196,
+      "holm_adjusted_p_value": 0.0,
+      "significant_at_05": true
+    },
+    "ARM-111-UNIFORM": {
+      "system_name": "ARM-111-UNIFORM",
+      "mean_delta_mrr": -0.00172,
+      "ci_95_lower": -0.00362,
+      "ci_95_upper": -0.00018,
+      "wilcoxon_w": 327.0,
+      "raw_p_value": 0.0009777898935532509,
+      "wins": 18,
+      "losses": 34,
+      "ties": 293,
+      "holm_adjusted_p_value": 0.005867,
+      "significant_at_05": true
+    },
+    "LANG-CALIBRATED": {
+      "system_name": "LANG-CALIBRATED",
+      "mean_delta_mrr": -0.00054,
+      "ci_95_lower": -0.00159,
+      "ci_95_upper": 1e-05,
+      "wilcoxon_w": 44.0,
+      "raw_p_value": 0.946044921875,
+      "wins": 9,
+      "losses": 4,
+      "ties": 332,
+      "holm_adjusted_p_value": 1.0,
+      "significant_at_05": false
+    },
+    "STRUCTURAL-ROLE": {
+      "system_name": "STRUCTURAL-ROLE",
+      "mean_delta_mrr": -2e-05,
+      "ci_95_lower": -0.00012,
+      "ci_95_upper": 6e-05,
+      "wilcoxon_w": 20.0,
+      "raw_p_value": 0.2783203125,
+      "wins": 9,
+      "losses": 2,
+      "ties": 334,
+      "holm_adjusted_p_value": 1.0,
+      "significant_at_05": false
+    },
+    "COMBINED-LANG-ROLE": {
+      "system_name": "COMBINED-LANG-ROLE",
+      "mean_delta_mrr": -0.00049,
+      "ci_95_lower": -0.00148,
+      "ci_95_upper": 2e-05,
+      "wilcoxon_w": 28.0,
+      "raw_p_value": 0.7001953125,
+      "wins": 8,
+      "losses": 3,
+      "ties": 334,
+      "holm_adjusted_p_value": 1.0,
+      "significant_at_05": false
+    },
+    "DEGREE-THRESHOLD-15": {
+      "system_name": "DEGREE-THRESHOLD-15",
+      "mean_delta_mrr": -4e-05,
+      "ci_95_lower": -0.00014,
+      "ci_95_upper": 3e-05,
+      "wilcoxon_w": 15.0,
+      "raw_p_value": 0.7421875,
+      "wins": 6,
+      "losses": 2,
+      "ties": 337,
+      "holm_adjusted_p_value": 1.0,
+      "significant_at_05": false
+    },
+    "BASE-REPOMAP": {
+      "system_name": "BASE-REPOMAP",
+      "mean_delta_mrr": 0.02149,
+      "ci_95_lower": -0.01055,
+      "ci_95_upper": 0.05419,
+      "wilcoxon_w": 23100.5,
+      "raw_p_value": 0.05601893759068009,
+      "wins": 181,
+      "losses": 143,
+      "ties": 21,
+      "holm_adjusted_p_value": 0.280095,
+      "significant_at_05": false
+    }
+  },
+  "comparisons_vs_control_cascade": {
+    "BASE-BM25": {
+      "mean_delta_mrr": -0.01456,
+      "ci_95_lower": -0.01786,
+      "ci_95_upper": -0.01142,
+      "wilcoxon_w": 2248.5,
+      "raw_p_value": 1.2297928914392525e-31,
+      "wins": 18,
+      "losses": 231,
+      "ties": 96
+    },
+    "ARM-101-BASE": {
+      "mean_delta_mrr": 0.01806,
+      "ci_95_lower": 0.00919,
+      "ci_95_upper": 0.02754,
+      "wilcoxon_w": 1273.0,
+      "raw_p_value": 2.894637433361983e-16,
+      "wins": 130,
+      "losses": 19,
+      "ties": 196
+    },
+    "ARM-111-UNIFORM": {
+      "mean_delta_mrr": 0.01634,
+      "ci_95_lower": 0.00725,
+      "ci_95_upper": 0.02572,
+      "wilcoxon_w": 2176.5,
+      "raw_p_value": 3.6661802009825425e-11,
+      "wins": 123,
+      "losses": 28,
+      "ties": 194
+    },
+    "LANG-CALIBRATED": {
+      "mean_delta_mrr": 0.01752,
+      "ci_95_lower": 0.00865,
+      "ci_95_upper": 0.02697,
+      "wilcoxon_w": 1260.0,
+      "raw_p_value": 1.0415233468695063e-15,
+      "wins": 132,
+      "losses": 14,
+      "ties": 199
+    },
+    "STRUCTURAL-ROLE": {
+      "mean_delta_mrr": 0.01805,
+      "ci_95_lower": 0.00901,
+      "ci_95_upper": 0.0273,
+      "wilcoxon_w": 1138.5,
+      "raw_p_value": 2.3953838655693403e-16,
+      "wins": 131,
+      "losses": 14,
+      "ties": 200
+    },
+    "COMBINED-LANG-ROLE": {
+      "mean_delta_mrr": 0.01758,
+      "ci_95_lower": 0.00856,
+      "ci_95_upper": 0.02697,
+      "wilcoxon_w": 1277.0,
+      "raw_p_value": 8.30156855562662e-16,
+      "wins": 132,
+      "losses": 15,
+      "ties": 198
+    },
+    "DEGREE-THRESHOLD-15": {
+      "mean_delta_mrr": 0.01803,
+      "ci_95_lower": 0.00914,
+      "ci_95_upper": 0.02756,
+      "wilcoxon_w": 1170.0,
+      "raw_p_value": 1.4991108671548185e-16,
+      "wins": 131,
+      "losses": 16,
+      "ties": 198
+    },
+    "BASE-REPOMAP": {
+      "mean_delta_mrr": 0.03955,
+      "ci_95_lower": 0.00728,
+      "ci_95_upper": 0.07213,
+      "wilcoxon_w": 21145.0,
+      "raw_p_value": 0.0006893301615181269,
+      "wins": 194,
+      "losses": 134,
+      "ties": 17
+    }
+  },
+  "language_stratified_mrr": {
+    "go": {
+      "BASE-BM25": 0.2725,
+      "CONTROL-CASCADE": 0.2897,
+      "ARM-101-BASE": 0.3125,
+      "ARM-111-UNIFORM": 0.3117,
+      "LANG-CALIBRATED": 0.3125,
+      "STRUCTURAL-ROLE": 0.3125,
+      "COMBINED-LANG-ROLE": 0.3125,
+      "DEGREE-THRESHOLD-15": 0.3124,
+      "BASE-REPOMAP": 0.2866
+    },
+    "java": {
+      "BASE-BM25": 0.1896,
+      "CONTROL-CASCADE": 0.2038,
+      "ARM-101-BASE": 0.2079,
+      "ARM-111-UNIFORM": 0.2079,
+      "LANG-CALIBRATED": 0.2079,
+      "STRUCTURAL-ROLE": 0.2079,
+      "COMBINED-LANG-ROLE": 0.2079,
+      "DEGREE-THRESHOLD-15": 0.2079,
+      "BASE-REPOMAP": 0.3371
+    },
+    "python": {
+      "BASE-BM25": 0.1271,
+      "CONTROL-CASCADE": 0.1398,
+      "ARM-101-BASE": 0.1515,
+      "ARM-111-UNIFORM": 0.149,
+      "LANG-CALIBRATED": 0.1499,
+      "STRUCTURAL-ROLE": 0.1515,
+      "COMBINED-LANG-ROLE": 0.1499,
+      "DEGREE-THRESHOLD-15": 0.1515,
+      "BASE-REPOMAP": 0.2005
+    },
+    "rust": {
+      "BASE-BM25": 0.1128,
+      "CONTROL-CASCADE": 0.1252,
+      "ARM-101-BASE": 0.1545,
+      "ARM-111-UNIFORM": 0.1506,
+      "LANG-CALIBRATED": 0.1541,
+      "STRUCTURAL-ROLE": 0.1545,
+      "COMBINED-LANG-ROLE": 0.1545,
+      "DEGREE-THRESHOLD-15": 0.1545,
+      "BASE-REPOMAP": 0.2434
+    },
+    "typescript": {
+      "BASE-BM25": 0.0317,
+      "CONTROL-CASCADE": 0.0462,
+      "ARM-101-BASE": 0.0517,
+      "ARM-111-UNIFORM": 0.0517,
+      "LANG-CALIBRATED": 0.0517,
+      "STRUCTURAL-ROLE": 0.0517,
+      "COMBINED-LANG-ROLE": 0.0517,
+      "DEGREE-THRESHOLD-15": 0.0517,
+      "BASE-REPOMAP": 0.0525
+    },
+    "unknown": {
+      "BASE-BM25": 0.0094,
+      "CONTROL-CASCADE": 0.0104,
+      "ARM-101-BASE": 0.0103,
+      "ARM-111-UNIFORM": 0.0106,
+      "LANG-CALIBRATED": 0.0105,
+      "STRUCTURAL-ROLE": 0.0105,
+      "COMBINED-LANG-ROLE": 0.0105,
+      "DEGREE-THRESHOLD-15": 0.0105,
+      "BASE-REPOMAP": 0.0168
+    }
+  }
+}
