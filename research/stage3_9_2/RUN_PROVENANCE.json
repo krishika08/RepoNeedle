@@ -1,0 +1,86 @@
+{
+  "audit_document_id": "STAGE3.9.2-PROV-001",
+  "stage": "3.9.2",
+  "title": "Cross-Stage Metric Reconciliation and Context-Budget Validity Audit",
+  "date": "2026-10-29",
+  "branch": "research-program",
+  "audited_commit": "b7cf35bc6ebfebc7e6c6cc5df122118bdb1c3bbc",
+  "stage3_5_commit": "4f78cc3658dfb5e338a5458579d38d5d7ef416e8",
+  "stage3_9_commit": "064e619d1bb2bf707fd356435ec9dd2831cde571",
+  "frozen_tags": {
+    "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+    "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+  },
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "win32",
+  "evaluation_scope": {
+    "query_count": 345,
+    "repository_count": 25,
+    "bootstrap_iterations": 10000,
+    "random_seed": 42
+  },
+  "budget_policies_evaluated": {
+    "policy_1": "char_greedy_stop_8k (ARB v2 baseline: character count, halts on first oversized chunk)",
+    "policy_2": "char_greedy_skip_8k (knapsack character skip)",
+    "policy_3": "token_truncation_8k (regex_code_tokenizer_v1, pack_files boundary truncation)",
+    "policy_4": "token_greedy_skip_8k (regex_code_tokenizer_v1, knapsack token skip)",
+    "policy_5": "token_skeleton_8k (estimate_tokens, BudgetOptimizer structural skeletons)"
+  },
+  "statistical_summary": {
+    "cascade_vs_bm25": {
+      "mean_diff": 0.013732814492753624,
+      "query_ci": [
+        0.010810651449275363,
+        0.016808342536231882
+      ],
+      "cluster_ci": [
+        0.011034166595272208,
+        0.016586401360880455
+      ],
+      "wilcoxon_stat": 3140.5,
+      "wilcoxon_pval": 8.223136153655746e-40
+    },
+    "cascade_vs_cand_f": {
+      "mean_diff": 0.056739556521739135,
+      "query_ci": [
+        0.03579963934782609,
+        0.07888408717391303
+      ],
+      "cluster_ci": [
+        -0.0073535495842420966,
+        0.10243249796742128
+      ],
+      "wilcoxon_stat": 15412.0,
+      "wilcoxon_pval": 1.0906848394554879e-14
+    },
+    "cascade_vs_repomap": {
+      "mean_diff": -0.038744292753623184,
+      "query_ci": [
+        -0.07119745123188406,
+        -0.006190168188405804
+      ],
+      "cluster_ci": [
+        -0.09006550625000001,
+        0.0014959975669960794
+      ],
+      "wilcoxon_stat": 23515.0,
+      "wilcoxon_pval": 0.0009026051648656639
+    }
+  },
+  "artifact_hashes": {
+    "CROSS_STAGE_METRIC_AUDIT_md": "128e5ef2bbca8f3d4a12af2551b36872e75c6635e67915198286176aef241083",
+    "HISTORICAL_REPRODUCTION_md": "908f100338e7b0a0e6818486b80a74edfb4fec0d5938563fd845eb60fa8deac2",
+    "BUDGET_METRIC_AUDIT_md": "42b9b5c80966d9f9c2ffdba7127e5c2aa2fbf9e1df7943c7bbefc2ded5f92b83",
+    "STATISTICAL_AND_LATENCY_AUDIT_md": "81a59f9b388ba00cd71a945d5818af04ac0daf9826488f4ac2437f03c98061d1",
+    "CANONICAL_EVALUATION_CONTRACT_md": "8d984a3a8bcebac6e86a77b81e81836eff86caacc06cdcc02511b5f2ba099b0c",
+    "STAGE3_9_2_DECISION_md": "7d59f14fc2b31a83a0cc8a3d960dcb0f92f46545f302ccb573bd8a48ac2bc922",
+    "REPRODUCE_md": "e4af023c485e5f01433b496986e950ad2fafde7306247e6d072daf52dc7f1421",
+    "DISCREPANCY_MATRIX_csv": "0c25a656f12987cde01d4679ecf75ba818696ba73937c3ee12a9799d2c6ae920",
+    "PER_QUERY_CROSS_STAGE_COMPARISON_csv": "de8a5b1224f4ec02bcb62ae323fcd092a517113588366adc1ac49c2107b6c443",
+    "PER_QUERY_BUDGET_COMPARISON_csv": "a3949fd397033862d1208ad894bb796096626e018362eb429687b037d6b1266a",
+    "tests_test_stage3_9_2_budget_audit_py": "8d6c812e1587eacc12f85c7468a5d1d82c923fef484bdda4bd08f86078299e89",
+    "reponeedle_core_cascade_py": "183231fda1c53e07352daf9878c9704d187861254f76cd7702c10e09171c492a",
+    "reponeedle_core_lexical_py": "8d9246ff555099f79c8fc9fbfa9e07470f76f630ed7f8a4419d365ac2837df57",
+    "reponeedle_core_budget_py": "495024a21ea3ba4c790bec4fdf6575688302043d2924dc028fc1b000735aede1"
+  }
+}
