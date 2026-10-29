@@ -1,0 +1,8 @@
+system_id,stage_3_5_reported_mrr,stage_3_5_reported_r20,stage_3_10_canonical_mrr,stage_3_10_canonical_r20,stage_3_10_2_recomputed_mrr,stage_3_10_2_recomputed_r20,reproducibility_verdict,technical_explanation
+BASE-BM25,0.1705,0.4467,0.1752,0.4535,0.1752,0.4535,REPRODUCED,Stage 3.5 used Stage 2 coupled length norm; Stage 3.10 uses live decoupled length norm.
+CAND-C,0.204,0.5516,0.1401,0.51,0.1401,0.51,REPRODUCED (UNCONSTRAINED),Stage 3.5 filtered candidate pool on code2test; on unconstrained universe PageRank dilutes score.
+CAND-F,0.2152,0.5652,0.1338,0.5083,0.1338,0.5083,INVALIDATED,Stage 3.5 used diagnostic string bypass + filtered pool; unconstrained diffusion collapses to 0.1338.
+CONTROL-CASCADE,N/A,N/A,0.1883,0.5518,0.1883,0.5518,REPRODUCED,Stage 3.9 architecture: Ranks 1-3 BM25 lock + package fencing + degree normalization.
+TEST-GRAPH,N/A,N/A,0.1898,0.5605,0.1898,0.5605,REPRODUCED (STATISTICALLY SIGNIFICANT),"Cascade + class-to-test invocation edges; delta = +0.0015 MRR, p = 0.00096, confirmed."
+DEGREE-CONTROL,N/A,N/A,0.1885,0.5474,0.1885,0.5474,REPRODUCED,Bipartite degree-matched random control; confirms random connectivity degrades Recall@20 (0.5474 < 0.5518).
+BASE-REPOMAP,0.214,0.5681,0.2293,0.6599,0.2293,0.6599,REPRODUCED (SUPERIOR),"Stage 3.5 hardcoded 0.2140; live run on pinned commit 9e4d689 achieves 0.2293 MRR, 0.6599 R@20."

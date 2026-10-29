@@ -1,0 +1,4 @@
+repository,file_count,source_size_kb,symbol_count,base_edges,invocation_edges,unresolved_diagnostics,cold_index_time_ms,warm_query_latency_p50_ms,warm_query_latency_p95_ms,warm_query_latency_mean_ms,process_rss_before_mb,process_rss_after_mb,process_rss_delta_mb,peak_working_set_mb
+pallets/click,133,422.9,0,0,20,0,714.2,0.63,0.66,0.63,71.14,104.36,33.22,120.02
+caddyserver/caddy,555,1728.0,0,480,81,3,5183.17,6.78,7.91,6.82,107.54,161.76,54.23,263.44
+gin-gonic/gin,119,320.1,0,172,51,0,1517.57,1.58,1.87,1.64,159.94,137.57,-22.37,263.44

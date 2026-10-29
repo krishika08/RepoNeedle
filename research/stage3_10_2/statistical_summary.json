@@ -1,0 +1,110 @@
+{
+  "TEST-GRAPH vs CONTROL-CASCADE": {
+    "mean_delta": 0.0014892753623188407,
+    "bootstrap_ci_95": [
+      0.0005092753623188407,
+      0.0026971304347826086
+    ],
+    "clustered_ci_95": [
+      7.248711089494163e-05,
+      0.002792196327603271
+    ],
+    "wilcoxon_stat": 87.5,
+    "raw_p_value": 0.0009643585276329035,
+    "wins": 24,
+    "losses": 8,
+    "ties": 313,
+    "holm_adjusted_p_value": 0.0028930755828987104,
+    "statistically_significant": true
+  },
+  "TEST-GRAPH vs BASE-BM25": {
+    "mean_delta": 0.014581739130434784,
+    "bootstrap_ci_95": [
+      0.011499391304347824,
+      0.01792182608695652
+    ],
+    "clustered_ci_95": [
+      0.011848827728426398,
+      0.01694282901540154
+    ],
+    "wilcoxon_stat": 2227.5,
+    "raw_p_value": 1.5708167717037052e-31,
+    "wins": 230,
+    "losses": 18,
+    "ties": 97,
+    "holm_adjusted_p_value": 9.424900630222232e-31,
+    "statistically_significant": true
+  },
+  "TEST-GRAPH vs BASE-REPOMAP": {
+    "mean_delta": -0.039526376811594204,
+    "bootstrap_ci_95": [
+      -0.07205705072463768,
+      -0.007036521739130434
+    ],
+    "clustered_ci_95": [
+      -0.09121776775324077,
+      0.0042451803926255504
+    ],
+    "wilcoxon_stat": 19699.0,
+    "raw_p_value": 0.000753529965395675,
+    "wins": 127,
+    "losses": 190,
+    "ties": 28,
+    "holm_adjusted_p_value": 0.0030141198615827,
+    "statistically_significant": true
+  },
+  "CAND-F vs CAND-C": {
+    "mean_delta": -0.0063433333333333345,
+    "bootstrap_ci_95": [
+      -0.013234981014492752,
+      -0.00016105311594203183
+    ],
+    "clustered_ci_95": [
+      -0.015573089978081262,
+      0.00459205453491031
+    ],
+    "wilcoxon_stat": 8471.0,
+    "raw_p_value": 0.018761851724890664,
+    "wins": 70,
+    "losses": 134,
+    "ties": 141,
+    "holm_adjusted_p_value": 0.018761851724890664,
+    "statistically_significant": true
+  },
+  "CAND-F vs BASE-BM25": {
+    "mean_delta": -0.0413749884057971,
+    "bootstrap_ci_95": [
+      -0.0628438458695652,
+      -0.020277277753623184
+    ],
+    "clustered_ci_95": [
+      -0.09022927594582315,
+      0.02308916561265394
+    ],
+    "wilcoxon_stat": 23161.5,
+    "raw_p_value": 0.016830981974581143,
+    "wins": 168,
+    "losses": 162,
+    "ties": 15,
+    "holm_adjusted_p_value": 0.03366196394916229,
+    "statistically_significant": true
+  },
+  "CAND-F vs BASE-REPOMAP": {
+    "mean_delta": -0.09548310434782609,
+    "bootstrap_ci_95": [
+      -0.12261324065217391,
+      -0.06939427739130434
+    ],
+    "clustered_ci_95": [
+      -0.11647293143333648,
+      -0.06354758021377586
+    ],
+    "wilcoxon_stat": 12996.0,
+    "raw_p_value": 2.8125769772199558e-15,
+    "wins": 101,
+    "losses": 223,
+    "ties": 21,
+    "holm_adjusted_p_value": 1.4062884886099779e-14,
+    "statistically_significant": true
+  }
+}

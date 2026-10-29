@@ -1,0 +1,67 @@
+{
+  "stage": "3.10.2",
+  "stage_title": "Canonical Evaluation Integrity Gate and Statistical Audit",
+  "timestamp": "2026-10-29T18:33:00+05:30",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "architecture": "AMD64",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "git_provenance": {
+    "branch": "research-program",
+    "head_commit": "7679b403eb1cd6c7d750e5666d8a3ab789f7c32e",
+    "frozen_tags": {
+      "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+      "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+    }
+  },
+  "audited_verdict": "PASS - CANONICAL RESULTS REPRODUCED",
+  "audit_summary": {
+    "total_canonical_queries": 345,
+    "total_corpus_snapshots": 218,
+    "systems_verified": [
+      "BASE-BM25",
+      "CONTROL-CASCADE",
+      "TEST-GRAPH",
+      "DEGREE-CONTROL",
+      "BASE-REPOMAP",
+      "CAND-C",
+      "CAND-F"
+    ],
+    "primary_delta_test_vs_control_mrr": 0.001489,
+    "wilcoxon_signed_rank_stat": 87.5,
+    "wilcoxon_asymptotic_p_value": 0.000964,
+    "holm_bonferroni_adjusted_p_value": 0.00289,
+    "test_graph_mrr": 0.1898,
+    "control_cascade_mrr": 0.1883,
+    "base_bm25_mrr": 0.1752,
+    "base_repomap_mrr": 0.2293,
+    "repomap_lead_over_test_graph": 0.0395,
+    "memory_audit": {
+      "click_process_rss_mb": 103.95,
+      "caddy_process_rss_mb": 159.57
+    }
+  },
+  "file_hashes_sha256": {
+    "research/stage3_10_2/audit_performance.py": "5e4007c48d6d73b7d3df14e9264ab13f6f2a64ae755fff8bb77faca36062d9cb",
+    "research/stage3_10_2/CANONICAL_EVALUATION_CONTRACT.md": "65c0d124035765597ee3a6e54ae8012b56f3cba5f9ece1794e63e033a2dbec20",
+    "research/stage3_10_2/EVALUATION_INTEGRITY_REPORT.md": "3a781c766636a41963baafa1d338f9b29b792e6aa20289f810cc004f27728d4a",
+    "research/stage3_10_2/independent_metrics.py": "c3e9e7e7d27a84ffe4a5d2dea0c5892facb70eb85c0743a17130b4c20be098dc",
+    "research/stage3_10_2/INDEPENDENT_METRIC_RECOMPUTATION.csv": "58c0d62e05e10a1a17e2600fdc6547a4d0c2b77c91daaede9891c7df522550d0",
+    "research/stage3_10_2/PER_QUERY_PAIRED_DIFFERENCES.csv": "73cabfa8ae7dba8c61e419de67174c29bab523b61d52e373191b159d7d9698ae",
+    "research/stage3_10_2/PER_REPOSITORY_RESULTS.csv": "cf376dcfa39594120463fe60ef1cedb91d7e3acd0dc954e07e61a3a760dfddb6",
+    "research/stage3_10_2/PER_TASK_RESULTS.csv": "3aec7adcedf25b9e77b33cd79040974bef525972bf64018edc3103921293e25f",
+    "research/stage3_10_2/REPRODUCTION_MATRIX.csv": "43a12db17695f48c16a6df83344445f83779e3aac608584b290ece3f705a9372",
+    "research/stage3_10_2/RUNTIME_MEMORY_RESULTS.csv": "a94070cf713c40a5a4e39ea5c379cff6249101ab0608dc3da3f52717baf1d820",
+    "research/stage3_10_2/run_canonical_audit.py": "ae01e8cae2712dc96af4a4c446e4c5b6b9171c676d244871bd46e7abce691420",
+    "research/stage3_10_2/statistical_summary.json": "bc3fae9389a3367b3744a50bd37b9da25a3a49b38ed267ef621d0cb53089189d",
+    "research/stage3_10_2/STATISTICAL_VALIDATION.md": "af9afd1bf23afde9b3524c527163289b1dc78deb3200f41d289230e5810d8045",
+    "research/stage3_10_2/REPRODUCE.md": "faeac7bb0634e0f6aff0a1bc52c67754998fde2f16a7fb51130314ebe20954f9",
+    "tests/test_stage3_10_2_integrity.py": "7797dd79ed76d1b44c40fd9925d986df7134be10f64d356db32fa1f1a07a2154",
+    "research/stage3_10/PER_QUERY_RESULTS.csv": "8a6ca945594f0b5febd03f747cd4dcd9fb8af5f38be5ae4cbf16ccf0e9e79a63",
+    "research/stage3_5/GRAPH_RETRIEVAL_RESULTS.csv": "fc4b0002bafb6b557f22771d78768b8ba94ced0b1f09f9a4658a7d568f55873f",
+    "external/agent-retrieval-bench/data/corpus/v2_selective_mixed/corpus_manifest.jsonl": "f7bc6131f40b9527911adc0d7f974b3c2329a37fc2d823b0379daa301b0aa28b"
+  }
+}
