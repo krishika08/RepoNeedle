@@ -1,0 +1,60 @@
+{
+  "stage": "3.15",
+  "audit_timestamp_iso": "2026-10-29T13:08:35+05:30",
+  "target_dataset": "Contextbench/ContextBench",
+  "expected_sha256": "2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8",
+  "local_cache_inspection": {
+    "huggingface_hub_dir": "C:\\Users\\krish\\.cache\\huggingface\\hub",
+    "cached_datasets_found": [
+      "eyuansu71--agent_retrieval_bench"
+    ],
+    "contextbench_in_cache": false,
+    "workspace_contextbench_data_found": false
+  },
+  "attempted_routes": [
+    {
+      "route_id": "ROUTE-01",
+      "name": "Hugging Face Web Dataset Endpoint",
+      "url": "https://huggingface.co/datasets/Contextbench/ContextBench",
+      "method": "urllib.request.urlopen",
+      "http_status": 403,
+      "error": "HTTPError: HTTP Error 403: Forbidden",
+      "status": "BLOCKED_BY_SANDBOX_POLICY"
+    },
+    {
+      "route_id": "ROUTE-02",
+      "name": "Hugging Face Dataset API",
+      "url": "https://huggingface.co/api/datasets/Contextbench/ContextBench",
+      "method": "urllib.request.urlopen",
+      "http_status": 403,
+      "error": "HTTPError: HTTP Error 403: Forbidden",
+      "status": "BLOCKED_BY_SANDBOX_POLICY"
+    },
+    {
+      "route_id": "ROUTE-03",
+      "name": "GitHub Official ContextBench Repository",
+      "url": "https://github.com/EuniAI/ContextBench.git",
+      "method": "urllib.request.urlopen",
+      "http_status": 403,
+      "error": "HTTPError: HTTP Error 403: Forbidden",
+      "status": "BLOCKED_BY_SANDBOX_POLICY"
+    },
+    {
+      "route_id": "ROUTE-04",
+      "name": "GitHub API ContextBench Repo Info",
+      "url": "https://api.github.com/repos/EuniAI/ContextBench",
+      "method": "urllib.request.urlopen",
+      "http_status": 403,
+      "error": "HTTPError: HTTP Error 403: Forbidden",
+      "status": "BLOCKED_BY_SANDBOX_POLICY"
+    }
+  ],
+  "policy_compliance": {
+    "network_restrictions_bypassed": false,
+    "tls_verification_disabled": false,
+    "proxy_settings_tampered": false,
+    "unauthorized_credentials_used": false,
+    "synthetic_proxy_data_substituted": false,
+    "verdict": "BLOCKED — DATA ACCESS"
+  }
+}
