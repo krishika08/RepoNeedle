@@ -1,0 +1,116 @@
+{
+  "FUNCTION-GRAPH vs. CONTROL-CASCADE": {
+    "mean_delta": 0.001892,
+    "wins": 38,
+    "losses": 24,
+    "ties": 283,
+    "active_queries": 62,
+    "wilcoxon_w": 507.5,
+    "raw_p_value": 0.001007566236815416,
+    "query_bootstrap_95ci": [
+      0.000768,
+      0.003243
+    ],
+    "cluster_bootstrap_95ci": [
+      5.2e-05,
+      0.003216
+    ],
+    "holm_adjusted_p_value": 0.004857,
+    "statistically_significant": true
+  },
+  "FUNCTION-GRAPH-VERIFIED vs. CONTROL-CASCADE": {
+    "mean_delta": 0.001951,
+    "wins": 37,
+    "losses": 23,
+    "ties": 285,
+    "active_queries": 60,
+    "wilcoxon_w": 470.5,
+    "raw_p_value": 0.0010663904261008124,
+    "query_bootstrap_95ci": [
+      0.000801,
+      0.003385
+    ],
+    "cluster_bootstrap_95ci": [
+      5.4e-05,
+      0.003337
+    ],
+    "holm_adjusted_p_value": 0.004857,
+    "statistically_significant": true
+  },
+  "FUNCTION-GRAPH-ABLATION vs. CONTROL-CASCADE": {
+    "mean_delta": 0.001951,
+    "wins": 37,
+    "losses": 23,
+    "ties": 285,
+    "active_queries": 60,
+    "wilcoxon_w": 470.5,
+    "raw_p_value": 0.0010663904261008124,
+    "query_bootstrap_95ci": [
+      0.000798,
+      0.003342
+    ],
+    "cluster_bootstrap_95ci": [
+      6.4e-05,
+      0.003296
+    ],
+    "holm_adjusted_p_value": 0.004857,
+    "statistically_significant": true
+  },
+  "FUNCTION-GRAPH-NO-FREEZE vs. CONTROL-CASCADE": {
+    "mean_delta": 0.019998,
+    "wins": 139,
+    "losses": 23,
+    "ties": 183,
+    "active_queries": 162,
+    "wilcoxon_w": 1475.5,
+    "raw_p_value": 1.0077213855644913e-17,
+    "query_bootstrap_95ci": [
+      0.010924,
+      0.029518
+    ],
+    "cluster_bootstrap_95ci": [
+      0.011679,
+      0.029519
+    ],
+    "holm_adjusted_p_value": 0.0,
+    "statistically_significant": true
+  },
+  "FUNCTION-GRAPH vs. TEST-GRAPH": {
+    "mean_delta": 0.000385,
+    "wins": 14,
+    "losses": 19,
+    "ties": 312,
+    "active_queries": 33,
+    "wilcoxon_w": 263.5,
+    "raw_p_value": 0.7612836713939953,
+    "query_bootstrap_95ci": [
+      -0.000175,
+      0.001019
+    ],
+    "cluster_bootstrap_95ci": [
+      -0.000403,
+      0.00096
+    ],
+    "holm_adjusted_p_value": 0.761284,
+    "statistically_significant": false
+  },
+  "FUNCTION-GRAPH vs. BASE-REPOMAP": {
+    "mean_delta": -0.039165,
+    "wins": 136,
+    "losses": 192,
+    "ties": 17,
+    "active_queries": 328,
+    "wilcoxon_w": 21308.5,
+    "raw_p_value": 0.0009714763663187145,
+    "query_bootstrap_95ci": [
+      -0.071802,
+      -0.006958
+    ],
+    "cluster_bootstrap_95ci": [
+      -0.092491,
+      0.003249
+    ],
+    "holm_adjusted_p_value": 0.004857,
+    "statistically_significant": true
+  }
+}

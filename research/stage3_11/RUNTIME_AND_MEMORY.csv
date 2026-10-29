@@ -1,0 +1,6 @@
+system_id,warm_query_latency_p50_ms,warm_query_latency_p95_ms,warm_query_latency_mean_ms,process_rss_mb,peak_working_set_mb
+BASE-BM25,13.08,101.32,33.42,935.71,3969.12
+CONTROL-CASCADE,16.3,119.14,39.5,935.71,3969.12
+TEST-GRAPH,16.02,117.74,38.69,935.71,3969.12
+FUNCTION-GRAPH,16.11,115.67,38.81,935.71,3969.12
+BASE-REPOMAP,180.2,180.2,180.2,935.71,3969.12

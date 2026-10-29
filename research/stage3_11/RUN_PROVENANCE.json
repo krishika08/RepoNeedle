@@ -1,0 +1,117 @@
+{
+  "stage": "3.11",
+  "stage_title": "Function-Level Graph Retrieval Research",
+  "timestamp": "2026-10-29T21:50:00+05:30",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "architecture": "AMD64",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]"
+  },
+  "git_provenance": {
+    "branch": "research-program",
+    "head_commit": "768f69d",
+    "frozen_tags": {
+      "v0.1.0-baseline": "8e0042553a14b6e3c6cf5b35823c4da84181a8e9",
+      "stage3-candidate-freeze": "cd7f3b01e28695f9a9357e0815069e0eae85baca"
+    }
+  },
+  "audited_verdict": "FAIL - PRIMARY PREREGISTERED CRITERION NOT MET (KEEP DEFAULT UNCHANGED)",
+  "independent_data_status": "BLOCKED / PRELIMINARY (ContextBench inaccessible via external network isolation)",
+  "benchmark_summary": {
+    "total_canonical_queries": 345,
+    "total_corpus_snapshots": 271,
+    "systems_evaluated": [
+      "BASE-BM25",
+      "CONTROL-CASCADE",
+      "TEST-GRAPH",
+      "DEGREE-CONTROL",
+      "BASE-REPOMAP",
+      "FUNCTION-GRAPH",
+      "FUNCTION-GRAPH-VERIFIED",
+      "FUNCTION-GRAPH-ABLATION",
+      "FUNCTION-GRAPH-NO-FREEZE"
+    ],
+    "metrics": {
+      "BASE-BM25": {
+        "mrr": 0.1752,
+        "recall_at_20": 0.4535,
+        "hit_at_20": 0.5275,
+        "latency_ms": 13.08
+      },
+      "CONTROL-CASCADE": {
+        "mrr": 0.1882,
+        "recall_at_20": 0.5503,
+        "hit_at_20": 0.6319,
+        "latency_ms": 16.3
+      },
+      "TEST-GRAPH": {
+        "mrr": 0.1897,
+        "recall_at_20": 0.5605,
+        "hit_at_20": 0.6435,
+        "latency_ms": 16.02
+      },
+      "FUNCTION-GRAPH": {
+        "mrr": 0.1901,
+        "recall_at_20": 0.5605,
+        "hit_at_20": 0.6435,
+        "latency_ms": 16.11
+      },
+      "FUNCTION-GRAPH-VERIFIED": {
+        "mrr": 0.1902,
+        "recall_at_20": 0.5605,
+        "hit_at_20": 0.6435,
+        "latency_ms": 16.11
+      },
+      "FUNCTION-GRAPH-NO-FREEZE": {
+        "mrr": 0.2082,
+        "recall_at_20": 0.5648,
+        "hit_at_20": 0.6493,
+        "latency_ms": 16.14
+      },
+      "BASE-REPOMAP": {
+        "mrr": 0.2293,
+        "recall_at_20": 0.6599,
+        "hit_at_20": 0.7478,
+        "latency_ms": 180.2
+      }
+    },
+    "statistical_findings": {
+      "function_graph_vs_control_delta": 0.001892,
+      "function_graph_wilcoxon_p": 0.001008,
+      "function_graph_holm_p_adj": 0.004857,
+      "function_graph_clustered_95ci": [
+        5.2e-05,
+        0.003216
+      ],
+      "no_freeze_vs_control_delta": 0.019998,
+      "no_freeze_wilcoxon_p": 1.01e-17,
+      "no_freeze_holm_p_adj": 0.0,
+      "no_freeze_clustered_95ci": [
+        0.011679,
+        0.029519
+      ]
+    }
+  },
+  "file_hashes_sha256": {
+    "research/stage3_11/STAGE3_11_PREREGISTRATION.md": "8903c51123cb7eea50a624c5675c77d2933d3790b32b0c3a1fc9be73bfd5cf5a",
+    "research/stage3_11/GRAPH_DESIGN.md": "85a03efeaa26970035dd8d9e77a4e110e927accdd1787bbab4dca07659b34b56",
+    "research/stage3_11/function_graph_engine.py": "1067dbeca1bbfc98e6d89425c23d4512a48d0b3d984a6910438ddd1fba62bfec",
+    "research/stage3_11/run_stage3_11_evaluation.py": "408b69ea9a1e072389382ae645ea06367b5648c9bea87cf845d3fe0d6482d758",
+    "research/stage3_11/GRAPH_COVERAGE_RESULTS.csv": "79069b1491ee711e45909977f2946203aded0e9a1ad2fbe7f206e05d3e77f4da",
+    "research/stage3_11/RETRIEVAL_RESULTS.csv": "269c533c0ceb0e024e84647d620ba47581cc000dc9ec596f850b436c1709e3ca",
+    "research/stage3_11/PER_TASK_RESULTS.csv": "1df9df7f7048544fe25b4049e2293def733c1b51a843a047f7da54742da1aa4d",
+    "research/stage3_11/PER_REPOSITORY_RESULTS.csv": "e7b25a7008f9c86bd374dbab5af8361a9a2b424ac8daed31b37f314b6260b3d7",
+    "research/stage3_11/CONTEXT_PACKING_RESULTS.csv": "72b7bcd0ca8213fa4a76b907d0a7cc6c617671866e78650c3669c67d1ac163ac",
+    "research/stage3_11/RUNTIME_AND_MEMORY.csv": "e7c58fec609e5aec924c37bde339bc370f1ba4aa3e761ae11d5c31578873d93d",
+    "research/stage3_11/statistical_summary.json": "09d7ca80d813e8b0a5dff4003eb715800ea5968a0f7d150ae478fa8687e2f313",
+    "research/stage3_11/STATISTICAL_VALIDATION.md": "76e7e3bab9c99e11d96b85d98dab2ddea7ca2bf565c5a897ac6b24b3243b95c3",
+    "research/stage3_11/FAILURE_ANALYSIS.md": "0a4d5a6b58f7c277b2e4b7968de81e0806504c758de8347a44c1fbc0307bed56",
+    "research/stage3_11/STAGE3_11_DECISION_REPORT.md": "33f30fb288e868ef3dd5d9cd232b42f4090e8c16ab267248c47a75d2a033e34e",
+    "research/stage3_11/REPRODUCE.md": "1a41d342c6e177e431ec5b2defae2d8589ccaba9a2eb1b966068e376f6387387",
+    "research/stage3_11/EXPERIMENT_REGISTRY.jsonl": "082a10939b89c430e78d499511e2d14c8864d6cc15ee79fbec2036ef3803db67",
+    "tests/test_stage3_11_function_graph.py": "ded4ad06d369318b620d4858c78edbbc44edffd888087ed6fb8f8d2a2f0efebc",
+    "tests/test_stage3_11_integrity.py": "d9e57efd778aeda5c8cff42b3308443c9291056b03eef28342a036524ef79b19"
+  }
+}
