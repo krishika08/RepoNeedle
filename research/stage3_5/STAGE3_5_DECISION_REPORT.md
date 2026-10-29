@@ -1,15 +1,18 @@
 > [!WARNING]
-> **HISTORICAL AUDIT NOTICE — INVALIDATED RESULT & SUPERSEDED ARCHITECTURE (STAGES 3.6–3.14)**  
-> **Status: INVALIDATED & SUPERSEDED**  
-> The claims in this document presenting **Candidate F** as the winning production architecture (MRR 0.2152 vs RepoMap 0.2140) have been **formally invalidated**.  
-> Subsequent rigorous audits in Stages 3.6 through 3.13 established that:  
-> 1. **RepoMap Reference Artifact**: The `0.2140` MRR reported for `BASE-REPOMAP` was an unmeasured, hardcoded static reference constant; the true pinned official RepoMap (`9e4d689`) achieves **MRR 0.2293**, **Recall@20 0.6599**, and **Token BCY@8k 0.3177**.  
-> 2. **Candidate F Rank Collapse**: Candidate F scores in Stage 3.5 relied on uncoupled synthetic Stage 2 lookup artifacts. When evaluated end-to-end on the complete polyglot corpus, Candidate F collapsed to **MRR 0.1334** due to supernode PageRank dilution and uncoupled token length penalties.  
-> 3. **Canonical Status**: The canonical winner of the RepoNeedle research programme on ARB v2 is **CONFIG-09** (MRR 0.2061), with **CONFIG-10** (MRR 0.2019) proven statistically equivalent within $\Delta = \pm 0.015$ ($p = 5.12 \times 10^{-12}$).  
+> **HISTORICAL AUDIT NOTICE — FORMALLY INVALIDATED RESULT & SUPERSEDED ARCHITECTURE (OCTOBER 2026)**  
+> **Status: INVALIDATED & SUPERSEDED BY STAGE 3.12A RECONCILIATION**  
+> The claims in this document presenting **Candidate F** as the winning production architecture (MRR 0.2152 vs RepoMap 0.2140) and universal sub-100 MB process memory have been **formally invalidated and retracted**.  
+> In accordance with the Stage 3.12A Canonical Evaluation Reconciliation ([`EVALUATOR_DIFFERENCES.md`](file:///F:/RepoNeedle/research/stage3_12a/EVALUATOR_DIFFERENCES.md) and [`RECONCILIATION_DECISION.md`](file:///F:/RepoNeedle/research/stage3_12a/RECONCILIATION_DECISION.md)):  
+> 1. **Invalid Candidate Pool Restriction**: Stage 3.5 restricted the candidate pool in `code2test` to test files only via `tests_only` filtering, artificially pruning code distractors. On the mandatory 100% unconstrained candidate pool, Candidate F collapses from $0.2152$ to **MRR 0.1338** (below pure BM25 $0.1752$, $p = 1.46 \times 10^{-13}$).  
+> 2. **Hit@20 vs. Fractional Recall@20 Confusion**: The reported "Recall@20" of $0.5652$ was mathematically **Binary Hit@20** ($195 / 345 = 0.5652$). True fractional recall on the unconstrained pool is only **0.5083**.  
+> 3. **Unmeasured Hardcoded RepoMap Reference**: The `0.2140` MRR reported for `BASE-REPOMAP` was an unmeasured static dictionary constant hardcoded in `evaluate_graph_retrieval.py:278`. Live empirical evaluation of version-pinned official RepoMap (`9e4d689`) establishes that RepoMap actually achieves **MRR 0.2293**, **Recall@20 0.6599**, and **Token BCY@8k 0.3177**, decisively outperforming Candidate F.  
+> 4. **Memory Contradiction**: The claim of a universal sub-100 MB process RSS was based solely on small repositories (`pallets/click`: $104\text{ MB}$). Native Win32 measurements on larger repositories (`caddyserver/caddy`: $160\text{ MB}$) confirm that memory scales with repository size.  
 >  
-> For full forensic root-cause analysis, canonical recomputations, and errata ledger, see:  
+> For complete forensic audit evidence and canonical recomputations, see:  
+> - [`research/stage3_12a/EVALUATOR_DIFFERENCES.md`](file:///F:/RepoNeedle/research/stage3_12a/EVALUATOR_DIFFERENCES.md)  
+> - [`research/stage3_12a/CANONICAL_METRIC_SUMMARY.csv`](file:///F:/RepoNeedle/research/stage3_12a/CANONICAL_METRIC_SUMMARY.csv)  
+> - [`research/stage3_12a/RECONCILIATION_DECISION.md`](file:///F:/RepoNeedle/research/stage3_12a/RECONCILIATION_DECISION.md)  
 > - [`research/stage3_13/CANONICAL_LINEAGE_AUDIT.md`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_LINEAGE_AUDIT.md)  
-> - [`research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv`](file:///F:/RepoNeedle/research/stage3_13/CANONICAL_METRIC_RECONCILIATION.csv)  
 > - [`research/stage3_14/HISTORICAL_ERRATA.md`](file:///F:/RepoNeedle/research/stage3_14/HISTORICAL_ERRATA.md)  
 
 # REPONEEDLE STAGE 3.5: ARCHITECTURAL DECISION & SYSTEM REPORT

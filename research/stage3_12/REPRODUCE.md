@@ -1,6 +1,6 @@
 # RepoNeedle Stage 3.12 — Reproduction Guide
 
-This guide describes how to reproduce all performance hardening benchmarks, canonical evaluations, and memory audits on the `research-program` branch.
+This guide describes how to reproduce all performance hardening benchmarks, canonical evaluations, memory audits, and the 2^3 factorial experiment on the `research-program` branch.
 
 ## Prerequisites
 
@@ -60,7 +60,38 @@ Generated deliverables:
 
 ---
 
-## 4. Run Full Regression Test Suite
+## 4. Execute the 2^3 Factorial Experiment Pipeline
+
+To execute the full 8-arm factorial benchmark across all 345 positive queries and 218 snapshots, computing all statistical tests (10,000 bootstrap replicates, Wilcoxon signed-rank tests, Holm-Bonferroni correction, ANOVA effects) and generating all canonical CSVs:
+
+```powershell
+python research/stage3_12/run_stage3_12_factorial.py
+```
+
+Generated factorial deliverables:
+- `research/stage3_12/DESIGN_AND_PREREGISTRATION.md`
+- `research/stage3_12/STAGE3_12_DECISION_REPORT.md`
+- `research/stage3_12/CANONICAL_PER_QUERY_RESULTS.csv`
+- `research/stage3_12/FACTORIAL_RESULTS.csv`
+- `research/stage3_12/PER_TASK_RESULTS.csv`
+- `research/stage3_12/REGRESSION_ANALYSIS.md`
+- `research/stage3_12/STATISTICAL_ANALYSIS.json`
+- `research/stage3_12/RUNTIME_AND_MEMORY.csv`
+- `research/stage3_12/RUN_PROVENANCE.json`
+
+---
+
+## 5. Run Factorial Unit & Integrity Tests
+
+Verify that all Stage 3.12 factorial deliverables exist, schemas match, and all preregistered constraints hold:
+
+```powershell
+python -m pytest tests/test_stage3_12_factorial.py -v
+```
+
+---
+
+## 6. Run Full Regression Test Suite
 
 Confirm that all existing and historical tests across RepoNeedle continue to pass:
 
