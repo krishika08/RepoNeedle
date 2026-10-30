@@ -1,0 +1,22 @@
+{
+  "reponeedle/models.py": "2ae0212e7d7bf99581d9bf9f361cad776fd6aed213a9bb7ae16346d419e3d4f1",
+  "reponeedle/engine.py": "63bb90d716e34aa79cbafd25b84075e050359c07fa412dfc192086a476f306cb",
+  "reponeedle/cli.py": "3d19fd8550bbec49dda796849f0e5cd5a6d399bacf1ad6c319830c5165d1585d",
+  "reponeedle/core/arm101.py": "d95bbad1b61930b2cec7ee8bce1ffef9a4158db932a5b468998cb138f26b65c5",
+  "reponeedle/core/attenuation.py": "2a6e66ea08459da2a4d3f88a8ff956799d36f9a427e2492e10975aee28cd0569",
+  "reponeedle/core/function_graph.py": "541d5a72e923871db866dc805c856faec8b4dbcb563f4b63b5dbaf22a852578a",
+  "reponeedle/core/cascade.py": "32e4e08e9755d3293f17afcfae5811b7efd6b124bad981ede6f5dff576213fd4",
+  "reponeedle/core/bm25.py": "FILE_NOT_FOUND",
+  "reponeedle/core/graph.py": "bed12b4bb1de4e00a0f284ae42f7d88b2e953df5cdbe300e93988e52537cffdf",
+  "reponeedle/core/budget.py": "495024a21ea3ba4c790bec4fdf6575688302043d2924dc028fc1b000735aede1",
+  "reponeedle/core/tokenizer.py": "c2aaf78ce89f0fb5cdb824d0a641b723aa666c5fd9906b915697e8eb5bd98cc0",
+  "research/stage3_20/PRODUCTION_ARB_RESULTS.csv": "bc7c19bc460562148fdc01d49fad4b48b2f3a2ac7393e2a186f0f715387f41bc",
+  "research/stage3_20/PRODUCTION_PER_QUERY_RESULTS.csv": "0ee3ee7055cd3db7bf34909d986cded84f87538a585ddb1dfac698f41b9c6137",
+  "research/stage3_20/RESEARCH_VS_PRODUCTION_PARITY.csv": "dface905e5c8e9c6c9a3f002d06e0b54eaabaf8c34c4a987b71f87b3941161c8",
+  "research/stage3_20/STAGE3_20_REPORT.md": "a19f9c93aec020337c9dbc7c9449fd1b99839d6c28fc083ec1a1bb420e74db3f",
+  "research/stage3_20/STAGE3_20_DECISION_REPORT.md": "1bd5db0a3da655919bad3b6561087f697f3279bfda9abb8095876c3162f7ef24",
+  "research/stage3_19/PER_QUERY_RESULTS.csv": "824b8b451f6d5c5dcb4e3b95f9ba46ee5dce705fcb4b4c4d39471f8ccd347a44",
+  "research/stage3_19/REPRODUCED_LEADERBOARD.csv": "a4296619fd1c478984a2050562b2bf6a8b677d99ed957e598a3f4a53369e664b",
+  "research/stage3_14/pilot_attenuation.py": "291c14cf59f6ced2d183d2751e269ed329c29d0183c5b51e46cbeea52632f3e5",
+  "research/stage3_11/function_graph_engine.py": "1067dbeca1bbfc98e6d89425c23d4512a48d0b3d984a6910438ddd1fba62bfec"
+}

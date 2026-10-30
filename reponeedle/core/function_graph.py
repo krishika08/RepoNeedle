@@ -205,7 +205,7 @@ class FunctionGraphEngine:
 
         except Exception:
             # Fallback regex extraction on syntax error
-            for m in re.finditer(r"^\s*def\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\)", content, re.MULTILINE):
+            for m in re.finditer(r"^\s*def\s+([a-zA-Z0-9_]+)\s*\(([^)\r\n]*)\)", content, re.MULTILINE):
                 fn = m.group(1)
                 funcs.append(FunctionSymbol(
                     name=fn,

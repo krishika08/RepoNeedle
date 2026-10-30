@@ -1,0 +1,7 @@
+{"experiment_id": "EXP-321-01", "stage": "3.21", "name": "ARB v2 Task Count & Population Forensics", "status": "COMPLETED", "timestamp": "2026-10-30T22:05:00", "verdict": "RECONCILED"}
+{"experiment_id": "EXP-321-02", "stage": "3.21", "name": "ARM-101 Research-to-Production Parity & Metric Audit", "status": "COMPLETED", "timestamp": "2026-10-30T22:08:00", "verdict": "BIT_FOR_BIT_PARITY"}
+{"experiment_id": "EXP-321-03", "stage": "3.21", "name": "Baseline Comparisons & RepoMap Provenance Reconciliation", "status": "COMPLETED", "timestamp": "2026-10-30T22:09:00", "verdict": "RECONCILED"}
+{"experiment_id": "EXP-321-04", "stage": "3.21", "name": "Memory & Resource Measurement Reconciliation", "status": "COMPLETED", "timestamp": "2026-10-30T22:21:00", "verdict": "RECONCILED"}
+{"experiment_id": "EXP-321-05", "stage": "3.21", "name": "Production Code Quality & Polyglot Graph Audit", "status": "COMPLETED", "timestamp": "2026-10-30T22:22:00", "verdict": "HARDENED_AND_VERIFIED"}
+{"experiment_id": "EXP-321-06", "stage": "3.21", "name": "ContextBench Ingestion Readiness & Blocker Review", "status": "COMPLETED", "timestamp": "2026-10-30T22:23:00", "verdict": "GATE_BLOCKED_NETWORK"}
+{"experiment_id": "EXP-321-07", "stage": "3.21", "name": "Incremental AST Graph Indexing Architecture Design", "status": "COMPLETED", "timestamp": "2026-10-30T22:24:00", "verdict": "DESIGN_SPEC_COMPLETE"}
