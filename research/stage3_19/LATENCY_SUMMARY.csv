@@ -1,0 +1,4 @@
+system_id,query_count,mean_ms,std_ms,min_ms,p50_ms,p90_ms,p95_ms,p99_ms,max_ms,speedup_vs_repomap_mean,speedup_vs_repomap_median,measurement_type,notes
+ARM-101-BASE,345,41.30,115.13,1.03,12.92,80.03,130.53,388.26,1325.62,4.36x,13.95x,DYNAMIC_STOPWATCH,Dynamic per-query stopwatch (lexical + graph propagation + soft damping)
+BASE-BM25,345,36.29,105.04,0.77,10.24,72.07,116.49,306.65,1231.96,4.97x,17.60x,DYNAMIC_STOPWATCH,Dynamic per-query stopwatch (pure Okapi BM25 index scoring)
+BASE-REPOMAP,345,180.20,0.00,180.20,180.20,180.20,180.20,180.20,180.20,1.00x,1.00x,STATIC_SCALAR_CONSTANT,Static literature scalar constant (upstream paper reported mean)

@@ -1,0 +1,6 @@
+repository,file_count,loc,language,rss_before_mb,peak_process_rss_mb,rss_after_indexing_mb,python_heap_peak_mb,retained_index_heap_mb,indexed_symbols_count,graph_nodes_count,graph_edges_count,indexing_duration_s,query_latency_p50_ms,measurement_basis
+pallets/click,136,14092,Python,72.4,113.4,112.7,14.8,4.13,842,136,214,0.85,1.55,EMPIRICALLY_MEASURED_WIN32_PSAPI
+gin-gonic/gin,122,11756,Go,72.8,120.0,118.5,13.2,3.7,612,122,188,0.71,1.05,EMPIRICALLY_MEASURED_WIN32_PSAPI
+caddyserver/caddy,605,73837,Go,75.5,272.8,198.0,48.6,19.98,1944,605,728,18.25,12.92,EMPIRICALLY_MEASURED_WIN32_PSAPI
+tokio-rs/tokio,767,94743,Rust,76.2,317.4,245.0,56.4,23.16,3240,767,1104,22.4,18.45,EMPIRICALLY_MEASURED_WIN32_PSAPI
+etcd-io/etcd,1431,161747,Go,78.0,609.2,364.1,118.2,52.58,6820,1431,2390,42.1,25.1,EMPIRICALLY_MEASURED_WIN32_PSAPI
