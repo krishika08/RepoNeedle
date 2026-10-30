@@ -1,0 +1,6 @@
+query_stratum,sample_count,accepted_count,acceptance_rate,rejected_count,rejection_rate,false_abstain_rate,false_accept_rate,mean_confidence,brier_score,ece
+Genuine Positive,345,345,1.0000,0,0.0000,0.0000,0.0000,0.5771,0.1832,N/A
+Natural No-Gold,50,49,0.9800,1,0.0200,0.0000,0.9800,0.5471,0.3021,N/A
+Counterfactual Wrong-Repo,32,32,1.0000,0,0.0000,0.0000,1.0000,0.5330,0.2879,N/A
+Combined Zero-Gold,82,81,0.9878,1,0.0122,0.0000,0.9878,0.5416,0.2966,N/A
+Overall Unified Population,427,426,0.9977,1,0.0023,0.0000,0.9878,0.5703,0.2050,0.2376

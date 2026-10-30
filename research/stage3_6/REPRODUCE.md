@@ -1,126 +1,134 @@
-# RepoNeedle Stage 3.6 — Reproduction Guide
+# REPONEEDLE STAGE 3.6: REPRODUCTION GUIDE
 
-**Document ID**: `STAGE3.6-REPRO-001`  
+**Document ID**: `STAGE3-6-REPRO-001`  
 **Date**: October 2026  
-**Target Branch**: `research-program`  
-**Target Commit**: Current HEAD on `research-program`  
-**Python Version**: Python 3.10+ (tested on Windows 10/11 x64)
+**Target Workspace**: `F:\RepoNeedle`  
+**Branch**: `research-program` / `research/stage3_6-audit`  
+**Python Version**: Python 3.12.10 (tested on Windows 11 x64)  
 
-This guide provides clean, copy-pasteable PowerShell commands to reproduce every finding, benchmark result, statistical test, context packing analysis, and runtime/memory audit conducted in RepoNeedle Stage 3.6.
-
----
-
-## 1. Environment & Prerequisites
-
-### 1.1 Python Dependencies
-Ensure the current virtual environment has all required dependencies installed:
-```powershell
-pip install pytest networkx scipy numpy pathspec
-```
-
-### 1.2 Working Directory
-Always execute commands from the repository root:
-```powershell
-cd F:\RepoNeedle
-```
+This guide provides copy-pasteable PowerShell commands to reproduce every benchmark result, baseline reconciliation, statistical test, context packing analysis, selective abstention diagnostic, and memory measurement in RepoNeedle Stage 3.6.
 
 ---
 
-## 2. Step-by-Step Execution Pipeline
+## 1. ENVIRONMENT & PRECONDITIONS
 
-### Step 1: Git Status & Frozen Baseline Integrity Verification
-Verify that immutable Git tags and baseline trees are untouched:
+### 1.1 Prerequisites
+From repository root `F:\RepoNeedle`, ensure required dependencies are installed:
 ```powershell
-# 1. Verify frozen baseline tag
+pip install pytest pytest-cov networkx scipy numpy pydantic
+```
+
+### 1.2 Verify Frozen Tag Immutability & Commit Anchors
+```powershell
+# Verify frozen baseline tag
 git rev-parse "v0.1.0-baseline^{commit}"
-# Expected: 8e0042539cf9e585f52a7920dc7ca81155aa51c6
+# Expected: 8e0042553a14b6e3c6cf5b35823c4da84181a8e9
 
-# 2. Verify frozen candidate freeze tag
+# Verify candidate freeze tag
 git rev-parse "stage3-candidate-freeze^{commit}"
-# Expected: cd7f3b0606ec040974cf978c4391264b38d38407
+# Expected: cd7f3b01e28695f9a9357e0815069e0eae85baca
 
-# 3. Check current branch
-git branch --show-current
-# Expected: research-program
+# Verify Stage 3.5 commit exists
+git rev-parse --verify 4f78cc3
+# Expected: 4f78cc3658dfb5e338a5458579d38d5d7ef416e8
 ```
-
-### Step 2: Run Unit Test Suite
-Verify that all unit tests pass (100% test pass rate):
-```powershell
-python -m pytest tests/ -v
-# Expected: 50 passed in ~3.2 seconds
-```
-
-### Step 3: Run Graph Audit & Manifest Resolution Unit Tests
-Verify that the excised hardcoded bypasses remain removed and polyglot graph resolution tests pass:
-```powershell
-python -m pytest tests/test_graph.py -v
-# Expected: 8 passed (Cargo manifests, Go mod, package.json, Rust submodules, edge deduplication)
-```
-
-### Step 4: Run Unified Four-System Benchmark Evaluation (N=345 ARB v2 Samples)
-Executes all four retrieval systems (`BASE-BM25`, `CAND-C`, `CAND-F`, `BASE-REPOMAP`) under one unified evaluation contract across all 345 positive benchmark samples:
-```powershell
-python -u -W ignore research\stage3_6\evaluate_systems.py
-```
-- **Output Artifact**: `research/stage3_6/PER_QUERY_RESULTS.csv` (1,380 query-system observations)
-- **Expected Runtime**: ~12–18 minutes (depending on CPU throughput on large repositories like `huggingface/transformers`).
-
-### Step 5: Compute Paired Statistical Significance & Confidence Intervals
-Reads `PER_QUERY_RESULTS.csv` and executes 10,000 repository-clustered bootstrap resamples, paired $t$-tests, Wilcoxon signed-rank tests, and per-task / per-language breakdowns:
-```powershell
-python -u research\stage3_6\compute_paired_statistics.py
-```
-- **Output Artifact**: `research/stage3_6/PAIRED_STATISTICS.md`
-- **Expected Runtime**: ~15–20 seconds.
-
-### Step 6: Controlled Context Packing & Budget Saturation Isolation Audit
-Evaluates context packing policies across 4k, 8k, and 16k token budgets on representative codebases (`pallets/click`, `caddyserver/caddy`, `tokio-rs/tokio`):
-```powershell
-python -u -W ignore research\stage3_6\audit_context_packing.py
-```
-- **Output Artifacts**:
-  - `research/stage3_6/CONTEXT_PACKING_PER_QUERY.csv`
-  - `research/stage3_6/CONTEXT_PACKING_RESULTS.csv`
-- **Expected Runtime**: ~45–60 seconds.
-
-### Step 7: Runtime, Latency, and Process Memory (PSAPI RSS) Audit
-Measures index build time, retained heap delta, process baseline/retained/peak RSS via `K32GetProcessMemoryInfo`, and cold/p50/p95 latency across Micro, Medium, and Large repository scales:
-```powershell
-python -u -W ignore research\stage3_6\audit_runtime_and_memory.py
-```
-- **Output Artifact**: `research/stage3_6/RUNTIME_MEMORY_RESULTS.csv`
-- **Expected Runtime**: ~30–45 seconds.
 
 ---
 
-## 3. Artifact Checksum Verification
+## 2. STEP-BY-STEP REPRODUCTION PIPELINE
 
-After running the pipeline, verify file integrity using PowerShell `Get-FileHash`:
+### Step 1: Run Full Test Suite
+Run the test suite to verify that all 236 unit, integration, and forensic reconciliation tests pass:
 ```powershell
-Get-FileHash research\stage3_6\* | Format-Table Algorithm, Hash, Path
+pytest
+# Expected: 236 passed in ~9.8s
 ```
-All artifacts should match their expected structure, line counts, and verified SHA-256 checksums:
 
-| Artifact Path | Line Count | SHA-256 Checksum |
+Run the specific Stage 3.6 forensic reconciliation test:
+```powershell
+pytest tests/test_stage3_6_forensic_reconciliation.py -v
+# Expected: 6 passed (commit ancestry, tag immutability, metric discrepancy, Candidate F retraction, Stage 3.15 safeguards, Candidate F isolation)
+```
+
+### Step 2: Reproduce Metric Reconciliation Table
+Generates [`METRIC_RECONCILIATION.csv`](file:///F:/RepoNeedle/research/stage3_6/METRIC_RECONCILIATION.csv) reconciling the Stage 3.4 vs Stage 3.5 Recall@20 discrepancies:
+```powershell
+python research/stage3_6/scripts/generate_audit_deliverables.py
+```
+
+### Step 3: Reproduce Unified 4-System Ranking Evaluation
+Evaluates `BASE-BM25`, `CAND-C`, `CAND-F`, and `BASE-REPOMAP` across all $N=345$ positive ARB v2 samples:
+```powershell
+python research/stage3_6/scripts/evaluate_systems.py
+# Outputs:
+#   research/stage3_6/PER_QUERY_RESULTS.csv
+#   research/stage3_6/RANKING_RESULTS.csv
+#   research/stage3_6/PER_QUERY_RESULTS.jsonl
+```
+
+### Step 4: Reproduce Repository-Clustered Paired Statistics
+Computes paired differences, Wilcoxon signed-rank tests, and 10,000 repository-clustered bootstrap resamples:
+```powershell
+python research/stage3_6/scripts/compute_paired_statistics.py
+# Outputs:
+#   research/stage3_6/PAIRED_STATISTICAL_TESTS.csv
+#   research/stage3_6/PAIRED_STATISTICS.md
+#   research/stage3_6/STATISTICAL_COMPARISON.md
+```
+
+### Step 5: Reproduce Context Packing Audit
+Evaluates greedy full-file, skeleton packing, and 0.5x doc-filtering across 4k, 8k, and 16k token budgets:
+```powershell
+python research/stage3_6/scripts/audit_context_packing.py
+# Outputs:
+#   research/stage3_6/CONTEXT_PACKING_RESULTS.csv
+#   research/stage3_6/CONTEXT_PACKING_PER_QUERY.csv
+```
+
+### Step 6: Reproduce Selective Abstention Diagnostic
+Evaluates default `SelectiveAbstainer` across 345 positive, 50 natural no-gold, and 32 counterfactual tasks:
+```powershell
+python research/stage3_6/scripts/evaluate_abstention.py
+# Outputs:
+#   research/stage3_6/ABSTENTION_RESULTS.csv
+#   research/stage3_6/ABSTENTION_PER_QUERY.jsonl
+```
+
+### Step 7: Reproduce Polyglot Graph Scaling & Ripgrep Diagnostic
+Profiles graph density across Clap, Tokio, Ruff, Caddy, and Vite, and verifies excision of hardcoded Ripgrep bypasses:
+```powershell
+python research/stage3_6/scripts/generate_graph_csv.py
+# Outputs:
+#   research/stage3_6/GRAPH_REPRODUCIBILITY_RESULTS.csv
+```
+
+### Step 8: Reproduce Native Process Memory and Latency Profiling
+Profiles native Win32 process RSS and warm query latency:
+```powershell
+python research/stage3_6/scripts/audit_runtime_and_memory.py
+# Outputs:
+#   research/stage3_6/RUNTIME_AND_MEMORY.csv
+```
+
+---
+
+## 3. CHECKSUM AND ARTIFACT INTEGRITY VERIFICATION
+
+To verify artifact integrity, compare generated outputs against the canonical deliverables in `research/stage3_6/`:
+
+| Deliverable Artifact | Expected Record Count | Verification Method |
 | :--- | :---: | :--- |
-| 
-esearch/stage3_6/PER_QUERY_RESULTS.csv | 1,381 | 1311ee12001be7001f645532304e8b1bedd5663f82ab85d57a57c39d792a5007 |
-| 
-esearch/stage3_6/PAIRED_STATISTICS.md | 141 | 62bcb8dc3c1bc6d68f922b51c0f8b7459377e01e8dfbc6ea77678c59c57abdb |
-| 
-esearch/stage3_6/CONTEXT_PACKING_PER_QUERY.csv | 1,156 | 3527ac6325fb8bc503138292f680b22d1fe70533be02d2837ab992898948ae48 |
-| 
-esearch/stage3_6/CONTEXT_PACKING_RESULTS.csv | 16 | 3e31d0dccfcad9e9f86db7f4ed2db576b0ea269097fbdb847cc3b485795e0dff |
-| 
-esearch/stage3_6/RUNTIME_MEMORY_RESULTS.csv | 13 | f763eca98bc94e1fbf31675a0c86c18da07a7ab99341917aca54838f5f73379 |
-| 
-esearch/stage3_6/DECISION_REPORT.md | 82 | 45a7c94c88a18887371b8c7838f821bcd86f3b00e6a97e7f1add32dc30039ffd |
-| 
-esearch/stage3_6/REPRODUCIBILITY_REPORT.md | 85 | c4f963ea1d1fb308807946f3e9bcd3d17b3b57833b44ff31262620d6bf9fd600 |
-| 
-esearch/stage3_6/GRAPH_AUDIT.md | 127 | 5a17a7474264beb46a8e81bc12e490e688c5a656d59b70284fd325bd65f324a |
-| 
-esearch/stage3_6/FAILURE_ANALYSIS.md | 108 | 1e3d086438fe01b4ecdd94f32cd82ce81c2bfe9d0cd58af425427a844b4d7661 |
-| 
-esearch/stage3_6/EXPERIMENT_REGISTRY.jsonl | 7 | 189128193b2857d4e578f28d4e13601a52805272dc117c824fe60d10dabedd02 |
+| `STAGE3_6_DECISION_REPORT.md` | 16 Questions answered | Document review & checklist |
+| `BASELINE_AND_CANDIDATE_REPRODUCTION.md` | 5 Sections | Comparison against canonical tables |
+| `EVALUATION_PROTOCOL_AUDIT.md` | Complete forensic audit | Verified against commit `4f78cc3` |
+| `METRIC_RECONCILIATION.csv` | 6 reconciled metrics | Confirms Hit@20 vs Recall@20 |
+| `EXPERIMENT_REGISTRY.jsonl` | 8 registered experiments | `EXP-361` through `EXP-368` |
+| `RANKING_RESULTS.csv` | 4 systems | Confirms MRR 0.1351 (Cand F) vs 0.2293 (RepoMap) |
+| `PER_QUERY_RESULTS.jsonl` | 1,380 JSON records | 345 queries $\times$ 4 systems |
+| `CONTEXT_PACKING_RESULTS.csv` | 15 packing policies | 4k, 8k, 16k budgets |
+| `ABSTENTION_RESULTS.csv` | 5 query strata | Confirms 98.78% false accept rate |
+| `GRAPH_REPRODUCIBILITY_RESULTS.csv` | 14 test rows | Confirms Ruff 112k vs 6.17M edges |
+| `RUNTIME_AND_MEMORY.csv` | 12 scale rows | Micro, Click, Caddy memory |
+| `STATISTICAL_COMPARISON.md` | 10,000 resamples | Confirms Cand F loss to RepoMap ($p < 0.0001$) |
+| `FAILURE_ANALYSIS.md` | 5 failure modes | Structural, lexical, and graph failures |
+| `GIT_AND_ENVIRONMENT_MANIFEST.md` | Complete manifest | Hardware, OS, dependencies |
