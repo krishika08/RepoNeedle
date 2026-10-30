@@ -1,0 +1,57 @@
+{
+  "manifest_id": "STAGE3-17-DATASET-MANIFEST-001",
+  "stage": "3.17",
+  "audit_date": "2026-10-30",
+  "dataset_name": "Contextbench/ContextBench",
+  "official_sources": {
+    "huggingface_hub": "https://huggingface.co/datasets/Contextbench/ContextBench",
+    "github_repository": "https://github.com/EuniAI/ContextBench",
+    "documentation": "https://euniai.github.io/ContextBench/"
+  },
+  "pinned_upstream_revision": "c285579",
+  "configurations": {
+    "default": {
+      "configuration_name": "default",
+      "expected_filename": "full.parquet",
+      "revision": "c285579",
+      "expected_rows": 1136,
+      "expected_repositories": 66,
+      "expected_languages": 8,
+      "expected_bytes": 26102607,
+      "expected_sha256": "2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8",
+      "role": "Primary external evaluation benchmark"
+    },
+    "contextbench_verified": {
+      "configuration_name": "contextbench_verified",
+      "expected_filename": "contextbench_verified.parquet",
+      "revision": "c285579",
+      "expected_rows": 500,
+      "expected_repositories": 35,
+      "expected_languages": 8,
+      "expected_bytes": 9558250,
+      "expected_sha256": "e9dcfd504cbfb849ac815a79040c793d0d92f94eecc9b5a4ee3e1445a2f8a791",
+      "role": "Secondary high-precision verified evaluation subset"
+    }
+  },
+  "required_schema_fields": [
+    "instance_id",
+    "repo",
+    "base_commit",
+    "problem_statement",
+    "gold_context"
+  ],
+  "forbidden_retrieval_fields": [
+    "gold_context",
+    "patch",
+    "test_patch",
+    "f2p",
+    "p2p"
+  ],
+  "unofficial_substitutes_policy": {
+    "schwerli_contextbench": "STRICTLY_PROHIBITED",
+    "mock_parquet": "STRICTLY_PROHIBITED"
+  },
+  "acquisition_status": "BLOCKED — DATA ACQUISITION OR VALIDATION FAILED",
+  "blocker_category": "SANDBOX_NETWORK_ISOLATION",
+  "blocker_details": "HTTP 403 Forbidden on Hugging Face direct endpoints. Artifacts full.parquet and contextbench_verified.parquet missing from research/external_data/contextbench/."
+}

@@ -1,0 +1,6 @@
+{"experiment_id": "EXP-080-STARTING-STATE", "stage": "3.17", "task": "Integrity Check", "commit": "548dab5eea6c71c3e9982676289098d9e0dca5f0", "status": "VERIFIED_TAGS_AND_ANCESTRY"}
+{"experiment_id": "EXP-081-DATASET-VALIDATION", "stage": "3.17", "task": "Dataset File Inspection", "target_dir": "research/external_data/contextbench", "files_found": [], "exit_code": 2, "status": "BLOCKED_FILES_MISSING"}
+{"experiment_id": "EXP-082-REVISION-CONTRACT", "stage": "3.17", "task": "Upstream Revision Pinned", "revision": "c285579", "full_sha256": "2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8", "verified_sha256": "e9dcfd504cbfb849ac815a79040c793d0d92f94eecc9b5a4ee3e1445a2f8a791", "status": "CONTRACT_SPECIFIED"}
+{"experiment_id": "EXP-083-CANDIDATE-NAMING-AUDIT", "stage": "3.17", "task": "Candidate Audit", "invalidated_candidate": "CAND-F", "champion_candidate": "ARM-101-BASE", "status": "RECONCILED"}
+{"experiment_id": "EXP-084-EVALUATION-GATE-DECISION", "stage": "3.17", "task": "Governance Verdict", "verdict": "BLOCKED — DATA ACQUISITION OR VALIDATION FAILED", "status": "GATE_RATIFIED"}
+{"experiment_id": "EXP-085-AUTOMATED-SAFEGUARD-TESTS", "stage": "3.17", "task": "Safeguard Verification", "test_file": "tests/test_stage3_17_evaluation_gate.py", "status": "100_PERCENT_PASS"}

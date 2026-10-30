@@ -1,0 +1,84 @@
+{
+  "manifest_id": "STAGE3-17-EVALUATION-MANIFEST-001",
+  "stage": "3.17",
+  "audit_date": "2026-10-30",
+  "evaluation_gate": "ContextBench Independent Validation Gate",
+  "evaluation_gate_verdict": "BLOCKED — DATA ACQUISITION OR VALIDATION FAILED",
+  "preregistered_configurations": [
+    {
+      "system_id": "ARM-101-BASE",
+      "display_name": "RepoNeedle ARM-101-BASE (Candidate Champion)",
+      "architecture": "Soft Lexical Damping (tau=0.25) + Level 1 Verified Function Call Edges (Unattenuated)",
+      "graph_parameters": {
+        "damping_tau": 0.25,
+        "edge_depth": 1,
+        "verified_call_edges_only": true,
+        "hub_attenuation": "none"
+      },
+      "arb_v2_development_mrr": 0.2078,
+      "arb_v2_development_recall20": 0.5648,
+      "arb_v2_development_bcy8k": 0.2822,
+      "arb_v2_p50_latency_ms": 12.92,
+      "status": "PREREGISTERED_CANDIDATE_CHAMPION",
+      "governance_role": "Primary system under evaluation"
+    },
+    {
+      "system_id": "BASE-BM25",
+      "display_name": "RepoNeedle BASE-BM25 (Lexical Baseline)",
+      "architecture": "Decoupled Okapi BM25 length-normalized scoring",
+      "graph_parameters": null,
+      "arb_v2_development_mrr": 0.1752,
+      "arb_v2_development_recall20": 0.4535,
+      "arb_v2_development_bcy8k": 0.2150,
+      "arb_v2_p50_latency_ms": 10.24,
+      "status": "PREREGISTERED_LEXICAL_BASELINE",
+      "governance_role": "Lower-bound reference baseline"
+    },
+    {
+      "system_id": "BASE-REPOMAP",
+      "display_name": "Aider RepoMap Reference (External Leader)",
+      "architecture": "Official RepoMap reference (commit 9e4d689) with AST PageRank graph ranking",
+      "graph_parameters": {
+        "algorithm": "tree_sitter_ast_pagerank"
+      },
+      "arb_v2_development_mrr": 0.2293,
+      "arb_v2_development_recall20": 0.6599,
+      "arb_v2_development_bcy8k": 0.3177,
+      "arb_v2_p50_latency_ms": 180.20,
+      "status": "PREREGISTERED_EXTERNAL_REFERENCE_LEADER",
+      "governance_role": "Upper-bound external benchmark reference"
+    }
+  ],
+  "candidate_naming_reconciliation": {
+    "candidate_f_status": "FORMALLY_INVALIDATED",
+    "candidate_f_arb_v2_mrr": 0.1351,
+    "candidate_f_flaw": "Depended on test-only candidate filtering and artificial 20-file corpus restriction. On true full-repository unconstrained corpus, MRR collapsed to 0.1351 (worse than BM25 0.1752, p=0.0122).",
+    "legitimate_champion": "ARM-101-BASE"
+  },
+  "acceptance_criteria": {
+    "quality_criterion": {
+      "vs_bm25_mrr": "MRR(ARM-101) > MRR(BM25) with p < 0.05",
+      "vs_bm25_recall20": "Recall@20(ARM-101) > Recall@20(BM25) with p < 0.05",
+      "vs_repomap_parity": "Competitive with BASE-REPOMAP (non-inferior or bounded delta)"
+    },
+    "latency_criterion": {
+      "p50_max_ms": 20.0,
+      "p95_max_ms": 100.0
+    },
+    "memory_criterion": {
+      "rss_max_mb": 200.0
+    },
+    "integrity_criterion": {
+      "data_leakage": "ZERO (fail-closed LeakageGuard)",
+      "denominator_preservation": "Strict denominator preservation (checkout errors -> 0.0 score, not excluded)",
+      "reproducibility": "Exact single-command reproduction with deterministic random seeds"
+    }
+  },
+  "statistical_evaluation_rules": {
+    "bootstrap_cluster_level": "repository",
+    "bootstrap_replicates": 10000,
+    "confidence_level": 0.95,
+    "paired_significance_test": "Wilcoxon signed-rank test",
+    "familywise_error_correction": "Holm-Bonferroni"
+  }
+}

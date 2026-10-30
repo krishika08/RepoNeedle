@@ -39,10 +39,16 @@ REQUIRED_COLUMNS = [
     "gold_context",
 ]
 
+PINNED_REVISION = "c285579"
 FULL_EXPECTED_ROWS = 1136
 FULL_EXPECTED_REPOS = 66
 FULL_EXPECTED_LANGUAGES = 8
+FULL_EXPECTED_BYTES = 26102607
+FULL_EXPECTED_SHA256 = "2f56535bdc73eb8a68bf4ebb49789d8e9cd4f219ea60df6290b85278aee61ca8"
+
 VERIFIED_EXPECTED_ROWS = 500
+VERIFIED_EXPECTED_BYTES = 9558250
+VERIFIED_EXPECTED_SHA256 = "e9dcfd504cbfb849ac815a79040c793d0d92f94eecc9b5a4ee3e1445a2f8a791"
 
 
 def compute_sha256(filepath: Path) -> str:
@@ -151,12 +157,25 @@ def validate_contextbench_records(records: List[Dict[str, Any]], expected_config
     return True, f"Valid {expected_config} dataset ({row_count} tasks, {len(repos)} repos)."
 
 
-def validate_file(filepath: Path, expected_config: str, expected_sha: Optional[str] = None) -> Tuple[int, str]:
+def verify_subset_integrity(full_records: List[Dict[str, Any]], verified_records: List[Dict[str, Any]]) -> Tuple[bool, str]:
+    full_ids = {str(r["instance_id"]).strip() for r in full_records}
+    verified_ids = {str(r["instance_id"]).strip() for r in verified_records}
+    if not verified_ids.issubset(full_ids):
+        diff = verified_ids - full_ids
+        return False, f"Verified dataset contains {len(diff)} tasks not present in full dataset: {list(diff)[:5]}"
+    return True, f"Verified dataset (500 tasks) is a strict subset of full dataset ({len(full_ids)} tasks)."
+
+
+def validate_file(filepath: Path, expected_config: str, expected_sha: Optional[str] = None, expected_bytes: Optional[int] = None) -> Tuple[int, str]:
     if not filepath.exists():
         return 2, f"Target file does not exist: {filepath}"
 
-    if filepath.stat().st_size == 0:
+    file_size = filepath.stat().st_size
+    if file_size == 0:
         return 4, f"Target file is 0 bytes: {filepath}"
+
+    if expected_bytes is not None and file_size != expected_bytes:
+        return 3, f"Byte size mismatch for {filepath.name}: expected {expected_bytes} bytes, got {file_size} bytes."
 
     actual_sha = compute_sha256(filepath)
     if expected_sha and actual_sha.lower() != expected_sha.lower():
@@ -171,7 +190,7 @@ def validate_file(filepath: Path, expected_config: str, expected_sha: Optional[s
     if not is_valid:
         return 4, f"Validation failure in {filepath.name}: {msg}"
 
-    return 0, f"SUCCESS: {filepath.name} valid {expected_config} dataset ({len(records)} rows, SHA-256: {actual_sha[:16]}...)"
+    return 0, f"SUCCESS: {filepath.name} valid {expected_config} dataset ({len(records)} rows, {file_size} bytes, SHA-256: {actual_sha[:16]}...)"
 
 
 def main():
@@ -179,12 +198,14 @@ def main():
     parser.add_argument("--data-dir", type=str, default=str(DEFAULT_DATA_DIR), help="Directory holding ContextBench artifacts")
     parser.add_argument("--expected-config", type=str, choices=["full", "verified", "auto"], default="auto")
     parser.add_argument("--expected-sha256", type=str, default=None)
+    parser.add_argument("--expected-bytes", type=int, default=None)
     args = parser.parse_args()
 
     data_dir = Path(args.data_dir)
     print("=" * 80)
-    print("REPONEEDLE: OFFICIAL CONTEXTBENCH VALIDATION GATE (STAGE 3.16)")
+    print("REPONEEDLE: OFFICIAL CONTEXTBENCH VALIDATION GATE (STAGE 3.17)")
     print(f"Data Directory: {data_dir}")
+    print(f"Pinned Upstream Revision: {PINNED_REVISION}")
     print("=" * 80)
 
     if not data_dir.exists():
@@ -199,20 +220,50 @@ def main():
     if not candidates:
         print("\n[STATUS: BLOCKED - DATA ACCESS]")
         print(f"No ContextBench artifacts found in {data_dir}.")
+        print("Required artifacts:")
+        print(f"  - full.parquet (expected SHA: {FULL_EXPECTED_SHA256}, {FULL_EXPECTED_BYTES} bytes)")
+        print(f"  - contextbench_verified.parquet (expected SHA: {VERIFIED_EXPECTED_SHA256}, {VERIFIED_EXPECTED_BYTES} bytes)")
         print("Network boundary prevents automated acquisition from Hugging Face.")
         print("See research/external_data/contextbench/ACQUISITION_BLOCKER.md for handoff instructions.")
         sys.exit(2)
 
     exit_code = 0
+    loaded_records = {}
     for cand in candidates:
         fname = cand.name.lower()
         cfg = args.expected_config
+        expected_sha = args.expected_sha256
+        expected_bytes = args.expected_bytes
+
         if cfg == "auto":
-            cfg = "verified" if "verified" in fname else "full"
-        code, msg = validate_file(cand, expected_config=cfg, expected_sha=args.expected_sha256)
+            if "verified" in fname:
+                cfg = "verified"
+                if not expected_sha:
+                    expected_sha = VERIFIED_EXPECTED_SHA256
+                if not expected_bytes:
+                    expected_bytes = VERIFIED_EXPECTED_BYTES
+            else:
+                cfg = "full"
+                if not expected_sha:
+                    expected_sha = FULL_EXPECTED_SHA256
+                if not expected_bytes:
+                    expected_bytes = FULL_EXPECTED_BYTES
+
+        code, msg = validate_file(cand, expected_config=cfg, expected_sha=expected_sha, expected_bytes=expected_bytes)
         print(f"[{'PASS' if code == 0 else 'FAIL'}] {cand.name}: {msg}")
         if code != 0:
             exit_code = code
+        else:
+            try:
+                loaded_records[cfg] = load_dataset_records(cand)
+            except Exception:
+                pass
+
+    if "full" in loaded_records and "verified" in loaded_records:
+        sub_ok, sub_msg = verify_subset_integrity(loaded_records["full"], loaded_records["verified"])
+        print(f"[{'PASS' if sub_ok else 'FAIL'}] Subset Integrity: {sub_msg}")
+        if not sub_ok:
+            exit_code = 4
 
     sys.exit(exit_code)
 
