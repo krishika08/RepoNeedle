@@ -1,0 +1,46 @@
+{
+  "manifest_id": "STAGE3-16-EVALUATION-MANIFEST-001",
+  "stage": "3.16",
+  "evaluation_gate": "ContextBench Independent Validation Gate",
+  "preregistered_configurations": [
+    {
+      "system_id": "ARM-101-BASE",
+      "architecture": "Soft Lexical Damping (tau=0.25) + Level 1 Verified Function Call Edges (Unattenuated)",
+      "arb_v2_development_mrr": 0.2078,
+      "arb_v2_development_recall20": 0.5648,
+      "arb_v2_development_bcy8k": 0.2822,
+      "arb_v2_p50_latency_ms": 12.92,
+      "status": "PREREGISTERED_CANDIDATE_CHAMPION"
+    },
+    {
+      "system_id": "BASE-BM25",
+      "architecture": "Decoupled Okapi BM25 length-normalized scoring",
+      "arb_v2_development_mrr": 0.1752,
+      "arb_v2_development_recall20": 0.4535,
+      "arb_v2_development_bcy8k": 0.2150,
+      "arb_v2_p50_latency_ms": 10.24,
+      "status": "PREREGISTERED_LEXICAL_BASELINE"
+    },
+    {
+      "system_id": "BASE-REPOMAP",
+      "architecture": "Official RepoMap reference (commit 9e4d689) with AST PageRank",
+      "arb_v2_development_mrr": 0.2293,
+      "arb_v2_development_recall20": 0.6599,
+      "arb_v2_development_bcy8k": 0.3177,
+      "arb_v2_p50_latency_ms": 180.20,
+      "status": "PREREGISTERED_EXTERNAL_REFERENCE_LEADER"
+    }
+  ],
+  "statistical_evaluation_rules": {
+    "bootstrap_cluster_level": "repository",
+    "bootstrap_replicates": 10000,
+    "confidence_level": 0.95,
+    "paired_significance_test": "Wilcoxon signed-rank test",
+    "familywise_error_correction": "Holm-Bonferroni"
+  },
+  "leakage_prevention": {
+    "enforcement_mechanism": "LeakageGuard fail-closed validation",
+    "forbidden_fields": ["gold_context", "patch", "test_patch", "f2p", "p2p"]
+  },
+  "evaluation_gate_status": "BLOCKED_EXTERNAL_DATA_ACQUISITION_REQUIRED"
+}

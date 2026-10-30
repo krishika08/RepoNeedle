@@ -1,0 +1,7 @@
+{"experiment_id": "EXP-070-STARTING-STATE", "stage": "3.16", "task": "Integrity Check", "commit": "143e8bc", "status": "VERIFIED_TAGS_AND_ANCESTRY"}
+{"experiment_id": "EXP-071-ACQUISITION-PROBE", "stage": "3.16", "task": "Dataset Acquisition", "routes_attempted": 5, "http_status": 403, "status": "BLOCKED_SANDBOX_NETWORK_ISOLATION"}
+{"experiment_id": "EXP-072-SUBSTITUTE-AUDIT", "stage": "3.16", "task": "Mirror Audit", "substitute": "Schwerli/ContextBench", "verdict": "FORMALLY_REJECTED", "status": "COMPLETED"}
+{"experiment_id": "EXP-073-INTAKE-VALIDATOR", "stage": "3.16", "task": "Integrity Layer", "target": "research/external_data/contextbench/validate_contextbench.py", "status": "FAIL_CLOSED_VALIDATOR_OPERATIONAL"}
+{"experiment_id": "EXP-074-LEAKAGE-GUARD", "stage": "3.16", "task": "Leakage Prevention", "target": "research/contextbench_evaluation/leakage_guard.py", "status": "SECURITY_GUARD_OPERATIONAL"}
+{"experiment_id": "EXP-075-PREREGISTER-CONFIGS", "stage": "3.16", "task": "Evaluation Preregistration", "candidates": ["ARM-101-BASE", "BASE-BM25", "BASE-REPOMAP"], "status": "FROZEN_FOR_EXTERNAL_BENCHMARK"}
+{"experiment_id": "EXP-076-SAFEGUARD-TESTS", "stage": "3.16", "task": "Automated Testing", "target": "tests/test_stage3_16_contextbench_gate.py", "status": "100_PERCENT_PASS"}

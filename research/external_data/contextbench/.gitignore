@@ -1,0 +1,14 @@
+# Ignore benchmark data files
+*.parquet
+*.jsonl
+*.json
+*.tar.gz
+*.zip
+*.arrow
+
+# Preserve manifests, documentation, and validator scripts
+!dataset_manifest.json
+!README.md
+!ACQUISITION_BLOCKER.md
+!validate_contextbench.py
+!.gitignore

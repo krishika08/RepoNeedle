@@ -1,0 +1,43 @@
+{
+  "manifest_id": "STAGE3-16-DATASET-MANIFEST-001",
+  "stage": "3.16",
+  "dataset_name": "Contextbench/ContextBench",
+  "official_sources": {
+    "huggingface": "https://huggingface.co/datasets/Contextbench/ContextBench",
+    "github": "https://github.com/EuniAI/ContextBench",
+    "documentation": "https://euniai.github.io/ContextBench/"
+  },
+  "configurations": {
+    "default": {
+      "configuration_name": "default",
+      "target_file": "full.parquet",
+      "row_count": 1136,
+      "repository_count": 66,
+      "language_count": 8,
+      "role": "Primary external evaluation benchmark"
+    },
+    "contextbench_verified": {
+      "configuration_name": "contextbench_verified",
+      "target_file": "contextbench_verified.parquet",
+      "row_count": 500,
+      "repository_count": 35,
+      "language_count": 8,
+      "role": "Secondary high-precision verified evaluation subset"
+    }
+  },
+  "forbidden_substitutes": [
+    {
+      "source": "Schwerli/ContextBench",
+      "status": "REJECTED",
+      "reason": "Differing task row count, unofficial schema"
+    },
+    {
+      "source": "Synthetic / Mock Parquet",
+      "status": "PROHIBITED",
+      "reason": "Research integrity violation"
+    }
+  ],
+  "intake_status": "INTAKE_LAYER_READY_ACQUISITION_BLOCKED",
+  "blocker_category": "SANDBOX_NETWORK_ISOLATION",
+  "blocker_code": "HTTP_403_FORBIDDEN"
+}

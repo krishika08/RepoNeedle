@@ -1,0 +1,47 @@
+{
+  "dataset_name": "Contextbench/ContextBench",
+  "official_sources": {
+    "huggingface_hub": "https://huggingface.co/datasets/Contextbench/ContextBench",
+    "github_repository": "https://github.com/EuniAI/ContextBench",
+    "documentation": "https://euniai.github.io/ContextBench/"
+  },
+  "configurations": {
+    "default": {
+      "configuration_name": "default",
+      "expected_filename": "full.parquet",
+      "expected_rows": 1136,
+      "expected_repositories": 66,
+      "expected_languages": 8,
+      "description": "Full uncurated ContextBench dataset across 66 repositories"
+    },
+    "contextbench_verified": {
+      "configuration_name": "contextbench_verified",
+      "expected_filename": "contextbench_verified.parquet",
+      "expected_rows": 500,
+      "expected_repositories": 35,
+      "expected_languages": 8,
+      "description": "Human-verified subset of 500 high-quality tasks"
+    }
+  },
+  "required_schema_fields": [
+    "instance_id",
+    "repo",
+    "base_commit",
+    "problem_statement",
+    "gold_context"
+  ],
+  "forbidden_retrieval_fields": [
+    "gold_context",
+    "patch",
+    "test_patch",
+    "f2p",
+    "p2p"
+  ],
+  "unofficial_substitutes_policy": {
+    "schwerli_contextbench": "STRICTLY_PROHIBITED",
+    "reason": "Schwerli/ContextBench differs in row count and schema and is not an authorized substitute for the official EuniAI/ContextBench dataset"
+  },
+  "acquisition_status": "BLOCKED_NETWORK_BOUNDARY",
+  "audit_stage": "3.16",
+  "audit_date": "2026-10-30"
+}
