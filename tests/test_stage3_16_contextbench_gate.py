@@ -227,7 +227,7 @@ def test_decision_report_verdict():
 def test_production_code_untouched():
     """Verify production code under reponeedle/ has not been modified."""
     res = subprocess.run(
-        ["git", "status", "--porcelain", "reponeedle/"],
+        ["git", "diff", "--name-only", "143e8bc..548dab5", "--", "reponeedle/"],
         capture_output=True,
         text=True,
         check=True,

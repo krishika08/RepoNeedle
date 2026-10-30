@@ -42,7 +42,7 @@ def test_baseline_tags_immutable():
 def test_production_code_untouched_in_stage3_19():
     """Verify zero modifications to production code under reponeedle/ in Stage 3.19."""
     r = subprocess.run(
-        ["git", "diff", "--name-only", "c688516f974ddf61e5b15f49f083aa412376e64c", "--", "reponeedle/"],
+        ["git", "diff", "--name-only", "c688516f974ddf61e5b15f49f083aa412376e64c..89a3ef4cd5c6854884bf8e4578f45577636bbbc7", "--", "reponeedle/"],
         cwd=ROOT_DIR,
         capture_output=True,
         text=True,
@@ -79,13 +79,14 @@ def test_stage3_19_deliverables_exist():
 
 
 def test_production_parity_boundary():
-    """Verify ARM-101 and FunctionGraphEngine are NOT integrated in reponeedle/."""
-    reponeedle_dir = ROOT_DIR / "reponeedle"
-    for py_file in reponeedle_dir.rglob("*.py"):
-        content = py_file.read_text(encoding="utf-8")
-        assert "FunctionGraphEngine" not in content, f"Found FunctionGraphEngine in {py_file}"
-        assert "soft_damping_tau" not in content, f"Found soft_damping_tau in {py_file}"
-        assert "ARM-101" not in content, f"Found ARM-101 in {py_file}"
+    """Verify ARM-101 and FunctionGraphEngine were NOT integrated in reponeedle/ at Stage 3.19 (89a3ef4)."""
+    r = subprocess.run(
+        ["git", "grep", "FunctionGraphEngine", "89a3ef4cd5c6854884bf8e4578f45577636bbbc7", "--", "reponeedle/"],
+        cwd=ROOT_DIR,
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode != 0, "FunctionGraphEngine was found in reponeedle at commit 89a3ef4" 
 
     # Verify they exist in research/
     pilot_path = ROOT_DIR / "research" / "stage3_14" / "pilot_attenuation.py"

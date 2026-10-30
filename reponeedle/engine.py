@@ -15,10 +15,14 @@ from reponeedle.models import (
     RetrievalResult,
     ScoredFile,
     TaskType,
+    RankerType,
     BudgetConfig,
     AblationConfig,
     ContextTier,
 )
+from reponeedle.core.function_graph import FunctionGraphEngine
+from reponeedle.core.arm101 import ARM101Ranker
+from reponeedle.core.cascade import CascadedRanker
 from reponeedle.core.tokenizer import CodeTokenizer, estimate_tokens
 from reponeedle.core.lexical import BM25Index
 from reponeedle.core.semantic import SubwordSemanticIndex
@@ -63,6 +67,9 @@ class RepoNeedleEngine:
         self.abstainer = SelectiveAbstainer(
             confidence_threshold=self.budget_config.abstention_threshold
         )
+        self.function_graph = FunctionGraphEngine()
+        self.arm101_ranker = ARM101Ranker()
+        self.cascaded_ranker = CascadedRanker()
 
         if docs:
             self._fit(docs)
@@ -92,6 +99,7 @@ class RepoNeedleEngine:
         self.lexical_index.fit(clean_docs)
         self.semantic_index.fit(clean_docs)
         self.repo_graph.fit(clean_docs)
+        self.function_graph.build_graph(clean_docs)
         self.abstainer.fit(clean_docs)
 
     @classmethod
@@ -113,6 +121,7 @@ class RepoNeedleEngine:
         budget_config: Optional[BudgetConfig] = None,
         max_files: int = 3000,
         extra_ignore: List[str] = None,
+        ablation_config: Optional[AblationConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Scans a local repository directory, parses files, and builds the retrieval index.
@@ -211,13 +220,27 @@ class RepoNeedleEngine:
         budget_tokens: Optional[int] = None,
         task_type: Optional[TaskType] = None,
         ablation_config: Optional[AblationConfig] = None,
+        ranker: Optional[Union[str, RankerType]] = None,
     ) -> RetrievalResult:
         """
         Executes workflow-adaptive retrieval and packs results within the token budget.
-        Supports controlled ablation overrides.
+        Supports controlled ablation overrides and modular ranker architectures.
         """
         start_time = time.perf_counter()
         ablation = ablation_config or self.ablation_config or AblationConfig()
+
+        if ranker is not None:
+            if isinstance(ranker, RankerType):
+                effective_ranker = ranker.value.lower()
+            else:
+                effective_ranker = str(ranker).lower()
+        else:
+            effective_ranker = "legacy"
+
+        if effective_ranker not in ("legacy", "bm25", "arm101", "cascade"):
+            raise ValueError(
+                f"Unknown ranker '{effective_ranker}'. Valid rankers are: 'legacy', 'bm25', 'arm101', 'cascade'."
+            )
 
         if isinstance(query, str):
             query_obj = Query(text=query)
@@ -244,128 +267,154 @@ class RepoNeedleEngine:
                 candidate_count=0,
                 explanation="Repository contains no candidate files.",
                 execution_time_ms=(time.perf_counter() - start_time) * 1000,
+                ranker=effective_ranker,
+                ranked_files=[],
             )
 
         num_docs = len(self.docs)
 
-        # 1. Workflow Classification / Fusion Weights (Factor D)
-        if ablation.enable_router:
-            inferred_task, metadata = self.router.classify_intent(query_obj)
-            weights = self.router.get_fusion_weights(inferred_task)
-        else:
-            # Documented fixed static fusion: equal weighting among active signals, zero task boost
-            inferred_task = TaskType.COMMENT2CONTEXT
-            metadata = {}
-            use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
-            active_signals = sum([ablation.enable_lexical, ablation.enable_semantic, use_pr])
-            base_w = 1.0 / max(1, active_signals)
-            weights = {
-                "lexical": base_w if ablation.enable_lexical else 0.0,
-                "semantic": base_w if ablation.enable_semantic else 0.0,
-                "structural": base_w if use_pr else 0.0,
-                "workflow_boost": 0.0,
-            }
-
-        # 2. Base Signal Scoring (Factors A, B, C)
+        # 1. Base Signal Scoring (Factors A, B)
         lex_scores = self.lexical_index.score(query_obj.text) if ablation.enable_lexical else np.zeros(num_docs, dtype=np.float32)
 
-        # Sparse candidate pool for cascaded reranking (CONFIG-10)
         cand_indices = None
         if ablation.candidate_pool_size is not None and ablation.candidate_pool_size > 0:
             if num_docs > ablation.candidate_pool_size:
                 cand_indices = np.argsort(-lex_scores)[: ablation.candidate_pool_size]
 
         sem_scores = self.semantic_index.score(query_obj.text, candidate_indices=cand_indices) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
-        use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
-        struct_scores = self.repo_graph.pagerank_scores if use_pr else np.zeros(num_docs, dtype=np.float32)
 
-        workflow_boosts = np.zeros(num_docs, dtype=np.float32)
+        # 2. Workflow Classification & Ranker Dispatch
+        if effective_ranker == "arm101":
+            inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
+            ranked_indices, fused_map = self.arm101_ranker.rank_with_scores(
+                self.docs, lex_scores, sem_scores, self.function_graph, self.repo_graph
+            )
+            fused_scores = np.array([fused_map.get(i, 0.0) for i in range(num_docs)], dtype=np.float32)
+            struct_scores = np.zeros(num_docs, dtype=np.float32)
+            workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
-        # 3. Workflow-Specific Boosts (Active only when router is enabled)
-        if ablation.enable_router and weights.get("workflow_boost", 0.0) > 0.0:
-            if inferred_task == TaskType.TRACE2CODE:
-                frames = metadata.get("trace_frames", [])
-                for frame_path, line_no, func_name in frames:
-                    clean_frame = frame_path.replace("\\", "/").lower()
-                    for idx, doc in enumerate(self.docs):
-                        doc_lower = doc.path.lower()
-                        if clean_frame.endswith(doc_lower) or doc_lower.endswith(clean_frame):
-                            workflow_boosts[idx] = max(workflow_boosts[idx], 1.0)
-                        elif func_name and func_name in doc.symbols:
-                            workflow_boosts[idx] = max(workflow_boosts[idx], 0.7)
+        elif effective_ranker == "bm25":
+            inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
+            ranked_indices = sorted(range(num_docs), key=lambda i: (-float(lex_scores[i]), self.docs[i].path))
+            fused_scores = lex_scores.copy()
+            struct_scores = np.zeros(num_docs, dtype=np.float32)
+            workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
-            elif inferred_task == TaskType.CODE2TEST:
-                if ablation.enable_graph:
-                    top_target_indices = np.argsort(lex_scores + sem_scores)[::-1][:3]
-                    target_paths = [
-                        self.docs[i].path for i in top_target_indices
-                        if not self.docs[i].is_test
-                    ]
-                    test_scores = self.repo_graph.get_test_scores_for_target(target_paths)
-                else:
-                    test_scores = np.zeros(num_docs, dtype=np.float32)
-                for idx, doc in enumerate(self.docs):
-                    if doc.is_test:
-                        workflow_boosts[idx] = max(0.4, float(test_scores[idx]))
+        elif effective_ranker == "cascade":
+            inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
+            ranked_indices = self.cascaded_ranker.rank(
+                self.docs, lex_scores, sem_scores, self.repo_graph, inferred_task.value if inferred_task else None
+            )
+            fused_scores = np.zeros(num_docs, dtype=np.float32)
+            for r, idx in enumerate(ranked_indices):
+                if float(lex_scores[idx]) > 0:
+                    fused_scores[idx] = max(0.001, float(num_docs - r) / float(num_docs))
+            struct_scores = np.zeros(num_docs, dtype=np.float32)
+            workflow_boosts = np.zeros(num_docs, dtype=np.float32)
+
+        else:  # "legacy"
+            if ablation.enable_router:
+                inferred_task, metadata = self.router.classify_intent(query_obj)
+                weights = self.router.get_fusion_weights(inferred_task)
+            else:
+                inferred_task = TaskType.COMMENT2CONTEXT
+                metadata = {}
+                use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
+                active_signals = sum([ablation.enable_lexical, ablation.enable_semantic, use_pr])
+                base_w = 1.0 / max(1, active_signals)
+                weights = {
+                    "lexical": base_w if ablation.enable_lexical else 0.0,
+                    "semantic": base_w if ablation.enable_semantic else 0.0,
+                    "structural": base_w if use_pr else 0.0,
+                    "workflow_boost": 0.0,
+                }
+
+            use_pr = ablation.enable_graph and getattr(ablation, "enable_pagerank_fusion", False)
+            struct_scores = self.repo_graph.pagerank_scores if use_pr else np.zeros(num_docs, dtype=np.float32)
+            workflow_boosts = np.zeros(num_docs, dtype=np.float32)
+
+            if ablation.enable_router and weights.get("workflow_boost", 0.0) > 0.0:
+                if inferred_task == TaskType.TRACE2CODE:
+                    frames = metadata.get("trace_frames", [])
+                    for frame_path, line_no, func_name in frames:
+                        clean_frame = frame_path.replace("\\", "/").lower()
+                        for idx, doc in enumerate(self.docs):
+                            doc_lower = doc.path.lower()
+                            if clean_frame.endswith(doc_lower) or doc_lower.endswith(clean_frame):
+                                workflow_boosts[idx] = max(workflow_boosts[idx], 1.0)
+                            elif func_name and func_name in doc.symbols:
+                                workflow_boosts[idx] = max(workflow_boosts[idx], 0.7)
+
+                elif inferred_task == TaskType.CODE2TEST:
+                    if ablation.enable_graph:
+                        top_target_indices = np.argsort(lex_scores + sem_scores)[::-1][:3]
+                        target_paths = [
+                            self.docs[i].path for i in top_target_indices
+                            if not self.docs[i].is_test
+                        ]
+                        test_scores = self.repo_graph.get_test_scores_for_target(target_paths)
                     else:
-                        workflow_boosts[idx] = -0.5
+                        test_scores = np.zeros(num_docs, dtype=np.float32)
+                    for idx, doc in enumerate(self.docs):
+                        if doc.is_test:
+                            workflow_boosts[idx] = max(0.4, float(test_scores[idx]))
+                        else:
+                            workflow_boosts[idx] = -0.5
 
-            elif inferred_task == TaskType.EDIT2RIPPLE:
-                if ablation.enable_graph:
-                    anchors = query_obj.anchor_files
-                    if not anchors:
-                        top_idx = int(np.argmax(lex_scores)) if len(lex_scores) > 0 else 0
-                        anchors = [self.docs[top_idx].path]
-                    workflow_boosts = self.repo_graph.get_ripple_scores(anchors)
+                elif inferred_task == TaskType.EDIT2RIPPLE:
+                    if ablation.enable_graph:
+                        anchors = query_obj.anchor_files
+                        if not anchors:
+                            top_idx = int(np.argmax(lex_scores)) if len(lex_scores) > 0 else 0
+                            anchors = [self.docs[top_idx].path]
+                        workflow_boosts = self.repo_graph.get_ripple_scores(anchors)
 
-        # 4. Fused Score Computation
-        fused_scores = (
-            weights["lexical"] * lex_scores +
-            weights["semantic"] * sem_scores +
-            weights["structural"] * struct_scores +
-            weights["workflow_boost"] * workflow_boosts
-        )
-        fused_scores = np.maximum(0.0, fused_scores)
+            fused_scores = (
+                weights["lexical"] * lex_scores +
+                weights["semantic"] * sem_scores +
+                weights["structural"] * struct_scores +
+                weights["workflow_boost"] * workflow_boosts
+            )
+            fused_scores = np.maximum(0.0, fused_scores)
 
-        # In sparse cascaded reranking (CONFIG-10), retain only candidates from the top-k pool
-        if cand_indices is not None:
-            cand_mask = np.zeros(num_docs, dtype=bool)
-            cand_mask[cand_indices] = True
-            fused_scores[~cand_mask] = 0.0
+            if cand_indices is not None:
+                cand_mask = np.zeros(num_docs, dtype=bool)
+                cand_mask[cand_indices] = True
+                fused_scores[~cand_mask] = 0.0
 
-        # 4b. Relevance-Aware Graph Diffusion (Candidate D / E / Recovered Bounded)
-        if ablation.enable_graph_diffusion and len(self.repo_graph.graph) > 0:
-            combined_hits = (lex_scores + sem_scores) if (ablation.enable_lexical and ablation.enable_semantic) else (lex_scores if ablation.enable_lexical else sem_scores)
-            if len(combined_hits) > 0 and float(np.max(combined_hits)) > 0:
-                top_seed_indices = np.argsort(combined_hits)[::-1][:5]
-                diffused_boost = np.zeros(num_docs, dtype=np.float32)
-                max_deg = getattr(ablation, "max_diffusion_degree", 25)
-                for s_idx in top_seed_indices:
-                    seed_path = self.docs[s_idx].path
-                    seed_val = float(combined_hits[s_idx])
-                    if seed_val > 0 and seed_path in self.repo_graph.graph:
-                        seed_deg = self.repo_graph.graph.degree(seed_path)
-                        if seed_deg <= max_deg:
-                            # Diffuse along successors (dependencies / callees)
-                            for succ in self.repo_graph.graph.successors(seed_path):
-                                if succ in self.repo_graph.path_to_idx and self.repo_graph.graph.degree(succ) <= max_deg:
-                                    n_idx = self.repo_graph.path_to_idx[succ]
-                                    diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.25))
-                            # Diffuse along predecessors (callers / importers)
-                            for pred in self.repo_graph.graph.predecessors(seed_path):
-                                if pred in self.repo_graph.path_to_idx and self.repo_graph.graph.degree(pred) <= max_deg:
-                                    n_idx = self.repo_graph.path_to_idx[pred]
-                                    diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.20))
-                fused_scores = fused_scores + 0.15 * diffused_boost
+            if ablation.enable_graph_diffusion and len(self.repo_graph.graph) > 0:
+                combined_hits = (lex_scores + sem_scores) if (ablation.enable_lexical and ablation.enable_semantic) else (lex_scores if ablation.enable_lexical else sem_scores)
+                if len(combined_hits) > 0 and float(np.max(combined_hits)) > 0:
+                    top_seed_indices = np.argsort(combined_hits)[::-1][:5]
+                    diffused_boost = np.zeros(num_docs, dtype=np.float32)
+                    max_deg = getattr(ablation, "max_diffusion_degree", 25)
+                    for s_idx in top_seed_indices:
+                        seed_path = self.docs[s_idx].path
+                        seed_val = float(combined_hits[s_idx])
+                        if seed_val > 0 and seed_path in self.repo_graph.graph:
+                            seed_deg = self.repo_graph.graph.degree(seed_path)
+                            if seed_deg <= max_deg:
+                                for succ in self.repo_graph.graph.successors(seed_path):
+                                    if succ in self.repo_graph.path_to_idx and self.repo_graph.graph.degree(succ) <= max_deg:
+                                        n_idx = self.repo_graph.path_to_idx[succ]
+                                        diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.25))
+                                for pred in self.repo_graph.graph.predecessors(seed_path):
+                                    if pred in self.repo_graph.path_to_idx and self.repo_graph.graph.degree(pred) <= max_deg:
+                                        n_idx = self.repo_graph.path_to_idx[pred]
+                                        diffused_boost[n_idx] = max(diffused_boost[n_idx], float(seed_val * 0.20))
+                    fused_scores = fused_scores + 0.15 * diffused_boost
 
-        # 4c. Documentation Distractor Filter (Candidate C / D / E)
-        if ablation.enable_doc_filter:
-            for idx, doc in enumerate(self.docs):
-                p_lower = doc.path.lower()
-                if any(seg in p_lower for seg in ["/doc/", "/docs/", "doc/", "docs/", "documentation/", "guide/", "tutorial/", ".github/"]) or p_lower.endswith((".md", ".rst", ".txt", ".adoc", ".html")):
-                    fused_scores[idx] *= ablation.doc_filter_penalty
+            if ablation.enable_doc_filter:
+                for idx, doc in enumerate(self.docs):
+                    p_lower = doc.path.lower()
+                    if any(seg in p_lower for seg in ["/doc/", "/docs/", "doc/", "docs/", "documentation/", "guide/", "tutorial/", ".github/"]) or p_lower.endswith((".md", ".rst", ".txt", ".adoc", ".html")):
+                        fused_scores[idx] *= ablation.doc_filter_penalty
 
-        # 5. Selective Abstention Check
+            ranked_indices = sorted(range(num_docs), key=lambda idx: (-float(fused_scores[idx]), self.docs[idx].path))
+
+        ranked_paths = [self.docs[i].path for i in ranked_indices]
+
+        # 3. Selective Abstention Check
         abstained, confidence, reason = self.abstainer.evaluate_abstention(
             query=query_obj.text,
             fused_scores=fused_scores,
@@ -385,12 +434,15 @@ class RepoNeedleEngine:
                 candidate_count=num_docs,
                 explanation=f"Abstained: {reason}",
                 execution_time_ms=exec_time,
+                ranker=effective_ranker,
+                ranked_files=ranked_paths,
             )
 
-        # 6. Budget-Aware Context Packing (Factor E)
+        # 4. Budget-Aware Context Packing (ordered by ranked_indices)
         query_terms = self.tokenizer.tokenize_text(query_obj.text)
         candidates_with_scores = []
-        for idx, doc in enumerate(self.docs):
+        for idx in ranked_indices:
+            doc = self.docs[idx]
             c_scores = {
                 "lexical": float(lex_scores[idx]),
                 "semantic": float(sem_scores[idx]),
@@ -417,7 +469,8 @@ class RepoNeedleEngine:
             total_tokens=total_tokens_used,
             budget_tokens=eff_budget,
             candidate_count=num_docs,
-            explanation=f"Retrieved {len(selected)} files ({total_tokens_used}/{eff_budget} tokens). Task: {inferred_task.value}. {reason}",
+            explanation=f"Retrieved {len(selected)} files ({total_tokens_used}/{eff_budget} tokens). Ranker: {effective_ranker}. Task: {inferred_task.value}. {reason}",
             execution_time_ms=(time.perf_counter() - start_time) * 1000,
+            ranker=effective_ranker,
+            ranked_files=ranked_paths,
         )
-

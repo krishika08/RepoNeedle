@@ -16,6 +16,13 @@ class TaskType(str, Enum):
     SELECTIVE = "selective"
 
 
+class RankerType(str, Enum):
+    LEGACY = "legacy"
+    BM25 = "bm25"
+    ARM101 = "arm101"
+    CASCADE = "cascade"
+
+
 class ContextTier(str, Enum):
     FULL = "full"
     SKELETON = "skeleton"
@@ -67,6 +74,8 @@ class RetrievalResult(BaseModel):
     candidate_count: int = 0
     explanation: str = ""
     execution_time_ms: float = 0.0
+    ranker: Optional[str] = "legacy"
+    ranked_files: Optional[List[str]] = None
 
 
 class BudgetConfig(BaseModel):

@@ -1,0 +1,15 @@
+parameter_name,symbol,default_value,valid_range,component,description
+soft_damping_tau,tau,0.25,[0.0, 1.0],SoftLexicalDamper,Margin multiplier applied to (BM25_top1 - BM25_top2) to guard Rank 1 against weak graph promotions
+top_k_seeds,K_seeds,3,[1, 10],SeedSelector,Number of top lexical BM25 documents selected as graph expansion seeds
+weight_lexical,w_lex,0.60,[0.0, 1.0],ScoreFusion,Linear combination weight for normalized Okapi BM25 scores
+weight_semantic,w_sem,0.15,[0.0, 1.0],ScoreFusion,Linear combination weight for subword TF-IDF / character n-gram semantic scores
+weight_graph,w_graph,0.25,[0.0, 1.0],ScoreFusion,Linear combination weight for propagated graph boost
+forward_weight,w_fwd,0.25,[0.0, 1.0],FunctionGraphPropagator,Diffusion multiplier for forward callee invocation edges
+reverse_weight,w_rev,0.20,[0.0, 1.0],FunctionGraphPropagator,Diffusion multiplier for reverse caller invocation edges
+class_to_test_weight,w_c2t,0.35,[0.0, 1.0],ClassToTestPropagator,Diffusion multiplier for class-to-test and test-to-implementation edges
+test_discovery_weight,w_test_disc,0.35,[0.0, 1.0],TestDiscovery,Direct score boost for convention-matched test companion files
+doc_filter_penalty,gamma_doc,0.50,[0.0, 1.0],DocumentFilter,Multiplicative score discount applied to documentation, markdown, and guide files
+min_edge_confidence,c_min,0.60,[0.0, 1.0],FunctionGraphEngine,Minimum confidence threshold for admitting an edge into the function call graph
+hub_attenuation_policy,policy,unattenuated,{unattenuated, uniform_log2, lang_calibrated},HubAttenuator,Hub attenuation policy; unattenuated (1.0) is the canonical ARM-101 champion setting
+max_ast_file_chars,L_max,25000,[1000, 500000],SymbolExtractor,Maximum character prefix parsed for symbol and call-site extraction
+package_fencing_enabled,flag_fence,True,{True, False},BoundaryEnforcer,Enforces package boundary compatibility to reject spurious cross-package edges

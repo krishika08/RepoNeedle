@@ -1,0 +1,4 @@
+repository,base_commit,file_count,loc,rss_baseline_mb,rss_post_indexing_mb,peak_process_rss_mb,retained_index_heap_mb,peak_python_heap_mb,cold_indexing_time_s,latency_p50_ms,latency_p90_ms,latency_p95_ms,latency_mean_ms,graph_nodes,graph_edges
+pallets/click,011b9f9,133,14670,66.5,104.9,178.8,15.72,43.02,7.13,14.1,61.63,62.93,23.71,133,107
+caddyserver/caddy,178294e,555,66662,99.2,149.9,490.4,39.2,160.92,29.68,6.73,17.38,17.69,9.5,555,652
+etcd-io/etcd,248f072,1435,152209,112.5,286.7,1203.2,111.52,445.48,126.48,18.91,26.64,27.17,19.88,1435,2308

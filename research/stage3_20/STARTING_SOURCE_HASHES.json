@@ -1,0 +1,70 @@
+{
+  "reponeedle/__init__.py": {
+    "sha256": "863b3f98aa05f7bdbce03a7f09be0c81d0ed56941613bc4d7db4ed48ffa7b2c7",
+    "size": 451
+  },
+  "reponeedle/engine.py": {
+    "sha256": "74176a944711e56b003e7bfc613571a4c3c304444f6d5e5c711b8b8b0794530e",
+    "size": 18576
+  },
+  "reponeedle/models.py": {
+    "sha256": "d247b00a4f12423703f376b7e6d86745212ed847c006a266625c80b221bd5e7b",
+    "size": 8563
+  },
+  "reponeedle/cli.py": {
+    "sha256": "b4833d5adc999a2d2f6716665d3ef0494df4ae0aced58fd42551071569f3792f",
+    "size": 2991
+  },
+  "reponeedle/core/lexical.py": {
+    "sha256": "8d9246ff555099f79c8fc9fbfa9e07470f76f630ed7f8a4419d365ac2837df57",
+    "size": 5857
+  },
+  "reponeedle/core/semantic.py": {
+    "sha256": "0a6ba50435dc0a000ac9171ed1deacfe6f9d58075ee7dde6544e2b4e180bc1b3",
+    "size": 7565
+  },
+  "reponeedle/core/graph.py": {
+    "sha256": "bed12b4bb1de4e00a0f284ae42f7d88b2e953df5cdbe300e93988e52537cffdf",
+    "size": 41406
+  },
+  "reponeedle/core/cascade.py": {
+    "sha256": "32e4e08e9755d3293f17afcfae5811b7efd6b124bad981ede6f5dff576213fd4",
+    "size": 12967
+  },
+  "reponeedle/core/budget.py": {
+    "sha256": "495024a21ea3ba4c790bec4fdf6575688302043d2924dc028fc1b000735aede1",
+    "size": 8102
+  },
+  "reponeedle/core/abstention.py": {
+    "sha256": "89b1c64ce7e6d9cb61f3866b73ce9b18857dc7cd487791bba0fafbe7a38d4766",
+    "size": 4634
+  },
+  "research/stage3_14/pilot_attenuation.py": {
+    "sha256": "291c14cf59f6ced2d183d2751e269ed329c29d0183c5b51e46cbeea52632f3e5",
+    "size": 14022
+  },
+  "research/stage3_11/function_graph_engine.py": {
+    "sha256": "1067dbeca1bbfc98e6d89425c23d4512a48d0b3d984a6910438ddd1fba62bfec",
+    "size": 37695
+  },
+  "research/stage3_19/REPRODUCED_LEADERBOARD.csv": {
+    "sha256": "a4296619fd1c478984a2050562b2bf6a8b677d99ed957e598a3f4a53369e664b",
+    "size": 1502
+  },
+  "research/stage3_19/PER_QUERY_RESULTS.csv": {
+    "sha256": "824b8b451f6d5c5dcb4e3b95f9ba46ee5dce705fcb4b4c4d39471f8ccd347a44",
+    "size": 71307
+  },
+  "research/stage3_19/STAGE3_19_REPORT.md": {
+    "sha256": "c1284af57724cb1711d892361ea1d8ca3c20f7e6332e13658e2e059fb9d243e1",
+    "size": 14114
+  },
+  "research/stage3_19/STAGE3_19_DECISION_REPORT.md": {
+    "sha256": "d24496b59482b1ce65ff52d74e822b7c382eb995069226eaeffd94293141e909",
+    "size": 5449
+  },
+  "research/stage3_18/CANDIDATE_LEADERBOARD.csv": {
+    "sha256": "e5e6e7e160ee3adcf8d92ee616a8aa98ffa56565cf78d39cd8be31a2d06b92dc",
+    "size": 1152
+  }
+}

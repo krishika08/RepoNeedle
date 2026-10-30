@@ -42,7 +42,7 @@ def test_baseline_tags_immutable():
 def test_production_code_untouched():
     """Verify zero modifications to production code under reponeedle/."""
     r = subprocess.run(
-        ["git", "diff", "--name-only", "461f690d5b4bd3c21776eaaf94f038250ee9d6a0", "--", "reponeedle/"],
+        ["git", "diff", "--name-only", "461f690d5b4bd3c21776eaaf94f038250ee9d6a0..c688516f974ddf61e5b15f49f083aa412376e64c", "--", "reponeedle/"],
         cwd=ROOT_DIR,
         capture_output=True,
         text=True,
