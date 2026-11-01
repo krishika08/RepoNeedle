@@ -21,6 +21,14 @@ class SelectiveAbstainer:
         self.tokenizer = CodeTokenizer()
         self.repo_vocabulary: Set[str] = set()
 
+    @staticmethod
+    def _stem(token: str) -> str:
+        w = token.lower()
+        for suf in ("ing", "ed", "es", "s"):
+            if len(w) > len(suf) + 2 and w.endswith(suf):
+                return w[:-len(suf)]
+        return w
+
     def fit(self, docs: List[FileDoc]) -> "SelectiveAbstainer":
         """
         Builds repository vocabulary from paths, symbols, and contents.
@@ -29,11 +37,22 @@ class SelectiveAbstainer:
         for doc in docs:
             # Add path tokens
             for t in self.tokenizer.tokenize_path(doc.path):
-                self.repo_vocabulary.add(t)
+                tl = t.lower()
+                self.repo_vocabulary.add(tl)
+                self.repo_vocabulary.add(self._stem(tl))
             # Add symbol tokens
             for s in doc.symbols:
                 for t in self.tokenizer.tokenize_text(s):
-                    self.repo_vocabulary.add(t)
+                    tl = t.lower()
+                    self.repo_vocabulary.add(tl)
+                    self.repo_vocabulary.add(self._stem(tl))
+            # Add content identifiers if doc.content is present
+            if doc.content:
+                for t in self.tokenizer.tokenize_text(doc.content[:3000]):
+                    if len(t) > 2:
+                        tl = t.lower()
+                        self.repo_vocabulary.add(tl)
+                        self.repo_vocabulary.add(self._stem(tl))
 
         return self
 
@@ -61,7 +80,10 @@ class SelectiveAbstainer:
         if not meaningful_tokens:
             overlap_ratio = 0.5
         else:
-            in_repo_count = sum(1 for t in meaningful_tokens if t in self.repo_vocabulary)
+            in_repo_count = sum(
+                1 for t in meaningful_tokens
+                if t.lower() in self.repo_vocabulary or self._stem(t.lower()) in self.repo_vocabulary
+            )
             overlap_ratio = in_repo_count / len(meaningful_tokens)
 
         # 2. Peak-to-Noise Ratio (Z-score of top-1 file)

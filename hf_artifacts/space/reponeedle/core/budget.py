@@ -97,6 +97,7 @@ class BudgetOptimizer:
         candidate_files: List[Tuple[FileDoc, float, Dict[str, float]]],
         budget_tokens: int,
         query_terms: List[str] = None,
+        allow_skeletons: Optional[bool] = None,
     ) -> List[ScoredFile]:
         """
         Packs files into the token budget using marginal utility density knapsack selection.
@@ -104,6 +105,8 @@ class BudgetOptimizer:
         """
         if not candidate_files or budget_tokens <= 0:
             return []
+
+        allow_skel = self.config.allow_skeletons if allow_skeletons is None else allow_skeletons
 
         # Sort candidate files by base score descending
         sorted_candidates = sorted(candidate_files, key=lambda x: x[1], reverse=True)
@@ -141,10 +144,14 @@ class BudgetOptimizer:
                 tokens_used += doc_tokens
 
             # 2. If full file is too large but skeletons are permitted
-            elif self.config.allow_skeletons:
-                skeleton_content, skeleton_tokens = self.generate_skeleton(
-                    doc.content, doc.path, query_terms
-                )
+            elif allow_skel:
+                if doc.metadata and "skeleton_content" in doc.metadata and "skeleton_token_count" in doc.metadata:
+                    skeleton_content = doc.metadata["skeleton_content"]
+                    skeleton_tokens = doc.metadata["skeleton_token_count"]
+                else:
+                    skeleton_content, skeleton_tokens = self.generate_skeleton(
+                        doc.content, doc.path, query_terms
+                    )
                 if skeleton_tokens <= tokens_remaining:
                     selected.append(
                         ScoredFile(

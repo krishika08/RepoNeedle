@@ -4,7 +4,7 @@ Operates completely offline with zero network dependency using vectorized n-gram
 """
 
 import math
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Optional, Sequence
 import numpy as np
 from scipy import sparse
 
@@ -35,6 +35,7 @@ class SubwordSemanticIndex:
         self.doc_matrix: sparse.csr_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
         self.num_docs: int = 0
         self.doc_paths: List[str] = []
+        self._query_cache: Dict[str, Optional[sparse.csr_matrix]] = {}
 
     def _extract_features(self, text: str) -> List[str]:
         """
@@ -58,6 +59,7 @@ class SubwordSemanticIndex:
         """
         Fits semantic index on repository documents.
         """
+        self._query_cache.clear()
         self.num_docs = len(docs)
         self.doc_paths = [d.path for d in docs]
         if self.num_docs == 0:
@@ -129,17 +131,17 @@ class SubwordSemanticIndex:
 
         return self
 
-    def score(self, query: str) -> np.ndarray:
+    def _get_query_vector(self, query: str) -> Optional[sparse.csr_matrix]:
         """
-        Computes cosine similarity between query and all documents.
-        Returns a float array of length num_docs in [0, 1].
+        Extracts features and builds normalized sparse query vector with caching.
         """
-        if self.num_docs == 0 or len(self.vocabulary) == 0:
-            return np.zeros(self.num_docs, dtype=np.float32)
+        if query in self._query_cache:
+            return self._query_cache[query]
 
         q_feats = self._extract_features(query)
         if not q_feats:
-            return np.zeros(self.num_docs, dtype=np.float32)
+            self._query_cache[query] = None
+            return None
 
         q_counts: Dict[str, int] = {}
         for f in q_feats:
@@ -156,7 +158,8 @@ class SubwordSemanticIndex:
                 q_data.append(val)
 
         if not q_cols:
-            return np.zeros(self.num_docs, dtype=np.float32)
+            self._query_cache[query] = None
+            return None
 
         q_vec = sparse.csr_matrix(
             (q_data, ([0] * len(q_cols), q_cols)),
@@ -167,9 +170,41 @@ class SubwordSemanticIndex:
         if q_norm > 0:
             q_vec = q_vec.multiply(1.0 / q_norm)
 
-        # Dot product with normalized document matrix yields cosine similarities
+        # LRU eviction if cache exceeds 512 entries
+        if len(self._query_cache) >= 512:
+            self._query_cache.pop(next(iter(self._query_cache)))
+        self._query_cache[query] = q_vec
+        return q_vec
+
+    def score(
+        self,
+        query: str,
+        candidate_indices: Optional[Sequence[int]] = None,
+    ) -> np.ndarray:
+        """
+        Computes cosine similarity between query and documents.
+        Supports candidate_indices to evaluate sparse cascaded candidate subsets.
+        Returns a float array of length num_docs in [0, 1].
+        """
+        if self.num_docs == 0 or len(self.vocabulary) == 0:
+            return np.zeros(self.num_docs, dtype=np.float32)
+
+        q_vec = self._get_query_vector(query)
+        if q_vec is None:
+            return np.zeros(self.num_docs, dtype=np.float32)
+
+        if candidate_indices is not None:
+            cand_list = list(candidate_indices) if not isinstance(candidate_indices, list) else candidate_indices
+            if not cand_list:
+                return np.zeros(self.num_docs, dtype=np.float32)
+            sub_matrix = self.doc_matrix[cand_list]
+            cand_scores = sub_matrix.dot(q_vec.T).toarray().flatten()
+            scores = np.zeros(self.num_docs, dtype=np.float32)
+            scores[cand_list] = np.clip(cand_scores, 0.0, 1.0)
+            return scores
+
+        # Dot product with normalized document matrix yields cosine similarities across all docs
         scores = self.doc_matrix.dot(q_vec.T).toarray().flatten()
-        # Clip to [0, 1]
         scores = np.clip(scores, 0.0, 1.0)
         return scores
 

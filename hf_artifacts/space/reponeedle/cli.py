@@ -29,11 +29,18 @@ def main():
         help="Explicit workflow task type (default: auto).",
     )
     parser.add_argument("--no-skeletons", action="store_true", help="Disallow structural skeleton mode; require full files.")
+    parser.add_argument(
+        "--ranker",
+        type=str,
+        default="legacy",
+        choices=["legacy", "bm25", "arm101", "cascade"],
+        help="Retrieval ranker architecture (default: legacy).",
+    )
 
     args = parser.parse_args()
     console = Console()
 
-    console.print(Panel(f"[bold cyan]RepoNeedle Context Retrieval[/bold cyan]\nTarget Repository: [green]{args.repo}[/green]\nQuery: [yellow]\"{args.query}\"[/yellow]\nToken Budget: [magenta]{args.budget}[/magenta]", expand=False))
+    console.print(Panel(f"[bold cyan]RepoNeedle Context Retrieval[/bold cyan]\nTarget Repository: [green]{args.repo}[/green]\nQuery: [yellow]\"{args.query}\"[/yellow]\nToken Budget: [magenta]{args.budget}[/magenta]\nRanker: [cyan]{args.ranker}[/cyan]", expand=False))
 
     config = BudgetConfig(
         max_tokens=args.budget,
@@ -44,7 +51,7 @@ def main():
         engine = RepoNeedleEngine.from_directory(args.repo, budget_config=config)
 
     task_type = TaskType(args.task) if args.task != "auto" else None
-    result = engine.retrieve(query=args.query, budget_tokens=args.budget, task_type=task_type)
+    result = engine.retrieve(query=args.query, budget_tokens=args.budget, task_type=task_type, ranker=args.ranker)
 
     if result.abstained:
         console.print(Panel(f"[bold red]System Abstained[/bold red]\n{result.explanation}\nConfidence Score: {result.confidence_score:.3f}\nExecution Time: {result.execution_time_ms:.1f}ms", border_style="red"))
