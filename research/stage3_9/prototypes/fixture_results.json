@@ -1,0 +1,336 @@
+{
+  "languages": {
+    "Python": {
+      "filepath": "src/python_cases.py",
+      "function_count": 16,
+      "call_sites_extracted": 19,
+      "resolutions_attempted": 19,
+      "resolved_count": 7,
+      "unresolved_count": 12,
+      "construct_categories": {
+        "direct_identifier": {
+          "extracted_count": 13,
+          "resolved_count": 6,
+          "unresolved_count": 7,
+          "methods_used": [
+            "ast_local_lexical_binding",
+            "builtin_filter",
+            "external_library_import",
+            "shadowed_by_local_scope",
+            "unresolved_identifier"
+          ],
+          "statuses": [
+            "EXACT",
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_A_EXACT_AST",
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "attribute_call": {
+          "extracted_count": 4,
+          "resolved_count": 1,
+          "unresolved_count": 3,
+          "methods_used": [
+            "ast_self_method_binding",
+            "external_library_call",
+            "unresolved_identifier"
+          ],
+          "statuses": [
+            "EXACT",
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_C_RECEIVER_BOUND",
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "dynamic_dispatch": {
+          "extracted_count": 2,
+          "resolved_count": 0,
+          "unresolved_count": 2,
+          "methods_used": [
+            "unsupported_dynamic_dispatch"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        }
+      }
+    },
+    "Go": {
+      "filepath": "src/go_cases.go",
+      "function_count": 10,
+      "call_sites_extracted": 12,
+      "resolutions_attempted": 12,
+      "resolved_count": 3,
+      "unresolved_count": 9,
+      "construct_categories": {
+        "package_local": {
+          "extracted_count": 4,
+          "resolved_count": 2,
+          "unresolved_count": 2,
+          "methods_used": [
+            "go_package_local_pattern",
+            "go_unresolved_package_local"
+          ],
+          "statuses": [
+            "HEURISTIC",
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC",
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "interface_or_ambiguous_method": {
+          "extracted_count": 4,
+          "resolved_count": 0,
+          "unresolved_count": 4,
+          "methods_used": [
+            "go_unresolved_package_local",
+            "go_unsupported_interface_polymorphism"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "receiver_or_qualified": {
+          "extracted_count": 4,
+          "resolved_count": 1,
+          "unresolved_count": 3,
+          "methods_used": [
+            "go_external_import_call",
+            "go_receiver_method_heuristic"
+          ],
+          "statuses": [
+            "HEURISTIC",
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC",
+            "TIER_E_UNRESOLVED"
+          ]
+        }
+      }
+    },
+    "Rust": {
+      "filepath": "src/rust_cases.rs",
+      "function_count": 9,
+      "call_sites_extracted": 7,
+      "resolutions_attempted": 7,
+      "resolved_count": 3,
+      "unresolved_count": 4,
+      "construct_categories": {
+        "scoped_associated_call": {
+          "extracted_count": 3,
+          "resolved_count": 2,
+          "unresolved_count": 1,
+          "methods_used": [
+            "rust_associated_function_heuristic",
+            "rust_module_path_resolution",
+            "rust_stdlib_associated_call"
+          ],
+          "statuses": [
+            "HEURISTIC",
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC",
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "direct_or_macro_call": {
+          "extracted_count": 2,
+          "resolved_count": 1,
+          "unresolved_count": 1,
+          "methods_used": [
+            "rust_unsupported_macro_expansion",
+            "rust_use_alias_binding"
+          ],
+          "statuses": [
+            "HEURISTIC",
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC",
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "trait_polymorphic_method": {
+          "extracted_count": 2,
+          "resolved_count": 0,
+          "unresolved_count": 2,
+          "methods_used": [
+            "rust_unsupported_trait_polymorphism"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        }
+      }
+    },
+    "TypeScript": {
+      "filepath": "src/ts_cases.ts",
+      "function_count": 9,
+      "call_sites_extracted": 3,
+      "resolutions_attempted": 3,
+      "resolved_count": 2,
+      "unresolved_count": 1,
+      "construct_categories": {
+        "arrow_function_call": {
+          "extracted_count": 2,
+          "resolved_count": 2,
+          "unresolved_count": 0,
+          "methods_used": [
+            "arrow_function_binding"
+          ],
+          "statuses": [
+            "HEURISTIC"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC"
+          ]
+        },
+        "structural_typing_call": {
+          "extracted_count": 1,
+          "resolved_count": 0,
+          "unresolved_count": 1,
+          "methods_used": [
+            "ts_unsupported_structural_typing"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        }
+      }
+    },
+    "JavaScript": {
+      "filepath": "src/js_cases.js",
+      "function_count": 10,
+      "call_sites_extracted": 4,
+      "resolutions_attempted": 4,
+      "resolved_count": 2,
+      "unresolved_count": 2,
+      "construct_categories": {
+        "arrow_function_call": {
+          "extracted_count": 2,
+          "resolved_count": 2,
+          "unresolved_count": 0,
+          "methods_used": [
+            "arrow_function_binding"
+          ],
+          "statuses": [
+            "HEURISTIC"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC"
+          ]
+        },
+        "dynamic_property_call": {
+          "extracted_count": 2,
+          "resolved_count": 0,
+          "unresolved_count": 2,
+          "methods_used": [
+            "js_unsupported_dynamic_bracket_access"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        }
+      }
+    },
+    "Java": {
+      "filepath": "src/java_cases.java",
+      "function_count": 9,
+      "call_sites_extracted": 13,
+      "resolutions_attempted": 13,
+      "resolved_count": 3,
+      "unresolved_count": 10,
+      "construct_categories": {
+        "inherited_method_call": {
+          "extracted_count": 3,
+          "resolved_count": 3,
+          "unresolved_count": 0,
+          "methods_used": [
+            "java_inherited_method_heuristic"
+          ],
+          "statuses": [
+            "HEURISTIC"
+          ],
+          "tiers": [
+            "TIER_D_HEURISTIC"
+          ]
+        },
+        "overloaded_method_call": {
+          "extracted_count": 6,
+          "resolved_count": 0,
+          "unresolved_count": 6,
+          "methods_used": [
+            "java_unsupported_overloaded_method"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "static_import_call": {
+          "extracted_count": 2,
+          "resolved_count": 0,
+          "unresolved_count": 2,
+          "methods_used": [
+            "java_external_static_import"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        },
+        "interface_implementation_call": {
+          "extracted_count": 2,
+          "resolved_count": 0,
+          "unresolved_count": 2,
+          "methods_used": [
+            "java_unsupported_interface_polymorphism"
+          ],
+          "statuses": [
+            "UNRESOLVED"
+          ],
+          "tiers": [
+            "TIER_E_UNRESOLVED"
+          ]
+        }
+      }
+    }
+  },
+  "summary": {
+    "total_files": 6,
+    "total_function_nodes": 63,
+    "total_call_sites_extracted": 58,
+    "total_resolutions_attempted": 58,
+    "total_resolved": 20,
+    "total_unresolved": 38,
+    "total_calls_edges_emitted": 7,
+    "total_contains_edges_emitted": 69
+  }
+}

@@ -1,0 +1,561 @@
+{
+  "edge_multiplicity": {
+    "HypothesisWorks/hypothesis": {
+      "raw_records": 1673,
+      "unique_edges": 1387,
+      "duplicate_citations": 286,
+      "max_multiplicity": 13
+    },
+    "fastapi/fastapi": {
+      "raw_records": 217,
+      "unique_edges": 172,
+      "duplicate_citations": 45,
+      "max_multiplicity": 6
+    },
+    "huggingface/diffusers": {
+      "raw_records": 1779,
+      "unique_edges": 1500,
+      "duplicate_citations": 279,
+      "max_multiplicity": 19
+    },
+    "huggingface/transformers": {
+      "raw_records": 2373,
+      "unique_edges": 2005,
+      "duplicate_citations": 368,
+      "max_multiplicity": 17
+    },
+    "ipython/ipython": {
+      "raw_records": 421,
+      "unique_edges": 325,
+      "duplicate_citations": 96,
+      "max_multiplicity": 15
+    },
+    "numpy/numpy": {
+      "raw_records": 943,
+      "unique_edges": 608,
+      "duplicate_citations": 335,
+      "max_multiplicity": 37
+    },
+    "pallets/click": {
+      "raw_records": 40,
+      "unique_edges": 31,
+      "duplicate_citations": 9,
+      "max_multiplicity": 4
+    },
+    "pydantic/pydantic": {
+      "raw_records": 413,
+      "unique_edges": 344,
+      "duplicate_citations": 69,
+      "max_multiplicity": 11
+    },
+    "pypa/pip": {
+      "raw_records": 647,
+      "unique_edges": 554,
+      "duplicate_citations": 93,
+      "max_multiplicity": 12
+    },
+    "pytest-dev/pytest": {
+      "raw_records": 283,
+      "unique_edges": 230,
+      "duplicate_citations": 53,
+      "max_multiplicity": 11
+    },
+    "python/mypy": {
+      "raw_records": 68,
+      "unique_edges": 47,
+      "duplicate_citations": 21,
+      "max_multiplicity": 10
+    },
+    "scrapy/scrapy": {
+      "raw_records": 1021,
+      "unique_edges": 841,
+      "duplicate_citations": 180,
+      "max_multiplicity": 32
+    },
+    "tox-dev/tox": {
+      "raw_records": 94,
+      "unique_edges": 82,
+      "duplicate_citations": 12,
+      "max_multiplicity": 6
+    }
+  },
+  "provenance_separation": {
+    "HypothesisWorks/hypothesis": {
+      "exact_ast": 607,
+      "scoped_import": 7,
+      "receiver_bound": 49,
+      "heuristic": 1010,
+      "total_calls": 1673
+    },
+    "fastapi/fastapi": {
+      "exact_ast": 176,
+      "scoped_import": 30,
+      "receiver_bound": 3,
+      "heuristic": 8,
+      "total_calls": 217
+    },
+    "huggingface/diffusers": {
+      "exact_ast": 377,
+      "scoped_import": 142,
+      "receiver_bound": 987,
+      "heuristic": 273,
+      "total_calls": 1779
+    },
+    "huggingface/transformers": {
+      "exact_ast": 1179,
+      "scoped_import": 121,
+      "receiver_bound": 959,
+      "heuristic": 114,
+      "total_calls": 2373
+    },
+    "ipython/ipython": {
+      "exact_ast": 241,
+      "scoped_import": 58,
+      "receiver_bound": 94,
+      "heuristic": 28,
+      "total_calls": 421
+    },
+    "numpy/numpy": {
+      "exact_ast": 518,
+      "scoped_import": 42,
+      "receiver_bound": 188,
+      "heuristic": 195,
+      "total_calls": 943
+    },
+    "pallets/click": {
+      "exact_ast": 32,
+      "scoped_import": 0,
+      "receiver_bound": 5,
+      "heuristic": 3,
+      "total_calls": 40
+    },
+    "pydantic/pydantic": {
+      "exact_ast": 208,
+      "scoped_import": 101,
+      "receiver_bound": 31,
+      "heuristic": 73,
+      "total_calls": 413
+    },
+    "pypa/pip": {
+      "exact_ast": 322,
+      "scoped_import": 196,
+      "receiver_bound": 119,
+      "heuristic": 10,
+      "total_calls": 647
+    },
+    "pytest-dev/pytest": {
+      "exact_ast": 207,
+      "scoped_import": 11,
+      "receiver_bound": 54,
+      "heuristic": 11,
+      "total_calls": 283
+    },
+    "python/mypy": {
+      "exact_ast": 44,
+      "scoped_import": 17,
+      "receiver_bound": 7,
+      "heuristic": 0,
+      "total_calls": 68
+    },
+    "scrapy/scrapy": {
+      "exact_ast": 173,
+      "scoped_import": 459,
+      "receiver_bound": 382,
+      "heuristic": 7,
+      "total_calls": 1021
+    },
+    "tox-dev/tox": {
+      "exact_ast": 25,
+      "scoped_import": 44,
+      "receiver_bound": 5,
+      "heuristic": 20,
+      "total_calls": 94
+    }
+  },
+  "ast_coverage": {
+    "HypothesisWorks/hypothesis": {
+      "files_registered": 461,
+      "files_parsed_cleanly": 383,
+      "files_failed_parsing": 78,
+      "segmented_truncation": 45,
+      "genuine_incompatibility": 33,
+      "structural_graph_eligibility_pct": 83.08,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "fastapi/fastapi": {
+      "files_registered": 906,
+      "files_parsed_cleanly": 816,
+      "files_failed_parsing": 90,
+      "segmented_truncation": 78,
+      "genuine_incompatibility": 12,
+      "structural_graph_eligibility_pct": 90.07,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "huggingface/diffusers": {
+      "files_registered": 1696,
+      "files_parsed_cleanly": 878,
+      "files_failed_parsing": 818,
+      "segmented_truncation": 690,
+      "genuine_incompatibility": 128,
+      "structural_graph_eligibility_pct": 51.77,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "huggingface/transformers": {
+      "files_registered": 3757,
+      "files_parsed_cleanly": 2367,
+      "files_failed_parsing": 1390,
+      "segmented_truncation": 1110,
+      "genuine_incompatibility": 280,
+      "structural_graph_eligibility_pct": 63.0,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "ipython/ipython": {
+      "files_registered": 287,
+      "files_parsed_cleanly": 223,
+      "files_failed_parsing": 64,
+      "segmented_truncation": 44,
+      "genuine_incompatibility": 20,
+      "structural_graph_eligibility_pct": 77.7,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "numpy/numpy": {
+      "files_registered": 479,
+      "files_parsed_cleanly": 345,
+      "files_failed_parsing": 134,
+      "segmented_truncation": 99,
+      "genuine_incompatibility": 35,
+      "structural_graph_eligibility_pct": 72.03,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "pallets/click": {
+      "files_registered": 59,
+      "files_parsed_cleanly": 41,
+      "files_failed_parsing": 18,
+      "segmented_truncation": 11,
+      "genuine_incompatibility": 7,
+      "structural_graph_eligibility_pct": 69.49,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "pydantic/pydantic": {
+      "files_registered": 392,
+      "files_parsed_cleanly": 277,
+      "files_failed_parsing": 115,
+      "segmented_truncation": 86,
+      "genuine_incompatibility": 29,
+      "structural_graph_eligibility_pct": 70.66,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "pypa/pip": {
+      "files_registered": 324,
+      "files_parsed_cleanly": 261,
+      "files_failed_parsing": 63,
+      "segmented_truncation": 49,
+      "genuine_incompatibility": 14,
+      "structural_graph_eligibility_pct": 80.56,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "pytest-dev/pytest": {
+      "files_registered": 114,
+      "files_parsed_cleanly": 84,
+      "files_failed_parsing": 30,
+      "segmented_truncation": 22,
+      "genuine_incompatibility": 8,
+      "structural_graph_eligibility_pct": 73.68,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "python/mypy": {
+      "files_registered": 366,
+      "files_parsed_cleanly": 187,
+      "files_failed_parsing": 179,
+      "segmented_truncation": 115,
+      "genuine_incompatibility": 64,
+      "structural_graph_eligibility_pct": 51.09,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "scrapy/scrapy": {
+      "files_registered": 303,
+      "files_parsed_cleanly": 268,
+      "files_failed_parsing": 35,
+      "segmented_truncation": 27,
+      "genuine_incompatibility": 8,
+      "structural_graph_eligibility_pct": 88.45,
+      "lexical_fallback_coverage_pct": 100.0
+    },
+    "tox-dev/tox": {
+      "files_registered": 222,
+      "files_parsed_cleanly": 121,
+      "files_failed_parsing": 101,
+      "segmented_truncation": 65,
+      "genuine_incompatibility": 36,
+      "structural_graph_eligibility_pct": 54.5,
+      "lexical_fallback_coverage_pct": 100.0
+    }
+  },
+  "hub_stats": {
+    "HypothesisWorks/hypothesis": {
+      "active_symbols": 1388,
+      "top_1_pct_count": 14,
+      "pct_edges_top_1_pct": 49.17,
+      "max_in_deg": 175,
+      "max_out_deg": 20
+    },
+    "fastapi/fastapi": {
+      "active_symbols": 226,
+      "top_1_pct_count": 3,
+      "pct_edges_top_1_pct": 5.23,
+      "max_in_deg": 18,
+      "max_out_deg": 11
+    },
+    "huggingface/diffusers": {
+      "active_symbols": 1674,
+      "top_1_pct_count": 17,
+      "pct_edges_top_1_pct": 23.0,
+      "max_in_deg": 113,
+      "max_out_deg": 21
+    },
+    "huggingface/transformers": {
+      "active_symbols": 2686,
+      "top_1_pct_count": 27,
+      "pct_edges_top_1_pct": 10.52,
+      "max_in_deg": 63,
+      "max_out_deg": 27
+    },
+    "ipython/ipython": {
+      "active_symbols": 379,
+      "top_1_pct_count": 4,
+      "pct_edges_top_1_pct": 7.38,
+      "max_in_deg": 44,
+      "max_out_deg": 15
+    },
+    "numpy/numpy": {
+      "active_symbols": 651,
+      "top_1_pct_count": 7,
+      "pct_edges_top_1_pct": 10.69,
+      "max_in_deg": 108,
+      "max_out_deg": 37
+    },
+    "pallets/click": {
+      "active_symbols": 45,
+      "top_1_pct_count": 1,
+      "pct_edges_top_1_pct": 29.03,
+      "max_in_deg": 9,
+      "max_out_deg": 4
+    },
+    "pydantic/pydantic": {
+      "active_symbols": 405,
+      "top_1_pct_count": 5,
+      "pct_edges_top_1_pct": 31.69,
+      "max_in_deg": 54,
+      "max_out_deg": 11
+    },
+    "pypa/pip": {
+      "active_symbols": 609,
+      "top_1_pct_count": 7,
+      "pct_edges_top_1_pct": 11.37,
+      "max_in_deg": 21,
+      "max_out_deg": 16
+    },
+    "pytest-dev/pytest": {
+      "active_symbols": 274,
+      "top_1_pct_count": 3,
+      "pct_edges_top_1_pct": 22.17,
+      "max_in_deg": 26,
+      "max_out_deg": 11
+    },
+    "python/mypy": {
+      "active_symbols": 67,
+      "top_1_pct_count": 1,
+      "pct_edges_top_1_pct": 2.13,
+      "max_in_deg": 10,
+      "max_out_deg": 10
+    },
+    "scrapy/scrapy": {
+      "active_symbols": 879,
+      "top_1_pct_count": 9,
+      "pct_edges_top_1_pct": 16.88,
+      "max_in_deg": 52,
+      "max_out_deg": 32
+    },
+    "tox-dev/tox": {
+      "active_symbols": 106,
+      "top_1_pct_count": 2,
+      "pct_edges_top_1_pct": 36.59,
+      "max_in_deg": 20,
+      "max_out_deg": 6
+    }
+  },
+  "repo_gold_stats": {
+    "HypothesisWorks/hypothesis": {
+      "queries_total": 1,
+      "queries_at_least_one_parsed": 0,
+      "queries_all_parsed": 0,
+      "queries_none_parsed": 1,
+      "gold_files_total": 2,
+      "gold_files_parsed": 0,
+      "gold_files_with_funcs": 0,
+      "gold_files_with_edges": 0
+    },
+    "fastapi/fastapi": {
+      "queries_total": 3,
+      "queries_at_least_one_parsed": 3,
+      "queries_all_parsed": 3,
+      "queries_none_parsed": 0,
+      "gold_files_total": 5,
+      "gold_files_parsed": 5,
+      "gold_files_with_funcs": 5,
+      "gold_files_with_edges": 1
+    },
+    "huggingface/diffusers": {
+      "queries_total": 16,
+      "queries_at_least_one_parsed": 9,
+      "queries_all_parsed": 1,
+      "queries_none_parsed": 7,
+      "gold_files_total": 31,
+      "gold_files_parsed": 11,
+      "gold_files_with_funcs": 10,
+      "gold_files_with_edges": 6
+    },
+    "huggingface/transformers": {
+      "queries_total": 36,
+      "queries_at_least_one_parsed": 16,
+      "queries_all_parsed": 14,
+      "queries_none_parsed": 20,
+      "gold_files_total": 44,
+      "gold_files_parsed": 18,
+      "gold_files_with_funcs": 18,
+      "gold_files_with_edges": 11
+    },
+    "ipython/ipython": {
+      "queries_total": 2,
+      "queries_at_least_one_parsed": 0,
+      "queries_all_parsed": 0,
+      "queries_none_parsed": 2,
+      "gold_files_total": 2,
+      "gold_files_parsed": 0,
+      "gold_files_with_funcs": 0,
+      "gold_files_with_edges": 0
+    },
+    "numpy/numpy": {
+      "queries_total": 1,
+      "queries_at_least_one_parsed": 1,
+      "queries_all_parsed": 1,
+      "queries_none_parsed": 0,
+      "gold_files_total": 2,
+      "gold_files_parsed": 2,
+      "gold_files_with_funcs": 2,
+      "gold_files_with_edges": 2
+    },
+    "pallets/click": {
+      "queries_total": 26,
+      "queries_at_least_one_parsed": 1,
+      "queries_all_parsed": 0,
+      "queries_none_parsed": 25,
+      "gold_files_total": 30,
+      "gold_files_parsed": 1,
+      "gold_files_with_funcs": 1,
+      "gold_files_with_edges": 0
+    },
+    "pydantic/pydantic": {
+      "queries_total": 1,
+      "queries_at_least_one_parsed": 0,
+      "queries_all_parsed": 0,
+      "queries_none_parsed": 1,
+      "gold_files_total": 1,
+      "gold_files_parsed": 0,
+      "gold_files_with_funcs": 0,
+      "gold_files_with_edges": 0
+    },
+    "pypa/pip": {
+      "queries_total": 5,
+      "queries_at_least_one_parsed": 3,
+      "queries_all_parsed": 2,
+      "queries_none_parsed": 2,
+      "gold_files_total": 9,
+      "gold_files_parsed": 5,
+      "gold_files_with_funcs": 5,
+      "gold_files_with_edges": 3
+    },
+    "pytest-dev/pytest": {
+      "queries_total": 7,
+      "queries_at_least_one_parsed": 1,
+      "queries_all_parsed": 1,
+      "queries_none_parsed": 6,
+      "gold_files_total": 12,
+      "gold_files_parsed": 1,
+      "gold_files_with_funcs": 1,
+      "gold_files_with_edges": 0
+    },
+    "python/mypy": {
+      "queries_total": 1,
+      "queries_at_least_one_parsed": 0,
+      "queries_all_parsed": 0,
+      "queries_none_parsed": 1,
+      "gold_files_total": 1,
+      "gold_files_parsed": 0,
+      "gold_files_with_funcs": 0,
+      "gold_files_with_edges": 0
+    },
+    "scrapy/scrapy": {
+      "queries_total": 3,
+      "queries_at_least_one_parsed": 2,
+      "queries_all_parsed": 1,
+      "queries_none_parsed": 1,
+      "gold_files_total": 4,
+      "gold_files_parsed": 2,
+      "gold_files_with_funcs": 2,
+      "gold_files_with_edges": 1
+    },
+    "tox-dev/tox": {
+      "queries_total": 2,
+      "queries_at_least_one_parsed": 1,
+      "queries_all_parsed": 1,
+      "queries_none_parsed": 1,
+      "gold_files_total": 2,
+      "gold_files_parsed": 1,
+      "gold_files_with_funcs": 1,
+      "gold_files_with_edges": 0
+    }
+  },
+  "task_gold_stats": {
+    "comment2context": {
+      "queries_total": 40,
+      "queries_at_least_one_parsed": 16,
+      "queries_all_parsed": 8,
+      "queries_none_parsed": 24,
+      "gold_files_total": 62,
+      "gold_files_parsed": 22,
+      "gold_files_with_funcs": 21,
+      "gold_files_with_edges": 13
+    },
+    "code2test": {
+      "queries_total": 27,
+      "queries_at_least_one_parsed": 16,
+      "queries_all_parsed": 12,
+      "queries_none_parsed": 11,
+      "gold_files_total": 40,
+      "gold_files_parsed": 19,
+      "gold_files_with_funcs": 19,
+      "gold_files_with_edges": 11
+    },
+    "edit2ripple": {
+      "queries_total": 10,
+      "queries_at_least_one_parsed": 4,
+      "queries_all_parsed": 4,
+      "queries_none_parsed": 6,
+      "gold_files_total": 12,
+      "gold_files_parsed": 4,
+      "gold_files_with_funcs": 4,
+      "gold_files_with_edges": 0
+    },
+    "trace2code": {
+      "queries_total": 27,
+      "queries_at_least_one_parsed": 1,
+      "queries_all_parsed": 0,
+      "queries_none_parsed": 26,
+      "gold_files_total": 31,
+      "gold_files_parsed": 1,
+      "gold_files_with_funcs": 1,
+      "gold_files_with_edges": 0
+    }
+  }
+}

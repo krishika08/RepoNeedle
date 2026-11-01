@@ -1,0 +1,4 @@
+repo,num_files,total_chars,graph_nodes,graph_edges,index_time_total_ms,index_time_bm25_ms,index_time_subword_ms,index_time_graph_ms,retained_index_mb,peak_index_mb,process_rss_mb,query_count,exp384_latency_median_ms,exp384_latency_p95_ms,exp386_latency_median_ms,exp386_latency_p95_ms
+pallets/click,133,433028,133,95,6431.09,982.06,4753.95,396.88,10.34,38.71,108.45,26,7.49,10.42,3.60,7.58
+clap-rs/clap,607,1596546,607,2433,18096.47,3429.18,14243.36,234.07,18.41,97.22,151.53,10,8.74,29.92,7.32,20.64
+gin-gonic/gin,116,341078,116,451,5439.72,1018.40,4331.85,49.38,6.64,30.30,126.63,88,4.52,17.93,2.34,7.30

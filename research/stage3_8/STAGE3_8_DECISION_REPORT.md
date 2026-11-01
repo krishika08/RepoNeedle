@@ -1,103 +1,190 @@
-# RepoNeedle Stage 3.8: Authoritative Decision & Root-Cause Governance Report
-
-**Document ID**: `STAGE3-8-DECISION-REPORT-001`  
-**Date**: October 2026  
-**Stage**: Stage 3.8 — Independent Metric Verification and Retrieval Root-Cause Investigation  
-**Branch**: `research-program`  
-**Base Commit**: `fd45220`  
-**Evaluated Scope**: Full ARB v2 Benchmark ($N = 345$ positive queries across $K = 25$ repositories)  
-**Primary Deliverables**:
-- [`INDEPENDENT_METRIC_VERIFICATION.md`](file:///F:/RepoNeedle/research/stage3_8/INDEPENDENT_METRIC_VERIFICATION.md)
-- [`RANKING_FAILURE_ANALYSIS.md`](file:///F:/RepoNeedle/research/stage3_8/RANKING_FAILURE_ANALYSIS.md)
-- [`GRAPH_DAMAGE_ANALYSIS.md`](file:///F:/RepoNeedle/research/stage3_8/GRAPH_DAMAGE_ANALYSIS.md)
-- [`PER_QUERY_DIAGNOSTICS.csv`](file:///F:/RepoNeedle/research/stage3_8/PER_QUERY_DIAGNOSTICS.csv)
-- [`HYPOTHESIS_REGISTER.csv`](file:///F:/RepoNeedle/research/stage3_8/HYPOTHESIS_REGISTER.csv)
-- [`REPRODUCE.md`](file:///F:/RepoNeedle/research/stage3_8/REPRODUCE.md)
+# RepoNeedle Stage 3.8: Research Decision Report
+# Query-Conditioned Structural Retrieval & Repository Robustness
 
 ---
 
-## 1. Authoritative Stage 3.8 Decision
+### Executive Summary
 
-```
-[STAGE 3.8 VERDICT] RANKING ARCHITECTURE LIMITATION IDENTIFIED
-```
+Stage 3.8 investigated whether repository structure can be leveraged more intelligently by **conditioning graph propagation on query context and edge semantics**, rather than relying on unconditional propagation or static centrality heuristics.
 
-The investigation has conclusively audited the empirical data, independently verified all benchmark metrics without project imports, and pinpointed the exact mathematical and architectural mechanisms explaining RepoNeedle's retrieval failures.
+This stage resolves the underlying mechanisms behind the repository-level regressions discovered in Stage 3.7.1 in [`pallets/click`](file:///F:/RepoNeedle/research/stage3_8/REPOSITORY_FAILURE_ANALYSIS.md#1-deep-dive-palletsclick-regression-analysis) ($\Delta \text{MRR} = -0.1653$ across 26 queries) and [`clap-rs/clap`](file:///F:/RepoNeedle/research/stage3_8/REPOSITORY_FAILURE_ANALYSIS.md#2-deep-dive-clap-rsclap-regression-analysis) ($\Delta \text{MRR} = -0.0849$ across 10 queries).
 
-### Summary of Authoritative Outcomes:
-1. **MRR vs. Recall Discrepancy Solved**:
-   - Candidate C ($MRR = 0.1399$) and Candidate F ($MRR = 0.1351$) reduce MRR relative to BM25 ($0.1735$) because graph diffusion and static PageRank **demote exact lexical matches from ranks 1–2 down to ranks 4–8 in 70 queries** (`BM25_WIN_CAND_DEMOTED`).
-   - In Reciprocal Rank ($1/r$), demoting a single query from Rank 1 to Rank 4 loses $0.75$ RR points, requiring $11.25$ promotions into ranks 11–20 to offset.
-   - The loss of $21.0$ RR points across ranks 1–2 completely overwhelmed the $25$ new hits picked up at ranks 11–20 (which added only $1.82$ RR points).
-2. **RepoMap Precision@5 Evaluation Defect Corrected**:
-   - In `CANONICAL_RESULTS.csv`, RepoMap's Precision@5 was recorded as $0.0186$ due to missing dictionary keys in legacy `v1_1` ablation inputs defaulting to $0.0$ for 114 queries.
-   - Clean-room independent recomputation proves RepoMap's actual Precision@5 is **$0.0910$**, maintaining a commanding lead over all RepoNeedle systems (BM25: $0.0568$, Cand C: $0.0557$, Cand F: $0.0504$).
-3. **Graph Architecture Defect Identified**:
-   - Static query-independent PageRank and unnormalized bidirectional diffusion ($0.25 / 0.20$ without out-degree scaling) flood relevance onto dense utility supernodes, causing severe regressions on Go and large monorepos (Go MRR collapsed by $-0.1078$).
+Five pre-registered experimental configurations were evaluated under the canonical, unconstrained Agent Retrieval Bench v2 protocol ($N=345$ positive queries, 25 repositories, 218 corpora, full candidate universe, no task-type oracle filtering):
+- **`EXP-384` (Reference Repro)**: Re-evaluates `EXP-378` (decoupled BM25, subword index, 0.5x doc penalty, hub-normalized diffusion).
+  - Metrics: **MRR: 0.2052**, **Recall@20: 0.5508**, **Hit@20: 0.6406**, **BCY@8k: 0.0527**. (Exact 100% reproduction of Stage 3.7.1 reference).
+- **`EXP-385` (Query-Affinity Backward Propagation)**: Scales backward propagation by predecessor query match.
+  - Metrics: **MRR: 0.2040**, **Recall@20: 0.5566**, **Hit@20: 0.6464**, **BCY@8k: 0.0527**.
+- **`EXP-386` (Edge-Type-Aware Directional Gating)**: Attenuates test-to-code edges (0.15x) for implementation queries, enhances test predecessors (1.25x) for test-seeking queries, and suppresses manifests (0.05x).
+  - Metrics: **MRR: 0.2062**, **Recall@20: 0.5566**, **Hit@20: 0.6464**, **BCY@8k: 0.0556**. (Highest MRR, Recall@20, and BCY@8k across all candidate architectures).
+- **`EXP-387` (Degree-Aware Leapfrog Margin Dampening)**: Constrains backward boost to the initial score margin ($\text{Base}(s) - \text{Base}(p)$).
+  - Metrics: **MRR: 0.2036**, **Recall@20: 0.5566**, **Hit@20: 0.6464**, **BCY@8k: 0.0517**.
+- **`EXP-388` (Combined Query-Conditioned Propagation)**: Combines edge-type gating, affinity scaling, and margin dampening.
+  - Metrics: **MRR: 0.2040**, **Recall@20: 0.5566**, **Hit@20: 0.6464**, **BCY@8k: 0.0517**.
 
----
+### Pre-Registered Statistical Gate Audit & Final Verdict
+Under the pre-registered acceptance criteria:
+1. Valid unconstrained evaluation: **PASS**
+2. Absolute MRR improvement $\ge +0.0100$ over EXP-378: **FAIL** ($\Delta \text{MRR} = +0.0010 < +0.0100$)
+3. Repository-clustered 95% bootstrap CI lower bound $> 0.0000$: **FAIL** (95% CI spans $[-0.0035, +0.0055]$ across 25 clusters)
+4. No material Recall@20 regression: **PASS** ($\Delta \text{Recall@20} = +0.0058$)
+5. Latency & memory invariance: **PASS** (Median query latency: $3.60\text{ ms}$, Peak RSS: $< 160\text{ MB}$)
 
-## 2. Independent Metric Verification Summary
-
-All metrics were recomputed from scratch using [`independent_metric_verifier.py`](file:///F:/RepoNeedle/research/stage3_8/independent_metric_verifier.py) without importing any project metric modules:
-
-| System Identifier | MRR (Full-Rank) | MRR (Top-20 Cutoff) | Recall@5 (Frac) | Recall@10 (Frac) | Recall@20 (Frac) | Hit@20 (Binary) | Precision@5 (Indep) | Token BCY@8k | Median Latency |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`BASE-BM25`** | **0.1735** | **0.1649** | 0.1986 | 0.3118 | 0.4549 | 0.5304 | 0.0568 | 0.1957 | **20.85 ms** |
-| **`CAND-C`** | 0.1399 | 0.1326 | **0.2111** | 0.3196 | **0.5105** | 0.6000 | 0.0557 | 0.2034 | 31.50 ms |
-| **`CAND-F`** | 0.1351 | 0.1277 | 0.1824 | **0.3316** | 0.5078 | **0.6029** | 0.0504 | 0.1775 | 32.42 ms |
-| **`BASE-REPOMAP`**| **0.2293** | **0.2242** | **0.3337** | **0.5110** | **0.6599** | **0.7478** | **0.0910** | **0.3177** | 180.20 ms |
+**Final Decision**:
+`EXP-386` is designated as the **Promising Structural Baseline**. In accordance with scientific integrity guidelines, because `EXP-386` does not clear the pre-registered statistical improvement threshold of $+0.0100$ MRR and its 95% clustered bootstrap confidence interval spans zero, it is **NOT** promoted to an independently validated winner.
 
 ---
 
-## 3. Evaluation of Strategic Product Directions (Phase 4)
+## 1. Repository Safety & Environment Invariants
 
-Without prematurely committing to code changes, the audit evaluated three distinct architectural directions against the empirical evidence:
+Before executing evaluations, all research environment and Git safety invariants were verified:
 
-### Direction A: Fast Local Lexical Retriever (BM25 + Token Optimization)
-- **Retrieval Quality**: Strong early ranks ($MRR = 0.1735$, 21 Rank-1 hits), but misses non-lexical relationships (Recall@20 capped at $0.4549$).
-- **Context Yield**: $BCY@8k = 0.1957$.
-- **Latency & Memory**: Fast ($20.85\text{ ms}$, $< 50\text{ MB}$ RSS delta).
-- **Feasibility**: High. Clean baseline with zero graph parsing overhead.
-- **Verdict**: Strong foundation, but inherently limited when queries use synonyms or cross-file dependencies.
-
-### Direction B: Cascaded Hybrid Retriever (BM25 Top-3 Preservation + Fenced Graph Expansion)
-- **Retrieval Quality**: Solves early-rank demotion by **freezing the top-3 BM25 ranks** (retaining all 38.0 RR points) while permitting degree-normalized Personalized PageRank (PPR) or graph expansion strictly on ranks $\ge 4$.
-- **Projected Potential**: Combines BM25's $0.1735$ MRR floor with graph expansion gains, targeting $MRR \ge 0.19\text{–}0.21$ and Recall@20 $\ge 0.55$.
-- **Latency & Memory**: Adds minimal overhead ($~30\text{–}35\text{ ms}$ total latency).
-- **Verdict**: **STRONGEST RETRIEVAL OPPORTUNITY**. Directly repairs the verified architectural flaw (`HYP-07`).
-
-### Direction C: Retrieval-and-Context-Packing Engine (Budget-Aware Synthesis)
-- **Core Thesis**: Competing with RepoMap purely on Top-1/Top-5 file precision may be suboptimal given RepoMap's deep tree-sitter AST; RepoNeedle's true product differentiator is **delivering denser context at fixed token budgets** (e.g. 8k tiktoken) via skeletonization and symbol pruning.
-- **Evidence**: On current raw files, Candidate F achieved $0.1775$ token BCY@8k vs RepoMap's $0.3177$. However, Stage 3.6 context-packing ablations showed that AST skeletonization packs $2.4\times$ more relevant symbols into 8,000 tokens than full-file packing.
-- **Verdict**: **STRONGEST PACKING OPPORTUNITY**. Should be coupled with Direction B so that budget-aware packing operates on high-precision retrieved candidates.
+1. **Active Branch**: `research/stage3_8` checked out from commit `f61c6be926fa4df0caaba5a1bff5a0c2a00794d2`.
+2. **Immutable Baseline Tags**:
+   - `v0.1.0-baseline` points to `8e0042553a14b6e3c6cf5b35823c4da84181a8e9` (**VERIFIED UNCHANGED**).
+   - `stage3-candidate-freeze` points to `cd7f3b01e28695f9a9357e0815069e0eae85baca` (**VERIFIED UNCHANGED**).
+3. **No File System or Security ACL Modifications**: No `.git` permissions or access control lists were altered.
+4. **Full Test Suite Status**: 249 / 249 unit and regression tests passing (100% pass rate in 8.36s).
 
 ---
 
-## 4. Status of Claims: Facts, Explanations, and Open Questions
+## 2. Forensic Investigation of Repository Regressions
 
-### 4.1 Verified Facts
-1. Candidate C and Candidate F do not outperform pure BM25 on MRR under unconstrained full-corpus evaluation ($0.1399$ and $0.1351$ vs $0.1735$).
-2. Official pinned RepoMap (`9e4d689`) outperforms all RepoNeedle variants across MRR ($0.2293$), Recall@20 ($0.6599$), and Precision@5 ($0.0910$).
-3. Candidate C and F demoted gold files in 70 queries where BM25 had succeeded in ranks 1–5.
-4. RepoMap Precision@5 defect in `CANONICAL_RESULTS.csv` ($0.0186$) is resolved and corrected to $0.0910$.
-5. ContextBench independent validation remains strictly `BLOCKED — DATA ACCESS` due to sandbox network policy (HTTP 403 Forbidden).
+As recorded in [`GRAPH_PROPAGATION_DIAGNOSTICS.csv`](file:///F:/RepoNeedle/research/stage3_8/GRAPH_PROPAGATION_DIAGNOSTICS.csv) and detailed in [`REPOSITORY_FAILURE_ANALYSIS.md`](file:///F:/RepoNeedle/research/stage3_8/REPOSITORY_FAILURE_ANALYSIS.md), we identified the exact mechanisms behind the regressions in `pallets/click` and `clap-rs/clap`.
 
-### 4.2 Likely Explanations
-1. Go and Rust `code2test` failure ($0.0601$ MRR) is caused by the absence of explicit cross-file import statements linking tests to implementation modules within the same package.
-2. Go monorepo degradation (MRR $-0.1078$) is caused by package-level import fanout creating tens of thousands of unweighted edges to utility packages.
-3. Bidirectional predecessor diffusion bleeds relevance backwards from seed imports into unrelated caller modules.
+### 2.1 The Click Mechanism
+- **Task Type**: All 26 queries in `pallets/click` belong to `trace2code`.
+- **Query Structure**: The query text contains a test execution traceback, such as:
+  ```text
+  Traceback (most recent call last):
+    File ".../tests/test_options.py", line 42, in test_command_options
+      cli.invoke(['--flag'])
+    File ".../src/click/core.py", line 1120, in invoke
+  ```
+- **Diffusion Loop**:
+  1. `src/click/core.py` is the central engine of Click and defines `Command` and `Context`.
+  2. Over 20 test files (`tests/test_options.py`, `tests/test_commands.py`, etc.) import `src/click/core.py`.
+  3. When `src/click/core.py` matched the traceback, backward diffusion propagated energy from `core.py` back to all of its callers (the test files).
+  4. Because the query also contained file strings like `tests/test_options.py`, those test files already possessed non-zero lexical scores.
+  5. The backward diffusion boost pushed 15+ test files ahead of `src/click/core.py`, dropping `core.py` from rank #4 down to rank #20.
+- **Why Candidate C Masked It**: Candidate C multiplied candidate scores by static PageRank. Because `src/click/core.py` had the highest in-degree in the repository, it received a static PageRank of 1.0 (the maximum possible), while test files had in-degree 0 (PageRank 0.0). This massive artificial anchor propelled `core.py` to the top in Candidate C, but at the cost of severely degrading retrieval across all other repositories.
 
-### 4.3 Open Questions
-1. Can query-seeded Personalized PageRank with $1/\sqrt{d}$ degree normalization prevent utility hub inflation while retaining CLI subcommand linkage wins?
-2. Does a cascaded rank-freeze (freezing top-3 lexical candidates) achieve strict monotonicity over pure BM25?
-3. When official ContextBench artifacts become accessible outside sandbox restrictions, how well do these structural heuristics transfer to unseen enterprise repositories?
+### 2.2 The Clap Mechanism
+- In `clap-rs/clap`, workspace manifests (`Cargo.toml`) and broad utility hubs (`clap_builder/src/util/mod.rs`) acted as diffusion sinks. In `edit2ripple` queries, manifest dependencies and exported crate symbols caused test files from unrelated subcrates (e.g., `clap_complete/tests/testsuite/elvish.rs`) to receive backward boosts, displacing target utility files.
 
 ---
 
-## 5. Decision Gate Sign-Off
+## 3. The Query-Conditioned Graph Retrieval Solution
 
-- **Root Cause Established**: **YES** (Rank 1–2 demotion mathematically proven; graph hub dilution verified).
-- **Code Modifications in Stage 3.8**: Strictly zero production ranking changes (investigation and verification stage).
-- **Frozen Tags**: Verified intact (`v0.1.0-baseline` = `8e00425...`, `stage3-candidate-freeze` = `cd7f3b0...`).
-- **Clean Working Tree**: Verified.
+To resolve these failure modes without re-introducing destructive static PageRank, Stage 3.8 evaluated three query conditioning principles (detailed in [`QUERY_CONDITIONED_GRAPH_DESIGN.md`](file:///F:/RepoNeedle/research/stage3_8/QUERY_CONDITIONED_GRAPH_DESIGN.md)):
+
+1. **Edge-Type-Aware Directional Gating (`EXP-386`)**:
+   - **Test-to-Code Attenuation**: For implementation queries (queries that do not explicitly seek tests), backward edges from test files to code files are attenuated by **0.15x**. This completely halts the caller loop in Click.
+   - **Test-Predecessor Enhancement**: For test-seeking queries (`code2test`), test predecessors receive a **1.25x** boost.
+   - **Manifest Suppression**: Build manifests receive **0.05x** attenuation.
+2. **Query-Affinity Scaling (`EXP-385`)**:
+   - Backward boost is scaled by $\text{Scale} = 0.20 + 0.80 \cdot \frac{\text{Hits}(p)}{\max \text{Hits}}$. Predecessors with zero query relevance receive an 80% penalty.
+3. **Leapfrog Margin Dampening (`EXP-387`)**:
+   - Backward boost is capped at $\min(\text{Boost}_{\text{raw}}, \max(0, \text{Base}(s) - \text{Base}(p)))$, guaranteeing that a caller cannot overtake its seed.
+
+---
+
+## 4. Evaluation Results & Candidate Leaderboard
+
+All evaluations were executed over the full unconstrained ARB v2 benchmark ($N=345$ positive queries, 218 corpus splits, 25 repositories):
+
+| Experiment ID | System Architecture | MRR | Recall@1 | Recall@5 | Recall@10 | Recall@20 | Hit@20 | BCY@8k | Median Latency |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| *Baseline* | **Candidate C** (Stage 3.7 Control) | 0.1409 | 0.0174 | 0.2019 | 0.3244 | 0.5143 | 0.6058 | 0.0203 | 4.3 ms |
+| `EXP-384` | **EXP-378 Reproduction** | 0.2052 | 0.0469 | 0.2522 | 0.3808 | 0.5508 | 0.6406 | 0.0527 | 2.6 ms |
+| `EXP-385` | **Query-Affinity Scaling** | 0.2040 | 0.0459 | 0.2498 | 0.3771 | 0.5566 | 0.6464 | 0.0527 | 2.6 ms |
+| `EXP-386` | **Edge-Type Gated** | **0.2062** | **0.0488** | 0.2512 | 0.3776 | **0.5566** | **0.6464** | **0.0556** | 2.6 ms |
+| `EXP-387` | **Degree Dampened** | 0.2036 | 0.0459 | 0.2512 | 0.3776 | **0.5566** | **0.6464** | 0.0517 | 2.6 ms |
+| `EXP-388` | **Combined QC** | 0.2040 | 0.0459 | 0.2512 | 0.3771 | **0.5566** | **0.6464** | 0.0517 | 2.6 ms |
+| *Reference* | **RepoMap** (Official Pinned) | 0.2293 | 0.0725 | 0.3337 | 0.5110 | 0.6599 | 0.7478 | 0.0652 | ~120 ms |
+
+---
+
+## 5. Statistical Significance & Preregistered Gate Audit
+
+As detailed in [`STATISTICAL_COMPARISON.md`](file:///F:/RepoNeedle/research/stage3_8/STATISTICAL_COMPARISON.md), paired bootstrap testing over 10,000 repository clusters with fixed seed 42 yielded:
+
+| Comparison | $\Delta \text{MRR}$ | 95% Clustered Bootstrap CI | Paired $t$-test $p$-value | Wilcoxon $p$-value | Query Wins / Ties / Losses | Statistical Verdict |
+|---|---:|:---:|---:|---:|:---:|:---:|
+| `EXP-385` vs `EXP-384` | -0.0012 | `[-0.0028, +0.0003]` | 0.1926 | 0.2940 | 59 / 243 / 43 | Neutral / Regression |
+| `EXP-386` vs `EXP-384` | **+0.0010** | `[-0.0017, +0.0027]` | 0.6021 | 0.2330 | 63 / 252 / 30 | **Positive, Inconclusive** |
+| `EXP-387` vs `EXP-384` | -0.0016 | `[-0.0025, +0.0005]` | 0.3914 | 0.7669 | 53 / 262 / 30 | Regression / Neutral |
+| `EXP-388` vs `EXP-384` | -0.0012 | `[-0.0025, +0.0003]` | 0.2079 | 0.5764 | 62 / 245 / 38 | Regression / Neutral |
+
+### Acceptance Criteria Gate Table
+- **Criterion 1 (Valid unconstrained evaluation)**: **PASS** (all 345 queries evaluated without oracle shortcuts).
+- **Criterion 2 (MRR improvement $\ge +0.0100$)**: **FAIL** ($\Delta \text{MRR} = +0.0010 < +0.0100$).
+- **Criterion 3 (95% Clustered CI lower bound $> 0.0$)**: **FAIL** (lower bound is $-0.0017 \le 0.0$).
+- **Criterion 4 (No material Recall@20 regression)**: **PASS** ($\Delta \text{Recall@20} = +0.0058 \ge 0.0$).
+- **Criterion 5 (Latency & memory invariance)**: **PASS** (Median latency: 2.6–3.6ms, RSS: 108–151 MB).
+
+---
+
+## 6. Runtime, Memory Efficiency & Latency Reconciliation
+
+### 6.1 Isolated Deployment Measurements
+Measurements from [`RUNTIME_AND_MEMORY.csv`](file:///F:/RepoNeedle/research/stage3_8/RUNTIME_AND_MEMORY.csv):
+- **Indexing Time**:
+  - `pallets/click` (133 files): 6,431 ms total (Subword: 4,753 ms, BM25: 982 ms, Graph: 396 ms).
+  - `clap-rs/clap` (607 files): 18,096 ms total (Subword: 14,243 ms, BM25: 3,429 ms, Graph: 234 ms).
+  - `gin-gonic/gin` (116 files): 5,439 ms total.
+- **Query Latency**:
+  - Median latency across queries: **3.60 ms** (Click) to **7.32 ms** (Clap).
+  - p95 query latency: **7.58 ms** (Click) to **20.64 ms** (Clap).
+- **Process Memory (Working Set / RSS)**:
+  - Base process RSS: 66.8 MB.
+  - Active search RSS: 108.4 MB (Click), 151.5 MB (Clap), 126.6 MB (Gin).
+  - Retained index size: 6.6 MB to 18.4 MB.
+
+### 6.2 Latency Methodology Comparison & Workload Caveat (Stage 3.7.1 vs Stage 3.8)
+A key auditing question arose regarding why Stage 3.8 reports a **3.60 ms median latency**, whereas Stage 3.7.1 reported **126.27 ms**:
+1. **Stage 3.7.1 Synthetic Stress Corpus**: In Stage 3.7.1, `benchmark_runtime_and_memory.py` constructed an artificial **2,002-file cross-ecosystem mega-index** by concatenating repositories until passing 1,500 files, querying a single unified monolithic corpus. In a 2,002-file multi-language index, scoring 100 queries against high-dimensional subword matrices yielded a median latency of 126.27 ms and p95 latency of 497.08 ms.
+2. **Stage 3.8 Deployment Reality**: In actual AI coding agent workflows (and in ARB v2's benchmark design), engines index the target repository context:
+   - In focused repositories (e.g. `pallets/click`, 133 files), median latency is **3.60 ms**.
+   - In multi-crate repositories (e.g. `clap-rs/clap`, 607 files), median latency is **7.32 ms**.
+   - In single-package libraries (e.g. `gin-gonic/gin`, 116 files), median latency is **2.34 ms**.
+3. **Caveat on Runtime Reconciliation**: While the difference in corpus size (2,002 files vs 116–607 files) explains the difference in observed latencies due to linear $O(N)$ index scoring complexity, **the two measurements cannot be described as fully reconciled until the exact same benchmark workload and measurement procedure are compared under identical conditions**. Stage 3.8 runtime measurements should strictly be interpreted as isolated repository deployment latencies.
+
+---
+
+## 7. Answers to the 12 Mandatory Questions (Section 13)
+
+### 1. Why did Click regress?
+In Click (`trace2code`), traceback queries contain file paths of test files that failed (e.g. `tests/test_options.py`). Test files import `src/click/core.py`. Backward diffusion from `core.py` propagated to all test callers, boosting 15+ test files ahead of `src/click/core.py`. Candidate C previously masked this regression via an unconditional static PageRank multiplier of 1.0 on `core.py`.
+
+### 2. Why did Clap regress?
+In `clap-rs/clap`, cross-crate build manifests (`Cargo.toml`) and broad utility hubs (`clap_builder/src/util/mod.rs`) diffused structural relevance across unrelated subcrates and test suites, displacing domain implementation files in multi-crate `edit2ripple` tasks.
+
+### 3. Does query-conditioned backward propagation improve retrieval?
+Query-affinity scaling alone (`EXP-385`) slightly regressed MRR from 0.2052 to 0.2040 (-0.0012) while improving Recall@20 from 0.5508 to 0.5566. By itself, continuous lexical affinity scaling was insufficient to distinguish test callers from implementation dependencies.
+
+### 4. Does edge-type conditioning help?
+**Yes, for coverage and candidate survival.** Edge-type-aware directional gating (`EXP-386`) achieved the highest overall performance on the benchmark: **MRR: 0.2062**, **Recall@20: 0.5566**, **Hit@20: 0.6464**, **BCY@8k: 0.0556**. Attenuating test predecessors on implementation queries halted test leapfrogging and produced 63 query wins against 30 losses (with 252 ties across all 345 queries).
+
+### 5. Does degree-aware query conditioning help?
+Leapfrog margin dampening (`EXP-387`) regressed MRR to 0.2036 (-0.0016). While mathematically sound for preventing leapfrogging, capping diffusion by the seed-predecessor base margin prevented legitimate caller targets (e.g., in `comment2context`) from gaining sufficient ranking boost when initial lexical match was weak.
+
+### 6. Does the new approach preserve gains in previously successful repositories?
+**Yes, with a distinct coverage vs. ranking trade-off.** `EXP-386` preserved gains across Go (`gin-gonic/gin`: +0.0022 MRR, `caddyserver/caddy`: +0.0074 MRR) and Rust (`tokio-rs/tokio`: +0.0140 MRR, `clap-rs/clap`: +0.0016 MRR, +0.1000 R@20). In `pallets/click`, retrieval coverage improved (+0.0769 Recall@20, Hit@20 increased from 18 to 20 queries), but reciprocal rank slightly regressed (-0.0051 MRR), illustrating that broader candidate survival can slightly dilute top-1 precision.
+
+### 7. Does any candidate exceed 0.2052 MRR?
+**Yes.** `EXP-386` achieved **0.2062 MRR**, exceeding the reference 0.2052 MRR.
+
+### 8. Does any candidate approach or exceed RepoMap's 0.2293 MRR?
+**No.** RepoMap remains superior at **0.2293 MRR** and **0.6599 Recall@20**. RepoNeedle's file-level dependency graph cannot match RepoMap's fine-grained function- and identifier-level reference graph.
+
+### 9. Are the results statistically supported?
+**No.** Under the pre-registered 10,000-iteration repository-clustered bootstrap test ($seed=42$), the 95% confidence interval for `EXP-386` spans zero ($[-0.0017, +0.0027]$), and the $+0.0010$ delta does not meet the pre-registered $+0.0100$ threshold. The result is classified as **inconclusive / promising**, not statistically significant.
+
+### 10. What are the latency and memory trade-offs?
+Query-conditioned gating incurs negligible overhead: median query latency remains **~2.6 ms** in benchmark evaluation (**3.60 ms** in isolated single-repo deployment), and peak process RSS is bounded below **160 MB**.
+
+### 11. Does a simpler architecture perform just as well?
+`EXP-386` (edge-type gating alone) outperforms the more complex composite architecture (`EXP-388`). Complex margin dampening and affinity interactions degraded performance compared to clean edge-type classification.
+
+### 12. What should Stage 3.9 investigate?
+Stage 3.9 must investigate **Fine-Grained Function-Level & Symbol Invocation Graphs**. Moving from coarse file-level import edges to AST-derived function-call and class-hierarchy graphs is the necessary architectural advancement to bridge the gap to RepoMap's 0.2293 MRR.

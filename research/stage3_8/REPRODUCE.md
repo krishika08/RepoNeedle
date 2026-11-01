@@ -1,125 +1,81 @@
-# Stage 3.8: Complete Reproduction Guide
+# RepoNeedle Stage 3.8: Complete Reproduction Guide
 
-**Document ID**: `STAGE3-8-REPRO-001`  
-**Stage**: Stage 3.8 — Independent Metric Verification and Retrieval Root-Cause Investigation  
-**Date**: October 2026  
-**Status**: Step-by-Step Verifiable Reproduction Guide  
-**Workspace**: `F:\RepoNeedle`  
-**Branch**: `research-program`  
+This document provides step-by-step instructions to reproduce the Stage 3.8 research findings, evaluation metrics, statistical significance tests, and runtime efficiency benchmarks.
 
 ---
 
-## 1. Environment Verification
+## 1. Environment & Baseline Integrity Verification
 
-Ensure Python environment meets requirements. From repository root `F:\RepoNeedle`, execute:
+Verify Python environment (Python 3.12+ on Windows) and ensure working directory is `F:\RepoNeedle`.
 
 ```powershell
-python -c "import sys, numpy, scipy, pytest; print('Python:', sys.version.split()[0], '| NumPy:', numpy.__version__, '| SciPy:', scipy.__version__, '| Pytest:', pytest.__version__)"
-```
-- Expected Python: `>= 3.12`
-- Expected Packages: `numpy >= 1.26`, `scipy >= 1.13`, `pytest >= 8.0`
+# 1. Verify Git Branch and HEAD
+git status
+git rev-parse HEAD
+# Expected starting commit: f61c6be926fa4df0caaba5a1bff5a0c2a00794d2
 
-Verify that the frozen Git tags have not moved:
-```powershell
-git rev-parse "v0.1.0-baseline^{commit}" "stage3-candidate-freeze^{commit}"
-```
-Expected output:
-```
-8e0042553a14b6e3c6cf5b35823c4da84181a8e9
-cd7f3b01e28695f9a9357e0815069e0eae85baca
+# 2. Verify Immutable Frozen Baseline Tags
+git cat-file -p v0.1.0-baseline
+# Expected target commit: 8e0042553a14b6e3c6cf5b35823c4da84181a8e9
+
+git cat-file -p stage3-candidate-freeze
+# Expected target commit: cd7f3b01e28695f9a9357e0815069e0eae85baca
+
+# 3. Verify Full Regression Test Suite
+pytest
+# Expected: 249 passed in ~8s
 ```
 
 ---
 
-## 2. Automated Regression Unit Tests
+## 2. Execute Stage 3.8 Comprehensive Evaluation
 
-Execute the Stage 3.8 unit test suite covering hand-calculated fixtures, dataset alignment, and reconciled point estimates:
+Run the canonical unconstrained evaluation script across all 345 positive ARB v2 queries and 218 corpora:
 
 ```powershell
-python -m pytest tests/test_stage3_8_reproducibility.py -v
+python research/stage3_8/scripts/evaluate_stage3_8_experiments.py
 ```
-- Expected output: `8 passed`
 
-Execute the full RepoNeedle test suite across all subsystems:
-```powershell
-python -m pytest tests/
-```
-- Expected output: `117 passed`.
+This generates:
+- `research/stage3_8/PER_QUERY_RESULTS.jsonl`: Complete query-level predictions, metrics, and latency for all 5 systems.
+- `research/stage3_8/RANKING_RESULTS.csv`: Canonical summary leaderboard across all positive ARB v2 samples.
+- `research/stage3_8/EXPERIMENT_REGISTRY.jsonl`: Experiment registry records for EXP-384 through EXP-388.
+- `research/stage3_8/REPOSITORY_LEVEL_RESULTS.csv`: Per-repository performance breakdown for all 25 evaluated repositories.
 
 ---
 
-## 3. Independent Metric Verification & Diagnostics Generation
+## 3. Execute Statistical Significance Testing
 
-To execute the clean-room independent metric verifier (zero project imports) and regenerate `research/stage3_8/PER_QUERY_DIAGNOSTICS.csv`:
+Run the 10,000-iteration repository-clustered bootstrap analysis with fixed seed 42:
 
 ```powershell
-python research/stage3_8/independent_metric_verifier.py
+python research/stage3_8/scripts/compute_stage3_8_statistics.py
 ```
-- Expected output:
-  - Validates 345 positive instances $\times$ 4 systems = 1,380 rows.
-  - Generates `research/stage3_8/PER_QUERY_DIAGNOSTICS.csv`.
-  - Recomputes full-rank MRR, rank-20 cutoff MRR, fractional Recall@5/10/20, binary Hit@20, independent Precision@5, and token BCY@8k.
+
+This generates:
+- `research/stage3_8/STATISTICAL_COMPARISON.md`: Paired difference analysis, 95% bootstrap confidence intervals, paired $t$-test and Wilcoxon signed-rank tests, and acceptance gate audit.
 
 ---
 
-## 4. Re-Running the Statistical Audit & Clustered Bootstrap
+## 4. Execute Isolated Runtime & Memory Profiling
 
-To recompute paired differences, 95% repository-clustered bootstrap intervals ($B=10,000$, seed=42), and Wilcoxon signed-rank tests:
+Run the isolated efficiency benchmark across representative repositories:
 
 ```powershell
-python -c "
-import csv, numpy as np, scipy.stats as stats
-from collections import defaultdict
-
-with open('research/stage3_8/CANONICAL_PER_QUERY_RESULTS.csv', encoding='utf-8') as f:
-    rows = list(csv.DictReader(f))
-
-by_sys = defaultdict(dict)
-all_queries = set()
-repo_by_query = {}
-for r in rows:
-    qid = r['query_id']
-    sid = r['system_id']
-    all_queries.add(qid)
-    repo_by_query[qid] = r['repo']
-    by_sys[sid][qid] = {'r20': float(r['recall_at_20']), 'mrr': float(r['mrr'])}
-
-q_list = sorted(list(all_queries))
-repo_clusters = defaultdict(list)
-for idx, q in enumerate(q_list):
-    repo_clusters[repo_by_query[q]].append(idx)
-
-unique_repos = list(repo_clusters.keys())
-n_repos = len(unique_repos)
-rng = np.random.default_rng(42)
-B = 10000
-
-diff_r20 = np.array([by_sys['CAND-F'][q]['r20'] - by_sys['BASE-BM25'][q]['r20'] for q in q_list])
-boot_r20 = [np.mean(diff_r20[[i for r in rng.choice(unique_repos, size=n_repos, replace=True) for i in repo_clusters[r]]]) for _ in range(B)]
-
-print('R@20 Point Delta:', round(np.mean(diff_r20), 4))
-print('R@20 95% Clustered CI: [', round(np.percentile(boot_r20, 2.5), 4), ',', round(np.percentile(boot_r20, 97.5), 4), ']')
-"
+python research/stage3_8/scripts/benchmark_runtime_and_memory.py
 ```
-- Expected Output:
-  `R@20 Point Delta: +0.0529`
-  `R@20 95% Clustered CI: [-0.0091, 0.1689]`
+
+This generates:
+- `research/stage3_8/RUNTIME_AND_MEMORY.csv`: Index construction time, query latency (median, p95), retained index memory, and peak process RSS.
 
 ---
 
-## 5. Artifact Verification
+## 5. Verify Diagnostic Traces for Click and Clap
 
-Verify that all Stage 3.8 research deliverables exist and are non-empty:
+Run the forensic diagnosis script for `pallets/click` and `clap-rs/clap`:
 
 ```powershell
-Get-ChildItem research\stage3_8 | Select-Object Name, Length
+python research/stage3_8/scripts/diagnose_repository_regressions.py
 ```
-- Key files required:
-  - `STAGE3_8_DECISION_REPORT.md`
-  - `INDEPENDENT_METRIC_VERIFICATION.md`
-  - `RANKING_FAILURE_ANALYSIS.md`
-  - `GRAPH_DAMAGE_ANALYSIS.md`
-  - `PER_QUERY_DIAGNOSTICS.csv`
-  - `HYPOTHESIS_REGISTER.csv`
-  - `REPRODUCE.md`
-  - `independent_metric_verifier.py`
+
+This verifies `research/stage3_8/GRAPH_PROPAGATION_DIAGNOSTICS.csv`.

@@ -1,0 +1,19 @@
+{
+  "determinism": {
+    "is_deterministic": true,
+    "sha256": "9a1b228f2630ab3df3a3f2580abd86c0a938fe7fdb9061a418dd63d4f8395ecb",
+    "node_count": 69,
+    "edge_count": 76
+  },
+  "indexing": {
+    "indexing_time_ms": 44.46,
+    "total_nodes": 550,
+    "total_edges": 500,
+    "peak_heap_mb": 0.59
+  },
+  "query_latency": {
+    "p50_ms": 0.005,
+    "p95_ms": 0.005,
+    "mean_ms": 0.005
+  }
+}

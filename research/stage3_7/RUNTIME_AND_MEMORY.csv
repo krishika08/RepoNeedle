@@ -1,0 +1,9 @@
+experiment_id,system_name,description,indexed_files,indexing_time_sec,graph_construction_ms,query_latency_median_ms,query_latency_p95_ms,python_heap_peak_mb,process_rss_mb,sub_100mb_rss
+EXP-371,CAND-C,BM25 Pure + Semantic + PageRank + DocFilter,2002,152.597,7734.93,249.35,539.59,632.11,279.36,NO
+EXP-372,CAND-F,Coupled BM25 + Polyglot AST + PageRank + Unbounded Diffusion,2002,169.438,3208.57,92.46,196.39,629.99,303.96,NO
+EXP-373,CAND-F-NO-DIFF,Candidate F without Graph Diffusion,2002,64.107,3226.41,93.59,195.41,629.97,311.87,NO
+EXP-374,CAND-F-DECOUPLED,Candidate F with Decoupled BM25 symbols,2002,67.554,3395.66,101.03,200.07,629.97,314.82,NO
+EXP-375,CAND-F-FWD-ONLY,Candidate F with Forward-Only Diffusion,2002,66.580,3277.13,105.09,223.82,629.97,321.53,NO
+EXP-376,CAND-F-BWD-ONLY,Candidate F with Backward-Only Diffusion,2002,74.933,3757.32,100.85,202.63,629.97,322.48,NO
+EXP-377,CAND-F-HUBNORM,Candidate F with Hub-Normalized Diffusion,2002,71.630,3395.70,98.45,205.13,629.97,650.14,NO
+EXP-378,CAND-COMBINED,Decoupled BM25 + Semantic + DocFilter + Hub-Normalized Diffusion,2002,69.477,3534.18,126.27,497.08,629.97,325.64,NO

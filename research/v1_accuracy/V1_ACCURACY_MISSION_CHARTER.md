@@ -128,3 +128,4 @@ Every intervention will be executed under the 10-step research protocol:
 - **Milestone 3 (Distractor Elimination)**: Implement Manifest & Documentation Dynamic Dampening and Sibling Disambiguation. Target: **Zero distractor top-1 inversions**.
 - **Milestone 4 (Generalization & Holdout Validation)**: Evaluate on untouched holdout repositories with independent ground-truth annotations. Target: **100% metrics replicated on holdout**.
 - **Milestone 5 (V1.0.0 Release Verification)**: Full regression suite, clean packaging, performance benchmarking, and sign-off.
+

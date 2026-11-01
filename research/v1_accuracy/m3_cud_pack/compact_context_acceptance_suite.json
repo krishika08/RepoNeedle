@@ -1,0 +1,346 @@
+[
+  {
+    "query_id": "597f32e9b482833bed151a23",
+    "repo": "clap-rs/clap",
+    "commit": "68b5ff900bae8ee1a0e328c1a2301a7985e4f1c6",
+    "track": "v2_code2test",
+    "gold_files": [
+      "tests/builder/help.rs"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "tests/builder/help.rs",
+        "target_symbol": "empty_args",
+        "signature": "symbol: empty_args"
+      }
+    ]
+  },
+  {
+    "query_id": "8e5f31c02cbb5bd1563ea5d1",
+    "repo": "clap-rs/clap",
+    "commit": "14202755e52802a3d294c4ceeadd703d24b21fe6",
+    "track": "v2_code2test",
+    "gold_files": [
+      "clap_complete/tests/testsuite/engine.rs"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "clap_complete/tests/testsuite/engine.rs",
+        "target_symbol": "suggest_subcommand_subset",
+        "signature": "symbol: suggest_subcommand_subset"
+      }
+    ]
+  },
+  {
+    "query_id": "0265037c6c534b98289fe815",
+    "repo": "etcd-io/etcd",
+    "commit": "c64f8fd68c2e75cc65b88bc0d956547a5f77cab1",
+    "track": "v2_comment2context",
+    "gold_files": [
+      "cache/cache.go",
+      "cache/demux.go",
+      "tests/integration/cache_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "cache/cache.go",
+        "target_symbol": "Cache",
+        "signature": "symbol: Cache"
+      },
+      {
+        "gold_path": "cache/demux.go",
+        "target_symbol": "NewDemux",
+        "signature": "symbol: NewDemux"
+      },
+      {
+        "gold_path": "tests/integration/cache_test.go",
+        "target_symbol": "TestCacheWithoutPrefixWatch",
+        "signature": "symbol: TestCacheWithoutPrefixWatch"
+      }
+    ]
+  },
+  {
+    "query_id": "ac0571b1e94a8f064f02e864",
+    "repo": "etcd-io/etcd",
+    "commit": "48d43ebae262f0067bafbae07c29d49b3d045c89",
+    "track": "v2_comment2context",
+    "gold_files": [
+      "client/v3/config_test.go",
+      "etcdctl/ctlv3/command/ep_command.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "client/v3/config_test.go",
+        "target_symbol": "TestNewClientConfig",
+        "signature": "symbol: TestNewClientConfig"
+      },
+      {
+        "gold_path": "etcdctl/ctlv3/command/ep_command.go",
+        "target_symbol": "NewEndpointCommand",
+        "signature": "symbol: NewEndpointCommand"
+      }
+    ]
+  },
+  {
+    "query_id": "e0a0b8ad2d50c7660fb64a40",
+    "repo": "etcd-io/etcd",
+    "commit": "9fc3b2ad40f8b681c31ce66ebb27fdcec7c930e6",
+    "track": "v2_code2test",
+    "gold_files": [
+      "server/etcdserver/api/v3compactor/periodic_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "server/etcdserver/api/v3compactor/periodic_test.go",
+        "target_symbol": "TestPeriodicHourly",
+        "signature": "symbol: TestPeriodicHourly"
+      }
+    ]
+  },
+  {
+    "query_id": "46cbbb206ba9c760f4550ec1",
+    "repo": "gin-gonic/gin",
+    "commit": "a481ee2897af1e368de5c919fbeb21b89aa26fc7",
+    "track": "v2_code2test",
+    "gold_files": [
+      "routes_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "routes_test.go",
+        "target_symbol": "PerformRequest",
+        "signature": "symbol: PerformRequest"
+      }
+    ]
+  },
+  {
+    "query_id": "2a108bc05f87154f903de451",
+    "repo": "gin-gonic/gin",
+    "commit": "a481ee2897af1e368de5c919fbeb21b89aa26fc7",
+    "track": "v2_trace2code",
+    "gold_files": [
+      "gin.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "gin.go",
+        "target_symbol": "RouteInfo",
+        "signature": "symbol: RouteInfo"
+      }
+    ]
+  },
+  {
+    "query_id": "4efdeafc9e5c6cf5ef4334fc",
+    "repo": "gin-gonic/gin",
+    "commit": "7a865dcf1dbe6ec52e074b1ddce830d278eb72cf",
+    "track": "v2_code2test",
+    "gold_files": [
+      "binding/binding_test.go",
+      "context_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "binding/binding_test.go",
+        "target_symbol": "FooBarFileFailStruct",
+        "signature": "symbol: FooBarFileFailStruct"
+      },
+      {
+        "gold_path": "context_test.go",
+        "target_symbol": "CreateTestContext",
+        "signature": "symbol: CreateTestContext"
+      }
+    ]
+  },
+  {
+    "query_id": "5c8898135fb93236ba5d6c13",
+    "repo": "gin-gonic/gin",
+    "commit": "64ead9e6bd924d431f4dd612349bc5e13300e6fc",
+    "track": "v2_code2test",
+    "gold_files": [
+      "binding/form_mapping_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "binding/form_mapping_test.go",
+        "target_symbol": "TestMappingBaseTypes",
+        "signature": "symbol: TestMappingBaseTypes"
+      }
+    ]
+  },
+  {
+    "query_id": "d3fe4d1559febe2ac282cced",
+    "repo": "gin-gonic/gin",
+    "commit": "79a61b90324586d3c3a5859f8755cae2d1c46f2d",
+    "track": "v2_trace2code",
+    "gold_files": [
+      "tree.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "tree.go",
+        "target_symbol": "Params",
+        "signature": "symbol: Params"
+      }
+    ]
+  },
+  {
+    "query_id": "725dd77bdee89b3e125bd7e5",
+    "repo": "gin-gonic/gin",
+    "commit": "ecb3f7b5e2f3915bf1db240ed5eee572f8dbea36",
+    "track": "v2_code2test",
+    "gold_files": [
+      "path_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "path_test.go",
+        "target_symbol": "TestPathClean",
+        "signature": "symbol: TestPathClean"
+      }
+    ]
+  },
+  {
+    "query_id": "8a1219475ef9f0e5271d7bd9",
+    "repo": "gin-gonic/gin",
+    "commit": "9914178584e42458ff7d23891463a880f58c9d86",
+    "track": "v2_code2test",
+    "gold_files": [
+      "recovery_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "recovery_test.go",
+        "target_symbol": "TestPanicClean",
+        "signature": "symbol: TestPanicClean"
+      }
+    ]
+  },
+  {
+    "query_id": "9bfe7e891a8f4f9127cf1f4f",
+    "repo": "gin-gonic/gin",
+    "commit": "9914178584e42458ff7d23891463a880f58c9d86",
+    "track": "v2_edit2ripple",
+    "gold_files": [
+      "recovery_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "recovery_test.go",
+        "target_symbol": "TestPanicClean",
+        "signature": "symbol: TestPanicClean"
+      }
+    ]
+  },
+  {
+    "query_id": "cd5fdafbfa862ca7662667c4",
+    "repo": "gin-gonic/gin",
+    "commit": "fad706f1216e6d12bdd51d28d5a40ec27e6c6453",
+    "track": "v2_trace2code",
+    "gold_files": [
+      "binding/form_mapping.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "binding/form_mapping.go",
+        "target_symbol": "setTimeDuration",
+        "signature": "symbol: setTimeDuration"
+      }
+    ]
+  },
+  {
+    "query_id": "4f6c4f2d9b8ae3a553dfbf1f",
+    "repo": "gin-gonic/gin",
+    "commit": "fad706f1216e6d12bdd51d28d5a40ec27e6c6453",
+    "track": "v2_edit2ripple",
+    "gold_files": [
+      "binding/form_mapping_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "binding/form_mapping_test.go",
+        "target_symbol": "TestMappingBaseTypes",
+        "signature": "symbol: TestMappingBaseTypes"
+      }
+    ]
+  },
+  {
+    "query_id": "aec3dd1a05160ca84c48d070",
+    "repo": "gin-gonic/gin",
+    "commit": "c4287b1300363cb3dc2c8408299d3ba6deded485",
+    "track": "v2_code2test",
+    "gold_files": [
+      "context_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "context_test.go",
+        "target_symbol": "createMultipartRequest",
+        "signature": "symbol: createMultipartRequest"
+      }
+    ]
+  },
+  {
+    "query_id": "b2bcc7a9cd02595dccde4bb0",
+    "repo": "gin-gonic/gin",
+    "commit": "90cf4602698dcbce18df3165b2d24e2940670a41",
+    "track": "v2_code2test",
+    "gold_files": [
+      "binding/binding_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "binding/binding_test.go",
+        "target_symbol": "FooBarFileFailStruct",
+        "signature": "symbol: FooBarFileFailStruct"
+      }
+    ]
+  },
+  {
+    "query_id": "c3931963a24dd965a4ebb50c",
+    "repo": "gin-gonic/gin",
+    "commit": "d4a64265f21993368c90602c18e778bf04ef36db",
+    "track": "v2_code2test",
+    "gold_files": [
+      "context_test.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "context_test.go",
+        "target_symbol": "createMultipartRequest",
+        "signature": "symbol: createMultipartRequest"
+      }
+    ]
+  },
+  {
+    "query_id": "4c232faf5b66c5e8febbe45d",
+    "repo": "gin-gonic/gin",
+    "commit": "d4a64265f21993368c90602c18e778bf04ef36db",
+    "track": "v2_trace2code",
+    "gold_files": [
+      "context.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "context.go",
+        "target_symbol": "Context",
+        "signature": "symbol: Context"
+      }
+    ]
+  },
+  {
+    "query_id": "d65a03b1febee94c93435793",
+    "repo": "gin-gonic/gin",
+    "commit": "d4a64265f21993368c90602c18e778bf04ef36db",
+    "track": "v2_trace2code",
+    "gold_files": [
+      "binding/form_mapping.go"
+    ],
+    "annotated_spans": [
+      {
+        "gold_path": "binding/form_mapping.go",
+        "target_symbol": "mapURI",
+        "signature": "symbol: mapURI"
+      }
+    ]
+  }
+]

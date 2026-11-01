@@ -1,0 +1,4 @@
+system,total_indexing_time_ms,peak_heap_mb,process_rss_mb,median_query_latency_ms,p95_query_latency_ms,total_nodes,total_edges
+EXP-386,16733053.86,2844.86,1193.25,5.118,60.986,312749,1796625
+EXP-392a,17448493.68,2817.56,1193.25,5.118,60.986,524087,1854514
+EXP-392b,17448493.68,2817.56,1193.25,5.118,60.986,524087,1854514

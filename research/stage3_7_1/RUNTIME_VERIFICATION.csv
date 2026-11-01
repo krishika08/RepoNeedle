@@ -1,0 +1,3 @@
+scale_regime,indexed_files,indexing_time_sec,graph_construction_ms,median_latency_ms,p95_latency_ms,python_heap_peak_mb,process_rss_mb,sub_100mb_rss,notes
+Medium Scale (pallets/click),269,7.828,537.19,16.17,38.82,73.36,119.57,NO,Verified under clean single-process conditions
+Large Scale (multi-repo benchmark),2002,85.905,3490.53,94.90,178.36,630.34,275.77,NO,Verified under clean single-process conditions

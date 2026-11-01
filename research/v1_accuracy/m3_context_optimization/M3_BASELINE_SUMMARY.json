@@ -1,0 +1,373 @@
+{
+  "metadata": {
+    "mission": "RepoNeedle V1.0.0 \u2014 Milestone 3.2 Baseline Context Packing Evaluation",
+    "authoritative_baseline": "M1 Frozen Multi-Channel Candidate Retrieval Snapshot",
+    "packing_engine": "reponeedle.core.budget.BudgetOptimizer (Standard Production Settings)",
+    "packing_config": {
+      "allow_skeletons": true,
+      "skeleton_token_cap": 350,
+      "density_exponent": 0.75,
+      "abstention_threshold": 0.12,
+      "full_file_budget_threshold": 0.45
+    },
+    "evaluation_scope": "345 Queries, 25 Repositories, 514 Gold Targets",
+    "tested_budgets": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "total_evaluation_time_seconds": 1174.3303068999958
+  },
+  "provenance_reconciliation": {
+    "total_corpus_snapshots_in_manifest": 271,
+    "unique_query_commits_evaluated": 218,
+    "gold_targets_recovered_from_file_chunks": 514,
+    "gold_targets_recovered_from_symbol_chunks": 0,
+    "gold_targets_missing": 0,
+    "provenance_invariant_confirmed": true
+  },
+  "tokenizer_calibration_findings": {
+    "calibrated_estimator": "reponeedle.core.tokenizer.estimate_tokens (Code-Aware BPE Heuristic)",
+    "exact_benchmark_tokenizer": "agent_retrieval_bench regex_code_tokenizer_v1",
+    "mean_ratio_estimated_to_exact": 0.8488,
+    "undercount_proportion": 0.8054,
+    "mean_packaging_overhead_tokens": 10.35
+  },
+  "budget_performance_summary": {
+    "2048": {
+      "budget_tokens": 2048,
+      "coverage": {
+        "complete_gold_full_queries": 28,
+        "complete_gold_full_pct": 0.08115942028985507,
+        "complete_gold_any_queries": 76,
+        "complete_gold_any_pct": 0.22028985507246376
+      },
+      "recall": {
+        "micro_recall_full": 0.0933852140077821,
+        "micro_recall_skeleton": 0.13618677042801555,
+        "micro_recall_any": 0.22957198443579765,
+        "macro_recall_full": 0.10700483091787438,
+        "macro_recall_any": 0.27246376811594203
+      },
+      "target_fates": {
+        "total_gold_targets": 514,
+        "gold_targets_full": 48,
+        "gold_targets_skeleton": 70,
+        "gold_targets_excluded": 396,
+        "skeletonization_rate": 0.13618677042801555,
+        "exclusion_rate": 0.7704280155642024
+      },
+      "token_utilization": {
+        "mean_utilization_estimated": 0.9896555140398551,
+        "median_utilization_estimated": 0.99072265625,
+        "p90_utilization_estimated": 0.9990234375,
+        "mean_utilization_exact": 1.176546931612319,
+        "median_utilization_exact": 1.16015625,
+        "mean_remaining_waste_tokens": 21.18550724637681,
+        "median_remaining_waste_tokens": 19.0,
+        "overflow_events_exact_count": 295,
+        "overflow_events_exact_pct": 0.855072463768116,
+        "mean_relevant_token_yield": 0.10356611582414885
+      },
+      "file_counts": {
+        "mean_selected_files": 3.8579710144927537,
+        "mean_full_files": 2.2927536231884056,
+        "mean_skeleton_files": 1.565217391304348
+      },
+      "latency_ms": {
+        "mean_latency_ms": 719.7016124637204,
+        "median_latency_ms": 79.74699999613222,
+        "p95_latency_ms": 4344.2566199984885,
+        "min_latency_ms": 0.036299999919719994,
+        "max_latency_ms": 17605.108299991116
+      }
+    },
+    "4096": {
+      "budget_tokens": 4096,
+      "coverage": {
+        "complete_gold_full_queries": 64,
+        "complete_gold_full_pct": 0.1855072463768116,
+        "complete_gold_any_queries": 112,
+        "complete_gold_any_pct": 0.32463768115942027
+      },
+      "recall": {
+        "micro_recall_full": 0.20428015564202334,
+        "micro_recall_skeleton": 0.13618677042801555,
+        "micro_recall_any": 0.3404669260700389,
+        "macro_recall_full": 0.23647342995169085,
+        "macro_recall_any": 0.39227053140096624
+      },
+      "target_fates": {
+        "total_gold_targets": 514,
+        "gold_targets_full": 105,
+        "gold_targets_skeleton": 70,
+        "gold_targets_excluded": 339,
+        "skeletonization_rate": 0.13618677042801555,
+        "exclusion_rate": 0.6595330739299611
+      },
+      "token_utilization": {
+        "mean_utilization_estimated": 0.9947930819746377,
+        "median_utilization_estimated": 0.995361328125,
+        "p90_utilization_estimated": 0.9990234375,
+        "mean_utilization_exact": 1.1993553272192028,
+        "median_utilization_exact": 1.19775390625,
+        "mean_remaining_waste_tokens": 21.327536231884057,
+        "median_remaining_waste_tokens": 19.0,
+        "overflow_events_exact_count": 299,
+        "overflow_events_exact_pct": 0.8666666666666667,
+        "mean_relevant_token_yield": 0.11360843058313864
+      },
+      "file_counts": {
+        "mean_selected_files": 6.133333333333334,
+        "mean_full_files": 3.7884057971014493,
+        "mean_skeleton_files": 2.344927536231884
+      },
+      "latency_ms": {
+        "mean_latency_ms": 579.8654620291875,
+        "median_latency_ms": 70.13249999727122,
+        "p95_latency_ms": 2739.472120004948,
+        "min_latency_ms": 0.021200001356191933,
+        "max_latency_ms": 22731.128100000205
+      }
+    },
+    "8192": {
+      "budget_tokens": 8192,
+      "coverage": {
+        "complete_gold_full_queries": 124,
+        "complete_gold_full_pct": 0.35942028985507246,
+        "complete_gold_any_queries": 140,
+        "complete_gold_any_pct": 0.4057971014492754
+      },
+      "recall": {
+        "micro_recall_full": 0.3832684824902724,
+        "micro_recall_skeleton": 0.06809338521400778,
+        "micro_recall_any": 0.45136186770428016,
+        "macro_recall_full": 0.43623188405797103,
+        "macro_recall_any": 0.4927536231884058
+      },
+      "target_fates": {
+        "total_gold_targets": 514,
+        "gold_targets_full": 197,
+        "gold_targets_skeleton": 35,
+        "gold_targets_excluded": 282,
+        "skeletonization_rate": 0.06809338521400778,
+        "exclusion_rate": 0.5486381322957199
+      },
+      "token_utilization": {
+        "mean_utilization_estimated": 0.9973392210144928,
+        "median_utilization_estimated": 0.99755859375,
+        "p90_utilization_estimated": 0.999755859375,
+        "mean_utilization_exact": 1.2186526975769927,
+        "median_utilization_exact": 1.2449951171875,
+        "mean_remaining_waste_tokens": 21.797101449275363,
+        "median_remaining_waste_tokens": 20.0,
+        "overflow_events_exact_count": 301,
+        "overflow_events_exact_pct": 0.8724637681159421,
+        "mean_relevant_token_yield": 0.10174579992503997
+      },
+      "file_counts": {
+        "mean_selected_files": 9.32463768115942,
+        "mean_full_files": 7.266666666666667,
+        "mean_skeleton_files": 2.0579710144927534
+      },
+      "latency_ms": {
+        "mean_latency_ms": 586.0751599998406,
+        "median_latency_ms": 83.69140001013875,
+        "p95_latency_ms": 3334.736200000045,
+        "min_latency_ms": 0.030399998649954796,
+        "max_latency_ms": 12146.750800005975
+      }
+    },
+    "16384": {
+      "budget_tokens": 16384,
+      "coverage": {
+        "complete_gold_full_queries": 165,
+        "complete_gold_full_pct": 0.4782608695652174,
+        "complete_gold_any_queries": 175,
+        "complete_gold_any_pct": 0.5072463768115942
+      },
+      "recall": {
+        "micro_recall_full": 0.5233463035019456,
+        "micro_recall_skeleton": 0.0311284046692607,
+        "micro_recall_any": 0.5544747081712063,
+        "macro_recall_full": 0.5634782608695652,
+        "macro_recall_any": 0.5977777777777777
+      },
+      "target_fates": {
+        "total_gold_targets": 514,
+        "gold_targets_full": 269,
+        "gold_targets_skeleton": 16,
+        "gold_targets_excluded": 229,
+        "skeletonization_rate": 0.0311284046692607,
+        "exclusion_rate": 0.4455252918287938
+      },
+      "token_utilization": {
+        "mean_utilization_estimated": 0.9985894686933877,
+        "median_utilization_estimated": 0.99859619140625,
+        "p90_utilization_estimated": 0.99979248046875,
+        "mean_utilization_exact": 1.2276303498641303,
+        "median_utilization_exact": 1.25048828125,
+        "mean_remaining_waste_tokens": 23.110144927536233,
+        "median_remaining_waste_tokens": 23.0,
+        "overflow_events_exact_count": 303,
+        "overflow_events_exact_pct": 0.8782608695652174,
+        "mean_relevant_token_yield": 0.06854702787032678
+      },
+      "file_counts": {
+        "mean_selected_files": 16.423188405797102,
+        "mean_full_files": 14.455072463768117,
+        "mean_skeleton_files": 1.9681159420289855
+      },
+      "latency_ms": {
+        "mean_latency_ms": 694.6461904349406,
+        "median_latency_ms": 75.74960000056308,
+        "p95_latency_ms": 3451.8217800068765,
+        "min_latency_ms": 0.05670000973623246,
+        "max_latency_ms": 26418.690200007404
+      }
+    },
+    "32768": {
+      "budget_tokens": 32768,
+      "coverage": {
+        "complete_gold_full_queries": 214,
+        "complete_gold_full_pct": 0.6202898550724638,
+        "complete_gold_any_queries": 221,
+        "complete_gold_any_pct": 0.6405797101449275
+      },
+      "recall": {
+        "micro_recall_full": 0.6595330739299611,
+        "micro_recall_skeleton": 0.017509727626459144,
+        "micro_recall_any": 0.6770428015564203,
+        "macro_recall_full": 0.7056038647342995,
+        "macro_recall_any": 0.7205797101449275
+      },
+      "target_fates": {
+        "total_gold_targets": 514,
+        "gold_targets_full": 339,
+        "gold_targets_skeleton": 9,
+        "gold_targets_excluded": 166,
+        "skeletonization_rate": 0.017509727626459144,
+        "exclusion_rate": 0.3229571984435798
+      },
+      "token_utilization": {
+        "mean_utilization_estimated": 0.9993120718693388,
+        "median_utilization_estimated": 0.99932861328125,
+        "p90_utilization_estimated": 0.99993896484375,
+        "mean_utilization_exact": 1.2421522057574728,
+        "median_utilization_exact": 1.263702392578125,
+        "mean_remaining_waste_tokens": 22.542028985507248,
+        "median_remaining_waste_tokens": 22.0,
+        "overflow_events_exact_count": 304,
+        "overflow_events_exact_pct": 0.881159420289855,
+        "mean_relevant_token_yield": 0.04234216635938554
+      },
+      "file_counts": {
+        "mean_selected_files": 32.04927536231884,
+        "mean_full_files": 30.214492753623187,
+        "mean_skeleton_files": 1.8347826086956522
+      },
+      "latency_ms": {
+        "mean_latency_ms": 571.2799408694095,
+        "median_latency_ms": 42.339699997683056,
+        "p95_latency_ms": 2812.2730599978245,
+        "min_latency_ms": 0.12229999992996454,
+        "max_latency_ms": 11951.830699996208
+      }
+    }
+  },
+  "oracle_gap_analysis": {
+    "2048": {
+      "budget_tokens": 2048,
+      "oracle_complete_gold_pct": 0.7159420289855073,
+      "actual_complete_gold_full_pct": 0.08115942028985507,
+      "actual_complete_gold_any_pct": 0.22028985507246376,
+      "complete_gold_gap_full": 0.6347826086956523,
+      "complete_gold_gap_any": 0.4956521739130435,
+      "oracle_micro_recall": 0.7334630350194552,
+      "actual_micro_recall_full": 0.0933852140077821,
+      "actual_micro_recall_any": 0.22957198443579765,
+      "micro_recall_gap_full": 0.6400778210116731,
+      "micro_recall_gap_any": 0.5038910505836576,
+      "oracle_macro_recall": 0.8447826086956524,
+      "actual_macro_recall_full": 0.10700483091787438,
+      "actual_macro_recall_any": 0.27246376811594203,
+      "macro_recall_gap_full": 0.737777777777778,
+      "macro_recall_gap_any": 0.5723188405797104
+    },
+    "4096": {
+      "budget_tokens": 4096,
+      "oracle_complete_gold_pct": 0.9043478260869565,
+      "actual_complete_gold_full_pct": 0.1855072463768116,
+      "actual_complete_gold_any_pct": 0.32463768115942027,
+      "complete_gold_gap_full": 0.7188405797101449,
+      "complete_gold_gap_any": 0.5797101449275363,
+      "oracle_micro_recall": 0.9319066147859922,
+      "actual_micro_recall_full": 0.20428015564202334,
+      "actual_micro_recall_any": 0.3404669260700389,
+      "micro_recall_gap_full": 0.727626459143969,
+      "micro_recall_gap_any": 0.5914396887159533,
+      "oracle_macro_recall": 0.9679227053140097,
+      "actual_macro_recall_full": 0.23647342995169085,
+      "actual_macro_recall_any": 0.39227053140096624,
+      "macro_recall_gap_full": 0.7314492753623189,
+      "macro_recall_gap_any": 0.5756521739130435
+    },
+    "8192": {
+      "budget_tokens": 8192,
+      "oracle_complete_gold_pct": 1.0,
+      "actual_complete_gold_full_pct": 0.35942028985507246,
+      "actual_complete_gold_any_pct": 0.4057971014492754,
+      "complete_gold_gap_full": 0.6405797101449275,
+      "complete_gold_gap_any": 0.5942028985507246,
+      "oracle_micro_recall": 1.0,
+      "actual_micro_recall_full": 0.3832684824902724,
+      "actual_micro_recall_any": 0.45136186770428016,
+      "micro_recall_gap_full": 0.6167315175097277,
+      "micro_recall_gap_any": 0.5486381322957199,
+      "oracle_macro_recall": 1.0,
+      "actual_macro_recall_full": 0.43623188405797103,
+      "actual_macro_recall_any": 0.4927536231884058,
+      "macro_recall_gap_full": 0.5637681159420289,
+      "macro_recall_gap_any": 0.5072463768115942
+    },
+    "16384": {
+      "budget_tokens": 16384,
+      "oracle_complete_gold_pct": 1.0,
+      "actual_complete_gold_full_pct": 0.4782608695652174,
+      "actual_complete_gold_any_pct": 0.5072463768115942,
+      "complete_gold_gap_full": 0.5217391304347826,
+      "complete_gold_gap_any": 0.49275362318840576,
+      "oracle_micro_recall": 1.0,
+      "actual_micro_recall_full": 0.5233463035019456,
+      "actual_micro_recall_any": 0.5544747081712063,
+      "micro_recall_gap_full": 0.47665369649805445,
+      "micro_recall_gap_any": 0.44552529182879375,
+      "oracle_macro_recall": 1.0,
+      "actual_macro_recall_full": 0.5634782608695652,
+      "actual_macro_recall_any": 0.5977777777777777,
+      "macro_recall_gap_full": 0.4365217391304348,
+      "macro_recall_gap_any": 0.40222222222222226
+    },
+    "32768": {
+      "budget_tokens": 32768,
+      "oracle_complete_gold_pct": 1.0,
+      "actual_complete_gold_full_pct": 0.6202898550724638,
+      "actual_complete_gold_any_pct": 0.6405797101449275,
+      "complete_gold_gap_full": 0.3797101449275362,
+      "complete_gold_gap_any": 0.35942028985507246,
+      "oracle_micro_recall": 1.0,
+      "actual_micro_recall_full": 0.6595330739299611,
+      "actual_micro_recall_any": 0.6770428015564203,
+      "micro_recall_gap_full": 0.3404669260700389,
+      "micro_recall_gap_any": 0.32295719844357973,
+      "oracle_macro_recall": 1.0,
+      "actual_macro_recall_full": 0.7056038647342995,
+      "actual_macro_recall_any": 0.7205797101449275,
+      "macro_recall_gap_full": 0.2943961352657005,
+      "macro_recall_gap_any": 0.2794202898550725
+    }
+  },
+  "root_cause_attribution": {}
+}

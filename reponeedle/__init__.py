@@ -9,10 +9,17 @@ from reponeedle.models import (
     ScoredFile,
     TaskType,
     BudgetConfig,
+    ContextTier,
 )
 from reponeedle.engine import RepoNeedleEngine
+from reponeedle.core.packer import (
+    CUDPackOptimizer,
+    BudgetOptimizer,
+    ExactTokenizer,
+    CodeSpanExtractor,
+)
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 __all__ = [
     "RepoNeedleEngine",
     "FileDoc",
@@ -21,5 +28,10 @@ __all__ = [
     "ScoredFile",
     "TaskType",
     "BudgetConfig",
+    "ContextTier",
+    "CUDPackOptimizer",
+    "BudgetOptimizer",
+    "ExactTokenizer",
+    "CodeSpanExtractor",
 ]
 

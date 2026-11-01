@@ -1,0 +1,2767 @@
+{
+  "HypothesisWorks/hypothesis": {
+    "base_commit": "2b1de221b8f627131169cac859597da6283cb7e1",
+    "chunks_path": "data/corpus/v2_abstention/HypothesisWorks__hypothesis/2b1de221b8f627131169cac859597da6283cb7e1.chunks.jsonl",
+    "manifest_files": 670,
+    "total_py_files": 461,
+    "parsed_cleanly": 383,
+    "parse_error_count": 78,
+    "syntax_taxonomy": {
+      "test_or_benchmark_code": 35,
+      "internal_module_syntax_variation": 42,
+      "doc_example_or_snippet": 1
+    },
+    "syntax_samples": [
+      [
+        "hypothesis-python/src/_hypothesis_pytestplugin.py",
+        "'(' was never closed (hypothesis-python/src/_hypothesis_pytestplugin.py, line 215)",
+        215,
+        "                raise_hypothesis_usage_error("
+      ],
+      [
+        "hypothesis-python/src/hypothesis/_settings.py",
+        "unterminated triple-quoted string literal (detected at line 249) (hypothesis-python/src/hypothesis/_settings.py, line 214)",
+        214,
+        "    \"\"\""
+      ],
+      [
+        "hypothesis-python/src/hypothesis/control.py",
+        "'(' was never closed (hypothesis-python/src/hypothesis/control.py, line 196)",
+        196,
+        "        self.known_object_printers[IDKey(obj)].append("
+      ]
+    ],
+    "raw_calls_records": 1673,
+    "unique_calls_edges": 1387,
+    "duplicate_citations": 286,
+    "self_recursive_edges": 13,
+    "heuristic_edges_count": 1010,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/_hypothesis_ftz_detector.py#target', target_uri='func://HypothesisWorks/hypothesis/hypothesis-python/tests/patching/callables.py#fn', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/extra/redis.py#RedisExampleDatabase.__init__', target_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/validation.py#check_type', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/extra/redis.py#RedisExampleDatabase.__init__', target_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/validation.py#check_type', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/extra/redis.py#RedisExampleDatabase.__init__', target_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/validation.py#check_type', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/extra/redis.py#RedisExampleDatabase.__init__', target_uri='func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/validation.py#check_type', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/strategies/_internal/numbers.py#integers",
+        175
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/debug.py#minimal",
+        150
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/debug.py#find_any",
+        124
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/debug.py#check_can_generate_examples",
+        92
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/debug.py#assert_simple_property",
+        40
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/utils.py#xfail_on_crosshair",
+        36
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/utils.py#fails_with",
+        26
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/debug.py#assert_all_examples",
+        25
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_lookup_py37.py#check",
+        25
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/debug.py#assert_no_examples",
+        23
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/extra/django/_impl.py#from_form",
+        23
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/floats.py#float_to_int",
+        21
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/floats.py#next_up",
+        21
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/utils.py#capture_out",
+        21
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/floats.py#next_down",
+        20
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/common/utils.py#temp_registered",
+        19
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_subnormal_floats.py#kw",
+        19
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_statistical_events.py#call_for_statistics",
+        16
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/validation.py#check_type",
+        12
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/strategies/_internal/misc.py#just",
+        12
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_filter_rewriting.py#test_filter_rewriting_floats",
+        20
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_subnormal_floats.py#test_allow_subnormal_defaults_correctly",
+        19
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/conjecture/test_junkdrawer.py#test_clamp",
+        12
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/conjecture/shrinking/common.py#Shrinker.consider",
+        9
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/internal/floats.py#count_between_floats",
+        9
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_subnormal_floats.py#test_subnormal_validation",
+        9
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_validation.py#test_does_not_error_if_min_size_is_bigger_than_default_size",
+        8
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_complex_numbers.py#test_allow_subnormal",
+        6
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_functions.py#test_functions_pure_two_functions_same_args_different_result",
+        6
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_simple_collections.py#test_find_empty_collection_gives_empty",
+        6
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/crosshair/test_crosshair.py#test_no_path_constraints_are_added_to_symbolic_values",
+        6
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/strategies/_internal/ipaddress.py#ip_addresses",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_composite.py#test_can_shrink_matrices_with_length_param",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_intervalset.py#test_subtraction_of_intervals",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_typealias_py312.py#test_resolves_simple_typealias",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/cover/test_validation.py#test_check_strategy_might_suggest_sampled_from",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/datetime/test_pytz_timezones.py#test_datetimes_can_exclude_imaginary",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/nocover/test_drypython_returns.py#test_several_generic_bases_functions",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/tests/nocover/test_type_lookup.py#test_binary_type_resolution",
+        5
+      ],
+      [
+        "func://HypothesisWorks/hypothesis/hypothesis-python/src/hypothesis/extra/redis.py#RedisExampleDatabase.__init__",
+        4
+      ]
+    ],
+    "total_symbols_active": 1388,
+    "top_1_pct_count": 14,
+    "pct_edges_top_1_pct": 49.17,
+    "source_sha256": "76e4eb02a68fe9440cf653ec08fe661fb5ff7edb1f8171f42407d0d90b5f9afa"
+  },
+  "fastapi/fastapi": {
+    "base_commit": "1e78a36b7310003f0ff634627d8a7bc53c6ccdee",
+    "chunks_path": "data/corpus/v2_code2test/fastapi__fastapi/1e78a36b7310003f0ff634627d8a7bc53c6ccdee.chunks.jsonl",
+    "manifest_files": 2455,
+    "total_py_files": 906,
+    "parsed_cleanly": 816,
+    "parse_error_count": 90,
+    "syntax_taxonomy": {
+      "internal_module_syntax_variation": 12,
+      "doc_example_or_snippet": 36,
+      "test_or_benchmark_code": 42
+    },
+    "syntax_samples": [
+      [
+        "fastapi/_compat/v2.py",
+        "invalid syntax (fastapi/_compat/v2.py, line 237)",
+        237,
+        "    if\n"
+      ],
+      [
+        "fastapi/applications.py",
+        "unterminated triple-quoted string literal (detected at line 247) (fastapi/applications.py, line 228)",
+        228,
+        "                \"\"\""
+      ],
+      [
+        "fastapi/dependencies/utils.py",
+        "'(' was never closed (fastapi/dependencies/utils.py, line 221)",
+        221,
+        "        inspect.Parameter("
+      ]
+    ],
+    "raw_calls_records": 217,
+    "unique_calls_edges": 172,
+    "duplicate_citations": 45,
+    "self_recursive_edges": 10,
+    "heuristic_edges_count": 8,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://fastapi/fastapi/docs_src/middleware/tutorial001_py310.py#add_process_time_header', target_uri='func://fastapi/fastapi/tests/test_ws_router.py#websocket_middleware.middleware_constructor.wrapped_app.call_next', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://fastapi/fastapi/fastapi/routing.py#request_response.app.app', target_uri='func://fastapi/fastapi/tests/test_duplicate_models_openapi.py#f', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://fastapi/fastapi/fastapi/utils.py#create_model_field', target_uri='func://fastapi/fastapi/fastapi/_compat/shared.py#annotation_is_pydantic_v1', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://fastapi/fastapi/tests/test_compat.py#test_is_uploadfile_sequence_annotation', target_uri='func://fastapi/fastapi/fastapi/_compat/shared.py#is_uploadfile_sequence_annotation', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://fastapi/fastapi/tests/test_dependency_contextvars.py#custom_middleware', target_uri='func://fastapi/fastapi/tests/test_ws_router.py#websocket_middleware.middleware_constructor.wrapped_app.call_next', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://fastapi/fastapi/fastapi/dependencies/models.py#_unwrapped_call",
+        18
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/dependencies/models.py#_impartial",
+        14
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#lenient_issubclass",
+        8
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_request_params/test_body/utils.py#get_body_model_name",
+        6
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#field_annotation_is_sequence",
+        5
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_ws_router.py#websocket_middleware.middleware_constructor.wrapped_app.call_next",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/scripts/mkdocs_hooks.py#resolve_file",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/scripts/mkdocs_hooks.py#resolve_files",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/scripts/notify_translations.py#get_graphql_response",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/datastructures.py#Default",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_regex_deprecated_body.py#get_client",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_regex_deprecated_params.py#get_client",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#_annotation_is_sequence",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#field_annotation_is_complex",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_tutorial/test_conditional_openapi/test_tutorial001.py#get_client",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_wrapped_method_forward_reference.py#passthrough",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_ws_dependencies.py#create_dependency",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_ws_router.py#make_app",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial004_an_py310.py#get_user",
+        2
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial004_an_py310.py#verify_password",
+        2
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://fastapi/fastapi/fastapi/dependencies/models.py#Dependant.is_coroutine_callable",
+        11
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/dependencies/models.py#Dependant.is_gen_callable",
+        9
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/dependencies/models.py#Dependant.is_async_gen_callable",
+        9
+      ],
+      [
+        "func://fastapi/fastapi/scripts/mkdocs_hooks.py#on_files",
+        5
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#field_annotation_is_complex",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#field_annotation_is_scalar_sequence",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#annotation_is_pydantic_v1",
+        4
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial004_an_py310.py#authenticate_user",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial004_py310.py#authenticate_user",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial005_an_py310.py#authenticate_user",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial005_py310.py#authenticate_user",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#field_annotation_is_sequence",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#is_bytes_sequence_annotation",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/fastapi/_compat/shared.py#is_uploadfile_sequence_annotation",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/scripts/mkdocs_hooks.py#resolve_files",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/scripts/translate.py#translate_lang",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/tests/test_wrapped_method_forward_reference.py#test_wrapped_method_type_inference",
+        3
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial004_an_py310.py#login_for_access_token",
+        2
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial004_py310.py#login_for_access_token",
+        2
+      ],
+      [
+        "func://fastapi/fastapi/docs_src/security/tutorial005_an_py310.py#login_for_access_token",
+        2
+      ]
+    ],
+    "total_symbols_active": 226,
+    "top_1_pct_count": 3,
+    "pct_edges_top_1_pct": 5.23,
+    "source_sha256": "3f56c88b3e7e3727917bf917dec00cb8d83502e5856edefaba0c6abd82817cd1"
+  },
+  "huggingface/diffusers": {
+    "base_commit": "357b6818903f0990a5e4815f31d1655555a035a7",
+    "chunks_path": "data/corpus/v2_code2test/huggingface__diffusers/357b6818903f0990a5e4815f31d1655555a035a7.chunks.jsonl",
+    "manifest_files": 2391,
+    "total_py_files": 1696,
+    "parsed_cleanly": 878,
+    "parse_error_count": 818,
+    "syntax_taxonomy": {
+      "doc_example_or_snippet": 197,
+      "internal_module_syntax_variation": 489,
+      "templated_or_generated": 1,
+      "test_or_benchmark_code": 131
+    },
+    "syntax_samples": [
+      [
+        "examples/advanced_diffusion_training/train_dreambooth_lora_sd15_advanced.py",
+        "'(' was never closed (examples/advanced_diffusion_training/train_dreambooth_lora_sd15_advanced.py, line 224)",
+        224,
+        "    model_card.save(os.pa"
+      ],
+      [
+        "examples/advanced_diffusion_training/train_dreambooth_lora_sdxl_advanced.py",
+        "'(' was never closed (examples/advanced_diffusion_training/train_dreambooth_lora_sdxl_advanced.py, line 205)",
+        205,
+        "    parser.add_argument("
+      ],
+      [
+        "examples/amused/train_amused.py",
+        "'(' was never closed (examples/amused/train_amused.py, line 200)",
+        200,
+        "    parser.add_argument(\"--max_grad_norm\", default=None, t"
+      ]
+    ],
+    "raw_calls_records": 1779,
+    "unique_calls_edges": 1500,
+    "duplicate_citations": 279,
+    "self_recursive_edges": 29,
+    "heuristic_edges_count": 273,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/diffusers/examples/community/pipeline_kolors_inpainting.py#prepare_mask_and_masked_image', target_uri='func://huggingface/diffusers/src/diffusers/utils/deprecation_utils.py#deprecate', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/diffusers/examples/community/pipeline_stable_diffusion_pag.py#PAGIdentitySelfAttnProcessor.__call__', target_uri='func://huggingface/diffusers/src/diffusers/utils/deprecation_utils.py#deprecate', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/diffusers/examples/community/pipeline_stable_diffusion_pag.py#PAGCFGIdentitySelfAttnProcessor.__call__', target_uri='func://huggingface/diffusers/src/diffusers/utils/deprecation_utils.py#deprecate', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/diffusers/examples/community/pipeline_zero1to3.py#Zero1to3StableDiffusionPipeline.__init__', target_uri='func://huggingface/diffusers/src/diffusers/utils/deprecation_utils.py#deprecate', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/diffusers/examples/community/pipeline_zero1to3.py#Zero1to3StableDiffusionPipeline.__init__', target_uri='func://huggingface/diffusers/src/diffusers/utils/deprecation_utils.py#deprecate', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/torch_utils.py#backend_empty_cache",
+        113
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/torch_utils.py#randn_tensor",
+        61
+      ],
+      [
+        "func://huggingface/diffusers/examples/test_examples_utils.py#run_command",
+        47
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/deprecation_utils.py#deprecate",
+        37
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/loading_utils.py#load_image",
+        33
+      ],
+      [
+        "func://huggingface/diffusers/tests/models/unets/test_models_unet_controlnetxs.py#UNetControlNetXSModelTests.assert_equal_weights",
+        19
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/testing_utils.py#numpy_cosine_similarity_distance",
+        15
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/testing_utils.py#torch_all_close",
+        14
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/logging.py#_get_library_root_logger",
+        12
+      ],
+      [
+        "func://huggingface/diffusers/tests/models/unets/test_models_unet_2d_condition.py#check_if_lora_correctly_set",
+        10
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/models/activations.py#get_activation",
+        9
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/logging.py#_configure_library_root_logger",
+        9
+      ],
+      [
+        "func://huggingface/diffusers/tests/others/test_video_processor.py#VideoProcessorTest.to_np",
+        9
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/torch_utils.py#backend_reset_peak_memory_stats",
+        9
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/models/transformers/transformer_qwenimage.py#get_timestep_embedding",
+        8
+      ],
+      [
+        "func://huggingface/diffusers/tests/others/test_image_processor.py#ImageProcessorTest.to_np",
+        8
+      ],
+      [
+        "func://huggingface/diffusers/tests/quantization/modelopt/test_modelopt.py#ModelOptBaseTesterMixin.get_dummy_model_init_kwargs",
+        8
+      ],
+      [
+        "func://huggingface/diffusers/tests/schedulers/test_scheduler_ddpm.py#DDPMSchedulerTest.get_scheduler_config",
+        8
+      ],
+      [
+        "func://huggingface/diffusers/utils/generate_model_tests.py#ModelAnalyzer._get_annotation_str",
+        8
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/torch_utils.py#_device_agnostic_dispatch",
+        7
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://huggingface/diffusers/tests/models/unets/test_models_unet_controlnetxs.py#UNetControlNetXSModelTests.test_from_unet",
+        21
+      ],
+      [
+        "func://huggingface/diffusers/tests/others/test_video_processor.py#VideoProcessorTest.get_dummy_sample",
+        10
+      ],
+      [
+        "func://huggingface/diffusers/tests/pipelines/prx/test_pipeline_prx.py#PRXPipelineFastTests.test_attention_slicing_forward_pass",
+        8
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/experimental/rl/value_guided_sampling.py#ValueGuidedRLPipeline.__call__",
+        7
+      ],
+      [
+        "func://huggingface/diffusers/utils/generate_model_tests.py#ModelAnalyzer._get_annotation_str",
+        7
+      ],
+      [
+        "func://huggingface/diffusers/benchmarks/benchmarking_utils.py#BenchmarkMixin.run_benchmark",
+        6
+      ],
+      [
+        "func://huggingface/diffusers/examples/research_projects/vae/vae_roundtrip.py#main_kwargs",
+        6
+      ],
+      [
+        "func://huggingface/diffusers/examples/community/lpw_stable_diffusion.py#parse_prompt_attention",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/examples/community/lpw_stable_diffusion_onnx.py#parse_prompt_attention",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/scripts/convert_stable_diffusion_checkpoint_to_onnx.py#convert_models",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/src/diffusers/utils/typing_utils.py#_is_valid_type",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/tests/models/transformers/test_models_transformer_helios.py#HeliosTransformer3DTesterConfig.get_dummy_inputs",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/tests/others/test_check_copies.py#CopyCheckTester.test_is_copy_consistent",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/tests/pipelines/kandinsky/test_kandinsky_combined.py#KandinskyPipelineCombinedFastTests.test_offloads",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/tests/pipelines/kandinsky2_2/test_kandinsky_combined.py#KandinskyV22PipelineCombinedFastTests.test_offloads",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/tests/pipelines/stable_cascade/test_stable_cascade_combined.py#StableCascadeCombinedPipelineFastTests.test_offloads",
+        5
+      ],
+      [
+        "func://huggingface/diffusers/examples/profiling/profiling_utils.py#PipelineProfiler.run",
+        4
+      ],
+      [
+        "func://huggingface/diffusers/examples/profiling/profiling_utils.py#PipelineProfiler.benchmark",
+        4
+      ],
+      [
+        "func://huggingface/diffusers/scripts/convert_aura_flow_to_diffusers.py#populate_state_dict",
+        4
+      ],
+      [
+        "func://huggingface/diffusers/scripts/convert_hunyuan_video_to_diffusers.py#remap_txt_in_",
+        4
+      ]
+    ],
+    "total_symbols_active": 1674,
+    "top_1_pct_count": 17,
+    "pct_edges_top_1_pct": 23.4,
+    "source_sha256": "01668509a801e71e3b906677d6ebbc4495d9b4984b48df81b509faa16a955829"
+  },
+  "huggingface/transformers": {
+    "base_commit": "168c5b68975ba00492a442cb8afad48e85724c94",
+    "chunks_path": "data/corpus/v2_comment2context/huggingface__transformers/168c5b68975ba00492a442cb8afad48e85724c94.chunks.jsonl",
+    "manifest_files": 5266,
+    "total_py_files": 3757,
+    "parsed_cleanly": 2367,
+    "parse_error_count": 1390,
+    "syntax_taxonomy": {
+      "internal_module_syntax_variation": 905,
+      "test_or_benchmark_code": 420,
+      "doc_example_or_snippet": 63,
+      "templated_or_generated": 2
+    },
+    "syntax_samples": [
+      [
+        ".circleci/create_circleci_config.py",
+        "'[' was never closed (.circleci/create_circleci_config.py, line 179)",
+        179,
+        "        steps = ["
+      ],
+      [
+        "benchmark/benches/llama.py",
+        "unterminated f-string literal (detected at line 198) (benchmark/benches/llama.py, line 198)",
+        198,
+        "        logger.info(f\"generat"
+      ],
+      [
+        "benchmark/benchmark.py",
+        "invalid syntax (benchmark/benchmark.py, line 219)",
+        219,
+        "    parser.\n"
+      ]
+    ],
+    "raw_calls_records": 2373,
+    "unique_calls_edges": 2005,
+    "duplicate_citations": 368,
+    "self_recursive_edges": 106,
+    "heuristic_edges_count": 114,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/transformers/src/transformers/activations.py#ClippedGELUActivation.forward', target_uri='func://huggingface/transformers/src/transformers/models/esm/modeling_esm.py#gelu', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/transformers/src/transformers/cli/serve.py#Serve.__init__', target_uri='func://huggingface/transformers/src/transformers/cli/serving/server.py#build_server', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/transformers/src/transformers/hyperparameter_search.py#OptunaBackend.is_available', target_uri='func://huggingface/transformers/src/transformers/integrations/integration_utils.py#is_optuna_available', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/transformers/src/transformers/hyperparameter_search.py#OptunaBackend.run', target_uri='func://huggingface/transformers/src/transformers/integrations/integration_utils.py#run_hp_search_optuna', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://huggingface/transformers/src/transformers/hyperparameter_search.py#RayTuneBackend.is_available', target_uri='func://huggingface/transformers/src/transformers/integrations/integration_utils.py#is_ray_tune_available', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://huggingface/transformers/tests/quantization/hqq/test_hqq.py#cleanup",
+        63
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/quantizers/quantizers_utils.py#get_module_from_name",
+        19
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/utils/versions.py#require_version_core",
+        18
+      ],
+      [
+        "func://huggingface/transformers/tests/models/wav2vec2/test_feature_extraction_wav2vec2.py#floats_list",
+        12
+      ],
+      [
+        "func://huggingface/transformers/utils/mlinter/_helpers.py#_has_rule_suppression",
+        11
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/quantizers/auto.py#AutoHfQuantizer.from_config",
+        10
+      ],
+      [
+        "func://huggingface/transformers/tests/generation/test_stopping_criteria.py#StoppingCriteriaTestCase._get_tensors",
+        10
+      ],
+      [
+        "func://huggingface/transformers/tests/utils/test_offline.py#OfflineTests._execute_with_env",
+        10
+      ],
+      [
+        "func://huggingface/transformers/tests/utils/test_video_utils.py#get_random_video",
+        10
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/data/metrics/__init__.py#simple_accuracy",
+        9
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/utils/logging.py#_get_library_root_logger",
+        9
+      ],
+      [
+        "func://huggingface/transformers/tests/models/granite_speech/test_processing_granite_speech.py#GraniteSpeechProcessorTest.get_tokenizer",
+        9
+      ],
+      [
+        "func://huggingface/transformers/tests/models/granite_speech/test_processing_granite_speech.py#GraniteSpeechProcessorTest.get_audio_processor",
+        9
+      ],
+      [
+        "func://huggingface/transformers/tests/models/wav2vec2/test_feature_extraction_wav2vec2.py#Wav2Vec2FeatureExtractionTest._check_zero_mean_unit_variance",
+        9
+      ],
+      [
+        "func://huggingface/transformers/tests/repo_utils/modular/test_conversion_order.py#appear_after",
+        9
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/quantizers/quantizers_utils.py#should_convert_module",
+        8
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/bert/convert_bert_token_dropping_original_tf2_checkpoint_to_pytorch.py#convert_checkpoint_to_pytorch.get_encoder_attention_layer_array",
+        8
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/bert/convert_bert_token_dropping_original_tf2_checkpoint_to_pytorch.py#convert_checkpoint_to_pytorch.get_encoder_layer_array",
+        8
+      ],
+      [
+        "func://huggingface/transformers/tests/models/wav2vec2_with_lm/test_processing_wav2vec2_with_lm.py#Wav2Vec2ProcessorWithLMTest.get_tokenizer",
+        8
+      ],
+      [
+        "func://huggingface/transformers/tests/models/wav2vec2_with_lm/test_processing_wav2vec2_with_lm.py#Wav2Vec2ProcessorWithLMTest.get_decoder",
+        8
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://huggingface/transformers/src/transformers/models/bert/convert_bert_token_dropping_original_tf2_checkpoint_to_pytorch.py#convert_checkpoint_to_pytorch",
+        27
+      ],
+      [
+        "func://huggingface/transformers/tests/utils/test_versions_utils.py#DependencyVersionCheckTest.test_core",
+        17
+      ],
+      [
+        "func://huggingface/transformers/benchmark_v2/framework/data_classes.py#BenchmarkResult.pprint",
+        10
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/data/metrics/__init__.py#glue_compute_metrics",
+        10
+      ],
+      [
+        "func://huggingface/transformers/tests/repo_utils/modular/test_conversion_order.py#ConversionOrderTest.test_conversion_order",
+        10
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/codegen/modeling_codegen.py#CodeGenAttention.forward",
+        7
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/timesfm/convert_timesfm_orignal_to_hf.py#write_model",
+        7
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/vivit/convert_vivit_flax_to_pytorch.py#transform_state_encoder_block",
+        7
+      ],
+      [
+        "func://huggingface/transformers/tests/models/prophetnet/test_tokenization_prophetnet.py#ProphetNetTokenizationTest.test_is_whitespace",
+        7
+      ],
+      [
+        "func://huggingface/transformers/tests/utils/test_expectations.py#ExpectationsTest.test_expectations",
+        7
+      ],
+      [
+        "func://huggingface/transformers/utils/mlinter/trf011.py#check",
+        7
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/moonshine/convert_usefulsensors_to_hf.py#convert_usefulsensors_moonshine_to_hf",
+        6
+      ],
+      [
+        "func://huggingface/transformers/tests/models/jamba/test_modeling_jamba.py#JambaConfigTester.test_attn_offsets",
+        6
+      ],
+      [
+        "func://huggingface/transformers/tests/models/jamba/test_modeling_jamba.py#JambaConfigTester.test_expert_offsets",
+        6
+      ],
+      [
+        "func://huggingface/transformers/tests/quantization/hqq/test_hqq.py#HQQTest.test_quantized_model_to_new_device_and_new_dtype",
+        6
+      ],
+      [
+        "func://huggingface/transformers/tests/trainer/distributed/scripts/train.py#main",
+        6
+      ],
+      [
+        "func://huggingface/transformers/utils/patch_helper.py#main",
+        6
+      ],
+      [
+        "func://huggingface/transformers/utils/scan_skipped_tests.py#main",
+        6
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/bark/modeling_bark.py#BarkSelfAttention.forward",
+        5
+      ],
+      [
+        "func://huggingface/transformers/src/transformers/models/bart/convert_bart_original_pytorch_checkpoint_to_pytorch.py#convert_bart_checkpoint",
+        5
+      ]
+    ],
+    "total_symbols_active": 2686,
+    "top_1_pct_count": 27,
+    "pct_edges_top_1_pct": 10.67,
+    "source_sha256": "dc176aa7fc2fe4817b63b9dbf9f19ff84f33374e101f6def8cfb8cb58a0ee842"
+  },
+  "ipython/ipython": {
+    "base_commit": "79f313ab453f82d231ba7ac2c1e5211e71d612ce",
+    "chunks_path": "data/corpus/v2_comment2context/ipython__ipython/79f313ab453f82d231ba7ac2c1e5211e71d612ce.chunks.jsonl",
+    "manifest_files": 418,
+    "total_py_files": 287,
+    "parsed_cleanly": 223,
+    "parse_error_count": 64,
+    "syntax_taxonomy": {
+      "internal_module_syntax_variation": 43,
+      "doc_example_or_snippet": 3,
+      "test_or_benchmark_code": 18
+    },
+    "syntax_samples": [
+      [
+        "IPython/core/alias.py",
+        "expected ':' (IPython/core/alias.py, line 206)",
+        206,
+        "        if s\n"
+      ],
+      [
+        "IPython/core/application.py",
+        "unterminated triple-quoted string literal (detected at line 245) (IPython/core/application.py, line 243)",
+        243,
+        "        help=\"\"\"Whether to install the default config files into the profile dir."
+      ],
+      [
+        "IPython/core/completer.py",
+        "'(' was never closed (IPython/core/completer.py, line 231)",
+        231,
+        "from traitlets import ("
+      ]
+    ],
+    "raw_calls_records": 421,
+    "unique_calls_edges": 325,
+    "duplicate_citations": 96,
+    "self_recursive_edges": 11,
+    "heuristic_edges_count": 28,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://ipython/ipython/IPython/core/magics/display.py#DisplayMagics.javascript', target_uri='func://ipython/ipython/examples/IPython Kernel/gui/gui-glut.py#display', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://ipython/ipython/IPython/core/magics/display.py#DisplayMagics.latex', target_uri='func://ipython/ipython/examples/IPython Kernel/gui/gui-glut.py#display', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://ipython/ipython/IPython/core/magics/display.py#DisplayMagics.svg', target_uri='func://ipython/ipython/examples/IPython Kernel/gui/gui-glut.py#display', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://ipython/ipython/IPython/core/magics/display.py#DisplayMagics.html', target_uri='func://ipython/ipython/examples/IPython Kernel/gui/gui-glut.py#display', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://ipython/ipython/IPython/core/magics/display.py#DisplayMagics.html', target_uri='func://ipython/ipython/examples/IPython Kernel/gui/gui-glut.py#display', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://ipython/ipython/tests/test_tokenutil.py#expect_token",
+        44
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/tests/test_deduperreload.py#squish_text",
+        14
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/timing.py#clock",
+        11
+      ],
+      [
+        "func://ipython/ipython/IPython/lib/editorhooks.py#install_editor",
+        10
+      ],
+      [
+        "func://ipython/ipython/IPython/core/magic_arguments.py#real_name",
+        8
+      ],
+      [
+        "func://ipython/ipython/docs/autogen_shortcuts.py#format_prompt_keys.to_rst",
+        8
+      ],
+      [
+        "func://ipython/ipython/tests/test_magic_terminal.py#PasteTestCase.paste",
+        8
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/capture.py#RichOutput._repr_mime_",
+        7
+      ],
+      [
+        "func://ipython/ipython/IPython/core/magic_arguments.py#parse_argstring",
+        7
+      ],
+      [
+        "func://ipython/ipython/examples/IPython Kernel/gui/gui-glut.py#display",
+        6
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/process.py#find_cmd",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/terminal/pt_inputhooks/osx.py#C",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/terminal/pt_inputhooks/osx.py#n",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/dir2.py#dir2",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/module_paths.py#find_mod",
+        5
+      ],
+      [
+        "func://ipython/ipython/tests/test_paths.py#patch_get_home_dir",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/deduperreload/deduperreload.py#compare_ast",
+        4
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/deduperreload/deduperreload_patching.py#DeduperReloaderPatchingMixin.infer_field_offset",
+        4
+      ],
+      [
+        "func://ipython/ipython/IPython/external/pickleshare.py#PickleShareDB.keys",
+        4
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/_process_common.py#process_handler",
+        4
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://ipython/ipython/tests/test_tokenutil.py#test_outer_name",
+        15
+      ],
+      [
+        "func://ipython/ipython/tests/test_magic_arguments.py#test_magic_arguments",
+        14
+      ],
+      [
+        "func://ipython/ipython/tests/test_tokenutil.py#test_nested_call_args",
+        10
+      ],
+      [
+        "func://ipython/ipython/docs/autogen_shortcuts.py#format_prompt_keys",
+        9
+      ],
+      [
+        "func://ipython/ipython/tests/test_tokenutil.py#test_function",
+        6
+      ],
+      [
+        "func://ipython/ipython/tests/test_tokenutil.py#test_nested_call_kwargs",
+        6
+      ],
+      [
+        "func://ipython/ipython/IPython/core/profileapp.py#ProfileList.list_profile_dirs",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/deduperreload/deduperreload_patching.py#DeduperReloaderPatchingMixin.patch_function",
+        5
+      ],
+      [
+        "func://ipython/ipython/IPython/lib/deepreload.py#deep_import_hook",
+        4
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/timing.py#timings_out",
+        4
+      ],
+      [
+        "func://ipython/ipython/IPython/utils/wildcard.py#list_namespace",
+        4
+      ],
+      [
+        "func://ipython/ipython/tests/test_module_paths.py#setup_module",
+        4
+      ],
+      [
+        "func://ipython/ipython/IPython/core/extensions.py#ExtensionManager.reload_extension",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/deduperreload/deduperreload_patching.py#DeduperReloaderPatchingMixin.try_patch_readonly_attr",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/storemagic.py#restore_data",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/tests/test_deduperreload.py#AutoreloadDetectionSuite.test_compare_ast",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/extensions/tests/test_deduperreload.py#AutoreloadDetectionSuite.test_compare_ast2",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/lib/latextools.py#latex_to_png_dvipng",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/terminal/magics.py#TerminalMagics.cpaste",
+        3
+      ],
+      [
+        "func://ipython/ipython/IPython/terminal/prompts.py#Prompts.continuation_prompt_tokens",
+        3
+      ]
+    ],
+    "total_symbols_active": 379,
+    "top_1_pct_count": 4,
+    "pct_edges_top_1_pct": 7.38,
+    "source_sha256": "94e1586b591d7e05686311307c5fb732385532938c676cb0cc9090daf951444b"
+  },
+  "numpy/numpy": {
+    "base_commit": "4d711763f8c5b978abd88cea710147c14d802675",
+    "chunks_path": "data/corpus/v2_comment2context/numpy__numpy/4d711763f8c5b978abd88cea710147c14d802675.chunks.jsonl",
+    "manifest_files": 2217,
+    "total_py_files": 479,
+    "parsed_cleanly": 345,
+    "parse_error_count": 134,
+    "syntax_taxonomy": {
+      "test_or_benchmark_code": 68,
+      "doc_example_or_snippet": 4,
+      "internal_module_syntax_variation": 61,
+      "templated_or_generated": 1
+    },
+    "syntax_samples": [
+      [
+        "benchmarks/benchmarks/bench_function_base.py",
+        "expected an indented block after function definition on line 298 (benchmarks/benchmarks/bench_function_base.py, line 299)",
+        299,
+        "...[truncated]\n"
+      ],
+      [
+        "benchmarks/benchmarks/bench_io.py",
+        "'(' was never closed (benchmarks/benchmarks/bench_io.py, line 262)",
+        262,
+        "        np.random.seed(1"
+      ],
+      [
+        "benchmarks/benchmarks/bench_lib.py",
+        "expected '(' (benchmarks/benchmarks/bench_lib.py, line 214)",
+        214,
+        "    def time_uni\n"
+      ]
+    ],
+    "raw_calls_records": 943,
+    "unique_calls_edges": 608,
+    "duplicate_citations": 335,
+    "self_recursive_edges": 14,
+    "heuristic_edges_count": 195,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://numpy/numpy/numpy/_configtool.py#main', target_uri='func://numpy/numpy/numpy/f2py/__init__.py#get_include', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://numpy/numpy/numpy/_configtool.py#main', target_uri='func://numpy/numpy/numpy/f2py/__init__.py#get_include', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://numpy/numpy/numpy/_core/__init__.py#_DType_reconstruct', target_uri='func://numpy/numpy/numpy/_core/tests/test_stringdtype.py#dtype', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://numpy/numpy/numpy/_core/_asarray.py#require', target_uri='func://numpy/numpy/numpy/_utils/__init__.py#set_module', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://numpy/numpy/numpy/_core/tests/test_abc.py#TestABC.test_floats', target_uri='func://numpy/numpy/doc/neps/nep-0016-benchmark.py#t', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://numpy/numpy/doc/neps/nep-0016-benchmark.py#t",
+        108
+      ],
+      [
+        "func://numpy/numpy/numpy/lib/_user_array_impl.py#container._rc",
+        36
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_classes.py#assert_poly_almost_equal",
+        23
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_classes.py#Poly",
+        22
+      ],
+      [
+        "func://numpy/numpy/numpy/core/_utils.py#_raise_warning",
+        18
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/auxfuncs.py#get_kind",
+        18
+      ],
+      [
+        "func://numpy/numpy/numpy/random/tests/test_smoke.py#RNG._create_rng",
+        18
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/auxfuncs.py#outmess",
+        17
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/auxfuncs.py#isarray",
+        16
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/auxfuncs.py#isscalar",
+        15
+      ],
+      [
+        "func://numpy/numpy/numpy/lib/tests/test_mixins.py#_assert_equal_type_and_value",
+        15
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_custom_dtypes.py#TestSFloat._get_array",
+        14
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_extint128.py#exc_iter",
+        13
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_chebyshev.py#trim",
+        12
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/common_rules.py#buildhooks.cadd",
+        11
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_print.py#_test_redirected_print",
+        10
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_hermite.py#trim",
+        10
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_hermite_e.py#trim",
+        10
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_legendre.py#trim",
+        10
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_stringdtype.py#dtype",
+        9
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://numpy/numpy/numpy/f2py/tests/test_return_logical.py#TestReturnLogical.check_function",
+        37
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/common_rules.py#buildhooks",
+        31
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/f90mod_rules.py#buildhooks",
+        25
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/tests/test_return_complex.py#TestReturnComplex.check_function",
+        21
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/tests/test_return_real.py#TestReturnReal.check_function",
+        18
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_classes.py#test_mul",
+        15
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/func2subr.py#createsubrwrapper",
+        14
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/tests/test_return_integer.py#TestReturnInteger.check_function",
+        14
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_errstate.py#TestErrstate.main",
+        12
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_classes.py#test_add",
+        11
+      ],
+      [
+        "func://numpy/numpy/numpy/polynomial/tests/test_classes.py#test_sub",
+        11
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/tests/test_return_character.py#TestReturnCharacter.check_function",
+        9
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/func2subr.py#createfuncwrapper",
+        8
+      ],
+      [
+        "func://numpy/numpy/numpy/lib/tests/test_mixins.py#TestNDArrayOperatorsMixin.test_array_like_add",
+        8
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_conversion_utils.py#StringConverterTestCase._check",
+        7
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_indexerrors.py#TestIndexErrors.test_mapping",
+        6
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_print.py#test_complex_type_print",
+        6
+      ],
+      [
+        "func://numpy/numpy/numpy/_core/tests/test_conversion_utils.py#StringConverterTestCase.test_wrong_value",
+        5
+      ],
+      [
+        "func://numpy/numpy/numpy/f2py/use_rules.py#buildusevars",
+        5
+      ],
+      [
+        "func://numpy/numpy/numpy/lib/tests/test__datasource.py#TestDataSourceAbspath.test_windows_os_sep",
+        5
+      ]
+    ],
+    "total_symbols_active": 651,
+    "top_1_pct_count": 7,
+    "pct_edges_top_1_pct": 10.69,
+    "source_sha256": "889def9570d27fb5e7c12205473d705d024a48515503ba14d43a5e795e87c5d9"
+  },
+  "pallets/click": {
+    "base_commit": "011b9f9d190c71310264e6c54bae6259f5e38a9f",
+    "chunks_path": "data/corpus/v2_trace2code/pallets__click/011b9f9d190c71310264e6c54bae6259f5e38a9f.chunks.jsonl",
+    "manifest_files": 133,
+    "total_py_files": 59,
+    "parsed_cleanly": 41,
+    "parse_error_count": 18,
+    "syntax_taxonomy": {
+      "doc_example_or_snippet": 1,
+      "internal_module_syntax_variation": 9,
+      "test_or_benchmark_code": 8
+    },
+    "syntax_samples": [
+      [
+        "examples/imagepipe/imagepipe.py",
+        "'{' was never closed (examples/imagepipe/imagepipe.py, line 280)",
+        280,
+        "    click.echo(f\"Paste '{to_paste.filename}' on '{imag"
+      ],
+      [
+        "src/click/_termui_impl.py",
+        "expected an indented block after 'if' statement on line 257 (src/click/_termui_impl.py, line 258)",
+        258,
+        "...[truncated]\n"
+      ],
+      [
+        "src/click/_winconsole.py",
+        "expected '(' (src/click/_winconsole.py, line 276)",
+        276,
+        "def _get_wind\n"
+      ]
+    ],
+    "raw_calls_records": 40,
+    "unique_calls_edges": 31,
+    "duplicate_citations": 9,
+    "self_recursive_edges": 0,
+    "heuristic_edges_count": 3,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pallets/click/tests/test_context.py#test_context_meta.cli', target_uri='func://pallets/click/tests/test_context.py#test_context_meta.get_language', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pallets/click/tests/test_context.py#test_context_meta.cli', target_uri='func://pallets/click/tests/test_context.py#test_context_meta.set_language', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pallets/click/tests/test_context.py#test_context_meta.cli', target_uri='func://pallets/click/tests/test_context.py#test_context_meta.get_language', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://pallets/click/tests/test_chain.py#debug",
+        9
+      ],
+      [
+        "func://pallets/click/examples/termui/termui.py#progress.process_slowly",
+        4
+      ],
+      [
+        "func://pallets/click/src/click/parser.py#_unpack_args._fetch",
+        3
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#is_ascii_encoding",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_is_binary_reader",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_is_binary_writer",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_is_compat_stream_attr",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/parser.py#_split_opt",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.open",
+        2
+      ],
+      [
+        "func://pallets/click/tests/test_context.py#test_context_meta.get_language",
+        2
+      ],
+      [
+        "func://pallets/click/examples/complex/complex/cli.py#Environment.log",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#get_best_encoding",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_is_compatible_text_stream",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_stream_is_misconfigured",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.close",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.close_intelligently",
+        1
+      ],
+      [
+        "func://pallets/click/tests/test_context.py#test_context_meta.set_language",
+        1
+      ],
+      [
+        "func://pallets/click/tests/test_types.py#_symlinks_supported",
+        1
+      ],
+      [
+        "func://pallets/click/tests/test_types.py#_non_utf8_filenames_supported",
+        1
+      ],
+      [
+        "func://pallets/click/tests/typing/typing_progressbar.py#it",
+        1
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://pallets/click/examples/termui/termui.py#progress",
+        4
+      ],
+      [
+        "func://pallets/click/src/click/parser.py#_unpack_args",
+        3
+      ],
+      [
+        "func://pallets/click/tests/test_context.py#test_context_meta.cli",
+        3
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_find_binary_reader",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_find_binary_writer",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_is_compatible_text_stream",
+        2
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_force_correct_text_stream",
+        2
+      ],
+      [
+        "func://pallets/click/examples/complex/complex/cli.py#Environment.vlog",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_make_text_stream",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#get_best_encoding",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/_compat.py#_stream_is_misconfigured",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/parser.py#_normalize_opt",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/parser.py#_Option.__init__",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.__getattr__",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.close_intelligently",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.__exit__",
+        1
+      ],
+      [
+        "func://pallets/click/src/click/utils.py#LazyFile.__iter__",
+        1
+      ],
+      [
+        "func://pallets/click/tests/test_chain.py#test_args_and_chain.cli",
+        1
+      ],
+      [
+        "func://pallets/click/tests/test_chain.py#test_args_and_chain.a",
+        1
+      ],
+      [
+        "func://pallets/click/tests/test_chain.py#test_args_and_chain.b",
+        1
+      ]
+    ],
+    "total_symbols_active": 45,
+    "top_1_pct_count": 1,
+    "pct_edges_top_1_pct": 29.03,
+    "source_sha256": "870710ce268c3f54217393c9a6e1d71e776a50ff3b9a3fc3464f4e78c179fe2a"
+  },
+  "pydantic/pydantic": {
+    "base_commit": "1a37a3d479dea9b21c7379e882bf5ec56fb94fc2",
+    "chunks_path": "data/corpus/v2_comment2context/pydantic__pydantic/1a37a3d479dea9b21c7379e882bf5ec56fb94fc2.chunks.jsonl",
+    "manifest_files": 701,
+    "total_py_files": 392,
+    "parsed_cleanly": 277,
+    "parse_error_count": 115,
+    "syntax_taxonomy": {
+      "internal_module_syntax_variation": 38,
+      "doc_example_or_snippet": 3,
+      "test_or_benchmark_code": 74
+    },
+    "syntax_samples": [
+      [
+        ".github/actions/people/people.py",
+        "invalid syntax (.github/actions/people/people.py, line 385)",
+        385,
+        "    if response.status_code !=\n"
+      ],
+      [
+        "docs/plugins/conversion_table.py",
+        "'(' was never closed (docs/plugins/conversion_table.py, line 289)",
+        289,
+        "    Row("
+      ],
+      [
+        "docs/plugins/main.py",
+        "unterminated triple-quoted string literal (detected at line 231) (docs/plugins/main.py, line 227)",
+        227,
+        "tile_template = \"\"\""
+      ]
+    ],
+    "raw_calls_records": 413,
+    "unique_calls_edges": 344,
+    "duplicate_citations": 69,
+    "self_recursive_edges": 17,
+    "heuristic_edges_count": 73,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pydantic/pydantic/pydantic-core/tests/serializers/test_model_root.py#Model.ser_root', target_uri='func://pydantic/pydantic/tests/test_decorators.py#test_inspect_annotated_serializer_invalid_number_of_arguments.serializer', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pydantic/pydantic/pydantic-core/tests/serializers/test_model_root.py#Model.ser_root', target_uri='func://pydantic/pydantic/tests/test_decorators.py#test_inspect_annotated_serializer_invalid_number_of_arguments.serializer', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pydantic/pydantic/pydantic-core/tests/test_isinstance.py#test_omit', target_uri='func://pydantic/pydantic/pydantic-core/tests/conftest.py#py_and_json', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pydantic/pydantic/pydantic-core/tests/test_strict.py#test_int_strict_argument', target_uri='func://pydantic/pydantic/pydantic-core/tests/conftest.py#py_and_json', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pydantic/pydantic/pydantic-core/tests/test_validation_context.py#test_after', target_uri='func://pydantic/pydantic/pydantic-core/tests/conftest.py#py_and_json', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/conftest.py#py_and_json",
+        54
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/conftest.py#plain_repr",
+        33
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/serializers/test_generator.py#gen_ok",
+        21
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_model_signature.py#_equals",
+        18
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/experimental/arguments_schema.py#generate_arguments_schema",
+        12
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/plugin/_loader.py#get_plugins",
+        11
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_deprecated.py#deprecated_from_orm",
+        10
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_config.py#_equals",
+        9
+      ],
+      [
+        "func://pydantic/pydantic/release/shared.py#run_command",
+        8
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/deprecated/tools.py#parse_obj_as",
+        8
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_type_hints.py#inspect_type_hints",
+        8
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/serializers/test_generator.py#gen_error",
+        5
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/v1/utils.py#is_valid_identifier",
+        5
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_internal.py#init_schema_and_cleaned_schema",
+        5
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_migration.py#import_from",
+        5
+      ],
+      [
+        "func://pydantic/pydantic/tests/test_networks.py#validate_url",
+        5
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/conftest.py#assert_gc",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/_internal/_core_utils.py#_clean_schema_for_pretty_print",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/plugin/_schema_validator.py#filter_handlers",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/version.py#version_short",
+        4
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/serializers/test_generator.py#test_include",
+        11
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/serializers/test_generator.py#test_generator_int",
+        6
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/serializers/test_generator.py#test_generator_any",
+        5
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/test_config.py#test_cache_strings",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/plugin/_schema_validator.py#build_wrapper",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/release/push.py#commit_and_push_changes",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/tests/benchmarks/generate_north_star_data.py#person",
+        4
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/validators/test_json.py#test_any_schema_no_schema",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/_internal/_core_utils.py#_clean_schema_for_pretty_print",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/_internal/_generics.py#iter_contained_typevars",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/_internal/_signature.py#_generate_signature_parameters",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/aliases.py#AliasGenerator.generate_aliases",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/color.py#Color.as_named",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/plugin/_schema_validator.py#PluggableSchemaValidator.__init__",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/v1/datetime_parse.py#parse_datetime",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/pydantic/v1/error_wrappers.py#flatten_errors",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/tests/benchmarks/generate_north_star_data.py#blog",
+        3
+      ],
+      [
+        "func://pydantic/pydantic/docs/plugins/algolia.py#on_page_content",
+        2
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/benchmarks/test_nested_benchmark.py#test_nested_schema_using_defs",
+        2
+      ],
+      [
+        "func://pydantic/pydantic/pydantic-core/tests/benchmarks/test_nested_benchmark.py#test_nested_schema_inlined",
+        2
+      ]
+    ],
+    "total_symbols_active": 405,
+    "top_1_pct_count": 5,
+    "pct_edges_top_1_pct": 31.69,
+    "source_sha256": "10695ff058ede1e530f770eea58cdca168ee20628ce02c51bfe1a40404838872"
+  },
+  "pypa/pip": {
+    "base_commit": "0981e071bee8ac3ca2497813fa0863005033c6c2",
+    "chunks_path": "data/corpus/v2_abstention/pypa__pip/0981e071bee8ac3ca2497813fa0863005033c6c2.chunks.jsonl",
+    "manifest_files": 527,
+    "total_py_files": 324,
+    "parsed_cleanly": 261,
+    "parse_error_count": 63,
+    "syntax_taxonomy": {
+      "doc_example_or_snippet": 1,
+      "internal_module_syntax_variation": 31,
+      "test_or_benchmark_code": 31
+    },
+    "syntax_samples": [
+      [
+        "docs/pip_sphinxext.py",
+        "'{' was never closed (docs/pip_sphinxext.py, line 241)",
+        241,
+        "            \"Windows\": {"
+      ],
+      [
+        "src/pip/_internal/build_env.py",
+        "unterminated string literal (detected at line 230) (src/pip/_internal/build_env.py, line 230)",
+        230,
+        "            \"--no-"
+      ],
+      [
+        "src/pip/_internal/cli/cmdoptions.py",
+        "unterminated string literal (detected at line 293) (src/pip/_internal/cli/cmdoptions.py, line 293)",
+        293,
+        "    help=\"Set the socket tim"
+      ]
+    ],
+    "raw_calls_records": 647,
+    "unique_calls_edges": 554,
+    "duplicate_citations": 93,
+    "self_recursive_edges": 0,
+    "heuristic_edges_count": 10,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pypa/pip/src/pip/__init__.py#main', target_uri='func://pypa/pip/src/pip/_internal/utils/entrypoints.py#_wrapper', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pypa/pip/src/pip/_internal/__init__.py#main', target_uri='func://pypa/pip/src/pip/_internal/utils/entrypoints.py#_wrapper', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pypa/pip/src/pip/_internal/cli/req_command.py#with_cleanup.wrapper', target_uri='func://pypa/pip/src/pip/_internal/cli/req_command.py#with_cleanup.configure_tempdir_registry', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pypa/pip/src/pip/_internal/cli/req_command.py#with_cleanup.wrapper', target_uri='func://pypa/pip/src/pip/_internal/cli/req_command.py#with_cleanup.configure_tempdir_registry', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pypa/pip/src/pip/_internal/commands/help.py#HelpCommand.run', target_uri='func://pypa/pip/src/pip/_internal/commands/__init__.py#get_similar_commands', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://pypa/pip/src/pip/_internal/utils/urls.py#path_to_url",
+        21
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/commands/__init__.py#create_command",
+        13
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/commands/debug.py#show_value",
+        13
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/models/direct_url.py#DirectUrl.from_dict",
+        13
+      ],
+      [
+        "func://pypa/pip/tests/lib/__init__.py#path_to_url",
+        10
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/models/direct_url.py#_get",
+        9
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_check.py#matches_expected_lines",
+        9
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/utils/virtualenv.py#running_under_virtualenv",
+        8
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/utils/distutils_args.py#parse_distutils_args",
+        8
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/network/utils.py#raise_for_status",
+        7
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_install_requested.py#_assert_requested_present",
+        7
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_pep660.py#_assert_hook_called",
+        7
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/utils/direct_url_helpers.py#direct_url_as_pep440_direct_reference",
+        7
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/utils/direct_url_helpers.py#direct_url_from_link",
+        7
+      ],
+      [
+        "func://pypa/pip/tests/lib/direct_url.py#get_created_direct_url",
+        6
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_pep660.py#_make_project",
+        6
+      ],
+      [
+        "func://pypa/pip/tests/lib/test_lib.py#assert_error_startswith",
+        6
+      ],
+      [
+        "func://pypa/pip/tests/unit/test_locations.py#_get_scheme_dict",
+        6
+      ],
+      [
+        "func://pypa/pip/tests/unit/test_utils_wheel.py#zip_dir",
+        6
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/metadata/__init__.py#get_default_environment",
+        5
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://pypa/pip/src/pip/_internal/commands/debug.py#DebugCommand.run",
+        16
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/cli/autocompletion.py#autocomplete",
+        7
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/cli/base_command.py#Command._main",
+        7
+      ],
+      [
+        "func://pypa/pip/tests/unit/test_direct_url.py#test_parsing_validation",
+        7
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/commands/cache.py#CacheCommand.get_cache_info",
+        6
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/models/direct_url.py#DirectUrl.from_dict",
+        6
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/locations/_sysconfig.py#get_scheme",
+        5
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/models/direct_url.py#VcsInfo._from_dict",
+        5
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/network/lazy_wheel.py#LazyZipOverHTTP._download",
+        5
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_pep660.py#test_wheel_editable_pep660_basic",
+        5
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_vcs_git.py#test_get_revision_sha",
+        5
+      ],
+      [
+        "func://pypa/pip/tests/unit/test_direct_url.py#test_redact_url",
+        5
+      ],
+      [
+        "func://pypa/pip/noxfile.py#test",
+        4
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/distributions/sdist.py#SourceDistribution._setup_isolation",
+        4
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/index/collector.py#_get_html_response",
+        4
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/network/download.py#_prepare_download",
+        4
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/operations/check.py#check_install_conflicts",
+        4
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/utils/virtualenv.py#virtualenv_no_global",
+        4
+      ],
+      [
+        "func://pypa/pip/src/pip/_internal/utils/wheel.py#parse_wheel",
+        4
+      ],
+      [
+        "func://pypa/pip/tests/functional/test_cache.py#test_cache_list",
+        4
+      ]
+    ],
+    "total_symbols_active": 609,
+    "top_1_pct_count": 7,
+    "pct_edges_top_1_pct": 11.37,
+    "source_sha256": "79b0dbca30e8fb88923fbcf1a71e9c83de65e7a389969d805880758a209639b3"
+  },
+  "pytest-dev/pytest": {
+    "base_commit": "09d163aa3a1f01701fe2e3f073a89d49b9d0cce2",
+    "chunks_path": "data/corpus/v2_abstention/pytest-dev__pytest/09d163aa3a1f01701fe2e3f073a89d49b9d0cce2.chunks.jsonl",
+    "manifest_files": 270,
+    "total_py_files": 114,
+    "parsed_cleanly": 84,
+    "parse_error_count": 30,
+    "syntax_taxonomy": {
+      "test_or_benchmark_code": 25,
+      "doc_example_or_snippet": 3,
+      "legacy_python_2_except": 1,
+      "legacy_python_2_print": 1
+    },
+    "syntax_samples": [
+      [
+        "_pytest/_code/code.py",
+        "unterminated string literal (detected at line 252) (_pytest/_code/code.py, line 252)",
+        252,
+        "    name = property(name, None, None, \"co_name of u"
+      ],
+      [
+        "_pytest/cacheprovider.py",
+        "invalid syntax (_pytest/cacheprovider.py, line 221)",
+        221,
+        "    tw.\n"
+      ],
+      [
+        "_pytest/capture.py",
+        "invalid syntax (_pytest/capture.py, line 259)",
+        259,
+        "            self.err.\n"
+      ]
+    ],
+    "raw_calls_records": 283,
+    "unique_calls_edges": 230,
+    "duplicate_citations": 53,
+    "self_recursive_edges": 4,
+    "heuristic_edges_count": 11,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pytest-dev/pytest/doc/en/example/xfail_demo.py#test_hello2', target_uri='func://pytest-dev/pytest/_pytest/skipping.py#xfail', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pytest-dev/pytest/doc/en/example/xfail_demo.py#test_hello3', target_uri='func://pytest-dev/pytest/_pytest/skipping.py#xfail', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pytest-dev/pytest/doc/en/example/xfail_demo.py#test_hello4', target_uri='func://pytest-dev/pytest/_pytest/skipping.py#xfail', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pytest-dev/pytest/doc/en/example/xfail_demo.py#test_hello5', target_uri='func://pytest-dev/pytest/_pytest/skipping.py#xfail', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://pytest-dev/pytest/doc/en/example/xfail_demo.py#test_hello7', target_uri='func://pytest-dev/pytest/_pytest/skipping.py#xfail', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://pytest-dev/pytest/testing/test_assertion.py#callequal",
+        26
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#getmsg",
+        23
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertinterpret.py#exvalue",
+        22
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/junitxml.py#bin_xml_escape",
+        8
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/nose.py#call_optional",
+        7
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#rewrite",
+        6
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/junitxml.py#_NodeReporter.append",
+        5
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/skipping.py#xfail",
+        5
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertinterpret.py#test_assert_keyword_arg.f",
+        5
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/assertion/reinterpret.py#DebugInterpreter._compile",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/junitxml.py#_NodeReporter._write_captured_output",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/junitxml.py#_NodeReporter._add_simple",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/runner.py#runtestprotocol",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/unittest.py#TestCaseFunction._addexcinfo",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/code/test_excinfo.py#g",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_argcomplete.py#_wrapcall",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_pdb.py#runpdb_and_get_report",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_resultlog.py#TestWithFunctionIntegration.getresultlog",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/_code/_py2traceback.py#_format_final_exc_line",
+        3
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/assertion/util.py#ecu",
+        3
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#TestAssertionRewrite.test_boolop",
+        11
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/assertion/util.py#assertrepr_compare",
+        6
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/nose.py#pytest_runtest_setup",
+        6
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/junitxml.py#_NodeReporter.append_failure",
+        5
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#TestAssertionRewrite.test_name",
+        5
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/assertion/util.py#format_explanation",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/junitxml.py#_NodeReporter.append_skipped",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/setup.py#main",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/code/test_code.py#test_frame_getargs",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/code/test_excinfo.py#TestTraceback_f_g_h.f",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_argcomplete.py#FilesCompleter.__call__",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#TestAssertionRewrite.test_place_initial_imports",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#TestAssertionRewrite.test_unary_op",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_resultlog.py#test_no_resultlog_on_slaves",
+        4
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/_code/_py2traceback.py#format_exception_only",
+        3
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/nose.py#teardown_nose",
+        3
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/runner.py#runtestprotocol",
+        3
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_assertrewrite.py#TestAssertionRewrite.f",
+        3
+      ],
+      [
+        "func://pytest-dev/pytest/testing/test_resultlog.py#TestWithFunctionIntegration.test_collection_report",
+        3
+      ],
+      [
+        "func://pytest-dev/pytest/_pytest/assertion/__init__.py#pytest_configure",
+        2
+      ]
+    ],
+    "total_symbols_active": 274,
+    "top_1_pct_count": 3,
+    "pct_edges_top_1_pct": 22.17,
+    "source_sha256": "2f56836b1e0d989739ad37d93e56f4d5df1f5eca5fc9b92962c9689930f9cd3e"
+  },
+  "python/mypy": {
+    "base_commit": "f60d40b47ea76ad817f0cf36a7c9a673e54a35f6",
+    "chunks_path": "data/corpus/v2_comment2context/python__mypy/f60d40b47ea76ad817f0cf36a7c9a673e54a35f6.chunks.jsonl",
+    "manifest_files": 1771,
+    "total_py_files": 366,
+    "parsed_cleanly": 187,
+    "parse_error_count": 179,
+    "syntax_taxonomy": {
+      "doc_example_or_snippet": 2,
+      "internal_module_syntax_variation": 130,
+      "test_or_benchmark_code": 47
+    },
+    "syntax_samples": [
+      [
+        "docs/source/html_builder.py",
+        "unterminated triple-quoted f-string literal (detected at line 60) (docs/source/html_builder.py, line 58)",
+        58,
+        "        data = f\"\"\""
+      ],
+      [
+        "misc/analyze_cache.py",
+        "'(' was never closed (misc/analyze_cache.py, line 69)",
+        69,
+        "                yield load_json("
+      ],
+      [
+        "misc/apply-cache-diff.py",
+        "'[' was never closed (misc/apply-cache-diff.py, line 59)",
+        59,
+        "                old_deps[\"snapshot\"][me"
+      ]
+    ],
+    "raw_calls_records": 68,
+    "unique_calls_edges": 47,
+    "duplicate_citations": 21,
+    "self_recursive_edges": 4,
+    "heuristic_edges_count": 0,
+    "heuristic_samples": [],
+    "top_in_degrees": [
+      [
+        "func://python/mypy/mypy/stubinfo.py#stub_distribution_name",
+        10
+      ],
+      [
+        "func://python/mypy/mypy/test/typefixture.py#TypeFixture.make_type_var",
+        6
+      ],
+      [
+        "func://python/mypy/mypy/test/helpers.py#diff_ranges",
+        4
+      ],
+      [
+        "func://python/mypy/mypy/test/meta/test_parse_data.py#_run_pytest",
+        4
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/add_overloaded_method.py#_generate_method_specs",
+        3
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/method_sig_hook.py#_str_to_int",
+        3
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/union_method.py#_str_to_int",
+        3
+      ],
+      [
+        "func://python/mypy/mypy/graph_utils.py#strongly_connected_components.dfs",
+        2
+      ],
+      [
+        "func://python/mypy/mypy/test/test_config_parser.py#chdir",
+        2
+      ],
+      [
+        "func://python/mypy/mypy/test/testdiff.py#ASTDiffSuite.build",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/lower/registry.py#lower_primitive_op",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/test-data/fixtures/testutil.py#assertRaises",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_ircheck.py#TestIrcheck.func_decl",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_ircheck.py#TestIrcheck.basic_block",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_pprint.py#register",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_pprint.py#make_block",
+        2
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/union_method.py#_float_to_int",
+        2
+      ],
+      [
+        "func://python/mypy/misc/cherry-pick-typeshed.py#parse_commit_title",
+        1
+      ],
+      [
+        "func://python/mypy/mypy/parse.py#parse",
+        1
+      ],
+      [
+        "func://python/mypy/misc/dump-ast.py#dump",
+        1
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://python/mypy/mypy/test/teststubinfo.py#TestStubInfo.test_stub_distribution_name",
+        10
+      ],
+      [
+        "func://python/mypy/mypy/test/typefixture.py#TypeFixture.__init__",
+        6
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_ircheck.py#TestIrcheck.test_valid_fn",
+        3
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_ircheck.py#TestIrcheck.test_block_not_terminated_empty_block",
+        3
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/add_overloaded_method.py#add_overloaded_method_hook",
+        3
+      ],
+      [
+        "func://python/mypy/mypy/test/meta/test_diff_helper.py#DiffHelperSuite.test_render_diff_range",
+        2
+      ],
+      [
+        "func://python/mypy/mypy/test/meta/test_diff_helper.py#DiffHelperSuite.test_diff_ranges",
+        2
+      ],
+      [
+        "func://python/mypy/mypy/test/test_config_parser.py#FindConfigFileSuite.test_parent_config_with_and_without_git",
+        2
+      ],
+      [
+        "func://python/mypy/mypy/test/testdiff.py#ASTDiffSuite.run_case",
+        2
+      ],
+      [
+        "func://python/mypy/mypyc/test/test_pprint.py#TestGenerateNames.test_assign",
+        2
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/method_sig_hook.py#my_hook",
+        2
+      ],
+      [
+        "func://python/mypy/test-data/unit/plugins/union_method.py#my_meth_sig_hook",
+        2
+      ],
+      [
+        "func://python/mypy/misc/cherry-pick-typeshed.py#main",
+        1
+      ],
+      [
+        "func://python/mypy/misc/dump-ast.py#dump",
+        1
+      ],
+      [
+        "func://python/mypy/misc/dump-ast.py#main",
+        1
+      ],
+      [
+        "func://python/mypy/misc/perf_compare.py#clone",
+        1
+      ],
+      [
+        "func://python/mypy/mypy/graph_utils.py#strongly_connected_components.dfs",
+        1
+      ],
+      [
+        "func://python/mypy/mypy/graph_utils.py#strongly_connected_components",
+        1
+      ],
+      [
+        "func://python/mypy/mypy/plugins/common.py#_get_decorator_bool_argument",
+        1
+      ],
+      [
+        "func://python/mypy/mypy/plugins/common.py#_get_bool_argument",
+        1
+      ]
+    ],
+    "total_symbols_active": 67,
+    "top_1_pct_count": 1,
+    "pct_edges_top_1_pct": 2.13,
+    "source_sha256": "894c821cdc845d209fe9524702256020ca243078f1d79cac6e3deab4a91fb60e"
+  },
+  "scrapy/scrapy": {
+    "base_commit": "0e579182319504ba7bfd0c09333fe92f70c6d312",
+    "chunks_path": "data/corpus/v2_abstention/scrapy__scrapy/0e579182319504ba7bfd0c09333fe92f70c6d312.chunks.jsonl",
+    "manifest_files": 450,
+    "total_py_files": 303,
+    "parsed_cleanly": 268,
+    "parse_error_count": 35,
+    "syntax_taxonomy": {
+      "doc_example_or_snippet": 1,
+      "internal_module_syntax_variation": 9,
+      "test_or_benchmark_code": 25
+    },
+    "syntax_samples": [
+      [
+        "docs/conf.py",
+        "'[' was never closed (docs/conf.py, line 234)",
+        234,
+        "coverage_ignore_pyobjects = ["
+      ],
+      [
+        "scrapy/commands/parse.py",
+        "expected an indented block after 'if' statement on line 200 (scrapy/commands/parse.py, line 201)",
+        201,
+        "...[truncated]\n"
+      ],
+      [
+        "scrapy/core/downloader/handlers/http11.py",
+        "unterminated triple-quoted string literal (detected at line 193) (scrapy/core/downloader/handlers/http11.py, line 189)",
+        189,
+        "    r\"\"\""
+      ]
+    ],
+    "raw_calls_records": 1021,
+    "unique_calls_edges": 841,
+    "duplicate_citations": 180,
+    "self_recursive_edges": 16,
+    "heuristic_edges_count": 7,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://scrapy/scrapy/scrapy/commands/bench.py#_BenchServer.__enter__', target_uri='func://scrapy/scrapy/scrapy/utils/test.py#get_testenv', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://scrapy/scrapy/scrapy/extensions/memusage.py#MemoryUsage._send_report', target_uri='func://scrapy/scrapy/scrapy/utils/display.py#pformat', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://scrapy/scrapy/scrapy/item.py#DictItem.__repr__', target_uri='func://scrapy/scrapy/scrapy/utils/display.py#pformat', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://scrapy/scrapy/scrapy/utils/conf.py#build_component_list._map_keys', target_uri='func://scrapy/scrapy/scrapy/utils/conf.py#build_component_list._check_components', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://scrapy/scrapy/scrapy/utils/defer.py#maybeDeferred_coro', target_uri='func://scrapy/scrapy/scrapy/utils/defer.py#deferred_f_from_coro_f.f', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://scrapy/scrapy/scrapy/utils/test.py#get_crawler",
+        52
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/python.py#to_bytes",
+        38
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/request.py#request_fingerprint",
+        34
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/python.py#to_unicode",
+        32
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/python.py#get_func_args",
+        23
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/httpobj.py#urlparse_cached",
+        18
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_downloadermiddleware_robotstxt.py#RobotsTxtMiddlewareTest.assertNotIgnored",
+        15
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/spider.py#iterate_spider_output",
+        12
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_utils_reqser.py#RequestSerializationTest._assert_serializes_ok",
+        12
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/display.py#pformat",
+        10
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/responsetypes.py#ResponseTypes.from_args",
+        9
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/python.py#equal_attributes",
+        9
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/datatypes.py#CaselessDict.normkey",
+        8
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_downloadermiddleware_retry.py#MaxRetryTimesTest._test_retry",
+        8
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_feedexport.py#FTPFeedStorageTest._store",
+        8
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/gz.py#is_gzipped",
+        8
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/defer.py#mustbe_deferred",
+        7
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/responsetypes.py#ResponseTypes.from_mimetype",
+        7
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/defer.py#deferred_from_coro",
+        7
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/utils/test.py#get_from_asyncio_queue",
+        7
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://scrapy/scrapy/tests/test_utils_request.py#UtilsRequestTest.test_request_fingerprint",
+        32
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_utils_python.py#UtilsPythonTestCase.test_get_func_args",
+        17
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/exporters.py#XmlItemExporter._export_xml_field",
+        9
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_link.py#LinkTest.test_eq_and_hash",
+        9
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_utils_python.py#UtilsPythonTestCase.test_equal_attributes",
+        9
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/cmdline.py#execute",
+        8
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/linkextractors/__init__.py#FilteringLinkExtractor._link_allowed",
+        7
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/commands/genspider.py#Command.run",
+        6
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/responsetypes.py#ResponseTypes.from_body",
+        6
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/shell.py#Shell.start",
+        6
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_downloadermiddleware_robotstxt.py#RobotsTxtMiddlewareTest.test_robotstxt",
+        6
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/exporters.py#XmlItemExporter.export_item",
+        5
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/spiders/crawl.py#Rule._compile",
+        5
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/spiders/feed.py#XMLFeedSpider._parse",
+        5
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/spiders/sitemap.py#SitemapSpider._parse_sitemap",
+        5
+      ],
+      [
+        "func://scrapy/scrapy/tests/test_downloadermiddleware_robotstxt.py#RobotsTxtMiddlewareTest.test_robotstxt_garbage",
+        5
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/commands/startproject.py#Command.run",
+        4
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/core/downloader/tls.py#ScrapyClientTLSOptions._identityVerifyingInfoCallback",
+        4
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/core/downloader/webclient.py#_parsed_url_args",
+        4
+      ],
+      [
+        "func://scrapy/scrapy/scrapy/pipelines/media.py#MediaPipeline._process_request",
+        4
+      ]
+    ],
+    "total_symbols_active": 879,
+    "top_1_pct_count": 9,
+    "pct_edges_top_1_pct": 16.05,
+    "source_sha256": "b664356ae466663aeaf9ca13e10ff524bd29d312e98207d575fd1f7726c35fd8"
+  },
+  "tox-dev/tox": {
+    "base_commit": "16df4d8d54d75b673482ab6021e5aaa3b2d0152a",
+    "chunks_path": "data/corpus/v2_comment2context/tox-dev__tox/16df4d8d54d75b673482ab6021e5aaa3b2d0152a.chunks.jsonl",
+    "manifest_files": 274,
+    "total_py_files": 222,
+    "parsed_cleanly": 121,
+    "parse_error_count": 101,
+    "syntax_taxonomy": {
+      "doc_example_or_snippet": 1,
+      "internal_module_syntax_variation": 48,
+      "test_or_benchmark_code": 52
+    },
+    "syntax_samples": [
+      [
+        "docs/tox_conf.py",
+        "expected an indented block after 'if' statement on line 64 (docs/tox_conf.py, line 65)",
+        65,
+        "...[truncated]\n"
+      ],
+      [
+        "src/tox/config/cli/ini.py",
+        "expected ':' (src/tox/config/cli/ini.py, line 51)",
+        51,
+        "                if self.ini is N\n"
+      ],
+      [
+        "src/tox/config/cli/parse.py",
+        "'(' was never closed (src/tox/config/cli/parse.py, line 60)",
+        60,
+        "    handler = setup_report(guess_ve"
+      ]
+    ],
+    "raw_calls_records": 94,
+    "unique_calls_edges": 82,
+    "duplicate_citations": 12,
+    "self_recursive_edges": 7,
+    "heuristic_edges_count": 20,
+    "heuristic_samples": [
+      "LFCGEdge(edge_type='CALLS', source_uri='func://tox-dev/tox/src/tox/session/cmd/show_config/__init__.py#show_config', target_uri='func://tox-dev/tox/src/tox/session/cmd/show_config/json_format.py#show_config_json', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://tox-dev/tox/src/tox/session/cmd/show_config/__init__.py#show_config', target_uri='func://tox-dev/tox/src/tox/session/cmd/show_config/toml_format.py#show_config_toml', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://tox-dev/tox/tests/config/loader/ini/replace/test_replace_os_pathsep.py#test_replace_os_pathsep', target_uri='func://tox-dev/tox/tests/config/loader/conftest.py#replace_one', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://tox-dev/tox/tests/config/loader/ini/replace/test_replace_os_sep.py#test_replace_os_sep', target_uri='func://tox-dev/tox/tests/config/loader/conftest.py#replace_one', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)",
+      "LFCGEdge(edge_type='CALLS', source_uri='func://tox-dev/tox/tests/config/loader/ini/replace/test_replace_os_sep.py#test_replace_os_sep_before_curly', target_uri='func://tox-dev/tox/tests/config/loader/conftest.py#replace_one', provenance_tier='TIER_D_HEURISTIC', heuristic_weight=0.4, ambiguity_penalty=1.0, effective_weight=0.4)"
+    ],
+    "top_in_degrees": [
+      [
+        "func://tox-dev/tox/src/tox/config/loader/native.py#to_native",
+        20
+      ],
+      [
+        "func://tox-dev/tox/tests/config/loader/conftest.py#replace_one",
+        13
+      ],
+      [
+        "func://tox-dev/tox/src/tox/util/graph.py#stable_topological_sort",
+        7
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/stringify.py#stringify",
+        6
+      ],
+      [
+        "func://tox-dev/tox/tests/config/loader/ini/conftest.py#mk_ini_conf",
+        5
+      ],
+      [
+        "func://tox-dev/tox/src/tox/util/path.py#ensure_cachedir_tag",
+        5
+      ],
+      [
+        "func://tox-dev/tox/src/tox/execute/util.py#shebang",
+        4
+      ],
+      [
+        "func://tox-dev/tox/src/tox/session/cmd/depends.py#depends._handle",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/session/cmd/run/sequential.py#run_sequential",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/tox_env/python/virtual_env/package/util.py#dependencies_with_extras_from_markers",
+        2
+      ],
+      [
+        "func://tox-dev/tox/tests/test_provision.py#_make_tox_wheel",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/tox_env/python/virtual_env/runner.py#VirtualEnvRunner.id",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/util/cpu.py#auto_detect_cpus",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/native.py#_to_native_complex",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/native.py#_to_native_collection",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/section.py#Section.from_key",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/ini/factor.py#extend_factors",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/source/toml_pyproject.py#TomlSection.env_prefix",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/source/toml_pyproject.py#TomlSection.env_base_prefix",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/execute/local_sub_process/read_via_thread.py#ReadViaThread._drain_stream",
+        1
+      ]
+    ],
+    "top_out_degrees": [
+      [
+        "func://tox-dev/tox/src/tox/config/loader/stringify.py#stringify",
+        6
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/native.py#_to_native_complex",
+        3
+      ],
+      [
+        "func://tox-dev/tox/tests/config/loader/ini/replace/test_replace_tty.py#test_replace_env_set",
+        3
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/native.py#_to_native_collection",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/run.py#run",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/session/cmd/show_config/__init__.py#show_config",
+        2
+      ],
+      [
+        "func://tox-dev/tox/tests/test_provision.py#tox_wheel",
+        2
+      ],
+      [
+        "func://tox-dev/tox/tests/tox_env/test_register.py#test_register_set_new_default_with_register",
+        2
+      ],
+      [
+        "func://tox-dev/tox/tests/util/test_path.py#test_ensure_cachedir_tag_idempotent",
+        2
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/loader/native.py#to_native",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/source/ini.py#IniSource.get_loader",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/source/ini_section.py#IniSection.names",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/source/toml_pyproject.py#TomlSection.test_env",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/config/source/toml_pyproject.py#TomlSection.env_base",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/execute/local_sub_process/read_via_thread.py#ReadViaThread.__exit__",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/plugin/inline.py#load_inline",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/run.py#main",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/session/cmd/depends.py#depends._handle",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/session/cmd/depends.py#depends",
+        1
+      ],
+      [
+        "func://tox-dev/tox/src/tox/session/cmd/devenv.py#devenv",
+        1
+      ]
+    ],
+    "total_symbols_active": 106,
+    "top_1_pct_count": 2,
+    "pct_edges_top_1_pct": 36.59,
+    "source_sha256": "b80f209053dfba97f812494c5360d9d661571bb4a82ac91d8a83037b3a8ab006"
+  }
+}

@@ -1,0 +1,6 @@
+Budget,Mode,Complete_Full_Coverage,Complete_Impl_Coverage,Complete_Any_Coverage,Micro_Recall_Full,Micro_Recall_Impl,Micro_Recall_Any,Macro_Recall_Full,Macro_Recall_Impl,Macro_Recall_Any,Gold_Impl_Preservation_Rate,Skeletonization_Rate,Exclusion_Rate,Mean_Utilization,Relevant_Token_Yield,Redundancy_Ratio,Exact_Overflow_Count,Exact_Overflow_Rate,Median_Latency_ms,P95_Latency_ms
+2k,compact,0.0029,0.3217,0.3681,0.0039,0.3463,0.4086,0.0043,0.3937,0.4542,0.3463,0.0623,0.5914,0.9916,0.1012,0.4154,0,0.0000,1.25,21.82
+4k,compact,0.0087,0.4406,0.4667,0.0078,0.4922,0.5195,0.0101,0.5334,0.5611,0.4922,0.0272,0.4805,0.9958,0.0710,0.4928,0,0.0000,0.29,23.36
+8k,complete,0.3130,0.3826,0.4145,0.3268,0.4163,0.4553,0.3749,0.4604,0.5019,0.4163,0.0389,0.5447,0.9980,0.1086,0.4382,0,0.0000,0.60,3.56
+16k,complete,0.4377,0.4667,0.4928,0.4786,0.5136,0.5389,0.5214,0.5561,0.5780,0.5136,0.0253,0.4611,0.9989,0.0776,0.5090,0,0.0000,0.72,10.92
+32k,complete,0.4986,0.7159,0.7217,0.5447,0.7607,0.7646,0.5880,0.7962,0.8005,0.7607,0.0039,0.2354,0.9952,0.0467,0.6100,0,0.0000,3.88,31.63

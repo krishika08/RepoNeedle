@@ -1,23 +1,23 @@
-# Reproduction Guide: Stage 3.7 Metric & Evaluation Audit
+# Reproduction Guide: Stage 3.7 Failure Deconstruction & Controlled Component Isolation
 
-**Document ID**: `STAGE3-7-REPRO-001`  
-**Stage**: Stage 3.7 — Forensic Evaluation Reconciliation and Research Integrity Audit  
-**Date**: October 28, 2026  
-**Status**: Step-by-Step Verifiable Reproduction Guide  
-**Workspace**: `F:\RepoNeedle`  
-**Branch**: `research-program`  
+**Document ID**: `STAGE3-7-REPRO-002`
+**Stage**: Stage 3.7 — Retrieval Failure Deconstruction & Controlled Component Isolation
+**Date**: October 31, 2026
+**Status**: Step-by-Step Verifiable Reproduction Guide
+**Workspace**: `F:\RepoNeedle`
+**Branch**: `research/stage3_7`
 
 ---
 
 ## 1. Environment Verification
 
-Ensure the runtime environment is properly configured. From the root directory `F:\RepoNeedle`, execute:
+Ensure the runtime environment is properly configured. From the root directory `F:\RepoNeedle`:
 
 ```powershell
 python -c "import sys, numpy, scipy, pytest; print('Python:', sys.version.split()[0], '| NumPy:', numpy.__version__, '| SciPy:', scipy.__version__, '| Pytest:', pytest.__version__)"
 ```
 - Expected Python: `>= 3.12`
-- Expected Packages: `numpy >= 1.26`, `scipy >= 1.13`, `pytest >= 8.0`
+- Expected Packages: `numpy >= 1.26`, `scipy >= 1.13`, `networkx >= 3.0`, `pytest >= 8.0`
 
 Verify that the frozen immutable Git tags are intact:
 ```powershell
@@ -31,88 +31,88 @@ git rev-parse "v0.1.0-baseline^{commit}" "stage3-candidate-freeze^{commit}"
 
 ---
 
-## 2. Automated Regression Unit Tests
+## 2. BM25 Document-Length Inflation Audit
 
-Execute the full suite of regression unit tests covering the metric contract, mathematical definitions, character vs token budget packing, tag immutability, shortcut excision, and fail-closed audit checks:
+To audit the mathematical impact of polyglot symbol extraction on BM25 effective document lengths and ranking degradation:
 
 ```powershell
-python -m pytest tests/test_stage3_7_metrics.py tests/test_stage3_7_fail_closed_audit.py -v
+python research/stage3_7/scripts/audit_bm25_length.py
 ```
-- Expected output: `16 passed` (9 metric tests + 7 fail-closed audit tests).
-
-To run the complete RepoNeedle unit test suite:
-```powershell
-python -m pytest tests/
-```
-- Expected output: `117 passed`.
+- **Generated File**: `research/stage3_7/BM25_LENGTH_DIAGNOSTICS.csv`
+- **Expected Results**:
+  - Pearson correlation between length inflation and rank degradation: $r \approx 0.4989$ ($p < 10^{-32}$)
+  - Spearman rank correlation: $r \approx 0.6029$ ($p < 10^{-51}$)
 
 ---
 
-## 3. Regenerating Canonical Stage 3.7 Evaluation Results
+## 3. Graph Hub Dilution & Score-Diffusion Diagnostics
 
-To deterministically recompute the canonical evaluation aggregates and per-query JSONL records:
+To measure graph degree distributions, hub concentration, and directional score diffusion across all queries:
 
 ```powershell
-python research/stage3_7/generate_canonical_stage3_7.py
+python research/stage3_7/scripts/audit_graph_hubs.py
 ```
-- Generates `research/stage3_7/CANONICAL_RESULTS.csv` and `research/stage3_7/PER_QUERY_RESULTS.jsonl` (345 queries x 4 systems = 1,380 evaluations).
+- **Generated Files**:
+  - `research/stage3_7/GRAPH_HUB_DIAGNOSTICS.csv`
+  - `research/stage3_7/GRAPH_DIFFUSION_RESULTS.csv`
+- **Expected Results**:
+  - Max node degree: up to 3,890.
+  - Bidirectional diffusion degrades 44.4% of gold target files and improves only 21.8%.
+  - Hub normalization ($1 / \sqrt{\text{degree}}$) improves 41.8% of degraded instances over raw diffusion.
 
 ---
 
-## 4. Reconciling the Stage 3.5 vs. Stage 3.6 Discrepancies
+## 4. Controlled 8-Experiment Matrix (EXP-371 to EXP-378)
 
-To inspect the exact macro metrics across all 4 systems from the authoritative dataset `research/stage3_6/PER_QUERY_RESULTS.csv`, execute:
+To evaluate all 8 controlled configurations under the unconstrained candidate-generation protocol across all $N=345$ positive ARB v2 samples:
 
 ```powershell
-python -c "
-import csv, numpy as np
-from collections import defaultdict
-with open('research/stage3_6/PER_QUERY_RESULTS.csv', encoding='utf-8') as f:
-    rows = list(csv.DictReader(f))
-by_sys = defaultdict(lambda: defaultdict(list))
-for r in rows:
-    s = r['system_id']
-    for k in ['mrr', 'recall_at_5', 'recall_at_10', 'recall_at_20', 'bcy_at_8k', 'latency_ms']:
-        by_sys[s][k].append(float(r[k]))
-for s in ['BASE-BM25', 'CAND-C', 'CAND-F', 'BASE-REPOMAP']:
-    v = by_sys[s]
-    print(f'{s:<15} | MRR: {np.mean(v[\"mrr\"]):.4f} | R@5: {np.mean(v[\"recall_at_5\"]):.4f} | R@20: {np.mean(v[\"recall_at_20\"]):.4f} | CharCov@8k: {np.mean(v[\"bcy_at_8k\"]):.4f} | Lat(p50): {np.median(v[\"latency_ms\"]):.2f}ms')
-"
+python research/stage3_7/scripts/evaluate_experiment_matrix.py
 ```
-
-Expected Output:
-```
-BASE-BM25       | MRR: 0.1735 | R@5: 0.1986 | R@20: 0.4549 | CharCov@8k: 0.0493 | Lat(p50): 20.85ms
-CAND-C          | MRR: 0.1399 | R@5: 0.2111 | R@20: 0.5105 | CharCov@8k: 0.0188 | Lat(p50): 31.50ms
-CAND-F          | MRR: 0.1351 | R@5: 0.1824 | R@20: 0.5078 | CharCov@8k: 0.0159 | Lat(p50): 32.42ms
-BASE-REPOMAP    | MRR: 0.2293 | R@5: 0.3337 | R@20: 0.6599 | CharCov@8k: 0.0652 | Lat(p50): 180.20ms
-```
+- **Generated Files**:
+  - `research/stage3_7/RANKING_RESULTS.csv`
+  - `research/stage3_7/PER_QUERY_RESULTS.jsonl` (2,760 evaluated query records)
+  - `research/stage3_7/EXPERIMENT_REGISTRY.jsonl`
+- **Expected Aggregate Results**:
+  - `EXP-371` (CAND-C): MRR = 0.1409, Recall@20 = 0.5143
+  - `EXP-372` (CAND-F): MRR = 0.1351, Recall@20 = 0.5078
+  - `EXP-373` (CAND-F-NO-DIFF): MRR = 0.1399, Recall@20 = 0.5105
+  - `EXP-374` (CAND-F-DECOUPLED): MRR = 0.1358, Recall@20 = 0.5078
+  - `EXP-375` (CAND-F-FWD-ONLY): MRR = 0.1314, Recall@20 = 0.4827
+  - `EXP-376` (CAND-F-BWD-ONLY): MRR = 0.1427, Recall@20 = 0.5216
+  - `EXP-377` (CAND-F-HUBNORM): MRR = 0.1427, Recall@20 = 0.5078
+  - `EXP-378` (CAND-COMBINED): MRR = 0.2052, Recall@20 = 0.5508, Hit@20 = 0.6406
 
 ---
 
-## 5. Re-Running the Statistical Audit
+## 5. Statistical Hypothesis Testing & Resampling
 
-To verify the Wilcoxon signed-rank and repository-clustered bootstrap results:
+To execute 10,000 repository-clustered bootstrap resamples and cluster-level paired tests:
 
 ```powershell
-python research/stage3_6/compute_paired_statistics.py
+python research/stage3_7/scripts/compute_paired_statistics.py
 ```
-- Expected Wilcoxon $p$-value: `0.0023`
-- Expected 95% Clustered Bootstrap CI: `[-0.0091, +0.1689]`
+- **Generated File**: `research/stage3_7/STATISTICAL_COMPARISON.md`
+- **Expected Results**:
+  - EXP-378 vs EXP-371 MRR diff: $+0.0642$ ($p_{\text{wilcoxon}} = 0.0024$, $p_{\text{ttest}} = 0.0250$).
+  - Clustered wins/ties/losses: 279 / 16 / 50.
 
 ---
 
-## 6. Artifact Checksum Verification
+## 6. Efficiency and Resource Benchmarking
 
-Verify that all research artifacts match their recorded SHA-256 hashes:
+To measure index build times, graph construction, latency percentiles, and memory RSS:
 
 ```powershell
-python -c "
-import hashlib
-from pathlib import Path
-for p in sorted(Path('research/stage3_7').glob('*.md')):
-    content = p.read_bytes()
-    sha = hashlib.sha256(content).hexdigest()
-    print(f'{p.name:<30} | {len(content.splitlines()):<5} lines | {sha}')
-"
+python research/stage3_7/scripts/benchmark_runtime_and_memory.py
 ```
+- **Generated File**: `research/stage3_7/RUNTIME_AND_MEMORY.csv`
+
+---
+
+## 7. Component Isolation Regression Tests
+
+```powershell
+pytest tests/test_stage3_7_component_isolation.py -v
+```
+- Expected: All tests pass.

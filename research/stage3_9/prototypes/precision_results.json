@@ -1,0 +1,423 @@
+{
+  "dataset_total": 250,
+  "fail_closed_lfcg": {
+    "overall": {
+      "candidates": 250,
+      "resolved": 120,
+      "correct": 118,
+      "incorrect": 2,
+      "unresolved": 130,
+      "precision": 0.9833,
+      "precision_95ci": [
+        0.9413,
+        0.9954
+      ],
+      "coverage": 0.48,
+      "coverage_95ci": [
+        0.4188,
+        0.5418
+      ]
+    },
+    "by_language": {
+      "Go": {
+        "candidates": 45,
+        "resolved": 20,
+        "correct": 19,
+        "incorrect": 1,
+        "unresolved": 25,
+        "precision": 0.95,
+        "precision_95ci": [
+          0.7639,
+          0.9911
+        ],
+        "coverage": 0.4444,
+        "coverage_95ci": [
+          0.3094,
+          0.5882
+        ]
+      },
+      "Java": {
+        "candidates": 35,
+        "resolved": 15,
+        "correct": 15,
+        "incorrect": 0,
+        "unresolved": 20,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.7961,
+          1.0
+        ],
+        "coverage": 0.4286,
+        "coverage_95ci": [
+          0.2798,
+          0.5914
+        ]
+      },
+      "JavaScript": {
+        "candidates": 30,
+        "resolved": 12,
+        "correct": 12,
+        "incorrect": 0,
+        "unresolved": 18,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.7575,
+          1.0
+        ],
+        "coverage": 0.4,
+        "coverage_95ci": [
+          0.2459,
+          0.5768
+        ]
+      },
+      "Python": {
+        "candidates": 60,
+        "resolved": 30,
+        "correct": 30,
+        "incorrect": 0,
+        "unresolved": 30,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.8865,
+          1.0
+        ],
+        "coverage": 0.5,
+        "coverage_95ci": [
+          0.3774,
+          0.6226
+        ]
+      },
+      "Rust": {
+        "candidates": 45,
+        "resolved": 22,
+        "correct": 21,
+        "incorrect": 1,
+        "unresolved": 23,
+        "precision": 0.9545,
+        "precision_95ci": [
+          0.782,
+          0.9919
+        ],
+        "coverage": 0.4889,
+        "coverage_95ci": [
+          0.3496,
+          0.63
+        ]
+      },
+      "TypeScript": {
+        "candidates": 35,
+        "resolved": 21,
+        "correct": 21,
+        "incorrect": 0,
+        "unresolved": 14,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.8454,
+          1.0
+        ],
+        "coverage": 0.6,
+        "coverage_95ci": [
+          0.4357,
+          0.7445
+        ]
+      }
+    },
+    "by_provenance_tier": {
+      "TIER_A_EXACT_AST": {
+        "candidates": 7,
+        "resolved": 7,
+        "correct": 7,
+        "incorrect": 0,
+        "unresolved": 0,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.6457,
+          1.0
+        ],
+        "coverage": 1.0,
+        "coverage_95ci": [
+          0.6457,
+          1.0
+        ]
+      },
+      "TIER_B_SCOPED_IMPORT": {
+        "candidates": 8,
+        "resolved": 8,
+        "correct": 8,
+        "incorrect": 0,
+        "unresolved": 0,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.6756,
+          1.0
+        ],
+        "coverage": 1.0,
+        "coverage_95ci": [
+          0.6756,
+          1.0
+        ]
+      },
+      "TIER_C_RECEIVER_BOUND": {
+        "candidates": 15,
+        "resolved": 15,
+        "correct": 15,
+        "incorrect": 0,
+        "unresolved": 0,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.7961,
+          1.0
+        ],
+        "coverage": 1.0,
+        "coverage_95ci": [
+          0.7961,
+          1.0
+        ]
+      },
+      "TIER_D_HEURISTIC": {
+        "candidates": 93,
+        "resolved": 90,
+        "correct": 88,
+        "incorrect": 2,
+        "unresolved": 3,
+        "precision": 0.9778,
+        "precision_95ci": [
+          0.9226,
+          0.9939
+        ],
+        "coverage": 0.9677,
+        "coverage_95ci": [
+          0.9094,
+          0.989
+        ]
+      },
+      "TIER_E_UNRESOLVED": {
+        "candidates": 127,
+        "resolved": 0,
+        "correct": 0,
+        "incorrect": 0,
+        "unresolved": 127,
+        "precision": 0.0,
+        "precision_95ci": [
+          0.0,
+          0.0
+        ],
+        "coverage": 0.0,
+        "coverage_95ci": [
+          0.0,
+          0.0294
+        ]
+      }
+    }
+  },
+  "naive_greedy_regex": {
+    "overall": {
+      "candidates": 250,
+      "resolved": 156,
+      "correct": 120,
+      "incorrect": 36,
+      "unresolved": 94,
+      "precision": 0.7692,
+      "precision_95ci": [
+        0.6971,
+        0.8284
+      ],
+      "coverage": 0.624,
+      "coverage_95ci": [
+        0.5625,
+        0.6817
+      ]
+    },
+    "by_language": {
+      "Go": {
+        "candidates": 45,
+        "resolved": 28,
+        "correct": 20,
+        "incorrect": 8,
+        "unresolved": 17,
+        "precision": 0.7143,
+        "precision_95ci": [
+          0.5294,
+          0.8475
+        ],
+        "coverage": 0.6222,
+        "coverage_95ci": [
+          0.4763,
+          0.7489
+        ]
+      },
+      "Java": {
+        "candidates": 35,
+        "resolved": 25,
+        "correct": 15,
+        "incorrect": 10,
+        "unresolved": 10,
+        "precision": 0.6,
+        "precision_95ci": [
+          0.4074,
+          0.766
+        ],
+        "coverage": 0.7143,
+        "coverage_95ci": [
+          0.5495,
+          0.8367
+        ]
+      },
+      "JavaScript": {
+        "candidates": 30,
+        "resolved": 15,
+        "correct": 12,
+        "incorrect": 3,
+        "unresolved": 15,
+        "precision": 0.8,
+        "precision_95ci": [
+          0.5481,
+          0.9295
+        ],
+        "coverage": 0.5,
+        "coverage_95ci": [
+          0.3315,
+          0.6685
+        ]
+      },
+      "Python": {
+        "candidates": 60,
+        "resolved": 35,
+        "correct": 30,
+        "incorrect": 5,
+        "unresolved": 25,
+        "precision": 0.8571,
+        "precision_95ci": [
+          0.7062,
+          0.9374
+        ],
+        "coverage": 0.5833,
+        "coverage_95ci": [
+          0.4573,
+          0.6994
+        ]
+      },
+      "Rust": {
+        "candidates": 45,
+        "resolved": 29,
+        "correct": 22,
+        "incorrect": 7,
+        "unresolved": 16,
+        "precision": 0.7586,
+        "precision_95ci": [
+          0.5789,
+          0.8778
+        ],
+        "coverage": 0.6444,
+        "coverage_95ci": [
+          0.4984,
+          0.7678
+        ]
+      },
+      "TypeScript": {
+        "candidates": 35,
+        "resolved": 24,
+        "correct": 21,
+        "incorrect": 3,
+        "unresolved": 11,
+        "precision": 0.875,
+        "precision_95ci": [
+          0.69,
+          0.9566
+        ],
+        "coverage": 0.6857,
+        "coverage_95ci": [
+          0.5202,
+          0.8145
+        ]
+      }
+    },
+    "by_provenance_tier": {
+      "TIER_A_EXACT_AST": {
+        "candidates": 7,
+        "resolved": 7,
+        "correct": 7,
+        "incorrect": 0,
+        "unresolved": 0,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.6457,
+          1.0
+        ],
+        "coverage": 1.0,
+        "coverage_95ci": [
+          0.6457,
+          1.0
+        ]
+      },
+      "TIER_B_SCOPED_IMPORT": {
+        "candidates": 8,
+        "resolved": 8,
+        "correct": 8,
+        "incorrect": 0,
+        "unresolved": 0,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.6756,
+          1.0
+        ],
+        "coverage": 1.0,
+        "coverage_95ci": [
+          0.6756,
+          1.0
+        ]
+      },
+      "TIER_C_RECEIVER_BOUND": {
+        "candidates": 15,
+        "resolved": 15,
+        "correct": 15,
+        "incorrect": 0,
+        "unresolved": 0,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.7961,
+          1.0
+        ],
+        "coverage": 1.0,
+        "coverage_95ci": [
+          0.7961,
+          1.0
+        ]
+      },
+      "TIER_D_HEURISTIC": {
+        "candidates": 93,
+        "resolved": 90,
+        "correct": 90,
+        "incorrect": 0,
+        "unresolved": 3,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.9591,
+          1.0
+        ],
+        "coverage": 0.9677,
+        "coverage_95ci": [
+          0.9094,
+          0.989
+        ]
+      },
+      "TIER_E_UNRESOLVED": {
+        "candidates": 127,
+        "resolved": 36,
+        "correct": 0,
+        "incorrect": 36,
+        "unresolved": 91,
+        "precision": 0.0,
+        "precision_95ci": [
+          0.0,
+          0.0964
+        ],
+        "coverage": 0.2835,
+        "coverage_95ci": [
+          0.2123,
+          0.3673
+        ]
+      }
+    }
+  }
+}

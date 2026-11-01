@@ -26,8 +26,39 @@ htmlcov/
 .mypy_cache/
 .tox/
 .env
+.env.*
+*.env
 .venv
 env/
 venv/
 ENV/
+
+# Local IDE & Editor configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+
+# Large benchmark candidate snapshots (> 100MB; tracked via .jsonl.gz)
+research/v1_accuracy/m2_structural_ranking/frozen_m1_candidates.jsonl
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Secrets & Credentials
+*.pem
+*.key
+*.cert
+*.token
+credentials.json
+secrets.json
+
+# Caches and logs
+*.log
+.cache/
+.ruff_cache/
 

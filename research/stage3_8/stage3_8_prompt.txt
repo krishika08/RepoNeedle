@@ -1,0 +1,537 @@
+<USER_REQUEST>
+# REPONEEDLE — STAGE 3.8
+# QUERY-CONDITIONED STRUCTURAL RETRIEVAL & REPOSITORY ROBUSTNESS
+
+You are continuing RepoNeedle, a long-term CPU-first repository-context retrieval research project.
+
+Stage 3.7 identified major retrieval failure mechanisms.
+
+Stage 3.7.1 completed statistical revalidation and component attribution.
+
+The current leading candidate is:
+
+`EXP-378 — CAND-COMBINED`
+
+Its reported performance:
+
+- MRR: 0.2052
+- Recall@5: 0.2522
+- Recall@10: 0.3808
+- Recall@20: 0.5508
+- Hit@20: 0.6406
+- BCY@8k: 0.0527
+
+Reference RepoMap performance:
+
+- MRR: 0.2293
+- Recall@20: 0.6599
+- Hit@20: 0.7478
+
+EXP-378 is reproducible according to Stage 3.7.1, but remains statistically inconclusive under its preregistered confidence-interval criterion.
+
+Do not call it an independently validated winner.
+
+The purpose of Stage 3.8 is to improve query-aware structural retrieval while retaining the components with evidence of usefulness.
+
+---
+
+# 1. PROJECT CONTEXT
+
+Project: RepoNeedle
+
+Language: Python
+
+Environment: Windows
+
+Current research branch: `research/stage3_7`
+
+Expected starting point: the verified Stage 3.7.1 repository state.
+
+Before proceeding, verify the actual branch and latest commit.
+
+Frozen tags:
+
+- `v0.1.0-baseline`
+- `stage3-candidate-freeze`
+
+Do not alter these tags.
+
+Primary benchmark:
+
+Agent Retrieval Bench v2.
+
+Evaluation population:
+
+345 positive tasks.
+
+25 repositories.
+
+218 corpus splits.
+
+Use the full unconstrained candidate universe.
+
+No benchmark task-type oracle filtering.
+
+The ARB v2 benchmark has been repeatedly used during development. Treat all results as development/regression evidence, not independent validation.
+
+---
+
+# 2. CORE RESEARCH QUESTION
+
+Can RepoNeedle use repository structure more intelligently by conditioning graph propagation on the actual query instead of relying on static centrality or indiscriminate propagation?
+
+The previous research identified three important findings:
+
+1. Static PageRank can harm ranking quality.
+2. Forward graph diffusion can leak scores to unrelated utility modules.
+3. Backward, hub-normalized propagation appears more promising.
+
+Stage 3.8 must investigate whether query-conditioned propagation can improve these results.
+
+Do not assume graph retrieval must always be enabled.
+
+A correct system may decide that structural information is not useful for a particular query.
+
+---
+
+# 3. PRESERVE THE EXP-378 ARCHITECTURE
+
+Use EXP-378 as the frozen experimental reference.
+
+Its important components are:
+
+- Decoupled BM25 document-length statistics.
+- Subword retrieval.
+- Documentation filtering using the existing 0.5x penalty.
+- Hub-normalized structural diffusion.
+- No unconditional static PageRank.
+
+Preserve these components unless a separately registered experiment explicitly tests a change.
+
+Do not casually change:
+
+- BM25 parameters.
+- Subword weighting.
+- Documentation penalty.
+- Tokenization.
+- Candidate generation.
+- Evaluation definitions.
+- Context packing.
+- Abstention thresholds.
+
+The primary purpose is to investigate structural relevance, not conduct another broad factorial experiment.
+
+---
+
+# 4. PHASE 0 — REPOSITORY INTEGRITY
+
+Inspect:
+
+- Branch.
+- HEAD.
+- Git status.
+- Current commit.
+- Recent commit history.
+- Frozen tag targets.
+- Git object integrity.
+- Existing Stage 3.7 and Stage 3.7.1 reports.
+- Existing experiment configurations.
+
+Review the previous Git permission and HEAD modification incidents.
+
+Do not modify `.git` permissions.
+
+Do not grant broad permissions.
+
+Do not manually modify Git references.
+
+Do not reset the repository or overwrite research history.
+
+Create a new stage directory:
+
+`research/stage3_8/`
+
+Use an isolated research branch from the verified current state.
+
+If Git operations fail, report the blocker.
+
+---
+
+# 5. PHASE 1 — REPRODUCE EXP-378
+
+Before changing code, independently reproduce EXP-378.
+
+Expected reference metrics:
+
+| Metric | EXP-378 |
+|---|---:|
+| MRR | 0.2052 |
+| Recall@5 | 0.2522 |
+| Recall@10 | 0.3808 |
+| Recall@20 | 0.5508 |
+| Hit@20 | 0.6406 |
+| BCY@8k | 0.0527 |
+
+Verify these from raw per-query records.
+
+Do not rely only on rounded aggregate tables.
+
+Save:
+
+- Full per-query rankings.
+- Repository identifiers.
+- Gold file annotations.
+- Candidate pools.
+- Configuration.
+- Commit.
+- Metric calculations.
+
+If the reproduction fails, stop the candidate experiments and diagnose the discrepancy.
+
+---
+
+# 6. PHASE 2 — INVESTIGATE REPOSITORY-LEVEL REGRESSIONS
+
+Stage 3.7.1 identified two notable regression cases:
+
+`pallets/click`
+
+`clap-rs/clap`
+
+Reported repository-level effects:
+
+- Click: Delta MRR = -0.1653 across 26 queries.
+- Clap: Delta MRR = -0.0849 across 10 queries.
+
+Inspect these cases carefully.
+
+For each query, capture:
+
+- Query text.
+- Gold files.
+- Initial lexical scores.
+- Initial subword scores.
+- Graph seed nodes.
+- Relevant graph neighbors.
+- Graph edge types.
+- Node degrees.
+- Diffusion scores.
+- Final rank changes.
+- Relevant files incorrectly displaced.
+- Irrelevant files promoted.
+
+Determine why the existing structural retrieval mechanism causes these regressions.
+
+Investigate whether:
+
+- Repository entrypoints receive excessive influence.
+- Import relationships are too broad.
+- Utility modules act as hubs.
+- Graph connectivity is unrelated to query intent.
+- Symbol naming produces misleading relationships.
+- Backward propagation reaches irrelevant integration points.
+
+Do not assume the same root cause applies to both repositories.
+
+Save individual failure case analyses.
+
+The `click` and `clap` queries must be locked before new parameter selection. Do not tune directly against their gold rankings.
+
+---
+
+# 7. PHASE 3 — QUERY-CONDITIONED GRAPH PROPAGATION
+
+Investigate query-conditioned graph retrieval.
+
+The basic principle:
+
+Only propagate structural relevance when the graph relationship is supported by the actual retrieval query.
+
+A graph edge by itself should not guarantee relevance.
+
+Inspect the existing architecture and choose an implementation compatible with its current score representation.
+
+Potential query relevance signals:
+
+- Lexical query-to-symbol overlap.
+- Character/subword similarity.
+- Query-to-path relevance.
+- Identifier relevance.
+- Initial lexical retrieval score.
+- Structural relationship type.
+- Node degree.
+
+Do not introduce a pretrained neural model.
+
+Do not assume these signals are equally important.
+
+## 7.1 Query-conditioned backward propagation
+
+Investigate whether high-relevance seed nodes can propagate scores backward to relevant callers, importers and integration contexts.
+
+Use the existing hub-normalization mechanism as the initial reference.
+
+A possible conceptual design:
+
+1. Run lexical and subword retrieval.
+2. Identify relevant initial seed nodes.
+3. Measure the relevance of connected structural nodes to the query.
+4. Apply backward propagation only when the relationship and query relevance justify it.
+5. Normalize score contributions to avoid hub domination.
+6. Combine graph contributions with the original retrieval score.
+
+This is a research hypothesis, not a mandatory implementation specification.
+
+Inspect the current graph direction conventions before coding.
+
+## 7.2 Query-conditioned edge-type awareness
+
+Investigate whether different relationships should receive different propagation eligibility.
+
+For example:
+
+- Importer relationships.
+- Caller relationships.
+- Module relationships.
+- Entry-point relationships.
+- Cross-crate dependencies.
+
+Do not assume all edge types are equally valuable.
+
+A relationship should contribute only when it provides evidence relevant to the actual query.
+
+Test edge-type gating separately from other changes.
+
+## 7.3 Degree-aware query-conditioned propagation
+
+Investigate whether highly connected nodes should receive attenuated contributions depending on query relevance.
+
+Preserve existing degree normalization as the baseline.
+
+Avoid arbitrary penalties.
+
+Any proposed normalization must have a clear mathematical explanation and controlled experiment.
+
+---
+
+# 8. PHASE 4 — CONTROLLED EXPERIMENT MATRIX
+
+Register the following experiments.
+
+| ID | Configuration |
+|---|---|
+| EXP-384 | Exact EXP-378 reproduction |
+| EXP-385 | Query-conditioned backward propagation |
+| EXP-386 | Query-conditioned edge-type-aware propagation |
+| EXP-387 | Degree-aware query-conditioned propagation |
+| EXP-388 | Best individually supported combined configuration |
+
+All experimental configurations must preserve the frozen EXP-378 reference.
+
+Do not change several unrelated components simultaneously.
+
+If a configuration is redundant, document the reason and preserve experiment identity appropriately.
+
+For each experiment record:
+
+- Full configuration.
+- Graph parameters.
+- Query-conditioning method.
+- Edge eligibility.
+- Node weighting.
+- Candidate-generation policy.
+- Full ranked output.
+- Per-query result.
+- Runtime.
+- Memory.
+
+---
+
+# 9. PHASE 5 — EVALUATION DESIGN
+
+Use all 345 positive ARB v2 queries under the canonical unconstrained protocol.
+
+No task-label-aware candidate filtering.
+
+No benchmark-specific path or string shortcuts.
+
+Measure:
+
+Retrieval:
+
+- MRR.
+- Recall@1.
+- Recall@5.
+- Recall@10.
+- Recall@20.
+- Hit@1.
+- Hit@5.
+- Hit@10.
+- Hit@20.
+
+Efficiency:
+
+- Median latency.
+- p95 latency.
+- Index construction time.
+- Process RSS.
+- Retained index size.
+
+Reliability diagnostics:
+
+- Candidate coverage.
+- Ranking failures.
+- Graph propagation failures.
+- Repository-level effects.
+
+## Repository-level analysis
+
+Report every repository separately.
+
+Pay particular attention to:
+
+- Click.
+- Clap.
+- Repositories where EXP-378 already performs well.
+- Repositories where graph diffusion hurts.
+- Repositories where graph diffusion helps.
+
+Do not hide poor-performing repositories behind overall averages.
+
+## Validation split
+
+Before selecting parameters, establish a repository-level internal development and validation split.
+
+Keep diagnostic repositories separate from parameter selection.
+
+Because the entire ARB corpus has historical development exposure, do not describe this split as an independent external holdout.
+
+Use it only for prospective within-benchmark validation.
+
+Do not use the same repository's queries in both parameter selection and validation.
+
+---
+
+# 10. PHASE 6 — STATISTICAL VALIDATION
+
+Retain the Stage 3.7.1 preregistered acceptance conditions.
+
+A new candidate must demonstrate:
+
+1. Valid unconstrained evaluation.
+2. MRR improvement of at least 0.010 absolute over EXP-378, unless the research question is explicitly about a trade-off.
+3. Repository-clustered 95% bootstrap CI lower bound strictly greater than zero for the primary comparison.
+4. No material Recall@20 regression.
+5. No serious p95 latency or process RSS regression.
+6. No benchmark-specific logic.
+7. Passing regression tests.
+
+Use at least 10,000 repository-clustered bootstrap resamples and a fixed seed.
+
+Report:
+
+- Bootstrap estimand.
+- Confidence interval construction.
+- Paired statistical test.
+- Test assumptions.
+- Repository-level effects.
+- Wins, ties and losses.
+
+Explain any disagreement between p-values and confidence intervals.
+
+Do not alter the statistical criteria after inspecting outcomes.
+
+If none of the new variants meets the acceptance criteria, EXP-378 remains the best promising development candidate.
+
+---
+
+# 11. PHASE 7 — CONTEXT PACKING AND ABSTENTION
+
+Do not tune context packing in the primary graph experiments.
+
+Do not tune the static abstention threshold.
+
+Preserve the existing 0.38 threshold and report its existing reliability problems.
+
+The Stage 3.6 report found a 98.78% false-accept rate on no-gold queries.
+
+A separate future stage should redesign selective abstention using repository-normalized evidence and confidence calibration.
+
+Stage 3.8 must not mix ranking and abstention research.
+
+Context packing can be measured secondarily using the frozen and verified metric definitions.
+
+---
+
+# 12. PHASE 8 — REQUIRED DELIVERABLES
+
+Create:
+
+`research/stage3_8/`
+
+Required reports:
+
+1. `STAGE3_8_DECISION_REPORT.md`
+2. `REPOSITORY_FAILURE_ANALYSIS.md`
+3. `QUERY_CONDITIONED_GRAPH_DESIGN.md`
+4. `EXPERIMENT_REGISTRY.jsonl`
+5. `RANKING_RESULTS.csv`
+6. `PER_QUERY_RESULTS.jsonl`
+7. `REPOSITORY_LEVEL_RESULTS.csv`
+8. `GRAPH_PROPAGATION_DIAGNOSTICS.csv`
+9. `STATISTICAL_COMPARISON.md`
+10. `RUNTIME_AND_MEMORY.csv`
+11. `FAILURE_ANALYSIS.md`
+12. `REPRODUCE.md`
+13. `GIT_AND_ENVIRONMENT_MANIFEST.md`
+
+Scripts:
+
+`research/stage3_8/scripts/`
+
+Preserve all previous research artifacts.
+
+Save raw outputs and checksums.
+
+Every result must be reproducible using documented commands.
+
+---
+
+# 13. FINAL DECISION
+
+The report must answer:
+
+1. Why did Click regress?
+2. Why did Clap regress?
+3. Does query-conditioned backward propagation improve retrieval?
+4. Does edge-type conditioning help?
+5. Does degree-aware query conditioning help?
+6. Does the new approach preserve gains in previously successful repositories?
+7. Does any candidate exceed 0.2052 MRR?
+8. Does any candidate approach or exceed RepoMap's 0.2293 MRR?
+9. Are the results statistically supported?
+10. What are the latency and memory trade-offs?
+11. Does a simpler architecture perform just as well?
+12. What should Stage 3.9 investigate?
+
+Do not promote a candidate simply because its aggregate MRR improves.
+
+A good retrieval engine must work consistently across repository types.
+
+The objective is not just to defeat RepoMap on one benchmark.
+
+The objective is to create robust, efficient repository-context retrieval for real AI coding agents.
+
+**Begin Stage 3.8 with repository integrity verification, EXP-378 reproduction and repository-level failure diagnosis. Do not modify the production retrieval architecture before establishing the failure mechanisms.**
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-11-01T01:49:12+05:30.
+
+The user's current state is as follows:
+Other open documents:
+- f:\RepoNeedle\external\agent-retrieval-bench\pyproject.toml (LANGUAGE_UNSPECIFIED)
+- f:\RepoNeedle\data_provenance\PROVENANCE.md (LANGUAGE_UNSPECIFIED)
+- f:\RepoNeedle\pyproject.toml (LANGUAGE_UNSPECIFIED)
+- f:\RepoNeedle\README.md (LANGUAGE_UNSPECIFIED)
+- f:\RepoNeedle\hf_artifacts\space\app.py (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>

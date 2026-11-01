@@ -1,0 +1,1552 @@
+{
+  "metadata": {
+    "mission": "RepoNeedle V1.0.0 \u2014 Milestone 3 Token-Budget Feasibility Audit",
+    "authoritative_baseline": "M1 Frozen Multi-Channel Candidate Snapshot",
+    "benchmark_scope": "Agent-Retrieval-Bench v2 (345 Queries, 25 Repositories, 514 Gold Targets)",
+    "source_data_path": "external/agent-retrieval-bench/data/corpus/",
+    "calibrated_tokenizer": "reponeedle.core.tokenizer.estimate_tokens (Code-Aware BPE Heuristic)",
+    "packaging_template": "# File: {path}\\n```{ext}\\n{content}\\n```\\n\\n",
+    "audit_policy": "Theoretical Oracle Ceiling Audit (No production packing implemented, gold labels used exclusively for bound calculation)"
+  },
+  "corpus_summary": {
+    "total_queries": 345,
+    "total_repositories": 25,
+    "total_corpus_snapshots": 218,
+    "total_gold_files": 514,
+    "single_gold_queries": 227,
+    "multi_gold_queries": 118,
+    "gold_files_per_query_distribution": {
+      "1": 227,
+      "2": 72,
+      "3": 42,
+      "4": 3,
+      "5": 1
+    }
+  },
+  "token_distributions": {
+    "gold_file_level": {
+      "mean_raw_tokens": 1369.7743190661479,
+      "std_raw_tokens": 463.72096345484914,
+      "median_raw_tokens": 1549.0,
+      "p25_raw_tokens": 1314.5,
+      "p75_raw_tokens": 1682.75,
+      "p90_raw_tokens": 1760.7,
+      "p95_raw_tokens": 1797.0,
+      "min_raw_tokens": 74,
+      "max_raw_tokens": 1877,
+      "mean_packaging_overhead_tokens": 10.651750972762645,
+      "mean_packaged_tokens": 1380.4260700389104
+    },
+    "query_level_total_gold_tokens": {
+      "mean_packaged_tokens": 2056.634782608696,
+      "std_packaged_tokens": 1228.8866600048989,
+      "median_packaged_tokens": 1691.0,
+      "p25_packaged_tokens": 1490.0,
+      "p75_packaged_tokens": 2589.0,
+      "p90_packaged_tokens": 3872.4000000000005,
+      "p95_packaged_tokens": 4830.200000000001,
+      "min_packaged_tokens": 88,
+      "max_packaged_tokens": 7486
+    }
+  },
+  "budget_feasibility_analysis": {
+    "2k": {
+      "budget_tokens": 2048,
+      "complete_gold_coverage_ceiling": {
+        "feasible_queries_count": 247,
+        "feasible_queries_pct": 0.7159420289855073,
+        "single_gold_feasible_count": 227,
+        "single_gold_feasible_pct": 1.0,
+        "multi_gold_feasible_count": 20,
+        "multi_gold_feasible_pct": 0.1694915254237288
+      },
+      "raw_tokens_comparison": {
+        "raw_feasible_queries_count": 249,
+        "raw_feasible_queries_pct": 0.7217391304347827,
+        "packaging_overhead_penalty_queries": 2
+      },
+      "impossibility_metrics": {
+        "impossible_queries_count": 98,
+        "impossible_queries_pct": 0.28405797101449276,
+        "zero_gold_feasible_queries_count": 0,
+        "impossible_by_track": {
+          "v2_comment2context": 30,
+          "v2_code2test": 28,
+          "v2_edit2ripple": 21,
+          "v2_trace2code": 19
+        },
+        "impossible_by_repo": {
+          "etcd-io/etcd": 26,
+          "vitejs/vite": 5,
+          "huggingface/transformers": 7,
+          "scrapy/scrapy": 1,
+          "huggingface/diffusers": 9,
+          "gin-gonic/gin": 14,
+          "tokio-rs/tokio": 11,
+          "numpy/numpy": 1,
+          "pytest-dev/pytest": 4,
+          "pallets/click": 3,
+          "clap-rs/clap": 4,
+          "caddyserver/caddy": 7,
+          "spring-projects/spring-boot": 5,
+          "microsoft/playwright": 1
+        }
+      },
+      "oracle_recall_ceilings": {
+        "knapsack_micro_recall_ceiling": 0.7334630350194552,
+        "knapsack_macro_recall_ceiling": 0.8447826086956524,
+        "oracle_gold_files_retrieved": 377,
+        "total_gold_files": 514
+      },
+      "impossible_queries_ledger": [
+        {
+          "query_id": "0265037c6c534b98289fe815",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5012,
+          "budget_overflow_tokens": 2964,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "056f7ac0b2a4940bc1ad5342",
+          "repo": "vitejs/vite",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3082,
+          "budget_overflow_tokens": 1034,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "0a4b3f17ec58d3405b1c9a47",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2987,
+          "budget_overflow_tokens": 939,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "0b514d819e10c606b274e8c0",
+          "repo": "scrapy/scrapy",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2995,
+          "budget_overflow_tokens": 947,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "0c60e782db37a60abbcd178d",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3212,
+          "budget_overflow_tokens": 1164,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "12b84b0c5fa5ad2a5ec98099",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4436,
+          "budget_overflow_tokens": 2388,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "148cbb0363427a9415265626",
+          "repo": "etcd-io/etcd",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2682,
+          "budget_overflow_tokens": 634,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "154523e8d0af9b78d3138dd4",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3730,
+          "budget_overflow_tokens": 1682,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "157caed0d859c12fb0ea4caf",
+          "repo": "gin-gonic/gin",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3310,
+          "budget_overflow_tokens": 1262,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "15959167576a87987d8f9f1f",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 2735,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "18a155cebfee9969b166934c",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5149,
+          "budget_overflow_tokens": 3101,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "191c9a48dcea15ffd9b74793",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4950,
+          "budget_overflow_tokens": 2902,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "19c290f5b37ff6d5a93db942",
+          "repo": "etcd-io/etcd",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2364,
+          "budget_overflow_tokens": 316,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "1aed02fc2c6d73a0ae8e2f1f",
+          "repo": "numpy/numpy",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2609,
+          "budget_overflow_tokens": 561,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "1dd2bdfdcf7092e1c69f50d6",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 5,
+          "total_packaged_tokens": 7486,
+          "budget_overflow_tokens": 5438,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.2
+        },
+        {
+          "query_id": "2097c0a5e982d33870da7ffa",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2700,
+          "budget_overflow_tokens": 652,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "274d3a66fcf1f52cec4d6c13",
+          "repo": "pytest-dev/pytest",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2984,
+          "budget_overflow_tokens": 936,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "27801f382096eabc8e450072",
+          "repo": "pallets/click",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3359,
+          "budget_overflow_tokens": 1311,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "2a765868fa2a6292543460f9",
+          "repo": "huggingface/diffusers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2812,
+          "budget_overflow_tokens": 764,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "2bbbe7ecba9c6fa62a48a36f",
+          "repo": "pytest-dev/pytest",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2879,
+          "budget_overflow_tokens": 831,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "2d65eeb2c97d07f557b1ddb2",
+          "repo": "clap-rs/clap",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3158,
+          "budget_overflow_tokens": 1110,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "30fded9a7b09048b5c8f39de",
+          "repo": "clap-rs/clap",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 2560,
+          "budget_overflow_tokens": 512,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "34b14301c5676ca5e49d6c22",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3355,
+          "budget_overflow_tokens": 1307,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "34b3f2f207dc4ebd77268875",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3625,
+          "budget_overflow_tokens": 1577,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "365be40339d415a67237eee9",
+          "repo": "caddyserver/caddy",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3284,
+          "budget_overflow_tokens": 1236,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "38c2a13af5bdc49dd7d75a2f",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3264,
+          "budget_overflow_tokens": 1216,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "3a9ae9c1d49cc6b262e3cab7",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3445,
+          "budget_overflow_tokens": 1397,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "3fd987cc42a8a4550add3562",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2589,
+          "budget_overflow_tokens": 541,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "41deac7db89b57cead1c85e0",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4950,
+          "budget_overflow_tokens": 2902,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "445f0e5cb04c0403b28b2294",
+          "repo": "spring-projects/spring-boot",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4069,
+          "budget_overflow_tokens": 2021,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "4eb8d03198ff006b7a39c280",
+          "repo": "vitejs/vite",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4531,
+          "budget_overflow_tokens": 2483,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "4efdeafc9e5c6cf5ef4334fc",
+          "repo": "gin-gonic/gin",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3120,
+          "budget_overflow_tokens": 1072,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "5bdeecc5409069d28e667e6d",
+          "repo": "caddyserver/caddy",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3601,
+          "budget_overflow_tokens": 1553,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "6338b75970bc7489e13952b4",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3361,
+          "budget_overflow_tokens": 1313,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "72f498bd4cd6b3fee84ad9e2",
+          "repo": "pytest-dev/pytest",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4460,
+          "budget_overflow_tokens": 2412,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "73fc2431777934774483cb2a",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2276,
+          "budget_overflow_tokens": 228,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "7a8ae85f26f7972e3c50c14c",
+          "repo": "caddyserver/caddy",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2541,
+          "budget_overflow_tokens": 493,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "7d5c2788e4c30bb773cb6643",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4950,
+          "budget_overflow_tokens": 2902,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "7d661ed7231eb85fa0e44073",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4749,
+          "budget_overflow_tokens": 2701,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "7db765ce2d8ea9b3f68029fd",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3526,
+          "budget_overflow_tokens": 1478,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "813d94498e2857e40587f5a5",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2879,
+          "budget_overflow_tokens": 831,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "845b2c207a9d6a99d2d0f83c",
+          "repo": "gin-gonic/gin",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3326,
+          "budget_overflow_tokens": 1278,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "874789dba71301e49e64f97c",
+          "repo": "vitejs/vite",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 2463,
+          "budget_overflow_tokens": 415,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "8a60031f5cc13ef87b0ecdab",
+          "repo": "spring-projects/spring-boot",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4208,
+          "budget_overflow_tokens": 2160,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "8ab746ffa3dc3b8e4f8d8327",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3261,
+          "budget_overflow_tokens": 1213,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "8b6ab1ba0883ff8104d28524",
+          "repo": "clap-rs/clap",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3168,
+          "budget_overflow_tokens": 1120,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "8c8c2eb1ece3b9098d999ec6",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4317,
+          "budget_overflow_tokens": 2269,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "8ccd4fc7cb2c41bf69717b6c",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2547,
+          "budget_overflow_tokens": 499,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "8cd3867f9e984d7f3adf41e6",
+          "repo": "microsoft/playwright",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3284,
+          "budget_overflow_tokens": 1236,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "8d19ca90da7a3f1ce81d3654",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3503,
+          "budget_overflow_tokens": 1455,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "8fbcfd329087a4fe16649d69",
+          "repo": "pallets/click",
+          "track": "v2_trace2code",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4363,
+          "budget_overflow_tokens": 2315,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "9151d23c9630aed754b3355b",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3562,
+          "budget_overflow_tokens": 1514,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "9212befbd9ac5a4308438522",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5010,
+          "budget_overflow_tokens": 2962,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "95a325995771fa5acd3f9c69",
+          "repo": "huggingface/diffusers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2854,
+          "budget_overflow_tokens": 806,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "9c3412dfb452df23d783c5e6",
+          "repo": "spring-projects/spring-boot",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2746,
+          "budget_overflow_tokens": 698,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "9cf0a50aa7225934e6f5ac59",
+          "repo": "vitejs/vite",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4238,
+          "budget_overflow_tokens": 2190,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "9edbbb5337d727bb496e7707",
+          "repo": "gin-gonic/gin",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4989,
+          "budget_overflow_tokens": 2941,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "a17b0c140c1465ce72d6380f",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4317,
+          "budget_overflow_tokens": 2269,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "a4bb43c519262529c3cd0ddf",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 2055,
+          "budget_overflow_tokens": 7,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "a5663509f3a348043512b15b",
+          "repo": "vitejs/vite",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2841,
+          "budget_overflow_tokens": 793,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "a5ef6228e76da22ccdcf6687",
+          "repo": "pytest-dev/pytest",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3165,
+          "budget_overflow_tokens": 1117,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "a726f272e7ddbd50bac4face",
+          "repo": "caddyserver/caddy",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2435,
+          "budget_overflow_tokens": 387,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "a82117a5d29dd98d94ceb931",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2949,
+          "budget_overflow_tokens": 901,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "a8e245be8d5dfb1782bf8c18",
+          "repo": "etcd-io/etcd",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 4,
+          "total_packaged_tokens": 4842,
+          "budget_overflow_tokens": 2794,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "a9432b3d44a06f48f40060bb",
+          "repo": "etcd-io/etcd",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3479,
+          "budget_overflow_tokens": 1431,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "a9c4956e69fe0ab051fc39a7",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2062,
+          "budget_overflow_tokens": 14,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "ac0571b1e94a8f064f02e864",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2682,
+          "budget_overflow_tokens": 634,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "ae7f8cc63000716014d4311a",
+          "repo": "huggingface/transformers",
+          "track": "v2_comment2context",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3048,
+          "budget_overflow_tokens": 1000,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "b389823a6435d1ada9d7d2b9",
+          "repo": "etcd-io/etcd",
+          "track": "v2_trace2code",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3220,
+          "budget_overflow_tokens": 1172,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "b872b8ef648b8cad2d959a36",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3685,
+          "budget_overflow_tokens": 1637,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "ba3c1cd24f66bb46eb30d57d",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 2735,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "bad03d80181bdf9b9d667638",
+          "repo": "etcd-io/etcd",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 4,
+          "total_packaged_tokens": 4499,
+          "budget_overflow_tokens": 2451,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "bed9a23bf8a662f0e6251a42",
+          "repo": "pallets/click",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3346,
+          "budget_overflow_tokens": 1298,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "c06816923c65bcd86bfd1c2a",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3371,
+          "budget_overflow_tokens": 1323,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "c2af1d6140c0b8b749bd1b77",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4520,
+          "budget_overflow_tokens": 2472,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "c60a8891f2e4fc1229f51fa7",
+          "repo": "huggingface/diffusers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3106,
+          "budget_overflow_tokens": 1058,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "c7f3b6917b991258d6cd1ba3",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4847,
+          "budget_overflow_tokens": 2799,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "c9059c66a5c31bceb46c9edf",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2941,
+          "budget_overflow_tokens": 893,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "d33132ce299c01e986c74210",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2942,
+          "budget_overflow_tokens": 894,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "d354e818b2436242628f1ea1",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5327,
+          "budget_overflow_tokens": 3279,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "d42e82da45418756a38691fc",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4990,
+          "budget_overflow_tokens": 2942,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "d5a6bc19ef154663f7e591ad",
+          "repo": "gin-gonic/gin",
+          "track": "v2_trace2code",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3550,
+          "budget_overflow_tokens": 1502,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "d5f1198f6fb5e19244fd4ac7",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5189,
+          "budget_overflow_tokens": 3141,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "d6dbe66e15d389619fb51499",
+          "repo": "etcd-io/etcd",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3864,
+          "budget_overflow_tokens": 1816,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "d7869de71f50a99dafc8478a",
+          "repo": "gin-gonic/gin",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3209,
+          "budget_overflow_tokens": 1161,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "de059c1c2e3ffc63820ce0e4",
+          "repo": "caddyserver/caddy",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3438,
+          "budget_overflow_tokens": 1390,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "e1280404f66f39671f1939e5",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 2735,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "e271598f05638161b8b0fbdc",
+          "repo": "spring-projects/spring-boot",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 3878,
+          "budget_overflow_tokens": 1830,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "e45d17f09b4ecbc9c61e2aff",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 2735,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "e8ef6b1c59b7afde52d0cded",
+          "repo": "spring-projects/spring-boot",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2436,
+          "budget_overflow_tokens": 388,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "eb14454231d369a4b024fc4b",
+          "repo": "gin-gonic/gin",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3070,
+          "budget_overflow_tokens": 1022,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "eca2d26fea4f7e75efe9edbd",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5001,
+          "budget_overflow_tokens": 2953,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "f0e2f6c47c53aab117eca775",
+          "repo": "caddyserver/caddy",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5227,
+          "budget_overflow_tokens": 3179,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "f39b3eb29d5ba2f6c18b0555",
+          "repo": "clap-rs/clap",
+          "track": "v2_code2test",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 2231,
+          "budget_overflow_tokens": 183,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "f7d79ec3fd20e651c379facb",
+          "repo": "caddyserver/caddy",
+          "track": "v2_trace2code",
+          "num_gold_files": 2,
+          "total_packaged_tokens": 3551,
+          "budget_overflow_tokens": 1503,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.5
+        },
+        {
+          "query_id": "fa3c694a355ce304193a46e8",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5158,
+          "budget_overflow_tokens": 3110,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "fa3cd07539adf20ceb766dda",
+          "repo": "gin-gonic/gin",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5120,
+          "budget_overflow_tokens": 3072,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.3333333333333333
+        },
+        {
+          "query_id": "fd368dbd80fe61af44f0637c",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 4,
+          "total_packaged_tokens": 6559,
+          "budget_overflow_tokens": 4511,
+          "oracle_max_gold_retrievable": 1,
+          "oracle_recall_ceiling": 0.25
+        }
+      ]
+    },
+    "4k": {
+      "budget_tokens": 4096,
+      "complete_gold_coverage_ceiling": {
+        "feasible_queries_count": 312,
+        "feasible_queries_pct": 0.9043478260869565,
+        "single_gold_feasible_count": 227,
+        "single_gold_feasible_pct": 1.0,
+        "multi_gold_feasible_count": 85,
+        "multi_gold_feasible_pct": 0.7203389830508474
+      },
+      "raw_tokens_comparison": {
+        "raw_feasible_queries_count": 312,
+        "raw_feasible_queries_pct": 0.9043478260869565,
+        "packaging_overhead_penalty_queries": 0
+      },
+      "impossibility_metrics": {
+        "impossible_queries_count": 33,
+        "impossible_queries_pct": 0.09565217391304348,
+        "zero_gold_feasible_queries_count": 0,
+        "impossible_by_track": {
+          "v2_comment2context": 18,
+          "v2_code2test": 5,
+          "v2_edit2ripple": 9,
+          "v2_trace2code": 1
+        },
+        "impossible_by_repo": {
+          "etcd-io/etcd": 13,
+          "huggingface/transformers": 1,
+          "tokio-rs/tokio": 7,
+          "vitejs/vite": 2,
+          "pytest-dev/pytest": 1,
+          "huggingface/diffusers": 4,
+          "spring-projects/spring-boot": 1,
+          "pallets/click": 1,
+          "gin-gonic/gin": 2,
+          "caddyserver/caddy": 1
+        }
+      },
+      "oracle_recall_ceilings": {
+        "knapsack_micro_recall_ceiling": 0.9319066147859922,
+        "knapsack_macro_recall_ceiling": 0.9679227053140097,
+        "oracle_gold_files_retrieved": 479,
+        "total_gold_files": 514
+      },
+      "impossible_queries_ledger": [
+        {
+          "query_id": "0265037c6c534b98289fe815",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5012,
+          "budget_overflow_tokens": 916,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "12b84b0c5fa5ad2a5ec98099",
+          "repo": "huggingface/transformers",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4436,
+          "budget_overflow_tokens": 340,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "15959167576a87987d8f9f1f",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 687,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "18a155cebfee9969b166934c",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5149,
+          "budget_overflow_tokens": 1053,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "191c9a48dcea15ffd9b74793",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4950,
+          "budget_overflow_tokens": 854,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "1dd2bdfdcf7092e1c69f50d6",
+          "repo": "etcd-io/etcd",
+          "track": "v2_code2test",
+          "num_gold_files": 5,
+          "total_packaged_tokens": 7486,
+          "budget_overflow_tokens": 3390,
+          "oracle_max_gold_retrievable": 3,
+          "oracle_recall_ceiling": 0.6
+        },
+        {
+          "query_id": "41deac7db89b57cead1c85e0",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4950,
+          "budget_overflow_tokens": 854,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "4eb8d03198ff006b7a39c280",
+          "repo": "vitejs/vite",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4531,
+          "budget_overflow_tokens": 435,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "72f498bd4cd6b3fee84ad9e2",
+          "repo": "pytest-dev/pytest",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4460,
+          "budget_overflow_tokens": 364,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "7d5c2788e4c30bb773cb6643",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4950,
+          "budget_overflow_tokens": 854,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "7d661ed7231eb85fa0e44073",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4749,
+          "budget_overflow_tokens": 653,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "8a60031f5cc13ef87b0ecdab",
+          "repo": "spring-projects/spring-boot",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4208,
+          "budget_overflow_tokens": 112,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "8c8c2eb1ece3b9098d999ec6",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4317,
+          "budget_overflow_tokens": 221,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "8fbcfd329087a4fe16649d69",
+          "repo": "pallets/click",
+          "track": "v2_trace2code",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4363,
+          "budget_overflow_tokens": 267,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "9212befbd9ac5a4308438522",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5010,
+          "budget_overflow_tokens": 914,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "9cf0a50aa7225934e6f5ac59",
+          "repo": "vitejs/vite",
+          "track": "v2_code2test",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4238,
+          "budget_overflow_tokens": 142,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "9edbbb5337d727bb496e7707",
+          "repo": "gin-gonic/gin",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4989,
+          "budget_overflow_tokens": 893,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "a17b0c140c1465ce72d6380f",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4317,
+          "budget_overflow_tokens": 221,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "a8e245be8d5dfb1782bf8c18",
+          "repo": "etcd-io/etcd",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 4,
+          "total_packaged_tokens": 4842,
+          "budget_overflow_tokens": 746,
+          "oracle_max_gold_retrievable": 3,
+          "oracle_recall_ceiling": 0.75
+        },
+        {
+          "query_id": "ba3c1cd24f66bb46eb30d57d",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 687,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "bad03d80181bdf9b9d667638",
+          "repo": "etcd-io/etcd",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 4,
+          "total_packaged_tokens": 4499,
+          "budget_overflow_tokens": 403,
+          "oracle_max_gold_retrievable": 3,
+          "oracle_recall_ceiling": 0.75
+        },
+        {
+          "query_id": "c2af1d6140c0b8b749bd1b77",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4520,
+          "budget_overflow_tokens": 424,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "c7f3b6917b991258d6cd1ba3",
+          "repo": "huggingface/diffusers",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4847,
+          "budget_overflow_tokens": 751,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "d354e818b2436242628f1ea1",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5327,
+          "budget_overflow_tokens": 1231,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "d42e82da45418756a38691fc",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4990,
+          "budget_overflow_tokens": 894,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "d5f1198f6fb5e19244fd4ac7",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5189,
+          "budget_overflow_tokens": 1093,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "e1280404f66f39671f1939e5",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 687,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "e45d17f09b4ecbc9c61e2aff",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 4783,
+          "budget_overflow_tokens": 687,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "eca2d26fea4f7e75efe9edbd",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5001,
+          "budget_overflow_tokens": 905,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "f0e2f6c47c53aab117eca775",
+          "repo": "caddyserver/caddy",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5227,
+          "budget_overflow_tokens": 1131,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "fa3c694a355ce304193a46e8",
+          "repo": "etcd-io/etcd",
+          "track": "v2_comment2context",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5158,
+          "budget_overflow_tokens": 1062,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "fa3cd07539adf20ceb766dda",
+          "repo": "gin-gonic/gin",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 3,
+          "total_packaged_tokens": 5120,
+          "budget_overflow_tokens": 1024,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.6666666666666666
+        },
+        {
+          "query_id": "fd368dbd80fe61af44f0637c",
+          "repo": "tokio-rs/tokio",
+          "track": "v2_edit2ripple",
+          "num_gold_files": 4,
+          "total_packaged_tokens": 6559,
+          "budget_overflow_tokens": 2463,
+          "oracle_max_gold_retrievable": 2,
+          "oracle_recall_ceiling": 0.5
+        }
+      ]
+    },
+    "8k": {
+      "budget_tokens": 8192,
+      "complete_gold_coverage_ceiling": {
+        "feasible_queries_count": 345,
+        "feasible_queries_pct": 1.0,
+        "single_gold_feasible_count": 227,
+        "single_gold_feasible_pct": 1.0,
+        "multi_gold_feasible_count": 118,
+        "multi_gold_feasible_pct": 1.0
+      },
+      "raw_tokens_comparison": {
+        "raw_feasible_queries_count": 345,
+        "raw_feasible_queries_pct": 1.0,
+        "packaging_overhead_penalty_queries": 0
+      },
+      "impossibility_metrics": {
+        "impossible_queries_count": 0,
+        "impossible_queries_pct": 0.0,
+        "zero_gold_feasible_queries_count": 0,
+        "impossible_by_track": {},
+        "impossible_by_repo": {}
+      },
+      "oracle_recall_ceilings": {
+        "knapsack_micro_recall_ceiling": 1.0,
+        "knapsack_macro_recall_ceiling": 1.0,
+        "oracle_gold_files_retrieved": 514,
+        "total_gold_files": 514
+      },
+      "impossible_queries_ledger": []
+    },
+    "16k": {
+      "budget_tokens": 16384,
+      "complete_gold_coverage_ceiling": {
+        "feasible_queries_count": 345,
+        "feasible_queries_pct": 1.0,
+        "single_gold_feasible_count": 227,
+        "single_gold_feasible_pct": 1.0,
+        "multi_gold_feasible_count": 118,
+        "multi_gold_feasible_pct": 1.0
+      },
+      "raw_tokens_comparison": {
+        "raw_feasible_queries_count": 345,
+        "raw_feasible_queries_pct": 1.0,
+        "packaging_overhead_penalty_queries": 0
+      },
+      "impossibility_metrics": {
+        "impossible_queries_count": 0,
+        "impossible_queries_pct": 0.0,
+        "zero_gold_feasible_queries_count": 0,
+        "impossible_by_track": {},
+        "impossible_by_repo": {}
+      },
+      "oracle_recall_ceilings": {
+        "knapsack_micro_recall_ceiling": 1.0,
+        "knapsack_macro_recall_ceiling": 1.0,
+        "oracle_gold_files_retrieved": 514,
+        "total_gold_files": 514
+      },
+      "impossible_queries_ledger": []
+    },
+    "32k": {
+      "budget_tokens": 32768,
+      "complete_gold_coverage_ceiling": {
+        "feasible_queries_count": 345,
+        "feasible_queries_pct": 1.0,
+        "single_gold_feasible_count": 227,
+        "single_gold_feasible_pct": 1.0,
+        "multi_gold_feasible_count": 118,
+        "multi_gold_feasible_pct": 1.0
+      },
+      "raw_tokens_comparison": {
+        "raw_feasible_queries_count": 345,
+        "raw_feasible_queries_pct": 1.0,
+        "packaging_overhead_penalty_queries": 0
+      },
+      "impossibility_metrics": {
+        "impossible_queries_count": 0,
+        "impossible_queries_pct": 0.0,
+        "zero_gold_feasible_queries_count": 0,
+        "impossible_by_track": {},
+        "impossible_by_repo": {}
+      },
+      "oracle_recall_ceilings": {
+        "knapsack_micro_recall_ceiling": 1.0,
+        "knapsack_macro_recall_ceiling": 1.0,
+        "oracle_gold_files_retrieved": 514,
+        "total_gold_files": 514
+      },
+      "impossible_queries_ledger": []
+    }
+  }
+}

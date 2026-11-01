@@ -454,11 +454,14 @@ class RepoNeedleEngine:
         selected = self.budget_optimizer.pack_context(
             candidate_files=candidates_with_scores,
             budget_tokens=eff_budget,
+            query_text=query_obj.text,
             query_terms=query_terms,
             allow_skeletons=ablation.allow_skeletons,
+            mode=self.budget_config.mode if self.budget_config.mode != "auto" else ("complete" if ablation_config is not None else None),
         )
 
         total_tokens_used = sum(s.token_count for s in selected)
+        rendered_context = self.budget_optimizer.tokenizer.render_prompt(selected)
 
         return RetrievalResult(
             query=query_obj.text,
@@ -473,4 +476,5 @@ class RepoNeedleEngine:
             execution_time_ms=(time.perf_counter() - start_time) * 1000,
             ranker=effective_ranker,
             ranked_files=ranked_paths,
+            rendered_context=rendered_context,
         )
