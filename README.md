@@ -84,6 +84,27 @@ Evaluated with **10,000 bootstrap resamples** (repository-clustered bootstrap ac
 | | | Recall@20 | 0.4986 | 0.5876 | **0.6121** | 0.4612 | -7.5% | -24.7% |
 | | | **BCY@8k** | 0.2428 | **0.4468** | 0.3534 | 0.3966 | +63.3% | +12.2% |
 
+> [!IMPORTANT]
+> **Methodological Disclosure on `code2test` (+151.7%) and Workflow Routing**:
+> - **Task-Conditioned Evaluation**: In the official ARB evaluation above, benchmark task labels (`code2test`, `trace2code`, etc.) were supplied directly to the `WorkflowRouter` (`task_type = sample.get("task_type")`), dynamically activating task-specific fusion weights and test-graph linkages.
+> - **Not Default AUTO-Mode Performance**: This measures **task-conditioned retrieval capacity**, not unassisted automatic classification. In unassisted production deployment (`TaskType.AUTO`), the engine relies on query text regex heuristics. If a natural-language query lacks explicit test keywords, automatic intent classification may default to `comment2context`, reducing the observed gain toward baseline BM25 performance (`0.1057`).
+> - **Candidate Set Integrity**: The task conditioning dynamically modulates ranking weights and structural graph boosts; candidate file pools themselves are never filtered by oracle labels.
+
+#### Part A.1: Stage 3.8 Controlled Research Reference (EXP-386 vs Full ARB v2)
+
+To ensure scientific reproducibility across research stages, Stage 3.8 evaluated candidate retrieval configurations under a controlled file-level graph harness:
+
+| Evaluation System | Overall MRR | Recall@5 | Recall@10 | Recall@20 | Hit@20 | BCY@8k (File-Yield) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Stage 3.8 Reference (EXP-386)** | **0.2062** | 0.2512 | 0.3776 | 0.5566 | 0.6464 | **0.0556** |
+| Stage 3.7 Reference (EXP-378) | 0.2052 | 0.2486 | 0.3710 | 0.5508 | 0.6406 | 0.0527 |
+
+> [!NOTE]
+> **Distinct Methodologies & BCY Definitions**:
+> - **Full ARB v2 Validation (Part A)**: Uses the complete production pipeline with fine-grained **block-level budget yield** (`block_metrics_at_budget` / `pack_files`, yielding BCY@8k: `0.3450`).
+> - **Stage 3.8 Research (Part A.1)**: Uses the experimental research harness measuring **file-level budget yield** (`sample_metrics().bcy_8k`, yielding BCY@8k: `0.0556`, where only 27/345 queries had gold files fully contained in the 8k budget).
+> - These two distinct metric methodologies reflect different measurement granularities and must not be merged.
+
 > [!NOTE]
 > *Historical Pilot Record ($N=35$ exploratory pilot)*: In early pre-release testing on a small 35-sample v0.1 subset with restricted candidate pools, RepoNeedle achieved MRR `0.879` vs BM25 `0.748`. Those scores reflect narrow candidate sub-pools. Full whole-repository evaluation ($N=345$) across full codebases yields the realistic production MRRs shown above.
 
@@ -168,6 +189,7 @@ Empirically measured across the full Agent Retrieval Bench evaluation suite:
 - **CPU Native Architecture**: RepoNeedle runs entirely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
 - **Neural Embedding Baseline Scope**: Heavy neural embedding checkpoints (such as `Qwen/Qwen3-Embedding-4B` and `8B`) were evaluated via published ARB literature. Local GPU inference was not executed due to host sandbox environment boundaries (CPU-only execution).
 - **Release Status**: **Limited Research Release (v0.1.0 Research Preview)**. Recommended for retrieval benchmarking and research experiments. Not recommended as a standalone zero-shot abstention gate without an upstream trained neural classifier.
+- **Stage 3.9.6 Research Status**: **TERMINATED INCOMPLETE — NO EXPERIMENTAL CONCLUSION**. Stage 3.9.6 experiment runner was cancelled at 60/218 corpora under host memory pressure. EXP-398, EXP-399a, and EXP-399b are formally excluded from stable V1. EXP-386 remains the provisional stable structural reference.
 
 ## 🚀 Quickstart & Installation
 
