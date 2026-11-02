@@ -99,9 +99,16 @@ class RepoGraph:
     def parse_cargo_manifest(content: str, filepath: str = "") -> Dict[str, Any]:
         """Parses Cargo.toml for package name, workspace members, and path dependencies."""
         res = {"name": "", "workspace_members": [], "path_dependencies": {}}
-        if tomllib:
+        parsed = False
+        toml_parser = tomllib
+        if not toml_parser:
             try:
-                data = tomllib.loads(content)
+                import tomli as toml_parser
+            except ImportError:
+                toml_parser = None
+        if toml_parser:
+            try:
+                data = toml_parser.loads(content)
                 res["name"] = data.get("package", {}).get("name", "")
                 ws = data.get("workspace", {})
                 if isinstance(ws, dict):
@@ -112,8 +119,14 @@ class RepoGraph:
                         for dep_name, dep_info in deps.items():
                             if isinstance(dep_info, dict) and "path" in dep_info:
                                 res["path_dependencies"][dep_name] = dep_info["path"]
+                parsed = True
             except Exception:
                 pass
+        if not parsed:
+            # Fallback regex parsing when tomllib is unavailable (e.g. Python 3.10)
+            pkg_match = re.search(r'\[package\][^\[]*?name\s*=\s*["\']([^"\']+)["\']', content, re.DOTALL)
+            if pkg_match:
+                res["name"] = pkg_match.group(1).strip()
         return res
 
     @staticmethod
