@@ -25,8 +25,8 @@ RepoNeedle solves this upstream bottleneck by combining:
 2. **Workflow-Adaptive Routing**: Automatic classification of query intent (`trace2code`, `code2test`, `edit2ripple`, `comment2context`, `selective`) with dynamic weight tuning.
 3. **Inverted Test-to-Target Mapping**: Dependency graph inversion and naming convention heuristics to locate regression test suites.
 4. **Calibrated Selective Abstention**: Peak-to-noise ($Z$-score) and repository symbol overlap gating to abstain from returning noise on counterfactual tasks.
-5. **CUD-Pack (Capacity-Sensitive Utility-Density Packing)**: Adaptive knapsack selection engine providing strict zero downstream overflows ($C_{\text{actual}} \le B_{\text{configured}}$) across dual modes: **Compact Mode** ($\le 4\text{k}$ tokens, extracting high-density implementation spans and structural skeletons) and **Complete Context Mode** ($\ge 8\text{k}$ tokens, preserving whole source files).
-6. **Change-Impact Ranking Engine (V1.1 Opt-in)**: Multi-hop typed dependency graph propagation (static imports, symbol definitions, call sites, and directory proximity) designed for bug fixing and refactoring tasks.
+5. **CUD-Pack (Capacity-Sensitive Utility-Density Packing)**: Adaptive knapsack selection engine providing strict zero downstream overflows ($C_{\text{actual}} \le B_{\text{configured}}$) according to RepoNeedle's regex code token model across dual modes: **Compact Mode** ($\le 4\text{k}$ tokens, extracting high-density implementation spans and structural skeletons) and **Complete Context Mode** ($\ge 8\text{k}$ tokens, preserving whole source files).
+6. **Change-Impact Ranking Engine (V1.1 Opt-in)**: Seed-relative relationship scoring (evaluating static imports, symbol definitions, call sites, build manifests, test-stems, and directory proximity) designed for bug fixing and refactoring tasks.
 
 ---
 
@@ -156,26 +156,29 @@ Empirically measured across the full Agent Retrieval Bench evaluation suite:
 ### Part E: System Architecture & Deployment Status
 
 - **CPU Native Architecture**: RepoNeedle runs entirely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
-- **Production Status**: **Production Release (v1.1.0)**. Features default `legacy` ranker with backwards-compatible contract preservation, and opt-in `change_impact` ranking engine for dependency-coupled retrieval.
+- **Release Status**: **V1.1.0 source integrated on main; formal release publication pending.** Features default `legacy` ranker with backwards-compatible contract preservation, and opt-in `change_impact` ranking engine for seed-relative relationship scoring.
 
 ---
 
 ### Part F: Independent R6 Change-Impact Benchmark ($N=180$ Queries across 18 Repositories)
 
-To evaluate retrieval generalizability beyond the original 25 ARB repositories, an independent benchmark cohort was constructed across **18 unseen open-source repositories** comprising 180 retrieval queries:
+To evaluate retrieval generalizability beyond the original 25 ARB repositories, an independent benchmark cohort was constructed across **18 unseen open-source repositories** comprising 180 retrieval queries.
 
-| Benchmark Split | Sample Size ($N$) | Repositories | Baseline MRR | Change-Impact MRR | Delta (Δ) | Wilcoxon Signed-Rank ($p$-value) | Statistically Significant |
+Statistical inference was conducted using **repository-clustered statistical models** across independent repository clusters:
+
+| Partition | Queries ($N$) | Repositories | Baseline MRR | Champion MRR | Delta (Δ) | Repository-Clustered Inference (95% CI) | Statistical Significance |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Pooled Cohort** | $N=180$ | 18 repos | 0.5994 | **0.6282** | **+0.0288** | $p = 0.0078$ | **YES ($p < 0.01$)** |
-| **Validation Cohort** | $N=70$ | 7 repos | 0.6472 | **0.6708** | **+0.0236** | $p = 0.0210$ | **YES ($p < 0.05$)** |
-| **Held-Out Cohort** | $N=50$ | 5 repos | 0.5215 | **0.5467** | **+0.0252** | $p = 0.5025$ | **NO (Underpowered)** |
+| **Training** | $N=90$ | 9 repos | 0.6213 | 0.6546 | +0.0333 | — | Training fit |
+| **Validation** | $N=40$ | 4 repos | 0.6472 | 0.6708 | +0.0236 | $p = 0.5073$, 95% CI [0.0000, +0.0472] | Not Statistically Significant |
+| **Held-Out** | $N=50$ | 5 repos | 0.5215 | 0.5467 | +0.0252 | $p = 0.5025$, 95% CI [0.0000, +0.0629] | Not Statistically Significant |
+| **Pooled Cohort** | $N=180$ | 18 repos | 0.5994 | **0.6282** | **+0.0288** | $p = 0.0078$, 95% CI [+0.0082, +0.0524] | **Statistically Significant ($p < 0.01$)** |
 
 > [!NOTE]
 > **Methodological Context & Scope of R6 Results**:
-> - **Candidate Pool Evaluation**: Queries were evaluated against pre-filtered candidate pools averaging approximately **53.79 files per query**. Within these pools, Candidate-Pool Recall@20 is 100%.
-> - **Full-Repository Retrieval**: Whole-repository Recall@20 of 60–75% represents a projected estimate under full repository indexing, not an empirically measured whole-codebase scan.
-> - **Statistical Power**: While the pooled 18-repository cohort achieves statistically significant improvement ($p = 0.0078$), the smaller held-out subset ($N=50$) is statistically underpowered ($p = 0.5025$). For this reason, the Change-Impact engine is provided as an **opt-in capability** rather than overriding the default `legacy` ranker.
-> - **Aspirational Target**: The long-term research objective of $\text{MRR} \ge 0.80$ is an aspirational milestone, not an achieved production metric.
+> - **Pre-Filtered Candidate Pools**: Queries were evaluated against pre-filtered candidate pools averaging approximately **53.79 files per query**. Within these candidate pools, Candidate-Pool Recall@20 is 100%.
+> - **Whole-Repository Generalization**: Whole-repository Recall@20 of 60–75% represents a projected estimate under full repository indexing, not an empirically measured whole-codebase scan.
+> - **Statistical Power & Default Ranker**: While the pooled 18-repository cohort achieves statistically significant improvement under repository-clustered inference ($p = 0.0078$), the smaller isolated validation ($N=40$, $p = 0.5073$) and held-out ($N=50$, $p = 0.5025$) subsets are statistically underpowered. For this reason, the Change-Impact engine is provided as an **opt-in capability** rather than overriding the default `legacy` ranker.
+> - **Aspirational Research Target**: The long-term research objective of $\text{MRR} \ge 0.80$ is an aspirational research milestone, not an achieved production metric.
 
 ---
 
@@ -186,7 +189,7 @@ RepoNeedle is self-contained and requires standard Python dependencies (`numpy`,
 ### 1. Installation
 
 ```bash
-# Clone the repository
+# Clone the verified repository
 git clone https://github.com/krishika08/RepoNeedle.git
 cd RepoNeedle
 
@@ -204,6 +207,7 @@ pip install -e ".[dev]"
 
 ### 2. Python API
 
+#### Standard Retrieval (Default Legacy Ranker):
 ```python
 from reponeedle import RepoNeedleEngine, BudgetConfig
 
@@ -228,14 +232,35 @@ else:
 
     # Access the exact fenced-markdown serialized prompt ready for LLM consumption:
     llm_prompt_context = result.rendered_context
+```
 
-# 3. Opt-in: Change-Impact ranking for bug fixes & refactoring
-impact_result = engine.retrieve(
-    query="Fix authentication session expiration bug in auth/session.py",
-    budget_tokens=4000,
+#### Opt-In: Seed-Based Change-Impact Retrieval:
+```python
+from reponeedle import RepoNeedleEngine, Query
+
+# Initialize engine with Change-Impact ranking
+engine = RepoNeedleEngine.from_directory(
+    repo_dir="./my-project",
     ranker="change_impact",
 )
+
+# Populate anchor_files with the seed path to activate relationship scoring
+query = Query(
+    text="Fix authentication session expiration",
+    anchor_files=["auth/session.py"],
+    budget_tokens=4000,
+)
+
+result = engine.retrieve(query)
+
+for f in result.selected_files:
+    print(f"[{f.tier.value.upper()}] {f.path} (score: {f.score:.3f}, tokens: {f.token_count})")
+    if f.explanation:
+        print(f"       Attribution: {f.explanation}")
 ```
+
+> [!NOTE]
+> **Seed-Based Relationship Scoring**: The Change-Impact ranking engine reads seed file paths from `query.anchor_files`. When `engine.retrieve(query)` is called with a plain string query, `anchor_files` is unpopulated, which skips seed-relative relationship scoring and applies only the Test Intent Prior (TIP). To activate seed-relative relationship scoring (imports, symbols, calls, manifests, test-stems, and directory proximity), pass seed paths via `Query(text=..., anchor_files=['path/to/seed.py'])`.
 
 ---
 
@@ -245,7 +270,7 @@ impact_result = engine.retrieve(
 # Default 'legacy' retrieval under a 4000 token limit
 reponeedle "Fix AttributeError in SecureCookieSessionInterface cookie saving" --repo ./flask --budget 4000
 
-# Opt-in Change-Impact retrieval for structural bug fixes & refactoring
+# Opt-in Change-Impact retrieval (applies Test Intent Prior scoring)
 reponeedle "fix token expiration in auth/session.py" --repo ./my-project --budget 4000 --ranker change_impact
 
 # Task-conditioned retrieval for finding regression tests
@@ -254,6 +279,9 @@ reponeedle "test suite for HTTPBasicAuth" --repo ./requests --task code2test --b
 # Serialize packaged markdown directly to a file
 reponeedle "blueprints and route registration" --repo ./flask --budget 4000 --output-file prompt.md
 ```
+
+> [!NOTE]
+> **CLI Seed-File Limitation**: The current CLI accepts query text as a positional string and does not currently expose a seed-file argument. Standard CLI queries run with `--ranker change_impact` apply Test Intent Prior scoring, while seed-based relationship scoring is available via the Python API (`Query(anchor_files=[...])`). CLI seed-file support is planned as a separate future enhancement.
 
 ---
 
@@ -266,9 +294,12 @@ RepoNeedle integrates the **CUD-Pack** context optimization engine, replacing he
 - **Complete Context Mode ($\ge 8\text{k}$ tokens, $\alpha = 0.25$)**: Prioritizes whole source files (`FULL`), selectively utilizing structural outlines for oversized files ($> 500$ tokens) when capacity is tight.
 
 ### 2. Verified Token Budget Invariants
-- **Budget Non-Exceedance**: Evaluated across nominal budgets (30, 50, 100, 500, 2000, 4000 tokens), CUD-Pack strictly enforces $C_{\text{actual}} \le B_{\text{configured}}$ with zero downstream token overflows.
-- **Exact Overhead Accounting**: Pre-computes file header fences (`# File: {path}\n```{ext}\n...\n```\n\n`) deterministically before admitting candidates into the knapsack.
+- **Deterministic Budget Enforcement**: Evaluated across tested nominal budgets (30, 50, 100, 500, 2000, 4000 tokens), CUD-Pack strictly enforces $C_{\text{actual}} \le B_{\text{configured}}$ with zero downstream token overflows according to RepoNeedle's deterministic regex token-counting model (`regex_code_tokenizer_v1`).
+- **Overhead Accounting**: Pre-computes file header fences (`# File: {path}\n```{ext}\n...\n```\n\n`) deterministically before admitting candidates into the knapsack.
 - **Representation Fallback Hierarchy**: Monotonically degrades candidate representations (`FULL` $\to$ `FOCUS_SPAN` $\to$ `SKELETON`) when full files exceed available token capacity.
+
+> [!WARNING]
+> **Tokenizer Boundary Disclosure**: Budget non-exceedance is enforced strictly according to RepoNeedle's internal regex token model (`regex_code_tokenizer_v1`). This does not imply exact token-count equivalence with arbitrary third-party LLM tokenizers (e.g. OpenAI tiktoken cl100k, LLaMA sentencepiece, or Qwen) or guarantee downstream token behavior for every external provider.
 
 ---
 
