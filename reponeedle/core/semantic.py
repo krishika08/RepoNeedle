@@ -36,6 +36,7 @@ class SubwordSemanticIndex:
         self.num_docs: int = 0
         self.doc_paths: List[str] = []
         self._query_cache: Dict[str, Optional[sparse.csr_matrix]] = {}
+        self._doc_feature_cache: Dict[str, Tuple[str, Dict[str, int]]] = {}
 
     def _extract_features(self, text: str) -> List[str]:
         """
@@ -70,13 +71,19 @@ class SubwordSemanticIndex:
         df_counts: Dict[str, int] = {}
 
         for doc in docs:
-            # Combine path, symbols, and sample of body
-            combined_text = f"{doc.path} {' '.join(doc.symbols)} {doc.content[:8000]}"
-            feats = self._extract_features(combined_text)
-            
-            counts: Dict[str, int] = {}
-            for f in feats:
-                counts[f] = counts.get(f, 0) + 1
+            cache_key = doc.path
+            sym_str = ",".join(doc.symbols) if doc.symbols else ""
+            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            if cache_key in self._doc_feature_cache and self._doc_feature_cache[cache_key][0] == content_sig:
+                counts = self._doc_feature_cache[cache_key][1]
+            else:
+                combined_text = f"{doc.path} {' '.join(doc.symbols)} {doc.content[:8000]}"
+                feats = self._extract_features(combined_text)
+                counts = {}
+                for f in feats:
+                    counts[f] = counts.get(f, 0) + 1
+                self._doc_feature_cache[cache_key] = (content_sig, counts)
+
             doc_feat_counts.append(counts)
 
             for f in counts.keys():

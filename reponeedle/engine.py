@@ -23,6 +23,7 @@ from reponeedle.models import (
 from reponeedle.core.function_graph import FunctionGraphEngine
 from reponeedle.core.arm101 import ARM101Ranker
 from reponeedle.core.cascade import CascadedRanker
+from reponeedle.core.change_impact import ChangeImpactRanker, ChangeImpactConfig
 from reponeedle.core.tokenizer import CodeTokenizer, estimate_tokens
 from reponeedle.core.lexical import BM25Index
 from reponeedle.core.semantic import SubwordSemanticIndex
@@ -50,9 +51,21 @@ class RepoNeedleEngine:
         docs: List[FileDoc] = None,
         budget_config: Optional[BudgetConfig] = None,
         ablation_config: Optional[AblationConfig] = None,
+        ranker: Optional[Union[str, RankerType]] = RankerType.LEGACY,
+        ranking_engine: Optional[Union[str, RankerType]] = None,
+        change_impact_config: Optional[ChangeImpactConfig] = None,
     ):
         self.budget_config = budget_config or BudgetConfig()
         self.ablation_config = ablation_config or AblationConfig()
+        raw_ranker = ranking_engine if ranking_engine is not None else ranker
+        if raw_ranker is not None:
+            if isinstance(raw_ranker, RankerType):
+                self.ranker = raw_ranker
+            else:
+                self.ranker = RankerType(str(raw_ranker).lower())
+        else:
+            self.ranker = RankerType.LEGACY
+
         self.tokenizer = CodeTokenizer()
         self.router = WorkflowRouter()
         self.budget_optimizer = BudgetOptimizer(self.budget_config)
@@ -70,6 +83,8 @@ class RepoNeedleEngine:
         self.function_graph = FunctionGraphEngine()
         self.arm101_ranker = ARM101Ranker()
         self.cascaded_ranker = CascadedRanker()
+        self.change_impact_config = change_impact_config or ChangeImpactConfig()
+        self.change_impact_ranker = ChangeImpactRanker(self.change_impact_config)
 
         if docs:
             self._fit(docs)
@@ -102,17 +117,69 @@ class RepoNeedleEngine:
         self.function_graph.build_graph(clean_docs)
         self.abstainer.fit(clean_docs)
 
+    def update_document(self, doc: FileDoc):
+        """
+        Incrementally updates or inserts a single document in the engine's indices.
+        Uses cached representation tokens for unchanged files to minimize re-parsing overhead
+        while preserving bit-identical mathematical ranking consistency.
+        """
+        self.update_documents([doc])
+
+    def update_documents(self, docs: List[FileDoc]):
+        """
+        Incrementally updates or inserts multiple documents in the engine's indices.
+        Uses cached representation tokens for unchanged files to minimize re-parsing overhead
+        while preserving bit-identical mathematical ranking consistency.
+        """
+        if not docs:
+            return
+
+        for d in docs:
+            self.path_to_doc[d.path] = d
+
+        clean_docs = list(self.path_to_doc.values())
+        self.docs = clean_docs
+
+        # Polyglot symbol extraction if enabled and symbols missing
+        if self.ablation_config.enable_polyglot_symbols:
+            for d in docs:
+                if not d.symbols and not d.imports:
+                    syms, imps = RepoGraph.extract_polyglot_symbols(d.content, d.path)
+                    if syms or imps:
+                        d.symbols = syms
+                        d.imports = imps
+
+        self.lexical_index.fit(clean_docs)
+        self.semantic_index.fit(clean_docs)
+        self.repo_graph.fit(clean_docs)
+        self.function_graph.build_graph(clean_docs)
+        self.abstainer.fit(clean_docs)
+
+    def query(self, *args, **kwargs) -> RetrievalResult:
+        """Alias for retrieve() to provide intuitive querying API."""
+        return self.retrieve(*args, **kwargs)
+
     @classmethod
     def from_documents(
         cls,
         docs: List[FileDoc],
         budget_config: Optional[BudgetConfig] = None,
         ablation_config: Optional[AblationConfig] = None,
+        ranker: Optional[Union[str, RankerType]] = RankerType.LEGACY,
+        ranking_engine: Optional[Union[str, RankerType]] = None,
+        change_impact_config: Optional[ChangeImpactConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Instantiates engine from an in-memory list of FileDoc instances.
         """
-        return cls(docs=docs, budget_config=budget_config, ablation_config=ablation_config)
+        return cls(
+            docs=docs,
+            budget_config=budget_config,
+            ablation_config=ablation_config,
+            ranker=ranker,
+            ranking_engine=ranking_engine,
+            change_impact_config=change_impact_config,
+        )
 
     @classmethod
     def from_directory(
@@ -122,6 +189,9 @@ class RepoNeedleEngine:
         max_files: int = 3000,
         extra_ignore: List[str] = None,
         ablation_config: Optional[AblationConfig] = None,
+        ranker: Optional[Union[str, RankerType]] = RankerType.LEGACY,
+        ranking_engine: Optional[Union[str, RankerType]] = None,
+        change_impact_config: Optional[ChangeImpactConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Scans a local repository directory, parses files, and builds the retrieval index.
@@ -212,7 +282,14 @@ class RepoNeedleEngine:
             if len(docs) >= max_files:
                 break
 
-        return cls(docs=docs, budget_config=budget_config, ablation_config=ablation_config)
+        return cls(
+            docs=docs,
+            budget_config=budget_config,
+            ablation_config=ablation_config,
+            ranker=ranker,
+            ranking_engine=ranking_engine,
+            change_impact_config=change_impact_config,
+        )
 
     def retrieve(
         self,
@@ -221,6 +298,8 @@ class RepoNeedleEngine:
         task_type: Optional[TaskType] = None,
         ablation_config: Optional[AblationConfig] = None,
         ranker: Optional[Union[str, RankerType]] = None,
+        ranking_engine: Optional[Union[str, RankerType]] = None,
+        change_impact_config: Optional[ChangeImpactConfig] = None,
     ) -> RetrievalResult:
         """
         Executes workflow-adaptive retrieval and packs results within the token budget.
@@ -229,17 +308,18 @@ class RepoNeedleEngine:
         start_time = time.perf_counter()
         ablation = ablation_config or self.ablation_config or AblationConfig()
 
-        if ranker is not None:
-            if isinstance(ranker, RankerType):
-                effective_ranker = ranker.value.lower()
+        raw_ranker = ranking_engine if ranking_engine is not None else ranker
+        if raw_ranker is not None:
+            if isinstance(raw_ranker, RankerType):
+                effective_ranker = raw_ranker.value.lower()
             else:
-                effective_ranker = str(ranker).lower()
+                effective_ranker = str(raw_ranker).lower()
         else:
-            effective_ranker = "legacy"
+            effective_ranker = self.ranker.value.lower() if isinstance(self.ranker, RankerType) else str(self.ranker).lower()
 
-        if effective_ranker not in ("legacy", "bm25", "arm101", "cascade"):
+        if effective_ranker not in ("legacy", "bm25", "arm101", "cascade", "change_impact"):
             raise ValueError(
-                f"Unknown ranker '{effective_ranker}'. Valid rankers are: 'legacy', 'bm25', 'arm101', 'cascade'."
+                f"Unknown ranker '{effective_ranker}'. Valid rankers are: 'legacy', 'bm25', 'arm101', 'cascade', 'change_impact'."
             )
 
         if isinstance(query, str):
@@ -284,6 +364,7 @@ class RepoNeedleEngine:
         sem_scores = self.semantic_index.score(query_obj.text, candidate_indices=cand_indices) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
 
         # 2. Workflow Classification & Ranker Dispatch
+        impact_exps: Dict[int, str] = {}
         if effective_ranker == "arm101":
             inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
             ranked_indices, fused_map = self.arm101_ranker.rank_with_scores(
@@ -309,6 +390,15 @@ class RepoNeedleEngine:
             for r, idx in enumerate(ranked_indices):
                 if float(lex_scores[idx]) > 0:
                     fused_scores[idx] = max(0.001, float(num_docs - r) / float(num_docs))
+            struct_scores = np.zeros(num_docs, dtype=np.float32)
+            workflow_boosts = np.zeros(num_docs, dtype=np.float32)
+
+        elif effective_ranker == "change_impact":
+            inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
+            ci_cfg = change_impact_config or getattr(self, "change_impact_config", None) or ChangeImpactConfig()
+            ranked_indices, fused_scores, impact_exps = self.change_impact_ranker.rank_with_scores(
+                self.docs, lex_scores, sem_scores, query_obj, config_override=ci_cfg
+            )
             struct_scores = np.zeros(num_docs, dtype=np.float32)
             workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
@@ -462,6 +552,12 @@ class RepoNeedleEngine:
 
         total_tokens_used = sum(s.token_count for s in selected)
         rendered_context = self.budget_optimizer.tokenizer.render_prompt(selected)
+
+        if effective_ranker == "change_impact" and impact_exps:
+            path_to_exp = {self.docs[i].path: exp for i, exp in impact_exps.items()}
+            for sf in selected:
+                if sf.path in path_to_exp and path_to_exp[sf.path]:
+                    sf.explanation = path_to_exp[sf.path]
 
         return RetrievalResult(
             query=query_obj.text,
