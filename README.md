@@ -26,7 +26,7 @@ RepoNeedle solves this upstream bottleneck by combining:
 3. **Inverted Test-to-Target Mapping**: Dependency graph inversion and naming convention heuristics to locate regression test suites.
 4. **Calibrated Selective Abstention**: Peak-to-noise ($Z$-score) and repository symbol overlap gating to abstain from returning noise on counterfactual tasks.
 5. **CUD-Pack (Capacity-Sensitive Utility-Density Packing)**: Adaptive knapsack selection engine providing strict zero downstream overflows ($C_{\text{actual}} \le B_{\text{configured}}$) according to RepoNeedle's regex code token model across dual modes: **Compact Mode** ($\le 4\text{k}$ tokens, extracting high-density implementation spans and structural skeletons) and **Complete Context Mode** ($\ge 8\text{k}$ tokens, preserving whole source files).
-6. **Change-Impact Ranking Engine (V1.1 Opt-in)**: Seed-relative relationship scoring (evaluating static imports, symbol definitions, call sites, build manifests, test-stems, and directory proximity) designed for bug fixing and refactoring tasks.
+6. **Change-Impact Ranking Engine (V1.1 Opt-in)**: Seed-relative relationship scoring (evaluating static imports, symbol definitions, call sites, build manifests (`setup.py`, `setup.cfg`, `pyproject.toml`, `cargo.toml`, `package.json`, `go.mod`, `pom.xml`), test-stems, and directory proximity) designed for bug fixing and refactoring tasks.
 
 ---
 
@@ -260,7 +260,14 @@ for f in result.selected_files:
 ```
 
 > [!NOTE]
-> **Seed-Based Relationship Scoring**: The Change-Impact ranking engine reads seed file paths from `query.anchor_files`. When `engine.retrieve(query)` is called with a plain string query, `anchor_files` is unpopulated, which skips seed-relative relationship scoring and applies only the Test Intent Prior (TIP). To activate seed-relative relationship scoring (imports, symbols, calls, manifests, test-stems, and directory proximity), pass seed paths via `Query(text=..., anchor_files=['path/to/seed.py'])`.
+> **Behavior of Plain-String (Seedless) Change-Impact Queries**:
+> The Change-Impact ranking engine reads seed file paths from `query.anchor_files`. When `engine.retrieve()` is called with a plain string query (or without `anchor_files`):
+> - **Lexical and semantic scoring remain active**: Candidate files continue to be retrieved and scored using combined BM25 lexical matching and subword semantic retrieval.
+> - **Seed suppression is inactive without `anchor_files`**: Seed File Suppression (SFS) is not triggered since there are no designated seed files to down-weight.
+> - **Seed-relative relationship boosts are inactive without `anchor_files`**: Relationship scoring across dependencies (static imports, symbols, calls, build manifests, test-stems, and directory proximity) is skipped.
+> - **Test Intent Prior adjustments remain available according to detected query intent**: Test files receive boosts or penalties (`tip_multiplier_test` / `tip_multiplier_non_test`) based on detected test intent in the query text.
+> 
+> To activate seed-relative relationship boosts and seed suppression, pass seed paths via `Query(text=..., anchor_files=['path/to/seed.py'])`.
 
 ---
 
@@ -281,7 +288,7 @@ reponeedle "blueprints and route registration" --repo ./flask --budget 4000 --ou
 ```
 
 > [!NOTE]
-> **CLI Seed-File Limitation**: The current CLI accepts query text as a positional string and does not currently expose a seed-file argument. Standard CLI queries run with `--ranker change_impact` apply Test Intent Prior scoring, while seed-based relationship scoring is available via the Python API (`Query(anchor_files=[...])`). CLI seed-file support is planned as a separate future enhancement.
+> **CLI Seed-File Limitation**: The current CLI accepts query text as a positional string and does not currently expose a seed-file argument. Standard CLI queries run with `--ranker change_impact` execute as seedless queries: lexical and semantic scoring remain active, and Test Intent Prior adjustments remain available according to detected query intent, while seed suppression and seed-relative relationship boosts are inactive without `anchor_files`. Full seed-based relationship scoring is available via the Python API (`Query(anchor_files=[...])`). CLI seed-file support is planned as a separate future enhancement.
 
 ---
 
