@@ -15,6 +15,11 @@ This is the static browser interface for the RepoNeedle V1.1.0 public demonstrat
 **Live backend:** `https://reponeedle.onrender.com`  
 **Source repository:** https://github.com/krishika08/RepoNeedle  
 **Dataset:** https://huggingface.co/datasets/RepoNeedle/RepoNeedle-Bench
+## ☕ Support RepoNeedle
+
+If you find RepoNeedle useful, consider supporting its continued development.
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support%20RepoNeedle-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/krishika.x)
 
 ## Demonstration scope
 
