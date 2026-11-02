@@ -5,6 +5,9 @@
 [![CI](https://github.com/krishika08/RepoNeedle/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/krishika08/RepoNeedle/actions/workflows/ci.yml)
 [![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-RepoNeedle--Bench-blue)](https://huggingface.co/datasets/RepoNeedle/RepoNeedle-Bench)
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-RepoNeedle--Playground-indigo)](https://huggingface.co/spaces/RepoNeedle/RepoNeedle-Playground)
+[![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-RepoNeedle--Playground-indigo)](https://huggingface.co/spaces/Krishikax/RepoNeedle-Playground)
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support%20RepoNeedle-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/krishika.x)
 
 **RepoNeedle** is an open-source, token-budget-aware repository context retrieval system designed to help AI coding agents discover the most critical files for a coding task under strict context-token constraints.
 
