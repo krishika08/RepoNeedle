@@ -394,7 +394,10 @@ class RepoNeedleEngine:
             workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
         elif effective_ranker == "change_impact":
-            inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
+    if query_obj.task_type == TaskType.AUTO:
+        inferred_task, _ = self.router.classify_intent(query_obj)
+    else:
+        inferred_task = query_obj.task_type
             ci_cfg = change_impact_config or getattr(self, "change_impact_config", None) or ChangeImpactConfig()
             ranked_indices, fused_scores, impact_exps = self.change_impact_ranker.rank_with_scores(
                 self.docs, lex_scores, sem_scores, query_obj, config_override=ci_cfg
