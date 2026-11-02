@@ -21,6 +21,7 @@ class RankerType(str, Enum):
     BM25 = "bm25"
     ARM101 = "arm101"
     CASCADE = "cascade"
+    CHANGE_IMPACT = "change_impact"
 
 
 class ContextTier(str, Enum):
@@ -80,6 +81,11 @@ class RetrievalResult(BaseModel):
     ranker: Optional[str] = "legacy"
     ranked_files: Optional[List[str]] = None
     rendered_context: str = ""
+
+    @property
+    def packed_files(self) -> List[ScoredFile]:
+        """Convenience alias for selected_files (CUD-Pack packed files)."""
+        return self.selected_files
 
 
 class BudgetConfig(BaseModel):

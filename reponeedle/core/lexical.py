@@ -49,6 +49,7 @@ class BM25Index:
         self.doc_lengths: np.ndarray = np.array([], dtype=np.float32)
         self.inverted_index: Dict[str, List[Tuple[int, float]]] = {}
         self.doc_len_norms: np.ndarray = np.array([], dtype=np.float32)
+        self._doc_term_cache: Dict[str, Tuple[str, Dict[str, float], float]] = {}
 
     def fit(self, docs: List[FileDoc]) -> "BM25Index":
         """
@@ -66,27 +67,35 @@ class BM25Index:
             return self
 
         for doc in docs:
-            # 1. Path tokens
-            path_tokens = self.tokenizer.tokenize_path(doc.path)
-            
-            # 2. Symbol tokens
-            symbol_tokens = []
-            for s in doc.symbols:
-                symbol_tokens.extend(self.tokenizer.tokenize_text(s))
-            
-            # 3. Content body tokens
-            body_tokens = self.tokenizer.tokenize_text(doc.content)
+            cache_key = doc.path
+            sym_str = ",".join(doc.symbols) if doc.symbols else ""
+            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            if cache_key in self._doc_term_cache and self._doc_term_cache[cache_key][0] == content_sig:
+                _, weighted_counts, effective_len = self._doc_term_cache[cache_key]
+            else:
+                # 1. Path tokens
+                path_tokens = self.tokenizer.tokenize_path(doc.path)
+                
+                # 2. Symbol tokens
+                symbol_tokens = []
+                for s in doc.symbols:
+                    symbol_tokens.extend(self.tokenizer.tokenize_text(s))
+                
+                # 3. Content body tokens
+                body_tokens = self.tokenizer.tokenize_text(doc.content)
 
-            # Combined term counts with field weights
-            weighted_counts: Dict[str, float] = {}
-            for t in path_tokens:
-                weighted_counts[t] = weighted_counts.get(t, 0.0) + self.path_weight
-            for t in symbol_tokens:
-                weighted_counts[t] = weighted_counts.get(t, 0.0) + self.symbol_weight
-            for t in body_tokens:
-                weighted_counts[t] = weighted_counts.get(t, 0.0) + self.body_weight
+                # Combined term counts with field weights
+                weighted_counts = {}
+                for t in path_tokens:
+                    weighted_counts[t] = weighted_counts.get(t, 0.0) + self.path_weight
+                for t in symbol_tokens:
+                    weighted_counts[t] = weighted_counts.get(t, 0.0) + self.symbol_weight
+                for t in body_tokens:
+                    weighted_counts[t] = weighted_counts.get(t, 0.0) + self.body_weight
 
-            effective_len = max(1.0, float(len(body_tokens) + len(path_tokens))) if self.decouple_symbols else sum(weighted_counts.values())
+                effective_len = max(1.0, float(len(body_tokens) + len(path_tokens))) if self.decouple_symbols else sum(weighted_counts.values())
+                self._doc_term_cache[cache_key] = (content_sig, weighted_counts, effective_len)
+
             doc_lengths_list.append(effective_len)
             self.doc_term_freqs.append(weighted_counts)
 

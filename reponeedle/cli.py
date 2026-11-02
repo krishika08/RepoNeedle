@@ -57,9 +57,11 @@ def main():
     parser.add_argument("--no-skeletons", action="store_true", help="Disallow structural skeleton mode; require full files.")
     parser.add_argument(
         "--ranker",
+        "--ranking-engine",
+        dest="ranker",
         type=str,
         default="legacy",
-        choices=["legacy", "bm25", "arm101", "cascade"],
+        choices=["legacy", "bm25", "arm101", "cascade", "change_impact"],
         help="Retrieval ranker architecture (default: legacy).",
     )
 

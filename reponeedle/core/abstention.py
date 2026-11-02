@@ -20,6 +20,7 @@ class SelectiveAbstainer:
         self.confidence_threshold = confidence_threshold
         self.tokenizer = CodeTokenizer()
         self.repo_vocabulary: Set[str] = set()
+        self._doc_vocab_cache: Dict[str, Tuple[str, Set[str]]] = {}
 
     @staticmethod
     def _stem(token: str) -> str:
@@ -35,24 +36,34 @@ class SelectiveAbstainer:
         """
         self.repo_vocabulary = set()
         for doc in docs:
-            # Add path tokens
-            for t in self.tokenizer.tokenize_path(doc.path):
-                tl = t.lower()
-                self.repo_vocabulary.add(tl)
-                self.repo_vocabulary.add(self._stem(tl))
-            # Add symbol tokens
-            for s in doc.symbols:
-                for t in self.tokenizer.tokenize_text(s):
+            cache_key = doc.path
+            sym_str = ",".join(doc.symbols) if doc.symbols else ""
+            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            if cache_key in self._doc_vocab_cache and self._doc_vocab_cache[cache_key][0] == content_sig:
+                doc_vocab = self._doc_vocab_cache[cache_key][1]
+            else:
+                doc_vocab = set()
+                # Add path tokens
+                for t in self.tokenizer.tokenize_path(doc.path):
                     tl = t.lower()
-                    self.repo_vocabulary.add(tl)
-                    self.repo_vocabulary.add(self._stem(tl))
-            # Add content identifiers if doc.content is present
-            if doc.content:
-                for t in self.tokenizer.tokenize_text(doc.content[:3000]):
-                    if len(t) > 2:
+                    doc_vocab.add(tl)
+                    doc_vocab.add(self._stem(tl))
+                # Add symbol tokens
+                for s in doc.symbols:
+                    for t in self.tokenizer.tokenize_text(s):
                         tl = t.lower()
-                        self.repo_vocabulary.add(tl)
-                        self.repo_vocabulary.add(self._stem(tl))
+                        doc_vocab.add(tl)
+                        doc_vocab.add(self._stem(tl))
+                # Add content identifiers if doc.content is present
+                if doc.content:
+                    for t in self.tokenizer.tokenize_text(doc.content[:3000]):
+                        if len(t) > 2:
+                            tl = t.lower()
+                            doc_vocab.add(tl)
+                            doc_vocab.add(self._stem(tl))
+                self._doc_vocab_cache[cache_key] = (content_sig, doc_vocab)
+
+            self.repo_vocabulary.update(doc_vocab)
 
         return self
 
