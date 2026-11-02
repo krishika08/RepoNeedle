@@ -1,0 +1,104 @@
+{
+  "train": {
+    "D_vs_B": {
+      "point_estimate": 0.0333,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0736,
+      "p_value": 0.2516,
+      "clusters": 9,
+      "n_iterations": 10000
+    },
+    "G_vs_B": {
+      "point_estimate": 0.0259,
+      "ci_95_lower": -0.0148,
+      "ci_95_upper": 0.0719,
+      "p_value": 0.4972,
+      "clusters": 9,
+      "n_iterations": 10000
+    },
+    "H_vs_B": {
+      "point_estimate": 0.0259,
+      "ci_95_lower": -0.0148,
+      "ci_95_upper": 0.0719,
+      "p_value": 0.4972,
+      "clusters": 9,
+      "n_iterations": 10000
+    },
+    "G_vs_D": {
+      "point_estimate": -0.0074,
+      "ci_95_lower": -0.0222,
+      "ci_95_upper": 0.0,
+      "p_value": 1.0,
+      "clusters": 9,
+      "n_iterations": 10000
+    }
+  },
+  "val": {
+    "D_vs_B": {
+      "point_estimate": 0.0236,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0472,
+      "p_value": 0.5073,
+      "clusters": 4,
+      "n_iterations": 10000
+    },
+    "G_vs_B": {
+      "point_estimate": 0.0236,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0472,
+      "p_value": 0.5073,
+      "clusters": 4,
+      "n_iterations": 10000
+    },
+    "H_vs_B": {
+      "point_estimate": 0.0236,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0472,
+      "p_value": 0.5073,
+      "clusters": 4,
+      "n_iterations": 10000
+    },
+    "G_vs_D": {
+      "point_estimate": 0.0,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0,
+      "p_value": 1.0,
+      "clusters": 4,
+      "n_iterations": 10000
+    }
+  },
+  "held_out": {
+    "D_vs_B": {
+      "point_estimate": 0.0252,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0629,
+      "p_value": 0.5025,
+      "clusters": 5,
+      "n_iterations": 10000
+    },
+    "G_vs_B": {
+      "point_estimate": 0.0252,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0629,
+      "p_value": 0.5025,
+      "clusters": 5,
+      "n_iterations": 10000
+    },
+    "H_vs_B": {
+      "point_estimate": 0.0252,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0629,
+      "p_value": 0.5025,
+      "clusters": 5,
+      "n_iterations": 10000
+    },
+    "G_vs_D": {
+      "point_estimate": 0.0,
+      "ci_95_lower": 0.0,
+      "ci_95_upper": 0.0,
+      "p_value": 1.0,
+      "clusters": 5,
+      "n_iterations": 10000
+    }
+  }
+}

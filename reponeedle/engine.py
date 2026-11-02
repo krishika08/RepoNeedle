@@ -23,6 +23,7 @@ from reponeedle.models import (
 from reponeedle.core.function_graph import FunctionGraphEngine
 from reponeedle.core.arm101 import ARM101Ranker
 from reponeedle.core.cascade import CascadedRanker
+from reponeedle.core.change_impact import ChangeImpactRanker, ChangeImpactConfig
 from reponeedle.core.tokenizer import CodeTokenizer, estimate_tokens
 from reponeedle.core.lexical import BM25Index
 from reponeedle.core.semantic import SubwordSemanticIndex
@@ -70,6 +71,8 @@ class RepoNeedleEngine:
         self.function_graph = FunctionGraphEngine()
         self.arm101_ranker = ARM101Ranker()
         self.cascaded_ranker = CascadedRanker()
+        self.change_impact_ranker = ChangeImpactRanker()
+        self.change_impact_config = ChangeImpactConfig()
 
         if docs:
             self._fit(docs)
@@ -221,6 +224,8 @@ class RepoNeedleEngine:
         task_type: Optional[TaskType] = None,
         ablation_config: Optional[AblationConfig] = None,
         ranker: Optional[Union[str, RankerType]] = None,
+        ranking_engine: Optional[Union[str, RankerType]] = None,
+        change_impact_config: Optional[ChangeImpactConfig] = None,
     ) -> RetrievalResult:
         """
         Executes workflow-adaptive retrieval and packs results within the token budget.
@@ -229,17 +234,18 @@ class RepoNeedleEngine:
         start_time = time.perf_counter()
         ablation = ablation_config or self.ablation_config or AblationConfig()
 
-        if ranker is not None:
-            if isinstance(ranker, RankerType):
-                effective_ranker = ranker.value.lower()
+        raw_ranker = ranking_engine if ranking_engine is not None else ranker
+        if raw_ranker is not None:
+            if isinstance(raw_ranker, RankerType):
+                effective_ranker = raw_ranker.value.lower()
             else:
-                effective_ranker = str(ranker).lower()
+                effective_ranker = str(raw_ranker).lower()
         else:
             effective_ranker = "legacy"
 
-        if effective_ranker not in ("legacy", "bm25", "arm101", "cascade"):
+        if effective_ranker not in ("legacy", "bm25", "arm101", "cascade", "change_impact"):
             raise ValueError(
-                f"Unknown ranker '{effective_ranker}'. Valid rankers are: 'legacy', 'bm25', 'arm101', 'cascade'."
+                f"Unknown ranker '{effective_ranker}'. Valid rankers are: 'legacy', 'bm25', 'arm101', 'cascade', 'change_impact'."
             )
 
         if isinstance(query, str):
@@ -284,6 +290,7 @@ class RepoNeedleEngine:
         sem_scores = self.semantic_index.score(query_obj.text, candidate_indices=cand_indices) if ablation.enable_semantic else np.zeros(num_docs, dtype=np.float32)
 
         # 2. Workflow Classification & Ranker Dispatch
+        impact_exps: Dict[int, str] = {}
         if effective_ranker == "arm101":
             inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
             ranked_indices, fused_map = self.arm101_ranker.rank_with_scores(
@@ -309,6 +316,15 @@ class RepoNeedleEngine:
             for r, idx in enumerate(ranked_indices):
                 if float(lex_scores[idx]) > 0:
                     fused_scores[idx] = max(0.001, float(num_docs - r) / float(num_docs))
+            struct_scores = np.zeros(num_docs, dtype=np.float32)
+            workflow_boosts = np.zeros(num_docs, dtype=np.float32)
+
+        elif effective_ranker == "change_impact":
+            inferred_task = query_obj.task_type or TaskType.COMMENT2CONTEXT
+            ci_cfg = change_impact_config or getattr(self, "change_impact_config", None) or ChangeImpactConfig()
+            ranked_indices, fused_scores, impact_exps = self.change_impact_ranker.rank_with_scores(
+                self.docs, lex_scores, sem_scores, query_obj, config_override=ci_cfg
+            )
             struct_scores = np.zeros(num_docs, dtype=np.float32)
             workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
@@ -462,6 +478,12 @@ class RepoNeedleEngine:
 
         total_tokens_used = sum(s.token_count for s in selected)
         rendered_context = self.budget_optimizer.tokenizer.render_prompt(selected)
+
+        if effective_ranker == "change_impact" and impact_exps:
+            path_to_exp = {self.docs[i].path: exp for i, exp in impact_exps.items()}
+            for sf in selected:
+                if sf.path in path_to_exp and path_to_exp[sf.path]:
+                    sf.explanation = path_to_exp[sf.path]
 
         return RetrievalResult(
             query=query_obj.text,

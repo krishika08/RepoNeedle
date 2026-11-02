@@ -1,0 +1,171 @@
+{
+  "D": {
+    "val": {
+      "num_queries": 60,
+      "num_repos": 5,
+      "mrr_a": 0.29712566298148696,
+      "mrr_comp": 0.3276088898350755,
+      "observed_delta": 0.030483226853588563,
+      "ci_clustered_95": [
+        0.006328227881672588,
+        0.12557165946086604
+      ],
+      "ci_clustered_width": 0.11924343157919345,
+      "p_nonpos_clustered": 0.0002,
+      "ci_query_95": [
+        -0.005931517896690238,
+        0.07030526793271881
+      ],
+      "ci_query_width": 0.07623678582940904,
+      "p_nonpos_query": 0.0542,
+      "p_val_permutation": 0.1345
+    },
+    "train": {
+      "num_queries": 210,
+      "num_repos": 15,
+      "mrr_a": 0.45437726789773286,
+      "mrr_comp": 0.4568034008714554,
+      "observed_delta": 0.002426132973722517,
+      "ci_clustered_95": [
+        -0.031311168667141606,
+        0.055114193157279744
+      ],
+      "ci_clustered_width": 0.08642536182442134,
+      "p_nonpos_clustered": 0.4143,
+      "ci_query_95": [
+        -0.019783146404231195,
+        0.024599545298032318
+      ],
+      "ci_query_width": 0.04438269170226351,
+      "p_nonpos_query": 0.4135,
+      "p_val_permutation": 0.8331
+    },
+    "held_out": {
+      "num_queries": 75,
+      "num_repos": 5,
+      "mrr_a": 0.29647714043881956,
+      "mrr_comp": 0.2973176676074496,
+      "observed_delta": 0.0008405271686300342,
+      "ci_clustered_95": [
+        -0.008357679804041646,
+        0.02618948286561923
+      ],
+      "ci_clustered_width": 0.034547162669660875,
+      "p_nonpos_clustered": 0.4169,
+      "ci_query_95": [
+        -0.011662938355042788,
+        0.014100114644507755
+      ],
+      "ci_query_width": 0.02576305299955054,
+      "p_nonpos_query": 0.4497,
+      "p_val_permutation": 0.8979
+    },
+    "overall": {
+      "num_queries": 345,
+      "num_repos": 25,
+      "mrr_a": 0.3927030480299263,
+      "mrr_comp": 0.3996639786773011,
+      "observed_delta": 0.006960930647374797,
+      "ci_clustered_95": [
+        -0.018658593807393105,
+        0.039878467750063186
+      ],
+      "ci_clustered_width": 0.05853706155745629,
+      "p_nonpos_clustered": 0.2889,
+      "ci_query_95": [
+        -0.008328354554272548,
+        0.022477175659713442
+      ],
+      "ci_query_width": 0.03080553021398599,
+      "p_nonpos_query": 0.1894,
+      "p_val_permutation": 0.3665
+    }
+  },
+  "H": {
+    "val": {
+      "num_queries": 60,
+      "num_repos": 5,
+      "mrr_a": 0.29712566298148696,
+      "mrr_comp": 0.3137522110855643,
+      "observed_delta": 0.01662654810407732,
+      "ci_clustered_95": [
+        0.0004226051154083421,
+        0.03963099112450369
+      ],
+      "ci_clustered_width": 0.03920838600909535,
+      "p_nonpos_clustered": 0.0095,
+      "ci_query_95": [
+        -0.015261828274527338,
+        0.051307685036016
+      ],
+      "ci_query_width": 0.06656951331054334,
+      "p_nonpos_query": 0.1613,
+      "p_val_permutation": 0.3747
+    },
+    "train": {
+      "num_queries": 210,
+      "num_repos": 15,
+      "mrr_a": 0.45437726789773286,
+      "mrr_comp": 0.4713203778879214,
+      "observed_delta": 0.016943109990188554,
+      "ci_clustered_95": [
+        -0.01166745451445721,
+        0.06460070162107558
+      ],
+      "ci_clustered_width": 0.07626815613553278,
+      "p_nonpos_clustered": 0.1512,
+      "ci_query_95": [
+        -0.0023565740813153804,
+        0.03749440173983966
+      ],
+      "ci_query_width": 0.03985097582115504,
+      "p_nonpos_query": 0.0444,
+      "p_val_permutation": 0.0928
+    },
+    "held_out": {
+      "num_queries": 75,
+      "num_repos": 5,
+      "mrr_a": 0.29647714043881956,
+      "mrr_comp": 0.2971758508087153,
+      "observed_delta": 0.0006987103698957164,
+      "ci_clustered_95": [
+        -0.013524748978214596,
+        0.06348826640748612
+      ],
+      "ci_clustered_width": 0.07701301538570071,
+      "p_nonpos_clustered": 0.4903,
+      "ci_query_95": [
+        -0.021796180899202475,
+        0.02628193128319035
+      ],
+      "ci_query_width": 0.04807811218239283,
+      "p_nonpos_query": 0.5051,
+      "p_val_permutation": 0.9533
+    },
+    "overall": {
+      "num_queries": 345,
+      "num_repos": 25,
+      "mrr_a": 0.3927030480299263,
+      "mrr_comp": 0.4060597125572494,
+      "observed_delta": 0.013356664527323092,
+      "ci_clustered_95": [
+        -0.006132786104742614,
+        0.04248163411484409
+      ],
+      "ci_clustered_width": 0.0486144202195867,
+      "p_nonpos_clustered": 0.1046,
+      "ci_query_95": [
+        -0.0006608244889655222,
+        0.027724420035893486
+      ],
+      "ci_query_width": 0.028385244524859007,
+      "p_nonpos_query": 0.0305,
+      "p_val_permutation": 0.0683
+    }
+  },
+  "candidate_recall": {
+    "total_golds": 514,
+    "recovered_golds": 514,
+    "recall_pct": 100.0
+  }
+}

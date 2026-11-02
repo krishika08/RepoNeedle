@@ -1,0 +1,20 @@
+{
+  "index_construction_latency_ms": 852.07,
+  "graph_construction_latency_ms": 0.264,
+  "query_ranking_latency": {
+    "mean_ms": 20.281,
+    "p50_ms": 20.079,
+    "p95_ms": 21.873,
+    "p99_ms": 22.642
+  },
+  "end_to_end_retrieval_latency": {
+    "mean_ms": 64.51,
+    "p50_ms": 64.22,
+    "p95_ms": 67.32,
+    "p99_ms": 70.07
+  },
+  "incremental_update_cost_ms": 720.05,
+  "peak_ram_mb": 18.51,
+  "index_storage_kb": 35.38,
+  "document_count": 200
+}

@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "total_queries": 180,
+    "total_candidates": 9683,
+    "total_edges": 1083,
+    "confirmed_edges": 427,
+    "heuristic_edges": 656
+  },
+  "precision_audit": {
+    "confirmed_precision": 0.3421,
+    "confirmed_false_positive_rate": 0.0264,
+    "confirmed_tp": 130,
+    "confirmed_fp": 250,
+    "heuristic_precision": 0.1034,
+    "heuristic_false_positive_rate": 0.0603,
+    "heuristic_tp": 66,
+    "heuristic_fp": 572
+  },
+  "edge_breakdown": {
+    "confirmed_import": 380,
+    "confirmed_symbol": 40,
+    "confirmed_call": 2,
+    "heuristic_ancestor": 455,
+    "heuristic_dir_proximity": 157,
+    "heuristic_test_stem": 44,
+    "confirmed_build": 5
+  }
+}

@@ -1,0 +1,272 @@
+{
+  "train": {
+    "A": {
+      "mrr": 0.4824,
+      "hit1": 0.2556,
+      "recall_5": 0.9222,
+      "recall_10": 0.9222,
+      "recall_20": 0.9222,
+      "complete_coverage": 0.9222,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.101
+    },
+    "B": {
+      "mrr": 0.6213,
+      "hit1": 0.4667,
+      "recall_5": 0.9,
+      "recall_10": 0.9,
+      "recall_20": 0.9,
+      "complete_coverage": 0.9,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.112
+    },
+    "C": {
+      "mrr": 0.6111,
+      "hit1": 0.4667,
+      "recall_5": 0.9222,
+      "recall_10": 0.9222,
+      "recall_20": 0.9222,
+      "complete_coverage": 0.9222,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.113
+    },
+    "D": {
+      "mrr": 0.6546,
+      "hit1": 0.4667,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.708
+    },
+    "E": {
+      "mrr": 0.6546,
+      "hit1": 0.4667,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.706
+    },
+    "F": {
+      "mrr": 0.6546,
+      "hit1": 0.4667,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.705
+    },
+    "G": {
+      "mrr": 0.6472,
+      "hit1": 0.4556,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.645
+    },
+    "H": {
+      "mrr": 0.6472,
+      "hit1": 0.4556,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 90,
+      "avg_latency_ms": 0.685
+    }
+  },
+  "val": {
+    "A": {
+      "mrr": 0.4931,
+      "hit1": 0.25,
+      "recall_5": 0.9125,
+      "recall_10": 0.9125,
+      "recall_20": 0.9125,
+      "complete_coverage": 0.9,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.11
+    },
+    "B": {
+      "mrr": 0.6472,
+      "hit1": 0.5,
+      "recall_5": 0.9125,
+      "recall_10": 0.9125,
+      "recall_20": 0.9125,
+      "complete_coverage": 0.9,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.119
+    },
+    "C": {
+      "mrr": 0.6306,
+      "hit1": 0.475,
+      "recall_5": 0.9125,
+      "recall_10": 0.9125,
+      "recall_20": 0.9125,
+      "complete_coverage": 0.9,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.123
+    },
+    "D": {
+      "mrr": 0.6708,
+      "hit1": 0.5,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.718
+    },
+    "E": {
+      "mrr": 0.6708,
+      "hit1": 0.5,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.718
+    },
+    "F": {
+      "mrr": 0.6708,
+      "hit1": 0.5,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.724
+    },
+    "G": {
+      "mrr": 0.6708,
+      "hit1": 0.5,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.686
+    },
+    "H": {
+      "mrr": 0.6708,
+      "hit1": 0.5,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 40,
+      "avg_latency_ms": 0.705
+    }
+  },
+  "held_out": {
+    "A": {
+      "mrr": 0.4194,
+      "hit1": 0.16,
+      "recall_5": 0.94,
+      "recall_10": 0.94,
+      "recall_20": 0.94,
+      "complete_coverage": 0.94,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.115
+    },
+    "B": {
+      "mrr": 0.5215,
+      "hit1": 0.28,
+      "recall_5": 0.92,
+      "recall_10": 0.92,
+      "recall_20": 0.92,
+      "complete_coverage": 0.92,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.105
+    },
+    "C": {
+      "mrr": 0.5178,
+      "hit1": 0.28,
+      "recall_5": 0.94,
+      "recall_10": 0.94,
+      "recall_20": 0.94,
+      "complete_coverage": 0.94,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.113
+    },
+    "D": {
+      "mrr": 0.5467,
+      "hit1": 0.28,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.692
+    },
+    "E": {
+      "mrr": 0.5467,
+      "hit1": 0.28,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.734
+    },
+    "F": {
+      "mrr": 0.5467,
+      "hit1": 0.28,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.684
+    },
+    "G": {
+      "mrr": 0.5467,
+      "hit1": 0.28,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.7
+    },
+    "H": {
+      "mrr": 0.5467,
+      "hit1": 0.28,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "complete_coverage": 1.0,
+      "candidate_recall": 1.0,
+      "query_count": 50,
+      "avg_latency_ms": 0.694
+    }
+  }
+}

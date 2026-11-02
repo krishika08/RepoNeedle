@@ -1,0 +1,24 @@
+{
+  "corpus_docs": 422,
+  "corpus_source_mb": 3.4118423461914062,
+  "dense_indexing": {
+    "fit_time_seconds": 20.622803211212158,
+    "throughput_docs_per_sec": 20.462785571777555,
+    "peak_memory_mb": 75.0706672668457,
+    "index_storage_kb": 7711.0,
+    "storage_per_doc_bytes": 18711.05213270142,
+    "inference_mean_ms": 0.672265999019146,
+    "inference_p50_ms": 0.6581499910680577,
+    "inference_p95_ms": 0.9163850161712617
+  },
+  "graph_indexing": {
+    "fit_time_seconds": 0.9748446941375732,
+    "throughput_docs_per_sec": 432.88946694564044,
+    "peak_memory_mb": 4.315396308898926,
+    "nodes": 422,
+    "edges": 23,
+    "expansion_mean_ms": 0.015767000149935484,
+    "expansion_p50_ms": 0.015099998563528061,
+    "expansion_p95_ms": 0.01699998538242653
+  }
+}

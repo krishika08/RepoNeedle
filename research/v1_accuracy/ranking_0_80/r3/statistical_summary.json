@@ -1,0 +1,67 @@
+{
+  "val": {
+    "num_queries": 60,
+    "num_repos": 5,
+    "mrr_a": 0.29712566298148696,
+    "mrr_i": 0.31237686853596547,
+    "observed_delta": 0.015251205554478509,
+    "ci_clustered_95": [
+      -0.032649048562744296,
+      0.03298348453556427
+    ],
+    "ci_clustered_width": 0.06563253309830856,
+    "p_nonpos_clustered": 0.2906,
+    "ci_query_95": [
+      -0.007920630235113905,
+      0.04134625613054432
+    ],
+    "ci_query_width": 0.04926688636565823,
+    "p_nonpos_query": 0.1031,
+    "p_val_permutation": 0.2502
+  },
+  "train": {
+    "num_queries": 210,
+    "num_repos": 15,
+    "mrr_a": 0.45437726789773286,
+    "mrr_i": 0.5277779671607903,
+    "observed_delta": 0.07340069926305742,
+    "ci_clustered_95": [
+      -0.07947502529696006,
+      0.23484424391515318
+    ],
+    "ci_clustered_width": 0.31431926921211323,
+    "p_nonpos_clustered": 0.1574,
+    "ci_query_95": [
+      0.036181082311538534,
+      0.1110906488154857
+    ],
+    "ci_query_width": 0.07490956650394717,
+    "p_nonpos_query": 0.0001,
+    "p_val_permutation": 0.0001
+  },
+  "held_out": {
+    "num_queries": 75,
+    "num_repos": 5,
+    "mrr_a": 0.29647714043881956,
+    "mrr_i": 0.2835298838653856,
+    "observed_delta": -0.012947256573433985,
+    "ci_clustered_95": [
+      -0.06680552100512568,
+      -0.0035392533087167943
+    ],
+    "ci_clustered_width": 0.06326626769640889,
+    "p_nonpos_clustered": 1.0,
+    "ci_query_95": [
+      -0.05858210592914649,
+      0.028603968418965325
+    ],
+    "ci_query_width": 0.08718607434811182,
+    "p_nonpos_query": 0.7208,
+    "p_val_permutation": 0.5977
+  },
+  "candidate_recall": {
+    "total_golds": 514,
+    "recovered_golds": 514,
+    "recall_pct": 100.0
+  }
+}

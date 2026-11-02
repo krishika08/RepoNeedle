@@ -21,6 +21,7 @@ class RankerType(str, Enum):
     BM25 = "bm25"
     ARM101 = "arm101"
     CASCADE = "cascade"
+    CHANGE_IMPACT = "change_impact"
 
 
 class ContextTier(str, Enum):

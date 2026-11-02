@@ -1,0 +1,382 @@
+{
+  "provenance": {
+    "total_queries": 345,
+    "train_repos": 15,
+    "val_repos": 5,
+    "held_out_repos": 5,
+    "query_overlap_pct": 100.0,
+    "repo_overlap_pct": 100.0
+  },
+  "reproduced_metrics": {
+    "val": {
+      "mrr_a": 0.29712566298148696,
+      "mrr_f": 0.323521756432298,
+      "delta": 0.026396093450811065,
+      "hit1_a": 16.666666666666664,
+      "hit1_f": 20.0
+    },
+    "held_out": {
+      "mrr_a": 0.29647714043881956,
+      "mrr_f": 0.3182549051809966,
+      "delta": 0.02177776474217702,
+      "hit1_a": 17.333333333333336,
+      "hit1_f": 18.666666666666668
+    },
+    "train": {
+      "mrr_a": 0.45437726789773286,
+      "mrr_f": 0.47994109145056685,
+      "delta": 0.025563823552833986,
+      "hit1_a": 25.71428571428571,
+      "hit1_f": 29.523809523809526
+    },
+    "overall": {
+      "mrr_a": 0.3927030480299263,
+      "mrr_f": 0.41758855791052657,
+      "delta": 0.024885509880600287,
+      "hit1_a": 22.318840579710145,
+      "hit1_f": 25.507246376811594
+    }
+  },
+  "bootstrap": {
+    "val": {
+      "num_repos": 5,
+      "num_queries": 60,
+      "ci_95": [
+        0.004013887794030155,
+        0.1250265731292517
+      ],
+      "p_nonpos": 0.0007
+    },
+    "held_out": {
+      "num_repos": 5,
+      "num_queries": 75,
+      "ci_95": [
+        -0.008832425367281405,
+        0.0636853741756187
+      ],
+      "p_nonpos": 0.0843
+    },
+    "train": {
+      "num_repos": 15,
+      "num_queries": 210,
+      "ci_95": [
+        -0.001177581152008418,
+        0.052138316683048636
+      ],
+      "p_nonpos": 0.0328
+    },
+    "overall": {
+      "num_repos": 25,
+      "num_queries": 345,
+      "ci_95": [
+        0.009674617258440968,
+        0.042447879621576694
+      ],
+      "p_nonpos": 0.0009
+    }
+  },
+  "repo_breakdown": {
+    "HypothesisWorks/hypothesis": {
+      "split": "train",
+      "queries": 1,
+      "mrr_a": 1.0,
+      "mrr_f": 1.0,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "astral-sh/ruff": {
+      "split": "held_out",
+      "queries": 6,
+      "mrr_a": 0.13571859903381642,
+      "mrr_f": 0.10486111111111111,
+      "diff": -0.030857487922705304,
+      "status": "REGRESSED"
+    },
+    "caddyserver/caddy": {
+      "split": "train",
+      "queries": 13,
+      "mrr_a": 0.4310683760683761,
+      "mrr_f": 0.4339086127547666,
+      "diff": 0.002840236686390496,
+      "status": "TIED"
+    },
+    "clap-rs/clap": {
+      "split": "train",
+      "queries": 10,
+      "mrr_a": 0.3666251861260396,
+      "mrr_f": 0.37773629723715074,
+      "diff": 0.011111111111111127,
+      "status": "IMPROVED"
+    },
+    "eslint/eslint": {
+      "split": "val",
+      "queries": 1,
+      "mrr_a": 0.00510204081632653,
+      "mrr_f": 0.005208333333333333,
+      "diff": 0.00010629251700680284,
+      "status": "TIED"
+    },
+    "etcd-io/etcd": {
+      "split": "train",
+      "queries": 41,
+      "mrr_a": 0.4189868087049847,
+      "mrr_f": 0.4960222027450362,
+      "diff": 0.0770353940400515,
+      "status": "IMPROVED"
+    },
+    "fastapi/fastapi": {
+      "split": "train",
+      "queries": 3,
+      "mrr_a": 0.20952380952380953,
+      "mrr_f": 0.20925925925925926,
+      "diff": -0.00026455026455027286,
+      "status": "TIED"
+    },
+    "gin-gonic/gin": {
+      "split": "train",
+      "queries": 88,
+      "mrr_a": 0.5404726229605231,
+      "mrr_f": 0.5620256019863281,
+      "diff": 0.021552979025804997,
+      "status": "IMPROVED"
+    },
+    "huggingface/diffusers": {
+      "split": "val",
+      "queries": 16,
+      "mrr_a": 0.10815092688585123,
+      "mrr_f": 0.1146602079865244,
+      "diff": 0.00650928110067317,
+      "status": "IMPROVED"
+    },
+    "huggingface/transformers": {
+      "split": "held_out",
+      "queries": 36,
+      "mrr_a": 0.40320282679768976,
+      "mrr_f": 0.4012213986507007,
+      "diff": -0.0019814281469890394,
+      "status": "TIED"
+    },
+    "ipython/ipython": {
+      "split": "train",
+      "queries": 2,
+      "mrr_a": 0.29166666666666663,
+      "mrr_f": 0.29166666666666663,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "microsoft/playwright": {
+      "split": "val",
+      "queries": 4,
+      "mrr_a": 0.04208874458874459,
+      "mrr_f": 0.04208874458874459,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "mockito/mockito": {
+      "split": "train",
+      "queries": 1,
+      "mrr_a": 0.030303030303030304,
+      "mrr_f": 0.030303030303030304,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "numpy/numpy": {
+      "split": "train",
+      "queries": 1,
+      "mrr_a": 0.5,
+      "mrr_f": 0.5,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "pallets/click": {
+      "split": "train",
+      "queries": 26,
+      "mrr_a": 0.39391025641025645,
+      "mrr_f": 0.39391025641025645,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "pydantic/pydantic": {
+      "split": "val",
+      "queries": 1,
+      "mrr_a": 0.5,
+      "mrr_f": 1.0,
+      "diff": 0.5,
+      "status": "IMPROVED"
+    },
+    "pypa/pip": {
+      "split": "train",
+      "queries": 5,
+      "mrr_a": 0.46818181818181814,
+      "mrr_f": 0.432051282051282,
+      "diff": -0.03613053613053613,
+      "status": "REGRESSED"
+    },
+    "pytest-dev/pytest": {
+      "split": "held_out",
+      "queries": 7,
+      "mrr_a": 0.39366496598639455,
+      "mrr_f": 0.48739522334132596,
+      "diff": 0.0937302573549314,
+      "status": "IMPROVED"
+    },
+    "python/mypy": {
+      "split": "held_out",
+      "queries": 1,
+      "mrr_a": 0.2,
+      "mrr_f": 0.2,
+      "diff": 0.0,
+      "status": "TIED"
+    },
+    "scrapy/scrapy": {
+      "split": "train",
+      "queries": 3,
+      "mrr_a": 0.3454287620954288,
+      "mrr_f": 0.344938445855877,
+      "diff": -0.000490316239551758,
+      "status": "TIED"
+    },
+    "spring-projects/spring-boot": {
+      "split": "train",
+      "queries": 8,
+      "mrr_a": 0.4202727317481416,
+      "mrr_f": 0.41689270644966847,
+      "diff": -0.003380025298473144,
+      "status": "TIED"
+    },
+    "tokio-rs/tokio": {
+      "split": "val",
+      "queries": 38,
+      "mrr_a": 0.40588599814590226,
+      "mrr_f": 0.4316625985911888,
+      "diff": 0.025776600445286513,
+      "status": "IMPROVED"
+    },
+    "tox-dev/tox": {
+      "split": "train",
+      "queries": 2,
+      "mrr_a": 0.2621951219512195,
+      "mrr_f": 0.5178571428571429,
+      "diff": 0.2556620209059234,
+      "status": "IMPROVED"
+    },
+    "vitejs/vite": {
+      "split": "held_out",
+      "queries": 25,
+      "mrr_a": 0.15802069648347905,
+      "mrr_f": 0.20736857228374284,
+      "diff": 0.049347875800263785,
+      "status": "IMPROVED"
+    },
+    "vuejs/core": {
+      "split": "train",
+      "queries": 6,
+      "mrr_a": 0.19356559949780286,
+      "mrr_f": 0.1708804143126177,
+      "diff": -0.02268518518518517,
+      "status": "REGRESSED"
+    }
+  },
+  "task_breakdown": {
+    "code2test": {
+      "queries": 106,
+      "mrr_a": 0.4129806590595891,
+      "mrr_f": 0.45036865920496705,
+      "diff": 0.037388000145377964
+    },
+    "comment2context": {
+      "queries": 80,
+      "mrr_a": 0.30383604194790026,
+      "mrr_f": 0.3347410798185792,
+      "diff": 0.030905037870678942
+    },
+    "edit2ripple": {
+      "queries": 58,
+      "mrr_a": 0.339512067519461,
+      "mrr_f": 0.37658051344605886,
+      "diff": 0.03706844592659786
+    },
+    "trace2code": {
+      "queries": 101,
+      "mrr_a": 0.47235661819848923,
+      "mrr_f": 0.47235661819848923,
+      "diff": 0.0
+    }
+  },
+  "jackknife": {
+    "val": {
+      "eslint/eslint": {
+        "omitted_queries": 1,
+        "remaining_queries": 59,
+        "mrr_a": 0.30207521589954045,
+        "mrr_f": 0.32891689919668726,
+        "delta": 0.026841683297146812
+      },
+      "huggingface/diffusers": {
+        "omitted_queries": 16,
+        "remaining_queries": 44,
+        "mrr_a": 0.36584374883444537,
+        "mrr_f": 0.3994714104125793,
+        "delta": 0.033627661578133905
+      },
+      "microsoft/playwright": {
+        "omitted_queries": 4,
+        "remaining_queries": 56,
+        "mrr_a": 0.3153425857238256,
+        "mrr_f": 0.3436241144211233,
+        "delta": 0.028281528697297664
+      },
+      "pydantic/pydantic": {
+        "omitted_queries": 1,
+        "remaining_queries": 59,
+        "mrr_a": 0.2936871148964273,
+        "mrr_f": 0.3120560234904725,
+        "delta": 0.01836890859404522
+      },
+      "tokio-rs/tokio": {
+        "omitted_queries": 38,
+        "remaining_queries": 22,
+        "mrr_a": 0.10926690224295112,
+        "mrr_f": 0.13673302906694101,
+        "delta": 0.027466126823989898
+      }
+    },
+    "held_out": {
+      "astral-sh/ruff": {
+        "omitted_queries": 6,
+        "remaining_queries": 69,
+        "mrr_a": 0.3104561440392547,
+        "mrr_f": 0.3368108872740301,
+        "delta": 0.02635474323477538
+      },
+      "huggingface/transformers": {
+        "omitted_queries": 36,
+        "remaining_queries": 39,
+        "mrr_a": 0.19796112226140097,
+        "mrr_f": 0.24167044967050044,
+        "delta": 0.04370932740909947
+      },
+      "pytest-dev/pytest": {
+        "omitted_queries": 7,
+        "remaining_queries": 68,
+        "mrr_a": 0.28647251133833385,
+        "mrr_f": 0.3008434018409627,
+        "delta": 0.014370890502628852
+      },
+      "python/mypy": {
+        "omitted_queries": 1,
+        "remaining_queries": 74,
+        "mrr_a": 0.2977808855798847,
+        "mrr_f": 0.3198529444401993,
+        "delta": 0.022072058860314603
+      },
+      "vitejs/vite": {
+        "omitted_queries": 25,
+        "remaining_queries": 50,
+        "mrr_a": 0.3657053624164898,
+        "mrr_f": 0.37369807162962343,
+        "delta": 0.007992709213133609
+      }
+    }
+  }
+}
