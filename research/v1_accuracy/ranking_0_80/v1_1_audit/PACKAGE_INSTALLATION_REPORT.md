@@ -79,3 +79,4 @@ The installed packages were verified to expose all required public symbols:
 - CLI executable entry point: `reponeedle = reponeedle.cli:main`
 
 **Conclusion**: The release distribution artifacts build cleanly, install reliably in isolated environments, and pass all verification checks.
+

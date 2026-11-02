@@ -120,3 +120,4 @@ python -m reponeedle.cli "BM25 inverted index" \
 ```
 
 The CLI executed in 149.6 ms, correctly selected relevant core modules, generated formatted explanations, packed exactly 1995 tokens within the 2000-token budget, and terminated with exit code 0.
+

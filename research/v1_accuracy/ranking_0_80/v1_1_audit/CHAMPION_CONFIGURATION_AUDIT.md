@@ -82,3 +82,4 @@ For candidate document $d$, query $q$, and detected seed files $S = \{s_1, \dots
 
 3. **Fallback & Determinism**:
    If $\text{impact}(d, S)$ fails or encounters an exception, the ranker gracefully defaults to $\text{score}_{\text{base}}(d)$ without crashing. Output sorting is completely deterministic across runs.
+

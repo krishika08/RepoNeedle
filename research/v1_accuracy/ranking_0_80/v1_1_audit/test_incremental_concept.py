@@ -116,3 +116,4 @@ diff = np.max(np.abs(s_inc - s_fr))
 print(f"BM25 Max absolute difference: {diff:.10f}")
 assert diff < 1e-6
 print("BM25 Index consistency: 100% PERFECT MATCH!")
+

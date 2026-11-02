@@ -108,3 +108,4 @@ The authoritative, fully verified metrics for Phase R6 are:
 - **Pooled Cohort**: Baseline B = **0.5993**, Champion D = **0.6282** ($\Delta = \mathbf{+0.0289}$, $p = 0.0078$)
 
 The alternative figures $\{0.2985, 0.3221, 0.2797, 0.3049\}$ are formally marked **UNVERIFIED TEXT TRANSCRIPTIONS** and are expunged from the release audit.
+
