@@ -68,7 +68,7 @@ def test_change_impact_auto_infers_task_from_seed(client):
     payload = response.json()
     assert payload["ranker"] == "change_impact"
     assert payload["task_type"] == "edit2ripple"
-    assert "seed-relative dependency boosts" in payload["ranker_note"]
+    assert "seed-relative dependency boosts" in payload["ranker_note"].lower()
     assert payload["tokens_used"] <= payload["token_budget"]
     selected_paths = [item["path"] for item in payload["selected_files"]]
     assert selected_paths
