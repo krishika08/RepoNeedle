@@ -393,7 +393,7 @@ class RepoNeedleEngine:
             struct_scores = np.zeros(num_docs, dtype=np.float32)
             workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
-        elif effective_ranker == "change_impact":
+              elif effective_ranker == "change_impact":
             if query_obj.task_type == TaskType.AUTO:
                 inferred_task, _ = self.router.classify_intent(query_obj)
             else:
