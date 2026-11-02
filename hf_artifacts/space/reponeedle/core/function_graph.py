@@ -99,6 +99,7 @@ class FunctionGraphEngine:
         self.callees_map: Dict[str, Dict[str, float]] = defaultdict(dict)  # caller -> {callee: conf}
 
         self.diagnostics: Dict[str, Any] = {}
+        self._polyglot_cache: Dict[str, Tuple[str, Tuple[List[FunctionSymbol], List[CallSite], List[str], List[str]]]] = {}
 
     def _normalize_module_name(self, path: str) -> str:
         norm = path.replace("\\", "/")
@@ -386,7 +387,15 @@ class FunctionGraphEngine:
         class_to_methods: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
 
         for doc in docs:
-            funcs, calls, syms, imps = self.extract_polyglot(doc.content, doc.path)
+            cache_key = doc.path
+            sym_str = ",".join(doc.symbols) if doc.symbols else ""
+            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            if cache_key in self._polyglot_cache and self._polyglot_cache[cache_key][0] == content_sig:
+                funcs, calls, syms, imps = self._polyglot_cache[cache_key][1]
+            else:
+                funcs, calls, syms, imps = self.extract_polyglot(doc.content, doc.path)
+                self._polyglot_cache[cache_key] = (content_sig, (funcs, calls, syms, imps))
+
             doc_functions[doc.path] = funcs
             doc_calls[doc.path] = calls
             doc_imports[doc.path] = list(dict.fromkeys(doc.imports + imps))

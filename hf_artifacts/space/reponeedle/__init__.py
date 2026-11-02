@@ -8,11 +8,20 @@ from reponeedle.models import (
     RetrievalResult,
     ScoredFile,
     TaskType,
+    RankerType,
     BudgetConfig,
+    ContextTier,
 )
 from reponeedle.engine import RepoNeedleEngine
+from reponeedle.core.change_impact import ChangeImpactRanker, ChangeImpactConfig
+from reponeedle.core.packer import (
+    CUDPackOptimizer,
+    BudgetOptimizer,
+    ExactTokenizer,
+    CodeSpanExtractor,
+)
 
-__version__ = "0.1.0"
+__version__ = "1.1.0"
 __all__ = [
     "RepoNeedleEngine",
     "FileDoc",
@@ -20,6 +29,14 @@ __all__ = [
     "RetrievalResult",
     "ScoredFile",
     "TaskType",
+    "RankerType",
     "BudgetConfig",
+    "ContextTier",
+    "ChangeImpactRanker",
+    "ChangeImpactConfig",
+    "CUDPackOptimizer",
+    "BudgetOptimizer",
+    "ExactTokenizer",
+    "CodeSpanExtractor",
 ]
 

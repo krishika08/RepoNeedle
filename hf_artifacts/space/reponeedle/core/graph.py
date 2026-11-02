@@ -14,7 +14,10 @@ import json
 try:
     import tomllib
 except ImportError:
-    tomllib = None
+    try:
+        import tomli as tomllib
+    except ImportError:
+        tomllib = None
 from typing import List, Dict, Set, Tuple, Optional, Any
 import networkx as nx
 import numpy as np
@@ -99,9 +102,16 @@ class RepoGraph:
     def parse_cargo_manifest(content: str, filepath: str = "") -> Dict[str, Any]:
         """Parses Cargo.toml for package name, workspace members, and path dependencies."""
         res = {"name": "", "workspace_members": [], "path_dependencies": {}}
-        if tomllib:
+        parsed = False
+        toml_parser = tomllib
+        if not toml_parser:
             try:
-                data = tomllib.loads(content)
+                import tomli as toml_parser
+            except ImportError:
+                toml_parser = None
+        if toml_parser:
+            try:
+                data = toml_parser.loads(content)
                 res["name"] = data.get("package", {}).get("name", "")
                 ws = data.get("workspace", {})
                 if isinstance(ws, dict):
@@ -112,8 +122,28 @@ class RepoGraph:
                         for dep_name, dep_info in deps.items():
                             if isinstance(dep_info, dict) and "path" in dep_info:
                                 res["path_dependencies"][dep_name] = dep_info["path"]
+                parsed = True
             except Exception:
                 pass
+        if not parsed:
+            # Fallback regex parsing when TOML parser is unavailable or on malformed TOML
+            pkg_match = re.search(r'\[package\][^\[]*?name\s*=\s*["\']([^"\']+)["\']', content, re.DOTALL)
+            if pkg_match:
+                res["name"] = pkg_match.group(1).strip()
+            ws_match = re.search(r'\[workspace\][^\[]*?members\s*=\s*\[(.*?)\]', content, re.DOTALL)
+            if ws_match:
+                members = re.findall(r'["\']([^"\']+)["\']', ws_match.group(1))
+                res["workspace_members"] = [m.strip() for m in members if m.strip()]
+            path_deps = re.findall(r'(\w[\w-]*)\s*=\s*\{[^}]*path\s*=\s*["\']([^"\']+)["\']', content)
+            for dep_name, dep_path in path_deps:
+                res["path_dependencies"][dep_name] = dep_path
+            table_deps = re.findall(
+                r'\[(?:dependencies|dev-dependencies|build-dependencies)\.([\w-]+)\][^\[]*?path\s*=\s*["\']([^"\']+)["\']',
+                content,
+                re.DOTALL,
+            )
+            for dep_name, dep_path in table_deps:
+                res["path_dependencies"][dep_name] = dep_path
         return res
 
     @staticmethod
