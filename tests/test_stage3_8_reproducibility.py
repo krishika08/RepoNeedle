@@ -19,6 +19,12 @@ if str(ARB_SRC) not in sys.path:
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+# Research-only reproducibility test requires optional external benchmark dependency
+pytest.importorskip(
+    "agent_retrieval_bench",
+    reason="Optional external benchmark dependency 'agent_retrieval_bench' is not installed (external/agent-retrieval-bench)"
+)
+
 from agent_retrieval_bench.baseline import (
     reciprocal_rank,
     recall_at,
