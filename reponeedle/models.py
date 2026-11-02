@@ -82,6 +82,11 @@ class RetrievalResult(BaseModel):
     ranked_files: Optional[List[str]] = None
     rendered_context: str = ""
 
+    @property
+    def packed_files(self) -> List[ScoredFile]:
+        """Convenience alias for selected_files (CUD-Pack packed files)."""
+        return self.selected_files
+
 
 class BudgetConfig(BaseModel):
     max_tokens: int = 4000

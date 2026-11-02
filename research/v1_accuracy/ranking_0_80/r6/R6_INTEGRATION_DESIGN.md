@@ -160,3 +160,4 @@ Output formatting includes rank changes, final scores, and structural explanatio
 - **Zero Oracle**: The ranking engine has no network calls, no telemetry, and no ingestion of benchmark test harnesses, ground truth manifests, or `.gold` files.
 - **Path Isolation**: Path traversal is validated to prevent directory traversal outside the active repository root.
 - **Deterministic**: Given identical query string and file tree, output ranking is strictly deterministic.
+

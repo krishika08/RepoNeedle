@@ -1,0 +1,16 @@
+{
+  "enable_graph": true,
+  "fallback_on_error": true,
+  "impact_multiplier": 3.0,
+  "sfs_multiplier": 0.01,
+  "tip_multiplier_non_test": 0.85,
+  "tip_multiplier_test": 1.45,
+  "weight_confirmed_build": 0.4,
+  "weight_confirmed_call": 0.8,
+  "weight_confirmed_import": 0.75,
+  "weight_confirmed_symbol": 0.8,
+  "weight_heuristic_ancestor": 0.3,
+  "weight_heuristic_dir_proximity": 0.75,
+  "weight_heuristic_doc": 0.35,
+  "weight_heuristic_test_stem": 0.85
+}

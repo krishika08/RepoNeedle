@@ -1,0 +1,10 @@
+{
+  "full_rebuild_ms": 892.52,
+  "single_file_update_ms": 320.0,
+  "five_file_update_ms": 328.79,
+  "twenty_file_update_ms": 324.24,
+  "peak_ram_mb": 11.85,
+  "index_consistency_single_delta": 0.0,
+  "index_consistency_five_delta": 0.0,
+  "index_consistency_twenty_delta": 0.0
+}

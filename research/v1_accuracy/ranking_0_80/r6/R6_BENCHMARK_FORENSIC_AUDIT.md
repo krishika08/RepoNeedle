@@ -57,3 +57,4 @@ Every task definition in `research/v1_accuracy/ranking_0_80/r6/src/task_definiti
 - **Pass 1 (Commit Diff Extraction)**: Primary modified files extracted directly from the pinned commit patch.
 - **Pass 2 (Independent Relevance Filter)**: Incidental files (e.g. changelogs, formatting churn, version bumps) were stripped.
 - For all 180 tasks, implementation files and regression test suites are explicitly documented with their corresponding AST public symbol definitions.
+

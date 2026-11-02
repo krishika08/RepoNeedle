@@ -86,3 +86,4 @@ Using the exact denominator ($N = 9,467$):
   - Confirmed FDR: $250 / 380 = \mathbf{65.79\%}$
   - Heuristic FDR: $572 / 638 = \mathbf{89.66\%}$
   - True False Positive Rate ($\text{FP} / \text{Actual Negatives}$): Confirmed is **2.64%**, Heuristic is **6.03%**.
+

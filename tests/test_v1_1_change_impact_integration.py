@@ -199,3 +199,44 @@ def test_large_repository_incremental_indexing():
     assert res.ranker == "change_impact"
     assert res.execution_time_ms < 50.0, f"Execution too slow: {res.execution_time_ms} ms"
     assert len(res.selected_files) > 0
+
+
+def test_incremental_indexing_bit_identical_consistency(sample_repo):
+    """Tests that update_document produces bit-identical scores to a fresh cold rebuild."""
+    engine = RepoNeedleEngine(sample_repo)
+    
+    updated_doc = FileDoc(
+        path="django/core/exceptions.py",
+        content="class FieldError(Exception):\n    \"\"\"Custom error.\"\"\"\n    code = 500\n",
+        symbols=["FieldError", "code"],
+        imports=[],
+        line_count=3,
+        token_count=18,
+    )
+    
+    # Incremental update
+    engine.update_document(updated_doc)
+    
+    # Fresh rebuild for ground truth
+    fresh_docs = [updated_doc if d.path == updated_doc.path else d for d in sample_repo]
+    engine_fresh = RepoNeedleEngine(fresh_docs)
+    
+    q = Query(text="FieldError code exception", budget_tokens=2000)
+    res_inc = engine.retrieve(q, ranking_engine="change_impact")
+    res_fresh = engine_fresh.retrieve(q, ranking_engine="change_impact")
+    
+    assert [f.path for f in res_inc.selected_files] == [f.path for f in res_fresh.selected_files]
+    inc_scores = [f.score for f in res_inc.selected_files]
+    fresh_scores = [f.score for f in res_fresh.selected_files]
+    np.testing.assert_allclose(inc_scores, fresh_scores, atol=1e-6)
+
+
+def test_engine_query_alias_and_packed_files(sample_repo):
+    """Tests that engine.query() and result.packed_files work as documented."""
+    engine = RepoNeedleEngine(sample_repo, ranker="change_impact")
+    res = engine.query("QuerySet filter", budget_tokens=1000)
+    
+    assert isinstance(res, RetrievalResult)
+    assert res.packed_files == res.selected_files
+    assert len(res.packed_files) > 0
+

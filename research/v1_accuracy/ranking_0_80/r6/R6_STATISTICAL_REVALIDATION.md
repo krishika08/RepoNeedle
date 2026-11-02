@@ -63,3 +63,4 @@ In compliance with scientific integrity rules:
 | `google/guava` | Java (Collections) | 10 | 0.5270 | 0.5450 | **+0.0180** | 0 |
 
 Across all evaluated repositories, $\Delta \text{MRR} > 0$ for every single codebase, and the query-level regression rate is **0.00%**.
+

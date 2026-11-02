@@ -109,3 +109,4 @@ The dedicated integration suite in [`tests/test_v1_1_change_impact_integration.p
 | **Error Containment** | Ranker crash does not crash query | Simulated failure test with fallback assertions | VERIFIED |
 
 **Conclusion**: RepoNeedle V1.1 passes all quality, stability, and invariant gates with zero regressions against V1.0.
+

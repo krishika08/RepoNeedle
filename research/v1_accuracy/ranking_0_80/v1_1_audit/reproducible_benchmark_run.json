@@ -1,0 +1,3203 @@
+{
+  "metadata": {
+    "timestamp": "2026-11-02T14:17:57Z",
+    "git_commit": "8e55dc736b818213d2f1ca184fa323512c5b7eb8",
+    "benchmark_sha256": "e4b0dad8a7a98bc07c08410f17338671902dd5d048adda97b9acd7d56d5212bd",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "metrics_summary": {
+    "train_baseline_b": {
+      "mrr": 0.6213,
+      "hit1": 0.4667,
+      "recall_5": 0.9,
+      "recall_10": 0.9,
+      "recall_20": 0.9,
+      "n_queries": 90
+    },
+    "train_champion_d": {
+      "mrr": 0.6546,
+      "hit1": 0.4667,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "n_queries": 90
+    },
+    "val_baseline_b": {
+      "mrr": 0.6472,
+      "hit1": 0.5,
+      "recall_5": 0.9125,
+      "recall_10": 0.9125,
+      "recall_20": 0.9125,
+      "n_queries": 40
+    },
+    "val_champion_d": {
+      "mrr": 0.6708,
+      "hit1": 0.5,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "n_queries": 40
+    },
+    "held_out_baseline_b": {
+      "mrr": 0.5215,
+      "hit1": 0.28,
+      "recall_5": 0.92,
+      "recall_10": 0.92,
+      "recall_20": 0.92,
+      "n_queries": 50
+    },
+    "held_out_champion_d": {
+      "mrr": 0.5467,
+      "hit1": 0.28,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "n_queries": 50
+    },
+    "pooled_baseline_b": {
+      "mrr": 0.5994,
+      "hit1": 0.4222,
+      "recall_5": 0.9083,
+      "recall_10": 0.9083,
+      "recall_20": 0.9083,
+      "n_queries": 180
+    },
+    "pooled_champion_d": {
+      "mrr": 0.6282,
+      "hit1": 0.4222,
+      "recall_5": 1.0,
+      "recall_10": 1.0,
+      "recall_20": 1.0,
+      "n_queries": 180
+    }
+  },
+  "latency_measurements": {
+    "baseline_mean_ms": 0.124,
+    "champion_mean_ms": 0.734,
+    "champion_p50_ms": 0.797,
+    "champion_p95_ms": 1.002
+  },
+  "per_query_rankings": [
+    {
+      "query_id": "e64b73de04427532f436d6ba",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "tests/queries/test_bitwise.py"
+      ],
+      "ranks_baseline_b": [
+        4
+      ],
+      "first_rank_b": 4,
+      "ranks_champion_d": [
+        4
+      ],
+      "first_rank_d": 4,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "4c78b0f07470138b9ad5a07d",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "tests/migrations/test_operations.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a7ef3e719dfb772014e4c3bc",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "tests/asgi/test_handlers.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c4e48834871e5e6e2e2f0723",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "django/forms/models.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "8015865e85630898689d791b",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "django/contrib/sessions/middleware.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "b6ffffc0264bd450afdb26e1",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "tests/serializers/test_natural_keys.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9527c9cf23753b475a85d22f",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "django/db/backends/base/base.py",
+        "django/db/utils.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "791189f675ba4becb14c00d2",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "django/urls/resolvers.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c7ca1fe3b6ae191c3d98f7d9",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "tests/admin_views/test_changelist.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7559c82f1d0532f2c6698b81",
+      "repo": "django/django",
+      "partition": "train",
+      "gold_files": [
+        "tests/bulk_create/tests.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "02866df0ecbbc51f77133519",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/ensemble/_hist_gradient_boosting/tests/test_gradient_boosting.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "42830174a626a3e2640c2a1d",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/pipeline.py",
+        "sklearn/utils/metaestimators.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "0655c21a33cbac4aff19b279",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/metrics/_classification.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "448b53cae32f753c47696604",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/linear_model/tests/test_base.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "0c9e09b994986ad401084171",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/preprocessing/tests/test_data.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "4267832e6bc7c7cc24eddbb1",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/cluster/tests/test_kmeans.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "4d18f31bfcada833c3115298",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/tree/_classes.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "0d00035a1f30b25de8a07fd5",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/linear_model/tests/test_ridge.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "98d10ef6c47926dbf3a0a508",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/compose/tests/test_column_transformer.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "83f89b3784e40f66f57d2ccd",
+      "repo": "scikit-learn/scikit-learn",
+      "partition": "train",
+      "gold_files": [
+        "sklearn/model_selection/_split.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c25b85348cdad0f84a9e8b84",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_requests.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9040bfc4265c9dcc23c15abb",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "requests/cookies.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "f5e2d3afe06c26ad995d8cc7",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "requests/models.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "544b4d8b3b906ece1e860eb8",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_adapters.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "64e0fabd7dab1bfc37aa8a96",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_requests.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "65d130f18813847ca7f6e9ff",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_lowlevel.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "27afd4fbd823a9061ee7ef4d",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "requests/models.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "1eda57f9dd517200d5035eb2",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "requests/adapters.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "16e3ae193d0143669b6bada9",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "requests/structures.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c4509e0b13a86a64ec51d3ea",
+      "repo": "psf/requests",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_requests.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "f98fabc5d60cf5d301c64ed5",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_fields.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "be1d138596e6a442e56ef06f",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "src/marshmallow/schema.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "bb0ad7714febf2175c68423b",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_datetime.py"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "3b4e656e2af224dceb4e3fe0",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_schema.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "e5ccc251c77805c89224c6d0",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "src/marshmallow/exceptions.py",
+        "src/marshmallow/error_store.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "cb07cf7355e57cb6c0bb9f8f",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_fields.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "e732caa796041fc5a2f68272",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "src/marshmallow/fields.py"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "760be6932c700434bffc1699",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_decorators.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "68b6da23fb21fdedb34d2fbb",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "src/marshmallow/validate.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "edfdfce02ed023a34cb180ee",
+      "repo": "marshmallow-code/marshmallow",
+      "partition": "train",
+      "gold_files": [
+        "tests/test_fields.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "68af4bb93a309b9a302f8e75",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-circus/src/__tests__/run.test.ts"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "60195aabb0c4cedc7372d092",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-snapshot/src/index.ts",
+        "packages/pretty-format/src/index.ts"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "08a639dcfc86db71f97714af",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-resolve/src/resolver.ts"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7955376fdeda0c2bd26b6d71",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-runtime/src/__tests__/runtime.test.ts"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "e8c370063668e346f1ae6438",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-fake-timers/src/__tests__/fakeTimers.test.ts"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "999280eeb12aa61f0e542dc0",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-reporters/src/__tests__/coverage.test.ts"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "82e4308bf919cef2bf19620d",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/expect/src/asymmetricMatchers.ts"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "3c482bb2ee2e404f6952954e",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-haste-map/src/HasteFS.ts"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c495f0af63b2693a99522b5e",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-core/src/TestSequencer.ts"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "16eaf272b26e309952b3c953",
+      "repo": "facebook/jest",
+      "partition": "train",
+      "gold_files": [
+        "packages/jest-config/src/normalize.ts"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c6283546ee30105866a74cc8",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "test/app.router.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7dfef7c2340042a79c67ed4d",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "lib/application.js",
+        "lib/router/index.js"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "699b34ea41796dcaca75ff50",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "lib/response.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "fd3a485ebbd94398eafde64c",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "test/router.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "09b862553052f00cb46a566a",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "test/res.cookie.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "6e2bbcd050a820e3cf52487e",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "test/req.subdomains.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "17eeb9a8d49f3b5479bb3c39",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "lib/application.js"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "3e70cccb1a3faa010c139c0f",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "lib/response.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a46269474a1ecb96e00d7cf1",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "lib/express.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "479472906eaf1a49a93f4ca3",
+      "repo": "expressjs/express",
+      "partition": "train",
+      "gold_files": [
+        "test/res.sendFile.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "414a369f63aa866e30135531",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "test_suite/tests/test_derive.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "746f56d2740d7d3c89d54b38",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "serde/src/de/mod.rs",
+        "serde/src/de/visitor.rs"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "2dda33ed0f5ee26aabac21af",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "serde_derive/src/internals/attr.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "01fe35f4fbb506264cea1745",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "test_suite/tests/test_integer128.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "1620e66212f2f1711e92640b",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "test_suite/tests/test_error.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "11686af07bc9748e36934c2f",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "test_suite/tests/test_skip.rs"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "fdc853f5d39a8de14100624c",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "serde/src/de/impls.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "2e1abb88965b97e7f83f1fae",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "serde/src/de/mod.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "dc6cd5dc367ba24b874eb333",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "serde/src/private/de.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "46b2c6b50057d33d24cfa080",
+      "repo": "serde-rs/serde",
+      "partition": "train",
+      "gold_files": [
+        "test_suite/tests/test_untagged.rs"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "5188012e72e372423361115c",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "a3c2a73dec9d042dc213c988",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7861bd1dec07b10a340ebe77",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c1107c241698279982f41ff7",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "0d0346a13031a22c389bd31c",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "bd8c00a62124d54cb8a8c368",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "13bacd81c1b7cf51d00c7a24",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        52
+      ],
+      "first_rank_b": 52,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.4807692307692308
+    },
+    {
+      "query_id": "ca08a02e98192f1459301b37",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "d3ef1d981e26401f42fef0d3",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "652953d4c9183df675da6b37",
+      "repo": "fatih/color",
+      "partition": "train",
+      "gold_files": [
+        "color_test.go"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "a47a1472e6804954888113c6",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/test/java/retrofit2/RetrofitTest.java"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "eeba2999090129fcf5a6d698",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/main/java/retrofit2/CallAdapter.java",
+        "retrofit/src/main/java/retrofit2/CompletableFutureCallAdapterFactory.java"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "dfd92094bdd86b002b849626",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/main/java/retrofit2/RequestFactory.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "286e770bffad5cb50e209fda",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/test/java/retrofit2/KotlinExtensionsTest.kt"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "ef1520235d598e03cb80726d",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/test/java/retrofit2/ConverterTest.java"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "317bb1fc615bed3a9449eee5",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/test/java/retrofit2/HttpExceptionTest.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "dfe5c8ddace65bc68765cf19",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/main/java/retrofit2/RequestFactory.java"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "561098ef40df6160de8d81af",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/test/java/retrofit2/ResponseTest.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "99ecc9078d90a4123a0c8bf9",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/main/java/retrofit2/ParameterHandler.java"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9d9581dc72a119091e8a2f24",
+      "repo": "square/retrofit",
+      "partition": "train",
+      "gold_files": [
+        "retrofit/src/test/java/retrofit2/PlatformTest.java"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "0aca816f039132bd4f3403ef",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "src/flask/helpers.py",
+        "tests/test_helpers.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        3
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        3
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "3454cb9864a6d507f966fe43",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "src/flask/ctx.py",
+        "src/flask/globals.py"
+      ],
+      "ranks_baseline_b": [
+        2,
+        3
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2,
+        3
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7e95b3f7145673f4c46635db",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "src/flask/blueprints.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "6614077f90bce35bccfb1b84",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "tests/test_async.py"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "be6817546e14eb8b81e720b7",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "tests/test_basic.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "fd843e4bbf4123690ff50e74",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "tests/test_static.py"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "d3184210e906eb3b26f7aa8b",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "src/flask/json/__init__.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "4358595c3ef07e0b87baae40",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "tests/test_cli.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a78eee4adc65f19219e43357",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "src/flask/signals.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "bb9c516877f54dddcc6499c2",
+      "repo": "pallets/flask",
+      "partition": "val",
+      "gold_files": [
+        "tests/test_reqctx.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "19fc46705ed80cfaeac35acd",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/axes/_base.py",
+        "lib/matplotlib/tests/test_axes.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        3
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        3
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "ca6b82eced2b106c14662454",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/backend_bases.py",
+        "lib/matplotlib/figure.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "76ae422f97cd840694185e23",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/colorbar.py",
+        "lib/matplotlib/colors.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "4817617b1e64bea10713d399",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/tests/test_backend_macosx.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c4f70cc4300b10f9d034b7da",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/tests/test_contour.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "1b8a44f8da109e2eadd01d82",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/tests/test_legend.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "39f33b5fd5c73b5b27064e6a",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/path.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "224147291222412e72fe9e0e",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/figure.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "96e0a0fe40831e34c48dc402",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/ticker.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "811edb0100fc36fa39b5253a",
+      "repo": "matplotlib/matplotlib",
+      "partition": "val",
+      "gold_files": [
+        "lib/matplotlib/tests/test_collections.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "d9a3c672f0b52e09d887ebd0",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "lib/core/AxiosError.js",
+        "test/specs/core/AxiosError.spec.js"
+      ],
+      "ranks_baseline_b": [
+        1,
+        53
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        3
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7851c9c92652131e301654bf",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "lib/core/InterceptorManager.js",
+        "lib/core/Axios.js"
+      ],
+      "ranks_baseline_b": [
+        1,
+        3
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        3
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c9f51d1d386020549ec23290",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "lib/adapters/http.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "f309f1c5b6649123258b42c1",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "test/specs/cancel/AbortController.spec.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "679b51d5d1ec1a7dae5dbd31",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "test/specs/helpers/buildURL.spec.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9cbf622e3a2071050c6183bc",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "test/specs/headers.spec.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "e035970b6258bd9fdeb81a88",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "lib/defaults/index.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9227a030247e2c72e1d3d889",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "lib/core/settle.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a09206a8e5f526a1a41eddb3",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "lib/helpers/isAxiosError.js"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "065abecb75533da655a43ee8",
+      "repo": "axios/axios",
+      "partition": "val",
+      "gold_files": [
+        "test/specs/adapters/http.spec.js"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "0fb011833bf4b428a75c587a",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "tests/integration.rs"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "886f1aee73d7240dcf5177ce",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "crates/ignore/src/walk.rs",
+        "crates/ignore/src/dir.rs"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "17fc27b15cf7d03634bf7057",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "crates/regex/src/matcher.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a1dc0f3252b4e90e76545f74",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "tests/multiline.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "baa2f18f31ce2f896b472e18",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "tests/replace.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a75fcf2cee376e745c94c9c7",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "tests/encoding.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "1480812c63ca521f5eb3d647",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "crates/core/main.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "37b39a2e8c07ea3e368f58bf",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "tests/json.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "b917924552ad5389f60d63f5",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "crates/ignore/src/types.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "cc546e01bb7eb06e871a5a5c",
+      "repo": "BurntSushi/ripgrep",
+      "partition": "val",
+      "gold_files": [
+        "tests/context.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "ff695494dd4c0aa3213c1e31",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/integrals/tests/test_heurisch.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "653debe5b05b07265056dad6",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/simplify/simplify.py",
+        "sympy/core/expr.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "2d43c14ca7be943aa7ef5035",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/matrices/matrices.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c42d15368269708f9c502b15",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/solvers/tests/test_solvers.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9cfe1fea2d2077d7dda975c9",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/series/tests/test_limits.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "f499bbeaf3dd08c6a29cb8c0",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/functions/elementary/piecewise.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "cd952559cb70baada1e985b2",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/solvers/polysys.py"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "b2facdbdca5569202b6709a2",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/assumptions/handlers/order.py"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "3599e4967348e5049dfff22c",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/printing/latex.py"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "5e8221e3b76a2f40cc5423cb",
+      "repo": "sympy/sympy",
+      "partition": "held_out",
+      "gold_files": [
+        "sympy/matrices/tests/test_matrices.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "daec85d3ce0d71bf76d31fcd",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/test_black.py"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "a51709bb9d8012bfb7f8dc81",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "src/black/linegen.py",
+        "src/black/lines.py"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9b72f116534fd5dfa5db2e55",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "src/black/brackets.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "6b7309d922089007037b4b22",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/test_black.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "85b9c91d74b43c7fa4f2d5bc",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/test_comments.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "21417d645be75f58ba744a4d",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/test_strings.py"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "6b9f14c5491aa50c268dab3c",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "src/black/__init__.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "f8c754d994607be5f65a1a1a",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/test_files.py"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "4798055ce2adafe1532a94fe",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "src/black/lines.py"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7c6250f61c60323b445b5950",
+      "repo": "psf/black",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/test_black.py"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "161a79bf8b38e6baccf91431",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/client.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "40d66807aac7ef052fb1ab45",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "src/client/conn.rs",
+        "src/client/pool.rs"
+      ],
+      "ranks_baseline_b": [
+        2,
+        3
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2,
+        3
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "224f3369c189ab1f7648823b",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "src/body/mod.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "06e56332a412364519e3a07d",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/server.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "071ba263c16777bfb5248d15",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/h1.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "ac909df3192d87d566eb24ba",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/h1.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9af3e2b953b0c4ce32c6e5c4",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "src/rt/tokio.rs"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "f4d9a33d5882a153507a6fbf",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/error.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c528b1d5f7b202dc1f821790",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "src/ext.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9cfd24e01d455f111d7c53e7",
+      "repo": "hyperium/hyper",
+      "partition": "held_out",
+      "gold_files": [
+        "tests/server.rs"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "da0eb6faa4c28f235bab8eaa",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "daemon/daemon_test.go"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "12ee0e9c0ce7c024089b1a58",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "daemon/images/image_pull.go",
+        "distribution/pull_v2.go"
+      ],
+      "ranks_baseline_b": [
+        2,
+        3
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2,
+        3
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "7eabe1993f2b9f228f82a7ee",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "libnetwork/drivers/bridge/bridge.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "a27729ca9785ac93bdf49fc2",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "integration/container/run_test.go"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "822f1d18a190099f23959fb2",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "integration/container/restart_test.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "76b0e358d81d75cbe7681018",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "container/health_test.go"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "09ffe694552d1c7d00d79a48",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "daemon/start.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "ce6fe17c97d3c7862901a6f6",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "volume/drivers/adapter.go"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "4ea13fc47c72f6e5a1fb2766",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "builder/dockerfile/parser/parser.go"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "c90b8ae1856909d38c196882",
+      "repo": "moby/moby",
+      "partition": "held_out",
+      "gold_files": [
+        "daemon/inspect_test.go"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "0915c05b14db4c4f063eea0c",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava-tests/test/com/google/common/cache/LocalCacheTest.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "9353b06103929a93ae4c5606",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava/src/com/google/common/collect/ImmutableList.java",
+        "guava/src/com/google/common/collect/ImmutableSet.java"
+      ],
+      "ranks_baseline_b": [
+        1,
+        2
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1,
+        2
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "eba9e001066e0efae78f145f",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava/src/com/google/common/util/concurrent/RateLimiter.java"
+      ],
+      "ranks_baseline_b": [
+        1
+      ],
+      "first_rank_b": 1,
+      "ranks_champion_d": [
+        1
+      ],
+      "first_rank_d": 1,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "12ce258b23b4842e7badacdd",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava-tests/test/com/google/common/collect/FluentIterableTest.java"
+      ],
+      "ranks_baseline_b": [
+        53
+      ],
+      "first_rank_b": 53,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.31446540880503143
+    },
+    {
+      "query_id": "37ae5ddaadaa9b26938f791b",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava-tests/test/com/google/common/eventbus/EventBusTest.java"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "6351ec1b162f97bef429b463",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava-tests/test/com/google/common/graph/GraphsTest.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "dde04bf37b97a339bd776a41",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava/src/com/google/common/io/ByteSource.java"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "5e15dc8b31a6f40a0882f103",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava-tests/test/com/google/common/base/PreconditionsTest.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "309773c6db525eeb65287475",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava/src/com/google/common/hash/BloomFilter.java"
+      ],
+      "ranks_baseline_b": [
+        2
+      ],
+      "first_rank_b": 2,
+      "ranks_champion_d": [
+        2
+      ],
+      "first_rank_d": 2,
+      "delta_mrr": 0.0
+    },
+    {
+      "query_id": "d69664ac0ced045346f6c7c4",
+      "repo": "google/guava",
+      "partition": "held_out",
+      "gold_files": [
+        "guava-tests/test/com/google/common/collect/RangeSetTest.java"
+      ],
+      "ranks_baseline_b": [
+        3
+      ],
+      "first_rank_b": 3,
+      "ranks_champion_d": [
+        3
+      ],
+      "first_rank_d": 3,
+      "delta_mrr": 0.0
+    }
+  ]
+}

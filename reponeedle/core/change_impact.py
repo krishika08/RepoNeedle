@@ -243,3 +243,4 @@ class ChangeImpactRanker:
                 explanations = {i: "Fallback to baseline lexical ranker due to exception" for i in range(num_docs)}
                 return ranked_indices, fallback_scores, explanations
             raise
+

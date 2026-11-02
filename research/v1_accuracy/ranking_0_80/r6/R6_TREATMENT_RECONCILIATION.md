@@ -89,3 +89,4 @@ Bit-for-bit reproduction of reported metrics across all three independent partit
 | **Validation** | 40 | 0.6472 | **0.6708** | **+0.0236** | 0.9125 | **1.0000** |
 | **Held-Out** | 50 | 0.5215 | **0.5467** | **+0.0252** | 0.9200 | **1.0000** |
 | **Overall (Pooled)** | 180 | 0.5993 | **0.6282** | **+0.0289** | 0.9083 | **1.0000** |
+
