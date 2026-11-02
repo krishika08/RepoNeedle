@@ -21,11 +21,15 @@ class RankerType(str, Enum):
     BM25 = "bm25"
     ARM101 = "arm101"
     CASCADE = "cascade"
+    CHANGE_IMPACT = "change_impact"
 
 
 class ContextTier(str, Enum):
     FULL = "full"
+    FULL_FILE = "full_file"
+    FOCUS_SPAN = "focus_span"
     SKELETON = "skeleton"
+    INTERFACE = "interface"
     SNIPPET = "snippet"
     OMITTED = "omitted"
 
@@ -76,6 +80,12 @@ class RetrievalResult(BaseModel):
     execution_time_ms: float = 0.0
     ranker: Optional[str] = "legacy"
     ranked_files: Optional[List[str]] = None
+    rendered_context: str = ""
+
+    @property
+    def packed_files(self) -> List[ScoredFile]:
+        """Convenience alias for selected_files (CUD-Pack packed files)."""
+        return self.selected_files
 
 
 class BudgetConfig(BaseModel):
@@ -84,6 +94,10 @@ class BudgetConfig(BaseModel):
     skeleton_token_cap: int = 350
     density_exponent: float = 0.75
     abstention_threshold: float = 0.12
+    mode: str = "auto"  # "auto", "compact", "complete"
+    capacity_elasticity: Optional[float] = None
+    candidate_pool_cutoff: int = 85
+    exact_tokenizer: bool = True
 
 
 class AblationConfig(BaseModel):
