@@ -14,7 +14,10 @@ import json
 try:
     import tomllib
 except ImportError:
-    tomllib = None
+    try:
+        import tomli as tomllib
+    except ImportError:
+        tomllib = None
 from typing import List, Dict, Set, Tuple, Optional, Any
 import networkx as nx
 import numpy as np
@@ -123,10 +126,24 @@ class RepoGraph:
             except Exception:
                 pass
         if not parsed:
-            # Fallback regex parsing when tomllib is unavailable (e.g. Python 3.10)
+            # Fallback regex parsing when TOML parser is unavailable or on malformed TOML
             pkg_match = re.search(r'\[package\][^\[]*?name\s*=\s*["\']([^"\']+)["\']', content, re.DOTALL)
             if pkg_match:
                 res["name"] = pkg_match.group(1).strip()
+            ws_match = re.search(r'\[workspace\][^\[]*?members\s*=\s*\[(.*?)\]', content, re.DOTALL)
+            if ws_match:
+                members = re.findall(r'["\']([^"\']+)["\']', ws_match.group(1))
+                res["workspace_members"] = [m.strip() for m in members if m.strip()]
+            path_deps = re.findall(r'(\w[\w-]*)\s*=\s*\{[^}]*path\s*=\s*["\']([^"\']+)["\']', content)
+            for dep_name, dep_path in path_deps:
+                res["path_dependencies"][dep_name] = dep_path
+            table_deps = re.findall(
+                r'\[(?:dependencies|dev-dependencies|build-dependencies)\.([\w-]+)\][^\[]*?path\s*=\s*["\']([^"\']+)["\']',
+                content,
+                re.DOTALL,
+            )
+            for dep_name, dep_path in table_deps:
+                res["path_dependencies"][dep_name] = dep_path
         return res
 
     @staticmethod

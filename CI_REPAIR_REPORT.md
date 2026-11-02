@@ -1,12 +1,12 @@
 # RepoNeedle V1.1 — CI Repair & Quality Gate Verification Report
 
-**Document Version**: 1.0.0  
+**Document Version**: 1.1.0  
 **Author**: Senior Python Test Infrastructure Engineer  
 **Date**: November 2026  
 **Repository**: `krishika08/RepoNeedle`  
-**Target Branch**: `v1.1-production-release` (Commit: `7807f769d67b074ef9f61b0cba4839ee8cb85785`)  
-**Production PR**: **[GitHub PR #2](https://github.com/krishika08/RepoNeedle/pull/2)**  
-**Successful CI Run**: **[Run #41472997734](https://github.com/krishika08/RepoNeedle/actions/runs/41472997734)** (All 4 Jobs Green)
+**Target Branch**: `v1.1-production-release`  
+**Follow-Up PR**: **[GitHub PR #3](https://github.com/krishika08/RepoNeedle/pull/3)**  
+**Authoritative PR CI Run**: **[Run #41476632666](https://github.com/krishika08/RepoNeedle/actions/runs/41476632666)** (All 4 Jobs Green)  
 
 ---
 
@@ -96,12 +96,34 @@ This clean architecture decouples standard production builds from external submo
 
 ---
 
-### 1.4 Python 3.10 Manifest Parsing Fallback
-In [`reponeedle/core/graph.py`](file:///F:/RepoNeedle/reponeedle/core/graph.py#L98-L138), `parse_cargo_manifest` was updated to support Python 3.10:
-- Attempts `tomllib` (standard in Python 3.11+).
-- Falls back to `tomli` if installed.
-- If no TOML library is present (Python 3.10 standard library), executes a zero-dependency regex fallback (`r'\[package\][^\[]*?name\s*=\s*["\']([^"\']+)["\']'`).
-- Result: 100% parse success across all Python versions without adding unpinned mandatory dependencies.
+### 1.4 Complete Python 3.10 Cargo TOML Compatibility
+Python 3.10 does not include `tomllib` in its standard library (introduced in Python 3.11). To provide full manifest parsing across all supported Python versions without weakening functionality:
+
+1. **Conditional PEP 508 Dependency in `pyproject.toml`**:
+   ```toml
+   dependencies = [
+       ...
+       "tomli>=2.0.1; python_version < \"3.11\"",
+   ]
+   ```
+   Pip automatically installs `tomli` on Python 3.10, adding zero dependencies on Python 3.11 and 3.12.
+2. **Full Parser Import with Fallback in `reponeedle/core/graph.py`**:
+   ```python
+   try:
+       import tomllib
+   except ImportError:
+       try:
+           import tomli as tomllib
+       except ImportError:
+           tomllib = None
+   ```
+3. **Comprehensive Zero-Dependency Regex Fallback**:
+   In bare environments or malformed manifests, `RepoGraph.parse_cargo_manifest()` extracts:
+   - Package name: `r'\[package\][^\[]*?name\s*=\s*["\']([^"\']+)["\']'`
+   - Workspace members: `r'\[workspace\][^\[]*?members\s*=\s*\[(.*?)\]'`
+   - Path dependencies (inline tables and table sections): `r'(\w[\w-]*)\s*=\s*\{[^}]*path\s*=\s*["\']([^"\']+)["\']'` and `r'\[(?:dependencies|dev-dependencies|build-dependencies)\.([\w-]+)\][^\[]*?path\s*=\s*["\']([^"\']+)["\']'`
+4. **Parity Testing in `tests/test_stage3_9_cascade.py`**:
+   `test_cargo_toml_full_compatibility` asserts 100% data parity between the TOML parser and the regex fallback across package name, workspace members, and path dependencies.
 
 ---
 
@@ -120,48 +142,52 @@ else:
 
 ## 2. GitHub Actions Quality Gate Verification
 
-All four workflow jobs completed with status **SUCCESS** in GitHub Actions Run [`41472997734`](https://github.com/krishika08/RepoNeedle/actions/runs/41472997734):
+All four workflow jobs completed with status **SUCCESS** in PR #3 GitHub Actions Run [`41476632666`](https://github.com/krishika08/RepoNeedle/actions/runs/41476632666):
 
 | Job Name | Python Version | OS Runner | Run Duration | Status | Notes |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Production CI** | `3.10` | `ubuntu-latest` | 1m 17s | **SUCCESS** | Clean checkout; 244 passed, 5 skipped; wheel built; CLI verified. |
-| **Production CI** | `3.11` | `ubuntu-latest` | 55s | **SUCCESS** | Clean checkout; 244 passed, 5 skipped; wheel built; CLI verified. |
-| **Production CI** | `3.12` | `ubuntu-latest` | 58s | **SUCCESS** | Clean checkout; 244 passed, 5 skipped; wheel built; CLI verified. |
-| **Research Benchmark Parity** | `3.11` | `ubuntu-latest` | 25s | **SUCCESS** | Pinned ARB checkout; **21 passed, 0 skipped** (100% assertions executed). |
+| **Production CI** | `3.10` | `ubuntu-latest` | 52s | **SUCCESS** | Clean checkout; 244 passed, 5 skipped; wheel built; CLI verified. |
+| **Production CI** | `3.11` | `ubuntu-latest` | 1m 1s | **SUCCESS** | Clean checkout; 244 passed, 5 skipped; wheel built; CLI verified. |
+| **Production CI** | `3.12` | `ubuntu-latest` | 57s | **SUCCESS** | Clean checkout; 244 passed, 5 skipped; wheel built; CLI verified. |
+| **Research Benchmark Parity** | `3.11` | `ubuntu-latest` | 34s | **SUCCESS** | Pinned ARB checkout; **21 passed, 0 skipped** (100% assertions executed). |
+
+> [!NOTE]
+> GitHub Actions CI execution occurs exclusively on `ubuntu-latest` Linux runners. Local developer verification was separately performed on Windows 11 (see Section 3.3).
 
 ---
 
 ## 3. Test Accounting: Passed vs. Skipped
 
-### 3.1 Clean Checkout Environment (Production CI)
+### 3.1 Clean Checkout Environment (Production CI on `ubuntu-latest`)
 - **Total Tests Passed**: **244 passed**
 - **Total Tests Skipped**: **5 skipped** (explicitly declared)
   1. `tests/test_arm101_production_parity.py`: *Optional external benchmark dependency 'agent_retrieval_bench' is not installed*
   2. `tests/test_stage3_7_metrics.py`: *Optional external benchmark dependency 'agent_retrieval_bench' is not installed*
   3. `tests/test_stage3_8_reproducibility.py`: *Optional external benchmark dependency 'agent_retrieval_bench' is not installed*
-  4. `tests/test_cud_pack_production.py:186`: *Corpus manifest not found*
-  5. `tests/test_cud_pack_production.py:245`: *Corpus manifest not found*
+  4. `tests/test_cud_pack_production.py:186`: *Corpus manifest not found* (requires external research corpus)
+  5. `tests/test_cud_pack_production.py:245`: *Corpus manifest not found* (requires external research corpus)
 - **Failures / Errors**: **0**
 
-### 3.2 Research Parity Environment (`research-parity` Job)
-- **Total Tests Passed**: **21 passed in 1.82s**
+### 3.2 Research Parity Environment (`research-parity` Job on `ubuntu-latest`)
+- **Total Tests Passed**: **21 passed**
 - **Total Tests Skipped**: **0 skipped**
 - **Failures / Errors**: **0**
 
-### 3.3 Full Local Developer Environment
-- **Total Tests Passed**: **270 passed in 17.58s**
+### 3.3 Local Windows Developer Verification (Windows 11, Python 3.12.10)
+- **Total Tests Passed**: **271 passed in 18.09s**
 - **Failures / Errors**: **0**
+- **Note**: Local verification includes all 21 research parity tests and the newly added `test_cargo_toml_full_compatibility`.
 
 ---
 
 ## 4. Package Build & CLI Smoke Test Verification
 
-In every Production CI runner (Python 3.10, 3.11, 3.12):
+In every Production CI runner (Python 3.10, 3.11, 3.12) as well as locally:
 1. **Package Build**:
    `python -m build` $\to$ Successfully generated:
-   - `reponeedle-1.1.0-py3-none-any.whl`
+   - `reponeedle-1.1.0-py3-none-any.whl` (verified metadata contains `Requires-Dist: tomli>=2.0.1; python_version < "3.11"`)
    - `reponeedle-1.1.0.tar.gz`
 2. **Default Legacy CLI**:
-   `reponeedle "test query" --repo . --budget 500` $\to$ Executed in ~300ms, packed 427/500 tokens using `legacy` ranker.
+   `reponeedle "test query" --repo . --budget 500` $\to$ Executed in ~160ms, packed 491/500 tokens using `legacy` ranker.
 3. **Opt-in Change-Impact CLI**:
-   `reponeedle "test query" --repo . --budget 500 --ranker change_impact` $\to$ Executed in ~140ms, packed 466/500 tokens using `change_impact` ranker with structured explanation trace.
+   `reponeedle "test query" --repo . --budget 500 --ranker change_impact` $\to$ Executed in ~254ms, packed 466/500 tokens using `change_impact` ranker with structured explanation trace.

@@ -164,6 +164,67 @@ def test_multi_language_manifest_parsing(tmp_path):
     assert p_info["name"] == "my-app"
 
 
+def test_cargo_toml_full_compatibility(monkeypatch):
+    """
+    Verifies comprehensive Cargo.toml parsing across Python 3.10, 3.11, and 3.12:
+    - Cargo package name
+    - Workspace members
+    - Path dependencies (dependencies, dev-dependencies, build-dependencies)
+    - Consistency between TOML parser and regex fallback
+    """
+    rg = RepoGraph()
+    cargo_content = """
+    [package]
+    name = "reponeedle-core"
+    version = "1.1.0"
+    edition = "2021"
+
+    [workspace]
+    members = [
+        "crates/core",
+        "crates/utils",
+        "crates/cli"
+    ]
+
+    [dependencies]
+    serde = "1.0"
+    reponeedle-types = { path = "crates/types", version = "1.1" }
+
+    [dev-dependencies]
+    tempfile = "3.8"
+    reponeedle-test-utils = { version = "1.0", path = "crates/test-utils" }
+
+    [build-dependencies.reponeedle-build-helper]
+    path = "crates/build-helper"
+    """
+
+    # 1. Test standard parsing (via tomllib or tomli if available)
+    parsed_std = rg.parse_cargo_manifest(cargo_content)
+    assert parsed_std["name"] == "reponeedle-core"
+    assert parsed_std["workspace_members"] == ["crates/core", "crates/utils", "crates/cli"]
+    assert parsed_std["path_dependencies"]["reponeedle-types"] == "crates/types"
+    assert parsed_std["path_dependencies"]["reponeedle-test-utils"] == "crates/test-utils"
+    assert parsed_std["path_dependencies"]["reponeedle-build-helper"] == "crates/build-helper"
+
+    # 2. Test fallback regex parsing branch (forcing tomllib/tomli unavailable)
+    import reponeedle.core.graph as graph_module
+    monkeypatch.setattr(graph_module, "tomllib", None)
+
+    parsed_fallback = rg.parse_cargo_manifest(cargo_content)
+    assert parsed_fallback["name"] == "reponeedle-core"
+    assert parsed_fallback["workspace_members"] == ["crates/core", "crates/utils", "crates/cli"]
+    assert parsed_fallback["path_dependencies"]["reponeedle-types"] == "crates/types"
+    assert parsed_fallback["path_dependencies"]["reponeedle-test-utils"] == "crates/test-utils"
+    assert parsed_fallback["path_dependencies"]["reponeedle-build-helper"] == "crates/build-helper"
+
+    # 3. Verify identical parity between parser and fallback regex
+    assert parsed_std == parsed_fallback
+
+    # 4. Verify boundary/empty manifest handling
+    empty_parsed = rg.parse_cargo_manifest("")
+    assert empty_parsed == {"name": "", "workspace_members": [], "path_dependencies": {}}
+
+
 def test_deterministic_ranking():
     """Verifies 100% deterministic ranking across repeated executions."""
     docs = [
