@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#10141c" />
+  <meta name="description" content="RepoNeedle — token-budget-aware repository context retrieval for AI coding agents." />
+  <title>RepoNeedle Playground · V1.1.0</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0f16;
+      --panel: #121925;
+      --panel-2: #171f2d;
+      --line: #283548;
+      --text: #edf2f8;
+      --muted: #9aa9bb;
+      --soft: #c6d1df;
+      --accent: #8db8ff;
+      --accent-2: #bfd6ff;
+      --good: #77d6b0;
+      --warn: #f2c879;
+      --bad: #f08e92;
+      --radius: 18px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: radial-gradient(ellipse at 76% -20%, #24324a 0%, transparent 40%), var(--bg);
+      min-height: 100vh;
+    }
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; padding: 34px 0 64px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 38px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .mark { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #40516b; border-radius: 14px; background: linear-gradient(145deg, #1d2b42, #121925); font-size: 24px; }
+    .brand-name { font-weight: 750; letter-spacing: -.04em; font-size: 19px; }
+    .brand-sub { color: var(--muted); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; margin-top: 3px; }
+    .version { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .hero { display: grid; grid-template-columns: 1.25fr .75fr; gap: 32px; align-items: end; margin-bottom: 28px; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; font-weight: 700; font-size: 11px; letter-spacing: .2em; margin-bottom: 13px; }
+    h1 { font-size: clamp(36px, 5vw, 58px); letter-spacing: -.065em; line-height: 1.02; margin: 0; max-width: 720px; }
+    .hero p { color: var(--muted); line-height: 1.7; max-width: 700px; margin: 17px 0 0; font-size: 15px; }
+    .hero-note { padding: 17px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(18,25,37,.78); color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .hero-note strong { display: block; color: var(--soft); font-size: 13px; margin-bottom: 5px; }
+    .api-bar { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 14px; margin: 24px 0; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(18,25,37,.88); }
+    .api-label { grid-column: 1 / -1; color: var(--soft); font-size: 12px; font-weight: 650; }
+    input, select, textarea, button { font: inherit; }
+    input, select, textarea { width: 100%; color: var(--text); background: #0d131d; border: 1px solid #34445b; border-radius: 11px; padding: 12px 13px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(141,184,255,.12); }
+    input::placeholder, textarea::placeholder { color: #6f8095; }
+    button { cursor: pointer; border: 0; border-radius: 11px; padding: 11px 16px; font-weight: 700; color: #0c1524; background: var(--accent-2); transition: transform .15s ease, opacity .15s ease; }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .secondary { color: var(--soft); background: #202c3c; border: 1px solid #34445b; }
+    .connect-state { grid-column: 1 / -1; min-height: 18px; color: var(--muted); font-size: 12px; }
+    .connect-state.ok { color: var(--good); }
+    .connect-state.err { color: var(--bad); }
+    .workspace { display: grid; grid-template-columns: minmax(280px, .78fr) minmax(0, 1.22fr); gap: 18px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(18,25,37,.92); overflow: hidden; }
+    .panel-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 15px; letter-spacing: -.02em; }
+    .panel-head p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .panel-body { padding: 19px 20px 21px; }
+    .field { margin-bottom: 17px; }
+    label { display: block; color: var(--soft); font-size: 12px; font-weight: 650; margin-bottom: 8px; }
+    .hint { color: var(--muted); font-size: 11px; margin-top: 6px; line-height: 1.5; }
+    textarea { min-height: 116px; resize: vertical; line-height: 1.55; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .range-row { display: flex; align-items: center; gap: 12px; }
+    input[type="range"] { padding: 0; accent-color: var(--accent); }
+    .range-value { min-width: 74px; text-align: right; color: var(--accent-2); font-variant-numeric: tabular-nums; font-size: 12px; }
+    .examples { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 17px; }
+    .example { border: 1px solid #34445b; background: #172233; color: var(--soft); border-radius: 999px; padding: 7px 10px; font-size: 11px; font-weight: 600; }
+    .run { width: 100%; padding: 14px; margin-top: 2px; }
+    .result-empty { padding: 44px 24px; text-align: center; color: var(--muted); }
+    .result-empty .empty-icon { font-size: 30px; margin-bottom: 12px; }
+    .result-empty strong { color: var(--soft); display: block; font-size: 14px; margin-bottom: 5px; }
+    .result { display: none; }
+    .result.show { display: block; }
+    .result-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+    .decision { color: var(--good); font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+    .decision.abstain { color: var(--warn); }
+    .query-echo { color: var(--muted); font-size: 12px; margin-top: 6px; max-width: 550px; line-height: 1.5; overflow-wrap: anywhere; }
+    .ranker-tag { border: 1px solid #3a4c65; color: var(--accent-2); background: #172438; border-radius: 999px; padding: 7px 10px; font-size: 11px; white-space: nowrap; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; padding: 15px 20px; border-bottom: 1px solid var(--line); }
+    .metric { padding: 12px; border-radius: 12px; background: var(--panel-2); min-width: 0; }
+    .metric span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; }
+    .metric strong { font-size: 18px; letter-spacing: -.04em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .section { padding: 17px 20px; border-bottom: 1px solid var(--line); }
+    .section:last-child { border-bottom: 0; }
+    .section h3 { margin: 0 0 10px; font-size: 12px; color: var(--soft); }
+    .explanation { color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 560px; }
+    th { text-align: left; padding: 9px 9px; color: var(--muted); font-weight: 650; border-bottom: 1px solid #34445b; }
+    td { padding: 10px 9px; color: var(--soft); border-bottom: 1px solid rgba(52,68,91,.55); vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    td.path { color: var(--accent-2); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    .codebox { max-height: 320px; overflow: auto; border: 1px solid #2c3b50; border-radius: 12px; background: #0a0f17; padding: 14px; color: #d7e1ed; font: 11px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .footer { color: #708096; font-size: 11px; line-height: 1.6; text-align: center; margin-top: 26px; }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .loading { color: var(--warn); }
+    @media (max-width: 850px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-note { max-width: none; }
+      .workspace { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 22px, 1180px); padding-top: 22px; }
+      header { margin-bottom: 28px; }
+      .api-bar { grid-template-columns: 1fr; }
+      .api-bar button { width: 100%; }
+      .two { grid-template-columns: 1fr; gap: 0; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .panel-body, .panel-head, .section, .result-top { padding-left: 15px; padding-right: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="mark">🪡</div>
+        <div><div class="brand-name">RepoNeedle</div><div class="brand-sub">Repository context retrieval</div></div>
+      </div>
+      <div class="version">PLAYGROUND · V1.1.0</div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">A context-selection engine for coding agents</div>
+        <h1>Find the code that<br>actually matters.</h1>
+        <p>Explore token-budget-aware, workflow-adaptive repository retrieval. Compare RepoNeedle with classical BM25 and RepoMap-style PageRank, inspect selected files, and test the optional Change-Impact ranker.</p>
+      </div>
+      <aside class="hero-note">
+        <strong>Demonstration scope</strong>
+        This playground runs on small embedded snapshots of Flask and Requests. It demonstrates the retrieval workflow; it is not a full upstream repository scan or a reproduction of the complete ARB v2 evaluation.
+      </aside>
+    </section>
+
+    <section class="api-bar" aria-label="Backend connection">
+      <div class="api-label">BACKEND API URL</div>
+      <input id="apiUrl" type="url" value="https://reponeedle.onrender.com" placeholder="https://your-reponeedle-api.onrender.com" autocomplete="url" />
+      <button id="connectBtn" class="secondary" type="button">Connect API</button>
+      <div id="connectionState" class="connect-state">Paste the public URL of the deployed Python API, then connect.</div>
+    </section>
+
+    <section class="workspace">
+      <section class="panel">
+        <div class="panel-head"><h2>Configure retrieval</h2><p>Choose a repository snapshot, ranking mode, workflow, and token budget.</p></div>
+        <div class="panel-body">
+          <div class="field">
+            <label for="repo">TARGET REPOSITORY</label>
+            <select id="repo"><option value="pallets/flask">pallets / flask</option><option value="psf/requests">psf / requests</option></select>
+          </div>
+          <div class="two">
+            <div class="field">
+              <label for="ranker">RANKING ENGINE</label>
+              <select id="ranker"><option value="legacy">Legacy · default</option><option value="change_impact">Change-Impact · opt-in</option></select>
+            </div>
+            <div class="field">
+              <label for="task">TASK ROUTING</label>
+              <select id="task"><option value="auto">Auto detect</option><option value="code2test">Code → Test</option><option value="comment2context">Comment → Context</option><option value="trace2code">Trace → Code</option><option value="edit2ripple">Edit → Ripple</option><option value="selective">Selective</option></select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="budget">CONTEXT TOKEN BUDGET</label>
+            <div class="range-row"><input id="budget" type="range" min="500" max="8000" step="500" value="4000"><div id="budgetValue" class="range-value">4,000 tokens</div></div>
+          </div>
+          <div class="field">
+            <label for="seeds">SEED / ANCHOR FILES <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+            <input id="seeds" type="text" placeholder="src/flask/sessions.py, src/flask/app.py">
+            <div class="hint">Used by Change-Impact for seed-relative dependency scoring. Separate multiple paths with commas.</div>
+          </div>
+          <div class="field">
+            <label for="query">CODING TASK / ISSUE / STACK TRACE</label>
+            <textarea id="query" placeholder="Describe the bug, code change, traceback, or tests you want to locate..."></textarea>
+          </div>
+          <div class="examples" aria-label="Example queries">
+            <button class="example" type="button" data-example="Fix cookie attribute handling during session modification in SecureCookieSessionInterface.">Session change</button>
+            <button class="example" type="button" data-example="Find unit and regression tests for SecureCookieSessionInterface cookie saving and modification.">Find tests</button>
+            <button class="example" type="button" data-example="Fix the request authentication flow and find where HTTPBasicAuth credentials are prepared.">Auth flow</button>
+          </div>
+          <button id="runBtn" class="run" type="button" disabled>Run RepoNeedle retrieval ↗</button>
+          <div id="runState" class="hint" role="status" aria-live="polite">Connect the API before running a query.</div>
+        </div>
+      </section>
+
+      <section class="panel" aria-live="polite">
+        <div id="emptyState" class="result-empty"><div class="empty-icon">⌁</div><strong>Your retrieval results will appear here.</strong>Connect the backend, enter a coding task, and run the query.</div>
+        <div id="result" class="result">
+          <div class="result-top">
+            <div><div id="decision" class="decision">RETRIEVED CONTEXT</div><div id="queryEcho" class="query-echo"></div></div>
+            <div id="rankerTag" class="ranker-tag">LEGACY</div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><span>Files selected</span><strong id="mFiles">—</strong></div>
+            <div class="metric"><span>Tokens packed</span><strong id="mTokens">—</strong></div>
+            <div class="metric"><span>Confidence</span><strong id="mConfidence">—</strong></div>
+            <div class="metric"><span>Latency</span><strong id="mLatency">—</strong></div>
+          </div>
+          <div class="section"><h3>ENGINE DIAGNOSTICS</h3><div id="diagnostics" class="explanation"></div></div>
+          <div class="section"><h3>SELECTED CONTEXT FILES</h3><div class="table-wrap"><table><thead><tr><th>#</th><th>File path</th><th>Tier</th><th>Tokens</th><th>Score</th></tr></thead><tbody id="filesBody"></tbody></table></div></div>
+          <div class="section"><h3>BASELINE COMPARISON</h3><div class="table-wrap"><table><thead><tr><th>#</th><th>RepoNeedle</th><th>BM25</th><th>RepoMap · PageRank</th></tr></thead><tbody id="compareBody"></tbody></table></div></div>
+          <div class="section"><h3>TOP FILE PREVIEW</h3><div id="previewPath" class="hint" style="margin:0 0 9px"></div><pre id="previewCode" class="codebox">No selected file to preview.</pre></div>
+        </div>
+      </section>
+    </section>
+
+    <footer class="footer">
+      RepoNeedle V1.1.0 · MIT License · <a href="https://github.com/krishika08/RepoNeedle" target="_blank" rel="noopener">GitHub repository</a> · <a href="https://huggingface.co/datasets/RepoNeedle/RepoNeedle-Bench" target="_blank" rel="noopener">Demo benchmark dataset</a><br>
+      Free backend hosting may sleep after inactivity; the first request can take about a minute to wake up.
+    </footer>
+  </main>
+
+  <script>
+    const apiUrlInput = document.getElementById('apiUrl');
+    const connectBtn = document.getElementById('connectBtn');
+    const connectionState = document.getElementById('connectionState');
+    const runBtn = document.getElementById('runBtn');
+    const runState = document.getElementById('runState');
+    const budget = document.getElementById('budget');
+    const budgetValue = document.getElementById('budgetValue');
+    const resultBox = document.getElementById('result');
+    const emptyState = document.getElementById('emptyState');
+    let apiBase = '';
+
+    function normalizeUrl(value) {
+      return value.trim().replace(/\/+$/, '');
+    }
+    function showConnection(message, kind) {
+      connectionState.textContent = message;
+      connectionState.className = 'connect-state' + (kind ? ' ' + kind : '');
+    }
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    }
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 150000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try { return await fetch(url, {...options, signal: controller.signal}); }
+      finally { clearTimeout(timer); }
+    }
+    async function connectApi() {
+      const value = normalizeUrl(apiUrlInput.value);
+      if (!/^https:\/\//i.test(value)) {
+        showConnection('Enter the full HTTPS URL of your Render API.', 'err');
+        return;
+      }
+      apiBase = value;
+      connectBtn.disabled = true;
+      connectBtn.textContent = 'Connecting…';
+      showConnection('Checking /health. A sleeping free service may take up to about a minute to wake.', '');
+      try {
+        const response = await fetchWithTimeout(apiBase + '/health', {method: 'GET'}, 150000);
+        if (!response.ok) throw new Error('Health check returned HTTP ' + response.status);
+        const data = await response.json();
+        if (data.status !== 'ok') throw new Error('The API did not return status=ok.');
+        localStorage.setItem('reponeedleApiBase', apiBase);
+        showConnection('Connected · RepoNeedle API ' + (data.version || ''), 'ok');
+        runBtn.disabled = false;
+        runState.textContent = 'Backend is ready. Enter a task and run retrieval.';
+      } catch (error) {
+        apiBase = '';
+        runBtn.disabled = true;
+        const detail = error.name === 'AbortError' ? 'The health check timed out. Try connecting again.' : error.message;
+        showConnection('Could not connect: ' + detail + ' Check the Render URL and service logs.', 'err');
+      } finally {
+        connectBtn.disabled = false;
+        connectBtn.textContent = 'Connect API';
+      }
+    }
+    function renderResult(data) {
+      emptyState.style.display = 'none';
+      resultBox.classList.add('show');
+      const decision = document.getElementById('decision');
+      decision.textContent = data.decision || 'RETRIEVAL COMPLETE';
+      decision.className = 'decision' + (data.abstained ? ' abstain' : '');
+      document.getElementById('queryEcho').textContent = '“' + data.query + '”';
+      document.getElementById('rankerTag').textContent = String(data.ranker || '').replace('_',' ').toUpperCase();
+      document.getElementById('mFiles').textContent = data.selected_files.length;
+      document.getElementById('mTokens').textContent = Number(data.tokens_used).toLocaleString() + ' / ' + Number(data.token_budget).toLocaleString();
+      document.getElementById('mConfidence').textContent = Number(data.confidence).toFixed(3);
+      document.getElementById('mLatency').textContent = Number(data.latency_ms).toFixed(1) + ' ms';
+      document.getElementById('diagnostics').textContent = [data.ranker_note, data.explanation, 'Inferred task: ' + data.task_type + ' · Candidates: ' + data.candidate_count].filter(Boolean).join(' ');
+
+      const filesBody = document.getElementById('filesBody');
+      filesBody.innerHTML = data.selected_files.length ? data.selected_files.map(file =>
+        `<tr><td>${file.rank}</td><td class="path">${escapeHtml(file.path)}</td><td>${escapeHtml(file.tier)}</td><td>${file.tokens}</td><td>${Number(file.score).toFixed(3)}</td></tr>`
+      ).join('') : '<tr><td colspan="5">No context files selected.</td></tr>';
+
+      const compareBody = document.getElementById('compareBody');
+      compareBody.innerHTML = data.comparison.length ? data.comparison.map(row =>
+        `<tr><td>${row.rank}</td><td class="path">${escapeHtml(row.reponeedle)}</td><td class="path">${escapeHtml(row.bm25)}</td><td class="path">${escapeHtml(row.repomap)}</td></tr>`
+      ).join('') : '<tr><td colspan="4">No comparison data.</td></tr>';
+
+      const preview = data.preview;
+      document.getElementById('previewPath').textContent = preview ? preview.path + ' · ' + preview.tier : 'No selected file';
+      document.getElementById('previewCode').textContent = preview ? (preview.content || 'No preview content available.') : 'The engine abstained or no files were selected.';
+    }
+
+    async function runRetrieval() {
+      if (!apiBase) { showConnection('Connect the backend API first.', 'err'); return; }
+      const query = document.getElementById('query').value.trim();
+      if (query.length < 2) { runState.textContent = 'Enter a coding task or query (at least 2 characters).'; return; }
+      const seedFiles = document.getElementById('seeds').value.split(/[\n,]+/).map(item => item.trim()).filter(Boolean);
+      const payload = {
+        repo_name: document.getElementById('repo').value,
+        ranker: document.getElementById('ranker').value,
+        task_mode: document.getElementById('task').value,
+        budget_tokens: Number(budget.value),
+        seed_files: seedFiles,
+        query
+      };
+      runBtn.disabled = true;
+      runBtn.textContent = 'Retrieving context…';
+      runState.className = 'hint loading';
+      runState.textContent = 'Running RepoNeedle. If the free backend was idle, its first request may take about a minute.';
+      try {
+        const response = await fetchWithTimeout(apiBase + '/api/retrieve', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || ('HTTP ' + response.status));
+        renderResult(data);
+        runState.className = 'hint';
+        runState.textContent = 'Retrieval completed successfully.';
+      } catch (error) {
+        runState.className = 'hint';
+        runState.textContent = 'Request failed: ' + (error.name === 'AbortError' ? 'The request timed out; retry after checking whether the backend has started.' : error.message);
+      } finally {
+        runBtn.disabled = !apiBase;
+        runBtn.textContent = 'Run RepoNeedle retrieval ↗';
+      }
+    }
+
+    budget.addEventListener('input', () => budgetValue.textContent = Number(budget.value).toLocaleString() + ' tokens');
+    connectBtn.addEventListener('click', connectApi);
+    runBtn.addEventListener('click', runRetrieval);
+    document.querySelectorAll('[data-example]').forEach(button => button.addEventListener('click', () => {
+      document.getElementById('query').value = button.dataset.example;
+      if (button.textContent === 'Session change') {
+        document.getElementById('repo').value = 'pallets/flask';
+        document.getElementById('ranker').value = 'change_impact';
+        document.getElementById('seeds').value = 'src/flask/sessions.py';
+      } else if (button.textContent === 'Find tests') {
+        document.getElementById('repo').value = 'pallets/flask';
+        document.getElementById('task').value = 'code2test';
+        document.getElementById('ranker').value = 'legacy';
+        document.getElementById('seeds').value = '';
+      } else {
+        document.getElementById('repo').value = 'psf/requests';
+        document.getElementById('ranker').value = 'legacy';
+        document.getElementById('seeds').value = '';
+      }
+    }));
+
+    const savedApi = localStorage.getItem('reponeedleApiBase');
+    if (savedApi) apiUrlInput.value = savedApi;
+  </script>
+</body>
+</html>
