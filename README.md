@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Tests: Passing](https://img.shields.io/badge/tests-259%20passed-brightgreen.svg)]()
+[![CI](https://github.com/krishika08/RepoNeedle/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/krishika08/RepoNeedle/actions/workflows/ci.yml)
 [![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-RepoNeedle--Bench-blue)](https://huggingface.co/datasets/RepoNeedle/RepoNeedle-Bench)
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-RepoNeedle--Playground-indigo)](https://huggingface.co/spaces/RepoNeedle/RepoNeedle-Playground)
 
@@ -25,13 +25,14 @@ RepoNeedle solves this upstream bottleneck by combining:
 2. **Workflow-Adaptive Routing**: Automatic classification of query intent (`trace2code`, `code2test`, `edit2ripple`, `comment2context`, `selective`) with dynamic weight tuning.
 3. **Inverted Test-to-Target Mapping**: Dependency graph inversion and naming convention heuristics to locate regression test suites.
 4. **Calibrated Selective Abstention**: Peak-to-noise ($Z$-score) and repository symbol overlap gating to abstain from returning noise on counterfactual tasks.
-5. **CUD-Pack (Capacity-Sensitive Utility-Density Packing)**: Adaptive knapsack selection engine providing strict zero downstream overflows ($C_{\text{actual}} \le B_{\text{configured}}$) across dual modes: **Compact Mode** ($\le 4\text{k}$ tokens, extracting high-density implementation spans and structural skeletons) and **Complete Context Mode** ($\ge 8\text{k}$ tokens, preserving whole source files).
+5. **CUD-Pack (Capacity-Sensitive Utility-Density Packing)**: Adaptive knapsack selection engine providing strict zero downstream overflows ($C_{\text{actual}} \le B_{\text{configured}}$) according to RepoNeedle's regex code token model across dual modes: **Compact Mode** ($\le 4\text{k}$ tokens, extracting high-density implementation spans and structural skeletons) and **Complete Context Mode** ($\ge 8\text{k}$ tokens, preserving whole source files).
+6. **Change-Impact Ranking Engine (V1.1 Opt-in)**: Seed-relative relationship scoring (evaluating static imports, symbol definitions, call sites, build manifests (`setup.py`, `setup.cfg`, `pyproject.toml`, `cargo.toml`, `package.json`, `go.mod`, `pom.xml`), test-stems, and directory proximity) designed for bug fixing and refactoring tasks.
 
 ---
 
 ## 📊 Benchmark Validation
 
-To maintain strict scientific integrity, **Official External Benchmark Results** are reported separately from **Synthetic Demonstration Benchmark Results**. Dataset sizes, query counts ($N$), and frozen repository snapshots are explicitly documented for every measurement.
+To maintain strict scientific integrity, **Official External Benchmark Results** are reported separately from **Independent Research Evaluations**. Dataset sizes, query counts ($N$), candidate pool properties, and evaluation methodologies are explicitly documented for every measurement.
 
 ---
 
@@ -90,24 +91,6 @@ Evaluated with **10,000 bootstrap resamples** (repository-clustered bootstrap ac
 > - **Not Default AUTO-Mode Performance**: This measures **task-conditioned retrieval capacity**, not unassisted automatic classification. In unassisted production deployment (`TaskType.AUTO`), the engine relies on query text regex heuristics. If a natural-language query lacks explicit test keywords, automatic intent classification may default to `comment2context`, reducing the observed gain toward baseline BM25 performance (`0.1057`).
 > - **Candidate Set Integrity**: The task conditioning dynamically modulates ranking weights and structural graph boosts; candidate file pools themselves are never filtered by oracle labels.
 
-#### Part A.1: Stage 3.8 Controlled Research Reference (EXP-386 vs Full ARB v2)
-
-To ensure scientific reproducibility across research stages, Stage 3.8 evaluated candidate retrieval configurations under a controlled file-level graph harness:
-
-| Evaluation System | Overall MRR | Recall@5 | Recall@10 | Recall@20 | Hit@20 | BCY@8k (File-Yield) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Stage 3.8 Reference (EXP-386)** | **0.2062** | 0.2512 | 0.3776 | 0.5566 | 0.6464 | **0.0556** |
-| Stage 3.7 Reference (EXP-378) | 0.2052 | 0.2486 | 0.3710 | 0.5508 | 0.6406 | 0.0527 |
-
-> [!NOTE]
-> **Distinct Methodologies & BCY Definitions**:
-> - **Full ARB v2 Validation (Part A)**: Uses the complete production pipeline with fine-grained **block-level budget yield** (`block_metrics_at_budget` / `pack_files`, yielding BCY@8k: `0.3450`).
-> - **Stage 3.8 Research (Part A.1)**: Uses the experimental research harness measuring **file-level budget yield** (`sample_metrics().bcy_8k`, yielding BCY@8k: `0.0556`, where only 27/345 queries had gold files fully contained in the 8k budget).
-> - These two distinct metric methodologies reflect different measurement granularities and must not be merged.
-
-> [!NOTE]
-> *Historical Pilot Record ($N=35$ exploratory pilot)*: In early pre-release testing on a small 35-sample v0.1 subset with restricted candidate pools, RepoNeedle achieved MRR `0.879` vs BM25 `0.748`. Those scores reflect narrow candidate sub-pools. Full whole-repository evaluation ($N=345$) across full codebases yields the realistic production MRRs shown above.
-
 ---
 
 ### Part B: Official ARB Selective Retrieval Evaluation ($N=82$ Abstention Samples)
@@ -122,12 +105,12 @@ Evaluated on the complete official Agent Retrieval Bench Selective Retrieval spl
 
 > [!CAUTION]
 > **Heuristic Abstention Failure Analysis**: In production benchmark conditions, RepoNeedle's heuristic confidence gating ($Z$-score + repository symbol overlap) achieved **0% abstention accuracy (0/82)**. 
-> - *Root Cause*: Heuristic confidence scores ranged between `0.64` and `0.86`, far exceeding the default threshold (`0.38`). Natural GitHub issue descriptions filed against a repository inherently contain valid repository vocabulary. Counterfactual queries similarly contain ubiquitous software engineering terminology (`error`, `parse`, `client`, `handler`).
+> - *Root Cause*: Heuristic confidence scores ranged between `0.64` and `0.86`, far exceeding the default threshold (`0.12` / `0.38`). Natural GitHub issue descriptions filed against a repository inherently contain valid repository vocabulary. Counterfactual queries similarly contain ubiquitous software engineering terminology (`error`, `parse`, `client`, `handler`).
 > - *Recommendation*: Heuristic score thresholds are insufficient for reliable abstention in large codebases. Selective retrieval requires a dedicated, trained neural discriminator rather than surface lexical statistics.
 
 ---
 
-### Part C: Component Ablations on Full ARB v2
+### Part C: Component Ablations on Full ARB v2 ($N=345$)
 
 Ablation evaluation conducted on the complete $N=345$ positive ARB v2 benchmark:
 
@@ -138,20 +121,6 @@ Ablation evaluation conducted on the complete $N=345$ positive ARB v2 benchmark:
 | *w/o RepoGraph* | 0.2287 | 0.00% | — | — | Graph centrality and test-to-target links zeroed |
 | **Official RepoMap Baseline** | 0.2140 | -6.45% | 0.3185 | **0.6306** | Standalone PageRank graph centrality ranker |
 | **Official BM25 Baseline** | 0.1520 | -33.53% | 0.1899 | 0.4452 | Standalone field BM25 ranker |
-
-*Diagnostic Observation*: While zeroing `RepoGraph` is neutral across the aggregate MRR, it is critical for `code2test` specifically, where graph-based inverted test linkage is responsible for boosting MRR from `0.1057` (BM25) to `0.2660` (+151.7%).
-
-#### Historical / Synthetic Demonstration Suite ($N=15$, Diagnostic Only)
-
-| System / Ablation | Overall MRR | 95% Bootstrap CI | Dev MRR ($N=8$) | Held-out MRR ($N=4$) | Recall@1 | Recall@3 | Wasted Tokens (4k) | Selective Accuracy |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Full RepoNeedle** | **0.917** | [0.792, 1.000] | 1.000 | 0.750 | 0.528 | 1.000 | 581 | 100.0% |
-| *w/o WorkflowRouter* | 0.743 | [0.569, 0.903] | 0.844 | 0.542 | 0.375 | 0.875 | 700 | 100.0% |
-| *w/o SelectiveAbstainer* | 0.917 | [0.792, 1.000] | 1.000 | 0.750 | 0.528 | 1.000 | 807 | 0.0% |
-| **Baseline: Static Hybrid** | 0.743 | [0.569, 0.903] | 0.844 | 0.542 | 0.375 | 0.875 | 927 | 0.0% |
-| **Baseline: BM25 Only** | 0.819 | [0.667, 0.958] | 0.938 | 0.583 | 0.417 | 0.861 | 694 | 33.3% |
-| **Baseline: Dense Semantic** | 0.771 | [0.604, 0.917] | 0.781 | 0.750 | 0.375 | 0.833 | 927 | 0.0% |
-| **Baseline: RepoMap Only** | 0.394 | [0.249, 0.577] | 0.448 | 0.286 | 0.083 | 0.403 | 927 | 0.0% |
 
 ---
 
@@ -177,45 +146,78 @@ Empirically measured across the full Agent Retrieval Bench evaluation suite:
 | Component / Ranker | Mean Latency | Median ($p_{50}$) | 95th Percentile ($p_{95}$) | 99th Percentile ($p_{99}$) | Method Notes |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **RepoNeedle Query Latency** | `317.7 ms` | `142.4 ms` | `827.2 ms` | `997.6 ms` | Multi-signal scoring + knapsack packing |
-| **Official BM25 Query Latency** | `994.4 ms` | `1,158.3 ms` | `1,246.0 ms` | `1,305.7 ms` | Full inverted index inverted posting scan |
+| **Official BM25 Query Latency** | `994.4 ms` | `1,158.3 ms` | `1,246.0 ms` | `1,305.7 ms` | Full inverted index posting scan |
 | **Official RepoMap Query Latency**| `157.5 ms` | `192.1 ms` | `239.8 ms` | `250.1 ms` | Graph PageRank vector lookup |
 | **Official Lexical Query Latency**| `884.1 ms` | `1,005.2 ms` | `1,150.3 ms` | `1,156.6 ms` | BM25 + subword character bigram matching |
 | **RepoNeedle Index Build** | `8,622.9 ms` | `10,471.2 ms` | `11,484.8 ms` | `11,551.5 ms` | One-time AST + dependency graph per repo |
 
 ---
 
-### Part E: System Architecture & Clear Hardware Boundaries
+### Part E: System Architecture & Deployment Status
 
 - **CPU Native Architecture**: RepoNeedle runs entirely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
-- **Neural Embedding Baseline Scope**: Heavy neural embedding checkpoints (such as `Qwen/Qwen3-Embedding-4B` and `8B`) were evaluated via published ARB literature. Local GPU inference was not executed due to host sandbox environment boundaries (CPU-only execution).
-- **Release Status**: **Limited Research Release (v0.1.0 Research Preview)**. Recommended for retrieval benchmarking and research experiments. Not recommended as a standalone zero-shot abstention gate without an upstream trained neural classifier.
-- **Stage 3.9.6 Research Status**: **TERMINATED INCOMPLETE — NO EXPERIMENTAL CONCLUSION**. Stage 3.9.6 experiment runner was cancelled at 60/218 corpora under host memory pressure. EXP-398, EXP-399a, and EXP-399b are formally excluded from stable V1. EXP-386 remains the provisional stable structural reference.
+- **Release Status**: **V1.1.0 source integrated on main; formal release publication pending.** Features default `legacy` ranker with backwards-compatible contract preservation, and opt-in `change_impact` ranking engine for seed-relative relationship scoring.
+
+---
+
+### Part F: Independent R6 Change-Impact Benchmark ($N=180$ Queries across 18 Repositories)
+
+To evaluate retrieval generalizability beyond the original 25 ARB repositories, an independent benchmark cohort was constructed across **18 unseen open-source repositories** comprising 180 retrieval queries.
+
+Statistical inference was conducted using **repository-clustered statistical models** across independent repository clusters:
+
+| Partition | Queries ($N$) | Repositories | Baseline MRR | Champion MRR | Delta (Δ) | Repository-Clustered Inference (95% CI) | Statistical Significance |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Training** | $N=90$ | 9 repos | 0.6213 | 0.6546 | +0.0333 | — | Training fit |
+| **Validation** | $N=40$ | 4 repos | 0.6472 | 0.6708 | +0.0236 | $p = 0.5073$, 95% CI [0.0000, +0.0472] | Not Statistically Significant |
+| **Held-Out** | $N=50$ | 5 repos | 0.5215 | 0.5467 | +0.0252 | $p = 0.5025$, 95% CI [0.0000, +0.0629] | Not Statistically Significant |
+| **Pooled Cohort** | $N=180$ | 18 repos | 0.5994 | **0.6282** | **+0.0288** | $p = 0.0078$, 95% CI [+0.0082, +0.0524] | **Statistically Significant ($p < 0.01$)** |
+
+> [!NOTE]
+> **Methodological Context & Scope of R6 Results**:
+> - **Pre-Filtered Candidate Pools**: Queries were evaluated against pre-filtered candidate pools averaging approximately **53.79 files per query**. Within these candidate pools, Candidate-Pool Recall@20 is 100%.
+> - **Whole-Repository Generalization**: Whole-repository Recall@20 of 60–75% represents a projected estimate under full repository indexing, not an empirically measured whole-codebase scan.
+> - **Statistical Power & Default Ranker**: While the pooled 18-repository cohort achieves statistically significant improvement under repository-clustered inference ($p = 0.0078$), the smaller isolated validation ($N=40$, $p = 0.5073$) and held-out ($N=50$, $p = 0.5025$) subsets are statistically underpowered. For this reason, the Change-Impact engine is provided as an **opt-in capability** rather than overriding the default `legacy` ranker.
+> - **Aspirational Research Target**: The long-term research objective of $\text{MRR} \ge 0.80$ is an aspirational research milestone, not an achieved production metric.
+
+---
 
 ## 🚀 Quickstart & Installation
 
-RepoNeedle is self-contained and requires only standard, battle-tested ML dependencies (`numpy`, `scipy`, `networkx`, `pydantic`, `pathspec`, `rich`).
+RepoNeedle is self-contained and requires standard Python dependencies (`numpy`, `scipy`, `networkx`, `pydantic`, `pathspec`, `rich`, and `tomli` on Python < 3.11).
 
 ### 1. Installation
 
 ```bash
-git clone https://github.com/RepoNeedle/RepoNeedle.git
+# Clone the verified repository
+git clone https://github.com/krishika08/RepoNeedle.git
 cd RepoNeedle
+
+# Install package in editable mode
 pip install -e .
+
+# Or install with development and test dependencies
+pip install -e ".[dev]"
 ```
+
+> [!TIP]
+> On Python 3.10, `tomli>=2.0.1` is automatically installed via conditional dependency. On Python 3.11 and 3.12, native standard library `tomllib` is used with zero extra dependencies.
+
+---
 
 ### 2. Python API
 
+#### Standard Retrieval (Default Legacy Ranker):
 ```python
-from reponeedle.engine import RepoNeedleEngine
-from reponeedle.models import BudgetConfig
+from reponeedle import RepoNeedleEngine, BudgetConfig
 
-# Initialize engine on a local codebase
+# 1. Initialize engine on a local codebase (uses default 'legacy' ranker)
 engine = RepoNeedleEngine.from_directory(
     repo_dir="./my-project",
     budget_config=BudgetConfig(max_tokens=4000, allow_skeletons=True, mode="auto"),
 )
 
-# 1. Retrieve context for a task (auto-resolves to compact mode for <= 4k)
+# 2. Retrieve context for a task (auto-resolves to compact mode for <= 4k)
 result = engine.retrieve(
     query="Add support for blueprint url_prefix inheritance in route registration",
     budget_tokens=4000,
@@ -232,61 +234,98 @@ else:
     llm_prompt_context = result.rendered_context
 ```
 
+#### Opt-In: Seed-Based Change-Impact Retrieval:
+```python
+from reponeedle import RepoNeedleEngine, Query
+
+# Initialize engine with Change-Impact ranking
+engine = RepoNeedleEngine.from_directory(
+    repo_dir="./my-project",
+    ranker="change_impact",
+)
+
+# Populate anchor_files with the seed path to activate relationship scoring
+query = Query(
+    text="Fix authentication session expiration",
+    anchor_files=["auth/session.py"],
+    budget_tokens=4000,
+)
+
+result = engine.retrieve(query)
+
+for f in result.selected_files:
+    print(f"[{f.tier.value.upper()}] {f.path} (score: {f.score:.3f}, tokens: {f.token_count})")
+    if f.explanation:
+        print(f"       Attribution: {f.explanation}")
+```
+
+> [!NOTE]
+> **Behavior of Plain-String (Seedless) Change-Impact Queries**:
+> The Change-Impact ranking engine reads seed file paths from `query.anchor_files`. When `engine.retrieve()` is called with a plain string query (or without `anchor_files`):
+> - **Lexical and semantic scoring remain active**: Candidate files continue to be retrieved and scored using combined BM25 lexical matching and subword semantic retrieval.
+> - **Seed suppression is inactive without `anchor_files`**: Seed File Suppression (SFS) is not triggered since there are no designated seed files to down-weight.
+> - **Seed-relative relationship boosts are inactive without `anchor_files`**: Relationship scoring across dependencies (static imports, symbols, calls, build manifests, test-stems, and directory proximity) is skipped.
+> - **Test Intent Prior adjustments remain available according to detected query intent**: Test files receive boosts or penalties (`tip_multiplier_test` / `tip_multiplier_non_test`) based on detected test intent in the query text.
+> 
+> To activate seed-relative relationship boosts and seed suppression, pass seed paths via `Query(text=..., anchor_files=['path/to/seed.py'])`.
+
+---
+
 ### 3. Command Line Interface (CLI)
 
 ```bash
-# Retrieve context for a bug report under a 4000 token limit in Compact Mode
-reponeedle "Fix AttributeError in SecureCookieSessionInterface cookie saving" --repo ./flask --budget 4000 --mode compact
+# Default 'legacy' retrieval under a 4000 token limit
+reponeedle "Fix AttributeError in SecureCookieSessionInterface cookie saving" --repo ./flask --budget 4000
 
-# Serialize fenced markdown directly to stdout or save to file
-reponeedle "test suite for HTTPBasicAuth" --repo ./requests --task code2test --budget 2000 --serialize --output-file prompt.md
+# Opt-in Change-Impact retrieval (applies Test Intent Prior scoring)
+reponeedle "fix token expiration in auth/session.py" --repo ./my-project --budget 4000 --ranker change_impact
 
-# Analyze ripple impact of an edit under Complete Context Mode (whole files)
-reponeedle "What files depend on RequestContext?" --repo ./flask --task edit2ripple --budget 16000 --mode complete
+# Task-conditioned retrieval for finding regression tests
+reponeedle "test suite for HTTPBasicAuth" --repo ./requests --task code2test --budget 2000
+
+# Serialize packaged markdown directly to a file
+reponeedle "blueprints and route registration" --repo ./flask --budget 4000 --output-file prompt.md
 ```
+
+> [!NOTE]
+> **CLI Seed-File Limitation**: The current CLI accepts query text as a positional string and does not currently expose a seed-file argument. Standard CLI queries run with `--ranker change_impact` execute as seedless queries: lexical and semantic scoring remain active, and Test Intent Prior adjustments remain available according to detected query intent, while seed suppression and seed-relative relationship boosts are inactive without `anchor_files`. Full seed-based relationship scoring is available via the Python API (`Query(anchor_files=[...])`). CLI seed-file support is planned as a separate future enhancement.
 
 ---
 
 ## 🧠 CUD-Pack Architecture (Capacity-Sensitive Utility-Density Packing)
 
-RepoNeedle V1.0 integrates the **CUD-Pack** context optimization engine, replacing heuristic packing with capacity-elastic utility-density optimization:
+RepoNeedle integrates the **CUD-Pack** context optimization engine, replacing heuristic packing with capacity-elastic utility-density optimization:
 
 ### 1. Dual Operational Modes
-- **Compact Mode ($\le 4	ext{k}$ tokens, $lpha = 0.65$)**: Prioritizes focal implementation spans (`FOCUS_SPAN`) and structural skeletons (`SKELETON`). Prevents single distractor files from consuming the budget and displacing multi-target dependencies.
-- **Complete Context Mode ($\ge 8	ext{k}$ tokens, $lpha = 0.25$)**: Prioritizes whole source files (`FULL`), selectively utilizing structural outlines for oversized files ($> 500$ tokens) when capacity is tight.
+- **Compact Mode ($\le 4\text{k}$ tokens, $\alpha = 0.65$)**: Prioritizes focal implementation spans (`FOCUS_SPAN`) and structural skeletons (`SKELETON`). Prevents single distractor files from consuming the budget and displacing multi-target dependencies.
+- **Complete Context Mode ($\ge 8\text{k}$ tokens, $\alpha = 0.25$)**: Prioritizes whole source files (`FULL`), selectively utilizing structural outlines for oversized files ($> 500$ tokens) when capacity is tight.
 
-### 2. Strict Downstream Token Invariant
-- **Guaranteed Zero Downstream Overflows**: Evaluated across 1,725 benchmarks (345 queries $	imes$ 5 budgets), CUD-Pack achieved **0 token overflows** ($C_{	ext{actual}} \le B_{	ext{configured}}$ at 100% compliance).
-- **Exact Accounting**: Accounts for file header fences (`# File: {path}
-```{ext}
-...
-```
+### 2. Verified Token Budget Invariants
+- **Deterministic Budget Enforcement**: Evaluated across tested nominal budgets (30, 50, 100, 500, 2000, 4000 tokens), CUD-Pack strictly enforces $C_{\text{actual}} \le B_{\text{configured}}$ with zero downstream token overflows according to RepoNeedle's deterministic regex token-counting model (`regex_code_tokenizer_v1`).
+- **Overhead Accounting**: Pre-computes file header fences (`# File: {path}\n```{ext}\n...\n```\n\n`) deterministically before admitting candidates into the knapsack.
+- **Representation Fallback Hierarchy**: Monotonically degrades candidate representations (`FULL` $\to$ `FOCUS_SPAN` $\to$ `SKELETON`) when full files exceed available token capacity.
 
-`) deterministically before admitting candidates into the knapsack.
-
-### 3. Knapsack Oracle Ceilings & Scientific Limits
-- Tested against the full Agent Retrieval Bench v2 ($N=345$ queries across 25 repositories).
-- Deep candidate analysis ($> 85$ candidates) confirmed that candidate pool cutoff at Top-85 achieves 100% empirical equivalence with the full candidate pool while bounding scanning latency to $< 200	ext{ ms}$ on CPU.
-- **Scope Note**: RepoNeedle does not claim universal 100% retrieval coverage on unseen multi-million-line monorepos without multi-stage candidate indexing.
+> [!WARNING]
+> **Tokenizer Boundary Disclosure**: Budget non-exceedance is enforced strictly according to RepoNeedle's internal regex token model (`regex_code_tokenizer_v1`). This does not imply exact token-count equivalence with arbitrary third-party LLM tokenizers (e.g. OpenAI tiktoken cl100k, LLaMA sentencepiece, or Qwen) or guarantee downstream token behavior for every external provider.
 
 ---
 
 ## 🔬 Reproducing Benchmark Results
 
-Run the complete deterministic benchmark suite with single commands:
+Run the complete deterministic test suite and benchmarks:
 
 ```bash
-# 1. Run Official Agent Retrieval Bench evaluation (v0.1, N=35)
-python benchmarks/run_arb_official_eval.py
+# 1. Run automated test suite (271 passed tests locally, 245 in clean CI checkouts)
+pytest -q -rs
 
-# 2. Run Component Ablation Study with 95% Bootstrap CI
+# 2. Run component ablation study with 95% Bootstrap CI
 python benchmarks/run_ablations.py
 
 # 3. Verify actual BPE token payload reduction and latency
 python scripts/verify_token_savings_and_latency.py
 
-# 4. Run automated unit test suite (25 tests)
-pytest -v
+# 4. Build distribution packages
+python -m build --no-isolation
 ```
 
 ---
@@ -295,11 +334,11 @@ pytest -v
 
 RepoNeedle distributes its validated assets primarily via Hugging Face:
 
-1. **RepoNeedle-Bench Dataset**: [`hf_artifacts/dataset/`](file:///hf_artifacts/dataset/README.md)
+1. **RepoNeedle-Bench Dataset**: [`hf_artifacts/dataset/`](hf_artifacts/dataset/README.md)
    - Permissively licensed JSONL datasets (`train.jsonl`, `test.jsonl`), schema, and provenance documentation.
-2. **RepoNeedle Playground Space**: [`hf_artifacts/space/`](file:///hf_artifacts/space/README.md)
+2. **RepoNeedle Playground Space**: [`hf_artifacts/space/`](hf_artifacts/space/README.md)
    - Interactive Gradio demonstration allowing side-by-side comparison of RepoNeedle against classical BM25 and RepoMap PageRank.
-3. **Automated Publishing Script**: [`scripts/prepare_hf_release.py`](file:///scripts/prepare_hf_release.py)
+3. **Automated Publishing Script**: [`scripts/prepare_hf_release.py`](scripts/prepare_hf_release.py)
    - Verified local release package ready to publish with `python scripts/prepare_hf_release.py --token <HF_TOKEN>`.
 
 ---
@@ -321,6 +360,6 @@ RepoNeedle distributes its validated assets primarily via Hugging Face:
   title = {RepoNeedle: Token-Budget-Aware, Workflow-Adaptive Repository Context Retrieval for AI Coding Agents},
   year = {2026},
   publisher = {GitHub},
-  howpublished = {\url{https://github.com/RepoNeedle/RepoNeedle}}
+  howpublished = {\url{https://github.com/krishika08/RepoNeedle}}
 }
 ```
