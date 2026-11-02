@@ -4,7 +4,23 @@ Verifies that reponeedle.core.arm101.ARM101Ranker produces identical ranking out
 to research.stage3_14.pilot_attenuation.ExperimentalLanguageRanker(policy="unattenuated").
 """
 
+import sys
+from pathlib import Path
 import pytest
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+ARB_SRC = ROOT_DIR / "external" / "agent-retrieval-bench" / "src"
+if ARB_SRC.exists() and str(ARB_SRC) not in sys.path:
+    sys.path.insert(0, str(ARB_SRC))
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+# Research-only parity test requires optional external benchmark dependency
+pytest.importorskip(
+    "agent_retrieval_bench",
+    reason="Optional external benchmark dependency 'agent_retrieval_bench' is not installed (external/agent-retrieval-bench)"
+)
+
 from reponeedle.models import FileDoc, Query, TaskType
 from reponeedle.engine import RepoNeedleEngine
 from reponeedle.core.function_graph import FunctionGraphEngine as ProdFG

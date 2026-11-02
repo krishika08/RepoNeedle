@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   test:
-    name: Test (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    name: Production CI (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -44,7 +46,7 @@ jobs:
 
       - name: Run test suite
         run: |
-          pytest -q
+          pytest -q -rs
 
       - name: Build distribution packages
         run: |
@@ -58,3 +60,33 @@ jobs:
         run: |
           reponeedle "test query" --repo . --budget 500 --ranker change_impact
 
+  research-parity:
+    name: Research Benchmark Parity (Python 3.11)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout pinned agent-retrieval-bench dependency
+        uses: actions/checkout@v4
+        with:
+          repository: eyuansu62/agent-retrieval-bench
+          ref: 9e4d68937f29d5967afd62f4f6a24c1478298133
+          path: external/agent-retrieval-bench
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel build
+          pip install -e ".[dev]"
+
+      - name: Run research benchmark parity tests
+        run: |
+          pytest tests/test_arm101_production_parity.py tests/test_stage3_7_metrics.py tests/test_stage3_8_reproducibility.py -v

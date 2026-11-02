@@ -111,9 +111,12 @@ def test_performance_audit_table_invariants():
 
 
 def test_contextbench_validator_script():
-    """Verify that validate_contextbench.py executes and reports BLOCKED cleanly in sandbox."""
+    """Verify that validate_contextbench.py executes and reports BLOCKED cleanly in sandbox or ONLINE in CI."""
     val_script = STAGE_DIR / "validate_contextbench.py"
     res = subprocess.run([sys.executable, str(val_script)], capture_output=True, text=True)
-    # Inside sandbox, exit code must be 2 (BLOCKED)
-    assert res.returncode == 2, f"Expected returncode 2 (BLOCKED), got {res.returncode}"
-    assert "[STATUS: BLOCKED]" in res.stdout
+    # Inside sandbox exit code is 2 (BLOCKED); in online CI runner exit code is 0 (ONLINE)
+    assert res.returncode in (0, 2), f"Unexpected returncode {res.returncode}: {res.stdout}\n{res.stderr}"
+    if res.returncode == 2:
+        assert "[STATUS: BLOCKED]" in res.stdout
+    else:
+        assert "[STATUS: ONLINE]" in res.stdout
