@@ -93,13 +93,18 @@ class BenchmarkRunner:
 
                 # 1. Ranking evaluation (using standard 4k budget)
                 if sys_name == "RepoNeedle":
+                    # Abstention policy (1.2.0+): the experimental heuristic is opt-in. It is enabled
+                    # only for selective (no-gold) samples, which measure it (SelectiveAccuracy).
+                    # Positive samples use the 1.2 default; verified to give identical positive
+                    # metrics to the 1.1.0 always-on behavior (see docs/BENCHMARK_CONFIGURATION.md).
                     res_4k = runner.retrieve(
                         query=Query(
                             text=sample.query,
                             task_type=sample.task_type,
                             anchor_files=sample.anchor_files,
                             budget_tokens=4000,
-                        )
+                        ),
+                        enable_experimental_abstention=is_selective,
                     )
                 else:
                     res_4k = runner.retrieve(sample.query, budget_tokens=4000)

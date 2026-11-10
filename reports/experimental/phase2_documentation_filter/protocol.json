@@ -1,0 +1,77 @@
+{
+  "milestone": "2B documentation-filter held-out validation (EXPERIMENTAL; not an official ARB score)",
+  "framework": "Phase 1 product-aligned evaluation: file unit, whole-file input, full ranking; packed context separate",
+  "treatment": "AblationConfig(enable_doc_filter=True, doc_filter_penalty=p) passed per call to retrieve()",
+  "control": "AblationConfig() (enable_doc_filter=False) passed per call to retrieve()",
+  "doc_predicate": "engine.py legacy ranker: path contains /doc/, /docs/, doc/, docs/, documentation/, guide/, tutorial/, .github/ OR ends with .md, .rst, .txt, .adoc, .html (case-insensitive)",
+  "split": {
+    "unit": "repository",
+    "test_repositories": 10,
+    "dev_repositories": 15,
+    "seed": "reponeedle-2B-split-v1",
+    "algorithm": "For attempt a = 0, 1, ...: shuffle the sorted repository list with random.Random(f'{seed}:{a}'); test = first 10. Accept the first attempt where, for every task with n repositories, the test count is within +-1 of round(0.4*n) and both splits contain >= 1 repository with that task.",
+    "inputs_used": "repository ids and task coverage (presence of >=1 gold-labelled query per task) only"
+  },
+  "primary": {
+    "task": "comment2context",
+    "metric": "recall@20",
+    "contrast": "filter ON - filter OFF on TEST repositories",
+    "success": "paired repository-clustered 95% percentile CI lower bound > 0"
+  },
+  "guardrails": {
+    "hypotheses": [
+      [
+        "comment2context",
+        "mrr"
+      ],
+      [
+        "code2test",
+        "mrr"
+      ],
+      [
+        "code2test",
+        "recall@20"
+      ],
+      [
+        "trace2code",
+        "mrr"
+      ],
+      [
+        "trace2code",
+        "recall@20"
+      ],
+      [
+        "edit2ripple",
+        "mrr"
+      ],
+      [
+        "edit2ripple",
+        "recall@20"
+      ]
+    ],
+    "test": "one-sided regression test: bootstrap p = (1 + #{resampled mean diff >= 0}) / (B + 1)",
+    "correction": "Holm-Bonferroni over the 7 guardrail hypotheses, family-wise alpha = 0.05",
+    "note": "Recall@5 and Recall@10 for every task are reported with uncorrected CIs (descriptive)"
+  },
+  "bootstrap": {
+    "type": "paired, repository-clustered percentile",
+    "resamples": 10000,
+    "seed": 20261109,
+    "ci": 0.95
+  },
+  "dev_grid": [
+    0.5,
+    0.25,
+    0.0
+  ],
+  "dev_selection_rule": "Among grid values whose DEV mean (ON - OFF) for comment2context MRR and for MRR and Recall@20 of every other task is >= -0.02, choose the one maximising DEV mean comment2context Recall@20 gain, provided it is > 0; ties -> larger penalty (milder). If none qualifies, freeze the existing default penalty 0.5 and record the dev failure.",
+  "decision_rule": {
+    "VALIDATED": "primary CI lower bound > 0 AND no Holm-supported guardrail regression",
+    "NOT VALIDATED": "any Holm-supported guardrail regression, OR primary point estimate <= 0",
+    "INCONCLUSIVE": "no Holm-supported regression, primary point estimate > 0, but primary CI includes 0; or fewer than 5 test repositories contain comment2context queries"
+  },
+  "budget_tokens": 8000,
+  "task_label_passed_to_engine": true,
+  "split_sha256": "6b8b0322ef70d5ffbd072c8a10d7b0154bc166dc3650df85c1cb30a154ba5bb4",
+  "registered_at": "2026-11-09T19:12:00"
+}

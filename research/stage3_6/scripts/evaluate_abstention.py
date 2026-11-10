@@ -17,14 +17,15 @@ from pathlib import Path
 from collections import defaultdict
 import numpy as np
 
-ROOT_DIR = Path(r"F:\RepoNeedle")
+# Repository root resolved relative to this file (was hard-coded to F:\RepoNeedle).
+ROOT_DIR = Path(__file__).resolve().parents[3]
 ARB_DIR = ROOT_DIR / "external" / "agent-retrieval-bench"
 STAGE_DIR = ROOT_DIR / "research" / "stage3_6"
 sys.path.insert(0, str(ARB_DIR / "src"))
 sys.path.insert(0, str(ROOT_DIR))
 
 from agent_retrieval_bench.baseline import read_jsonl, query_text_for_eval
-from reponeedle.models import FileDoc, Query, AblationConfig
+from reponeedle.models import FileDoc, Query, AblationConfig, BudgetConfig
 from reponeedle.engine import RepoNeedleEngine
 
 
@@ -67,7 +68,9 @@ def run_abstention():
                     file_map[p] = c.get("content", "")[:10000]
 
         docs = [FileDoc(path=p, content=t) for p, t in file_map.items()]
-        eng = RepoNeedleEngine(docs, ablation_config=cfg)
+        # Abstention policy (1.2.0+): this script measures the experimental heuristic, which is
+        # opt-in since 1.2.0. Enabled explicitly; threshold unchanged (BudgetConfig default 0.12).
+        eng = RepoNeedleEngine(docs, ablation_config=cfg, budget_config=BudgetConfig(enable_experimental_abstention=True))
 
         for s in queries:
             q_text = query_text_for_eval(s)
@@ -125,7 +128,9 @@ def run_abstention():
                 if p and p not in file_map:
                     file_map[p] = c.get("content", "")[:10000]
         docs = [FileDoc(path=p, content=t) for p, t in file_map.items()]
-        eng = RepoNeedleEngine(docs, ablation_config=cfg)
+        # Only confidence_score is read here; it is computed identically whether or not
+        # abstention is enabled. Opt-in kept for consistency with the negative-sample pass.
+        eng = RepoNeedleEngine(docs, ablation_config=cfg, budget_config=BudgetConfig(enable_experimental_abstention=True))
         res = eng.retrieve(Query(text=query_text_for_eval(s)))
         sample_pos_confidences.append(float(res.confidence_score))
 

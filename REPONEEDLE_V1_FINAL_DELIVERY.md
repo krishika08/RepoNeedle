@@ -1,4 +1,8 @@
 # REPONEEDLE V1.0.0 — FINAL DELIVERY REPORT
+
+> [!NOTE]
+> **Historical record (2026-11-02), describing the 1.0.0 delivery only.** It has not been updated for later versions. The current release is **1.1.0** (PyPI, 2026-11-03); the development branch is planned for **1.2.0** (unreleased). Two statements below are qualified elsewhere: the description of RepoNeedle as "the first" engine of its kind is an unverified priority claim, and the zero-overflow guarantee holds for RepoNeedle's internal regex token model, not for every LLM tokenizer (see the README's tokenizer boundary disclosure).
+
 ## MASTER EXECUTION DIRECTIVE COMPLETION
 
 **Final Software Version**: `1.0.0`  

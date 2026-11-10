@@ -1,6 +1,6 @@
 # CLAIMS AND EVIDENCE: SCIENTIFIC RECONCILIATION FOR REPONEEDLE
 
-**Version**: 0.1.0 Research Preview  
+**Version**: Evidence originally compiled for the 0.1.0 Research Preview. Claims C11–C13 and corrections to C2, C4 and C6 were added on 2026-11-09 and cover released 1.1.0 and the unreleased development branch planned for 1.2.0.  
 **Benchmark Suite**: Official Agent Retrieval Bench (ARB v2, $N=427$ total samples, $N=345$ positive retrieval samples across 25 repositories and 271 unique repository snapshots)  
 **Evaluator**: `agent_retrieval_bench` v0.2.1, Commit `9e4d68937f29`  
 **Evaluation Date**: 2026-10-28  
@@ -14,7 +14,7 @@ This document provides a line-by-line verification of all scientific, empirical,
 | # | Claim Description | Status | Empirical Verdict |
 | :-: | :--- | :---: | :--- |
 | **C1** | RepoNeedle significantly outperforms BM25 on positive retrieval MRR on ARB v2 | **SUPPORTED** | Statistically significant ($+50.5\%$ relative gain, $p = 2.65\times 10^{-6}$) |
-| **C2** | RepoNeedle significantly outperforms Lexical baseline on positive retrieval MRR | **SUPPORTED** | Statistically significant ($+45.3\%$ relative gain, $p = 8.17\times 10^{-6}$) |
+| **C2** | RepoNeedle significantly outperforms Lexical baseline on positive retrieval MRR | **SUPPORTED (mean MRR; see caveat)** | Paired $t$-test significant ($+45.3\%$ relative gain, $p = 8.17\times 10^{-6}$), but Wilcoxon signed-rank is not ($p = 0.1215$) and RepoNeedle wins fewer queries than it loses (133 / 29 / 183) |
 | **C3** | RepoNeedle outperforms RepoMap overall on ARB v2 | **REFUTED / NOT SUPPORTED** | Parity on MRR ($p = 0.4089$); RepoMap dominates deep recall (R@20 $+47.4\%$) |
 | **C4** | RepoNeedle is superior for regression test discovery (`code2test`) | **SUPPORTED** | Strongest track ($+151.7\%$ vs BM25, $+37.0\%$ vs RepoMap on MRR) |
 | **C5** | RepoNeedle outperforms classical baselines on issue comments (`comment2context`) | **REFUTED / NOT SUPPORTED** | BM25 achieves higher MRR ($0.1974$ vs $0.1708$, $-13.5\%$ deficit for RepoNeedle) |
@@ -23,6 +23,25 @@ This document provides a line-by-line verification of all scientific, empirical,
 | **C8** | Budget knapsack packing maximizes context yield under strict token limits | **SUPPORTED** | $+20.4\%$ advantage over RepoMap at BCY@4k ($0.2436$ vs $0.2024$) |
 | **C9** | Structural skeletons reduce token payload without sacrificing signatures | **SUPPORTED** | $52.8\%$ to $90.4\%$ measured BPE token compression across 4 languages |
 | **C10**| System is lightweight and runs purely on commodity CPU without GPUs | **SUPPORTED** | $317.7\text{ ms}$ mean query latency; zero PyTorch or CUDA dependencies |
+| **C11**| "100% selective abstention accuracy" (v0.1.0 announcement) | **RETRACTED** | Based on 3 synthetic samples from a stale result file; current code scores 2/3 on that set and 0/82 on ARB v2 |
+| **C12**| "100% test coverage across core modules" (v0.1.0 roadmap) | **REFUTED** | Measured line coverage of the `reponeedle` package: 87% (2026-11-09) |
+| **C13**| The MCP server works with Claude Code / Cursor | **NOT VERIFIED (protocol level only)** | Verified with the MCP Python SDK and a JSON-RPC STDIO handshake; no live client session recorded |
+
+### Re-check on the Current Engine (2026-11-09)
+
+The ARB-derived evidence for C1–C8 and C10 was measured on 2026-10-28 with the engine at commit `8e00425` (tag `v0.1.0-baseline`). Engine changes made before the 1.1.0 release altered the rankings, so the ARB v2 positive split was re-measured with the current engine (1.1.0, identical to the development branch). Method and full tables: [docs/BENCHMARK_CONFIGURATION.md §7](docs/BENCHMARK_CONFIGURATION.md#7-verification-performed-2026-11-09).
+
+| # | Status on the current engine | Current evidence |
+| :-: | :---: | :--- |
+| C1 | **SUPPORTED** | MRR 0.2153 vs BM25 0.1520 (+41.6%); repository-clustered 95% CI of the difference [+0.0111, +0.0980] |
+| C2 | **SUPPORTED (mean MRR; same caveat)** | +36.8% vs Lexical, clustered CI [+0.0180, +0.0933]; wins / ties / losses 118 / 24 / 203 |
+| C3 | **REFUTED / NOT SUPPORTED** | Parity on MRR (+0.0013, clustered CI [−0.0597, +0.0517]); RepoMap Recall@20 0.6306 vs 0.3842 |
+| C4 | **SUPPORTED** | `code2test` MRR 0.2546 vs BM25 0.1057 (+140.8%) and RepoMap 0.1942 (+31.0%) |
+| C5 | **REFUTED / NOT SUPPORTED** | `comment2context` MRR 0.1658 vs BM25 0.1974 (−16.0%) |
+| C6 | **REFUTED / NOT SUPPORTED** | 0/82 abstained with explicit opt-in (unchanged) |
+| C7 | **NOT RE-MEASURED** | Router ablation was not re-run on the current engine |
+| C8 | **SUPPORTED (no CI)** | BCY@4k 0.2400 vs RepoMap 0.2024 (+18.5%); no confidence interval computed for BCY |
+| C10 | **SUPPORTED (latency not comparable)** | CPU-only dependencies unchanged; re-measurement latency was taken with three concurrent shards and is not comparable to the published figures |
 
 ---
 
@@ -53,6 +72,7 @@ This document provides a line-by-line verification of all scientific, empirical,
   - Standard Error: `0.0157`
   - Repository-Clustered 95% Bootstrap CI: `[+0.0307, +0.1029]`
   - Paired Student's $t$-test: $t = 4.529$, $p = 8.17 \times 10^{-6}$ ($p < 0.001$)
+  - *Caveat (added 2026-11-09)*: the Wilcoxon signed-rank test is **not** significant ($W = 22521.5$, $p = 0.1215$), and per-query wins / ties / losses are 133 / 29 / 183. The mean gain comes from fewer, larger wins rather than consistent per-query improvement. The README's significance column reflects the $t$-test and repository-clustered bootstrap.
 
 ### Claim 3: "RepoNeedle outperforms RepoMap overall on ARB v2"
 - **Status**: **REFUTED / NOT SUPPORTED**
@@ -100,7 +120,7 @@ This document provides a line-by-line verification of all scientific, empirical,
   - Deficit vs BM25: $\frac{0.1708 - 0.1974}{0.1974} \times 100\% = \mathbf{-13.48\%}$
   - Recall@20 Deficit: BM25 `0.5292` vs RepoNeedle `0.2083` ($-60.6\%$ deficit)
   - BCY@8k Deficit: BM25 `0.2604` vs RepoNeedle `0.1896` ($-27.2\%$ deficit)
-  - Root Cause: In informal issue comments, exact lexical term matching is the strongest signal. RepoNeedle's workflow router dilutes BM25 weights by allocating probability mass to semantic and graph components, which introduces noise when AST symbols do not directly align with colloquial issue text.
+  - Root Cause *(corrected 2026-11-10; the earlier explanation attributed the deficit to "colloquial issue text" and router weight dilution, which the later evidence does not support)*: the queries are structured JSON PR-review contexts, not colloquial issue text. Much of the official-harness gap is a measurement artifact: RepoNeedle receives file fragments and unpacked files are scored in corpus order. On matched whole-file input, MRR is level with BM25 while Recall@20 remains significantly lower. Development-only lexical forensics point to query-term-frequency handling as the strongest candidate cause; no lexical change has been validated. See `KNOWN_LIMITATIONS.md` §4 and `reports/experimental/`.
 
 ### Claim 6: "Heuristic selective abstention reliably identifies no-gold tasks on ARB v2"
 - **Status**: **REFUTED / NOT SUPPORTED**
@@ -110,8 +130,8 @@ This document provides a line-by-line verification of all scientific, empirical,
   - Counterfactual Wrong-Repo Queries ($N=32$): **0 / 32 correctly abstained (0.0% accuracy)**.
   - Combined Benchmark ($N=82$): **0 / 82 correctly abstained (0.0% accuracy)**.
   - Empirical Observations:
-    - Default abstention threshold: $\tau = 0.38$.
-    - Observed heuristic confidence range on no-gold queries: `[0.64, 0.86]`.
+    - Engine default abstention threshold: $\tau = 0.12$ (`BudgetConfig.abstention_threshold`). *Corrected 2026-11-09: earlier text stated 0.38, which is only the standalone `SelectiveAbstainer` class default and is not used by the engine.*
+    - Observed heuristic confidence on the 82 no-gold queries: range `[0.532, 0.891]`, 5th–95th percentile `[0.635, 0.851]`. *Corrected 2026-11-09: earlier text gave `[0.64, 0.86]`. Source: `reports/full_arb_validation/checkpoint_selective.jsonl`.*
     - Every single query exceeded the threshold, producing a 100% false return rate (zero abstention recall).
   - Diagnostic Explanation: Surface vocabulary overlap and score peakiness ($Z$-score) fail on full repositories because:
     1. Real GitHub issues filed against a repository naturally contain identifiers that exist within the repository.
@@ -160,7 +180,7 @@ This document provides a line-by-line verification of all scientific, empirical,
 
 ### What RepoNeedle DOES Achieve:
 1. **Proven Superiority over Classical Lexical & BM25**: $+50.5\%$ relative gain on MRR ($p = 2.65 \times 10^{-6}$) and $+68.2\%$ relative gain on BCY@8k across 345 real-world repository samples.
-2. **State-of-the-Art CPU Regression Test Discovery (`code2test`)**: $+151.7\%$ MRR over BM25 and $+37.0\%$ over RepoMap via inverted dependency graph AST linkages.
+2. **Strongest Regression Test Discovery Among the Evaluated Baselines (`code2test`)**: $+151.7\%$ MRR over BM25 and $+37.0\%$ over RepoMap via inverted dependency graph AST linkages.
 3. **High Context Yield Under Strict Token Budgets**: $+20.4\%$ higher BCY@4k than RepoMap, packing multi-tier structural skeletons to prevent context overflow.
 4. **Sub-Second CPU Execution**: $142.4\text{ ms}$ median retrieval latency across real open-source codebases without requiring GPU infrastructure.
 5. **Zero Data Contamination**: Strict isolation of proprietary or copyleft non-permissive datasets; 100% permissively licensed MIT release.
@@ -168,7 +188,7 @@ This document provides a line-by-line verification of all scientific, empirical,
 ### What RepoNeedle DOES NOT Achieve:
 1. **Conclusive Statistical Superiority Over RepoMap**: Overall MRR difference ($+0.0148$) is statistically insignificant ($p = 0.4089$), and RepoMap achieves substantially higher deep recall (Recall@20: $0.6306$ vs $0.4279$).
 2. **Reliable Selective Abstention on Full Codebases**: Heuristic confidence gating achieved 0.0% accuracy on ARB v2 no-gold benchmarks; a trained neural discriminator is mandatory.
-3. **Colloquial Issue Comment Dominance (`comment2context`)**: Classical BM25 achieves higher MRR ($0.1974$ vs $0.1708$) on conversational issue comments.
+3. **Parity with BM25 on PR-review comment queries (`comment2context`)**: In the official harness, BM25 achieves higher MRR ($0.1974$ vs $0.1708$) on these structured JSON PR-review contexts. On matched whole-file input (supplemental, not official), MRR is level, but RepoNeedle's Recall@20 remains significantly lower. These are not conversational queries; ARB v2 does not measure conversational retrieval.
 4. **Span-Level Retrieval**: RepoNeedle selects file-level units and structural skeletons, not fine-grained line-level spans.
 5. **Deep Neural Foundation Model Representations**: RepoNeedle is a structured CPU ranking engine, not a pre-trained dense transformer embedding model.
 

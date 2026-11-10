@@ -11,8 +11,10 @@ from reponeedle.models import (
     RankerType,
     BudgetConfig,
     ContextTier,
+    AbstentionDiagnostics,
+    IndexingDiagnostics,
 )
-from reponeedle.engine import RepoNeedleEngine
+from reponeedle.engine import RepoNeedleEngine, DEFAULT_MAX_FILE_SIZE_BYTES
 from reponeedle.core.change_impact import ChangeImpactRanker, ChangeImpactConfig
 from reponeedle.core.packer import (
     CUDPackOptimizer,
@@ -32,6 +34,9 @@ __all__ = [
     "RankerType",
     "BudgetConfig",
     "ContextTier",
+    "AbstentionDiagnostics",
+    "IndexingDiagnostics",
+    "DEFAULT_MAX_FILE_SIZE_BYTES",
     "ChangeImpactRanker",
     "ChangeImpactConfig",
     "CUDPackOptimizer",

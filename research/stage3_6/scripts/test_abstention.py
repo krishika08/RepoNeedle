@@ -6,13 +6,14 @@ from pathlib import Path
 from collections import defaultdict
 import numpy as np
 
-ROOT_DIR = Path(r"F:\RepoNeedle")
+# Repository root resolved relative to this file (was hard-coded to F:\RepoNeedle).
+ROOT_DIR = Path(__file__).resolve().parents[3]
 ARB_DIR = ROOT_DIR / "external" / "agent-retrieval-bench"
 sys.path.insert(0, str(ARB_DIR / "src"))
 sys.path.insert(0, str(ROOT_DIR))
 
 from agent_retrieval_bench.baseline import read_jsonl, query_text_for_eval
-from reponeedle.models import FileDoc, Query, AblationConfig
+from reponeedle.models import FileDoc, Query, AblationConfig, BudgetConfig
 from reponeedle.engine import RepoNeedleEngine
 from reponeedle.core.abstention import SelectiveAbstainer
 
@@ -75,7 +76,11 @@ def main():
                 symbols=chunk.get("symbols", []),
             ))
         cfg = AblationConfig.candidate_f()
-        engine = RepoNeedleEngine(docs, ablation_config=cfg)
+        # Abstention policy (1.2.0+): this script measures abstention decisions on positive and
+        # no-gold samples, so the opt-in heuristic is enabled explicitly (threshold unchanged).
+        engine = RepoNeedleEngine(
+            docs, ablation_config=cfg, budget_config=BudgetConfig(enable_experimental_abstention=True)
+        )
         engines[key] = engine
         return engine
 

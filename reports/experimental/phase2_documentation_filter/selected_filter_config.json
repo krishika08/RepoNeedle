@@ -1,0 +1,21 @@
+{
+  "enable_doc_filter": true,
+  "doc_filter_penalty": 0.5,
+  "status": "selected by dev rule",
+  "dev_eligible": [
+    {
+      "penalty": 0.5,
+      "dev_c2c_recall20_gain": 0.05797101449275362
+    },
+    {
+      "penalty": 0.25,
+      "dev_c2c_recall20_gain": 0.05797101449275362
+    },
+    {
+      "penalty": 0.0,
+      "dev_c2c_recall20_gain": 0.05797101449275362
+    }
+  ],
+  "split_sha256": "6b8b0322ef70d5ffbd072c8a10d7b0154bc166dc3650df85c1cb30a154ba5bb4",
+  "frozen_at": "2026-11-09T19:32:56"
+}

@@ -1,0 +1,64 @@
+{
+  "evaluation": "supplemental product-aligned full-ranking evaluation (NOT an official ARB score)",
+  "dataset": "ARB v2 positive split: v2_code2test, v2_comment2context, v2_trace2code, v2_edit2ripple",
+  "corpus_manifest": "data/corpus/v2_selective_mixed/corpus_manifest.jsonl",
+  "retrieval_unit": "file",
+  "candidate_universe": "paths with >=1 chunk in the snapshot chunk file",
+  "representations": {
+    "fragment": "longest ARB chunk per path, [:25000]",
+    "wholefile": "file-chunk header lines before first symbol + all symbol chunks in line order"
+  },
+  "systems": [
+    "rn_fragment",
+    "rn_wholefile",
+    "bm25_fragment",
+    "bm25_wholefile",
+    "bm25_chunks"
+  ],
+  "chunk_to_file_rule": "max (best chunk score) = ARB unique_ranked_paths order",
+  "tie_rule": "score desc, path asc",
+  "metrics": [
+    "mrr",
+    "recall@5",
+    "recall@10",
+    "recall@20",
+    "reciprocal_rank",
+    "gold_positions"
+  ],
+  "packed_context_budget_tokens": 8000,
+  "task_label_passed_to_engine": true,
+  "stored_ranking_depth": 100,
+  "bootstrap": {
+    "type": "paired, repository-clustered percentile",
+    "resamples": 10000,
+    "seed": 20261109,
+    "ci": 0.95
+  },
+  "comparisons": [
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle"
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25"
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input"
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input"
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)"
+    }
+  ]
+}
