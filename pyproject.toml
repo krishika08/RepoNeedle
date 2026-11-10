@@ -38,8 +38,8 @@ dev = [
     "pytest-cov>=4.0.0",
     "pytest-asyncio>=0.23",
 ]
-# Retained from the published 1.1.0 release for installation compatibility. Optional only;
-# no RepoNeedle module imports these packages.
+# Optional dependencies for the repository's public demonstration API (`api.py` at the repository
+# root; not part of the installed package). Published with 1.1.0; kept for installation compatibility.
 api = [
     "fastapi>=0.115,<1.0",
     "httpx>=0.24",

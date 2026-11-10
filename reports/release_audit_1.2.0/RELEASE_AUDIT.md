@@ -37,7 +37,7 @@ Results: **35 / 35** checks (Python 3.11.9, base wheel, `mcp` absent) and **45 /
 | New optional `RetrievalResult.abstention`, new `IndexingDiagnostics` | Yes | Additive |
 | **Abstention default: always on → off** | **Behaviour change** | Out-of-scope queries now return results instead of abstaining. Restore 1.1.0 behaviour with `BudgetConfig(enable_experimental_abstention=True)` or `--enable-experimental-abstention`. Empty repositories still abstain |
 | New stderr `WARNING` (logger `reponeedle.engine`) when files are skipped | Mostly | New output on stderr for library users when files exceed the size limit |
-| `api` extra (present in published 1.1.0, absent from this source) | **Breaking for `pip install reponeedle[api]`** | pip will warn that the extra does not exist. It only installed `fastapi`, `httpx`, `uvicorn`; no package code used them |
+| `api` extra (present in published 1.1.0, absent from this branch's pre-merge source) | **Breaking for `pip install reponeedle[api]`** | pip will warn that the extra does not exist. It installs `fastapi`, `httpx`, `uvicorn` for the root-level demo `api.py` on `main` (see correction note below); no module inside the `reponeedle` package uses them |
 | `change_impact` task label for `AUTO` queries | **Regression vs published 1.1.0** | See §10, B2 |
 
 ## 4. Security and path validation
@@ -58,7 +58,7 @@ Results: **35 / 35** checks (Python 3.11.9, base wheel, `mcp` absent) and **45 /
 - Python ≥ 3.10: every package module parses with the 3.10 grammar; `tomllib` has a `tomli` fallback; CI matrix covers 3.10–3.12; clean installs verified on 3.11 and 3.12 (3.10 not available locally).
 - Console scripts: `reponeedle = reponeedle.cli:main`, `reponeedle-mcp = reponeedle.mcp.server:main`.
 - Metadata 2.4, `License-Expression: MIT`; `twine check --strict` PASSED for wheel and sdist.
-- **Provenance**: the published PyPI 1.1.0 wheel was not built exactly from this repository's 1.1.0 source. It declares the extra `api`, and its `engine.py` contains a 4-line change absent from `main`. The other 17 modules are byte-identical. 1.2.0 should be built only by the release workflow from the tagged commit.
+- **Provenance** *(corrected, see note below)*: the published PyPI 1.1.0 wheel's `api` extra and 4-line `engine.py` change were absent from this feature branch, which had not yet merged `main`. They **are** present on `main` at the `v1.1.0` tag (`74660db`); the wheel is consistent with the tagged source. 1.2.0 should be built only by the release workflow from the tagged commit.
 - `pytest-asyncio` (needed by 4 test files) is not declared in any extra.
 
 ## 6. Test suite
@@ -139,3 +139,10 @@ See `PROPOSED_CHANGELOG_1.2.0.md` in this directory.
 | S3 MCP version | `serverInfo.version` reports RepoNeedle's version. |
 | S4 `api` extra | Retained (optional) for 1.1.0 installation compatibility. |
 | S5 anchors | Component-aware `..` check (CLI, MCP); CLI anchors use canonical containment. |
+
+## Correction (2026-11-10): provenance and `api` extra
+
+Two statements in this audit were wrong. They were based on a stale local `origin/main` (not fetched before the audit), which lagged 20 commits behind the remote.
+
+1. **The published 1.1.0 wheel was not built from different source.** The `api` extra and the `change_impact` task-inference change are both on `main` at tag `v1.1.0` (`74660db`). They were missing only from this feature branch, whose base predated them. The "B2" port therefore matches `main` exactly. After `main` was merged into the branch, the logic is identical apart from comments.
+2. **The `api` extra is used.** Its packages serve the repository's root-level demonstration API (`api.py`, tested by `tests/test_public_api.py`). That file is not part of the installed `reponeedle` package, and no module inside the package imports them. The release workflow's `validate` job now installs `.[dev,mcp,api]` so the full suite (including `test_public_api.py`) runs.

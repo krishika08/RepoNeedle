@@ -40,14 +40,14 @@
 
   `task_type="selective"` does not enable it. Empty repositories still return `abstained=True`. `confidence_score` is still reported and remains an uncalibrated diagnostic, not a probability.
 - **Skipped files are reported.** When files exceed the size limit, are unreadable, or the `max_files` cap is hit, a `WARNING` is logged on the `reponeedle.engine` logger (stderr by default) and details are recorded in `indexing_diagnostics`.
-- **`api` extra retained.** The optional `api` extra published with 1.1.0 (`fastapi`, `httpx`, `uvicorn`) is kept so `pip install "reponeedle[api]"` continues to work. It remains optional, and no RepoNeedle module imports these packages.
+- **`api` extra retained.** The optional `api` extra published with 1.1.0 (`fastapi`, `httpx`, `uvicorn`) is kept so `pip install "reponeedle[api]"` continues to work. It remains optional. It supports the repository's demonstration API (`api.py`), and no module inside the `reponeedle` package imports these packages.
 
 ## Security
 - **Indexing no longer reads files outside the repository through links.** `from_directory` resolves every file before opening it and skips files whose canonical location is outside the repository root (symlinks; junctions on Windows), without reading the target. Skipped links are listed by their in-repository path in `indexing_diagnostics.symlink_outside_repository_paths` (reason `symlink_outside_repository`). In 1.1.0 such files were indexed and their contents could be returned by retrieval. Links resolving inside the repository are still indexed.
 - CLI anchors use the same canonical containment check, so an anchor that links outside the repository is rejected.
 
 ## Fixes
-- `change_impact` results report the router-classified task for `AUTO` queries, restoring the behaviour of the published 1.1.0 wheel (reporting only; ranking unchanged).
+- `change_impact` results report the router-classified task for `AUTO` queries, matching 1.1.0 on `main` (reporting only; ranking unchanged).
 - Anchor and MCP path validation are now component-aware: legitimate names beginning with `..` (e.g. `..cache/x.py`) are accepted, and real parent traversal is still rejected.
 - The MCP server reports RepoNeedle's version in `serverInfo.version` (previously the MCP SDK's version).
 

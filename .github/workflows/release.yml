@@ -26,10 +26,10 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install package with development and MCP extras
+      - name: Install package with development, MCP and demo-API extras
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -e ".[dev,mcp]"
+          pip install -e ".[dev,mcp,api]"
 
       - name: Verify tag, pyproject version and package __version__ match
         env:

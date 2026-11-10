@@ -1,9 +1,9 @@
 """
 Release 1.2.0 compatibility guards:
-- B2: change_impact reports the router-classified task for AUTO queries (published PyPI 1.1.0
-  behaviour); explicit task types are unchanged; ranking is unaffected (reporting only).
+- B2: change_impact reports the router-classified task for AUTO queries (1.1.0 behaviour on
+  main, as published to PyPI); explicit task types are unchanged; ranking is unaffected (reporting only).
 - MCP serverInfo.version reports RepoNeedle's version, not the MCP SDK's.
-- The `api` optional extra published with 1.1.0 is retained (optional only).
+- The `api` optional extra published with 1.1.0 is retained (optional; used by the demo api.py).
 """
 
 import json
