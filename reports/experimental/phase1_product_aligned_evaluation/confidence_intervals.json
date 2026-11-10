@@ -1,0 +1,1512 @@
+{
+  "overall": [
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "mrr",
+      "mean_diff": 0.04100153938301359,
+      "wins": 165,
+      "ties": 73,
+      "losses": 107,
+      "ci95": [
+        0.0006914835099752493,
+        0.10418125463818034
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@5",
+      "mean_diff": 0.12086956521739131,
+      "wins": 66,
+      "ties": 261,
+      "losses": 18,
+      "ci95": [
+        0.05025974191760037,
+        0.24221626831560508
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@10",
+      "mean_diff": 0.1455072463768116,
+      "wins": 76,
+      "ties": 257,
+      "losses": 12,
+      "ci95": [
+        0.07251797555709769,
+        0.26836550533584425
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@20",
+      "mean_diff": 0.12386473429951692,
+      "wins": 68,
+      "ties": 265,
+      "losses": 12,
+      "ci95": [
+        0.057206290592918506,
+        0.24303214355993516
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "mrr",
+      "mean_diff": 0.027724784267218278,
+      "wins": 191,
+      "ties": 37,
+      "losses": 117,
+      "ci95": [
+        0.007954364532310052,
+        0.0499573648128874
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@5",
+      "mean_diff": 0.06400966183574879,
+      "wins": 50,
+      "ties": 277,
+      "losses": 18,
+      "ci95": [
+        0.027048369388926317,
+        0.09917757946434526
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@10",
+      "mean_diff": 0.1108695652173913,
+      "wins": 64,
+      "ties": 266,
+      "losses": 15,
+      "ci95": [
+        0.06238402924069584,
+        0.16160536457267577
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@20",
+      "mean_diff": 0.1533816425120773,
+      "wins": 78,
+      "ties": 252,
+      "losses": 15,
+      "ci95": [
+        0.11416086394018449,
+        0.2199845971563981
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "mrr",
+      "mean_diff": 0.09400194844002423,
+      "wins": 239,
+      "ties": 33,
+      "losses": 73,
+      "ci95": [
+        0.05696377236657928,
+        0.12010187618395433
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@5",
+      "mean_diff": 0.1411594202898551,
+      "wins": 76,
+      "ties": 249,
+      "losses": 20,
+      "ci95": [
+        0.07848241518537963,
+        0.18727627139565503
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@10",
+      "mean_diff": 0.2017874396135266,
+      "wins": 96,
+      "ties": 228,
+      "losses": 21,
+      "ci95": [
+        0.12025401645186197,
+        0.26506770590369566
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@20",
+      "mean_diff": 0.2199033816425121,
+      "wins": 107,
+      "ties": 218,
+      "losses": 20,
+      "ci95": [
+        0.1278021275299945,
+        0.2937953246625283
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "mrr",
+      "mean_diff": 0.10727870355581955,
+      "wins": 233,
+      "ties": 28,
+      "losses": 84,
+      "ci95": [
+        0.06471834709123764,
+        0.1596041092447289
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@5",
+      "mean_diff": 0.19801932367149758,
+      "wins": 100,
+      "ties": 218,
+      "losses": 27,
+      "ci95": [
+        0.09515389766843255,
+        0.3102117159515778
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@10",
+      "mean_diff": 0.23642512077294686,
+      "wins": 116,
+      "ties": 196,
+      "losses": 33,
+      "ci95": [
+        0.11518395691609978,
+        0.35508020833333326
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@20",
+      "mean_diff": 0.1903864734299517,
+      "wins": 97,
+      "ties": 226,
+      "losses": 22,
+      "ci95": [
+        0.11139379844961239,
+        0.27153684964577407
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "mrr",
+      "mean_diff": 0.12689889890682782,
+      "wins": 250,
+      "ties": 20,
+      "losses": 75,
+      "ci95": [
+        0.09213284727266687,
+        0.16714031452099123
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@5",
+      "mean_diff": 0.23714975845410627,
+      "wins": 114,
+      "ties": 210,
+      "losses": 21,
+      "ci95": [
+        0.1325113902580017,
+        0.31797456220014486
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@10",
+      "mean_diff": 0.28280193236714973,
+      "wins": 135,
+      "ties": 180,
+      "losses": 30,
+      "ci95": [
+        0.1650255905511811,
+        0.3681248348854104
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@20",
+      "mean_diff": 0.2589855072463768,
+      "wins": 127,
+      "ties": 193,
+      "losses": 25,
+      "ci95": [
+        0.1737198440112948,
+        0.32423103745267806
+      ],
+      "excludes_zero": true
+    }
+  ],
+  "code2test": [
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "mrr",
+      "mean_diff": 0.08208564833208896,
+      "wins": 52,
+      "ties": 23,
+      "losses": 31,
+      "ci95": [
+        0.009752874919494343,
+        0.14166716034481303
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@5",
+      "mean_diff": 0.08993710691823899,
+      "wins": 19,
+      "ties": 80,
+      "losses": 7,
+      "ci95": [
+        0.009187148447053074,
+        0.15604529616724735
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@10",
+      "mean_diff": 0.08364779874213837,
+      "wins": 18,
+      "ties": 82,
+      "losses": 6,
+      "ci95": [
+        0.02991352201257862,
+        0.13562119675456388
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@20",
+      "mean_diff": 0.12641509433962264,
+      "wins": 22,
+      "ties": 82,
+      "losses": 2,
+      "ci95": [
+        0.07902109800362977,
+        0.17854785478547852
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "mrr",
+      "mean_diff": 0.050392820519170066,
+      "wins": 63,
+      "ties": 3,
+      "losses": 40,
+      "ci95": [
+        0.01497579518400553,
+        0.08949036173573524
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@5",
+      "mean_diff": 0.05660377358490566,
+      "wins": 13,
+      "ties": 89,
+      "losses": 4,
+      "ci95": [
+        -0.006329113924050633,
+        0.12921443858442253
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@10",
+      "mean_diff": 0.09905660377358491,
+      "wins": 16,
+      "ties": 87,
+      "losses": 3,
+      "ci95": [
+        0.01293103448275862,
+        0.21428571428571427
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@20",
+      "mean_diff": 0.07861635220125784,
+      "wins": 15,
+      "ties": 86,
+      "losses": 5,
+      "ci95": [
+        0.035211267605633804,
+        0.1316887125220458
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "mrr",
+      "mean_diff": 0.2079811752765758,
+      "wins": 97,
+      "ties": 2,
+      "losses": 7,
+      "ci95": [
+        0.16723729957995015,
+        0.25113598958420963
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@5",
+      "mean_diff": 0.31477987421383646,
+      "wins": 45,
+      "ties": 56,
+      "losses": 5,
+      "ci95": [
+        0.2033324175824176,
+        0.4207325403172064
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@10",
+      "mean_diff": 0.4279874213836478,
+      "wins": 55,
+      "ties": 50,
+      "losses": 1,
+      "ci95": [
+        0.2935723381330199,
+        0.5545185123921373
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@20",
+      "mean_diff": 0.3839622641509434,
+      "wins": 49,
+      "ties": 56,
+      "losses": 1,
+      "ci95": [
+        0.25441992014196985,
+        0.4879906692406692
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "mrr",
+      "mean_diff": 0.23967400308949469,
+      "wins": 92,
+      "ties": 5,
+      "losses": 9,
+      "ci95": [
+        0.17830023194707764,
+        0.29942282070742043
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@5",
+      "mean_diff": 0.3481132075471698,
+      "wins": 45,
+      "ties": 60,
+      "losses": 1,
+      "ci95": [
+        0.2400789835164835,
+        0.4401182804937423
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@10",
+      "mean_diff": 0.4125786163522013,
+      "wins": 52,
+      "ties": 51,
+      "losses": 3,
+      "ci95": [
+        0.28803221288515407,
+        0.5133333333333333
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@20",
+      "mean_diff": 0.4317610062893082,
+      "wins": 54,
+      "ties": 52,
+      "losses": 0,
+      "ci95": [
+        0.32068776467029647,
+        0.5228840903449987
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "mrr",
+      "mean_diff": 0.24995375615865506,
+      "wins": 92,
+      "ties": 4,
+      "losses": 10,
+      "ci95": [
+        0.1694395970249799,
+        0.3148978733826568
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@5",
+      "mean_diff": 0.35125786163522016,
+      "wins": 47,
+      "ties": 56,
+      "losses": 3,
+      "ci95": [
+        0.21761335403726706,
+        0.4684424809424809
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@10",
+      "mean_diff": 0.4393081761006289,
+      "wins": 53,
+      "ties": 51,
+      "losses": 2,
+      "ci95": [
+        0.3015383685483023,
+        0.5615975577026301
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@20",
+      "mean_diff": 0.46320754716981133,
+      "wins": 59,
+      "ties": 46,
+      "losses": 1,
+      "ci95": [
+        0.3373134328358209,
+        0.5726120025795682
+      ],
+      "excludes_zero": true
+    }
+  ],
+  "comment2context": [
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "mrr",
+      "mean_diff": 0.017981369655854125,
+      "wins": 43,
+      "ties": 9,
+      "losses": 28,
+      "ci95": [
+        -0.036210810009589145,
+        0.07717489446475888
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@5",
+      "mean_diff": 0.08125,
+      "wins": 14,
+      "ties": 61,
+      "losses": 5,
+      "ci95": [
+        0.019899926970651335,
+        0.15625
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@10",
+      "mean_diff": 0.12708333333333335,
+      "wins": 19,
+      "ties": 58,
+      "losses": 3,
+      "ci95": [
+        0.0625,
+        0.217953431372549
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@20",
+      "mean_diff": 0.175,
+      "wins": 24,
+      "ties": 53,
+      "losses": 3,
+      "ci95": [
+        0.09150063251106895,
+        0.29091037493579863
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "mrr",
+      "mean_diff": 0.01881147940283824,
+      "wins": 43,
+      "ties": 9,
+      "losses": 28,
+      "ci95": [
+        -0.028889335700428946,
+        0.07487940964392602
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@5",
+      "mean_diff": 0.09375,
+      "wins": 18,
+      "ties": 55,
+      "losses": 7,
+      "ci95": [
+        -0.0013946197411003136,
+        0.1902178487776314
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@10",
+      "mean_diff": 0.17916666666666667,
+      "wins": 24,
+      "ties": 52,
+      "losses": 4,
+      "ci95": [
+        0.06817915066154502,
+        0.28682170542635654
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@20",
+      "mean_diff": 0.22291666666666665,
+      "wins": 26,
+      "ties": 51,
+      "losses": 3,
+      "ci95": [
+        0.10389432971400185,
+        0.3681657501963864
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "mrr",
+      "mean_diff": -0.0017846733289655435,
+      "wins": 35,
+      "ties": 13,
+      "losses": 32,
+      "ci95": [
+        -0.03292834854161057,
+        0.03991993194381369
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@5",
+      "mean_diff": -0.022916666666666665,
+      "wins": 4,
+      "ties": 69,
+      "losses": 7,
+      "ci95": [
+        -0.06008021102497846,
+        0.00841804117120572
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@10",
+      "mean_diff": -0.029166666666666664,
+      "wins": 3,
+      "ties": 68,
+      "losses": 9,
+      "ci95": [
+        -0.07555620155038759,
+        0.028248587570621465
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@20",
+      "mean_diff": -0.041666666666666664,
+      "wins": 7,
+      "ties": 61,
+      "losses": 12,
+      "ci95": [
+        -0.12403306943757215,
+        0.05147549019607836
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "mrr",
+      "mean_diff": -0.0026147830759496614,
+      "wins": 32,
+      "ties": 10,
+      "losses": 38,
+      "ci95": [
+        -0.029656449357856156,
+        0.033672092917158926
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@5",
+      "mean_diff": -0.03541666666666666,
+      "wins": 7,
+      "ties": 59,
+      "losses": 14,
+      "ci95": [
+        -0.1204840639152354,
+        0.06470860566448798
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@10",
+      "mean_diff": -0.08125,
+      "wins": 7,
+      "ties": 54,
+      "losses": 19,
+      "ci95": [
+        -0.15942287784679088,
+        0.028679211469533974
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@20",
+      "mean_diff": -0.08958333333333333,
+      "wins": 6,
+      "ties": 60,
+      "losses": 14,
+      "ci95": [
+        -0.1779288822721026,
+        -0.005551075268817272
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "mrr",
+      "mean_diff": 0.00631884568601237,
+      "wins": 38,
+      "ties": 12,
+      "losses": 30,
+      "ci95": [
+        -0.048087697834351475,
+        0.05763590516174947
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@5",
+      "mean_diff": 0.03125,
+      "wins": 11,
+      "ties": 61,
+      "losses": 8,
+      "ci95": [
+        -0.03164808117339763,
+        0.07857142857142857
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@10",
+      "mean_diff": -0.052083333333333336,
+      "wins": 13,
+      "ties": 49,
+      "losses": 18,
+      "ci95": [
+        -0.19518387314439944,
+        0.06751360606616516
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@20",
+      "mean_diff": -0.03958333333333334,
+      "wins": 14,
+      "ties": 49,
+      "losses": 17,
+      "ci95": [
+        -0.1960871848739496,
+        0.11200612244897949
+      ],
+      "excludes_zero": false
+    }
+  ],
+  "trace2code": [
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "mrr",
+      "mean_diff": 0.03074112744037026,
+      "wins": 50,
+      "ties": 16,
+      "losses": 35,
+      "ci95": [
+        -0.06582779193884587,
+        0.21251669259221895
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@5",
+      "mean_diff": 0.2194719471947195,
+      "wins": 28,
+      "ties": 68,
+      "losses": 5,
+      "ci95": [
+        0.045454545454545456,
+        0.5879749240121571
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@10",
+      "mean_diff": 0.25082508250825086,
+      "wins": 31,
+      "ties": 67,
+      "losses": 3,
+      "ci95": [
+        0.0,
+        0.5913978494623656
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@20",
+      "mean_diff": 0.1518151815181518,
+      "wins": 20,
+      "ties": 76,
+      "losses": 5,
+      "ci95": [
+        -0.009692772457820334,
+        0.4725274725274725
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "mrr",
+      "mean_diff": 0.004343486321484281,
+      "wins": 58,
+      "ties": 11,
+      "losses": 32,
+      "ci95": [
+        -0.02832527537820409,
+        0.08584517357665226
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@5",
+      "mean_diff": 0.054455445544554455,
+      "wins": 10,
+      "ties": 88,
+      "losses": 3,
+      "ci95": [
+        0.03112770651425167,
+        0.1875
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@10",
+      "mean_diff": 0.08415841584158416,
+      "wins": 14,
+      "ties": 83,
+      "losses": 4,
+      "ci95": [
+        0.05172413793103448,
+        0.25
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@20",
+      "mean_diff": 0.21617161716171615,
+      "wins": 27,
+      "ties": 70,
+      "losses": 4,
+      "ci95": [
+        0.1292123127340824,
+        0.36363636363636365
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "mrr",
+      "mean_diff": 0.11450456111598958,
+      "wins": 79,
+      "ties": 9,
+      "losses": 13,
+      "ci95": [
+        -0.03963738952377089,
+        0.16192739124112834
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@5",
+      "mean_diff": 0.13201320132013203,
+      "wins": 16,
+      "ties": 82,
+      "losses": 3,
+      "ci95": [
+        -0.010638297872340425,
+        0.17820098784194516
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@10",
+      "mean_diff": 0.2260726072607261,
+      "wins": 28,
+      "ties": 69,
+      "losses": 4,
+      "ci95": [
+        0.13513513513513514,
+        0.2693281683626272
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@20",
+      "mean_diff": 0.2854785478547855,
+      "wins": 34,
+      "ties": 64,
+      "losses": 3,
+      "ci95": [
+        0.1,
+        0.3373015873015873
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "mrr",
+      "mean_diff": 0.14090220223487557,
+      "wins": 80,
+      "ties": 8,
+      "losses": 13,
+      "ci95": [
+        -0.03443722776389033,
+        0.22751902240127417
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@5",
+      "mean_diff": 0.297029702970297,
+      "wins": 37,
+      "ties": 56,
+      "losses": 8,
+      "ci95": [
+        -0.10526315789473684,
+        0.5913978494623656
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@10",
+      "mean_diff": 0.3927392739273927,
+      "wins": 45,
+      "ties": 53,
+      "losses": 3,
+      "ci95": [
+        -0.047619047619047616,
+        0.6505376344086021
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@20",
+      "mean_diff": 0.22112211221122113,
+      "wins": 27,
+      "ties": 71,
+      "losses": 3,
+      "ci95": [
+        -0.03578296703296697,
+        0.40555555555555556
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "mrr",
+      "mean_diff": 0.12462380837135727,
+      "wins": 76,
+      "ties": 2,
+      "losses": 23,
+      "ci95": [
+        0.037535018368837804,
+        0.20791396250855748
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@5",
+      "mean_diff": 0.28217821782178215,
+      "wins": 37,
+      "ties": 56,
+      "losses": 8,
+      "ci95": [
+        -0.11904761904761904,
+        0.46153846153846156
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@10",
+      "mean_diff": 0.3828382838283828,
+      "wins": 45,
+      "ties": 51,
+      "losses": 5,
+      "ci95": [
+        0.0,
+        0.5222222222222221
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@20",
+      "mean_diff": 0.33663366336633666,
+      "wins": 38,
+      "ties": 60,
+      "losses": 3,
+      "ci95": [
+        0.11428571428571428,
+        0.45604395604395603
+      ],
+      "excludes_zero": true
+    }
+  ],
+  "edit2ripple": [
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "mrr",
+      "mean_diff": 0.015536015861940238,
+      "wins": 20,
+      "ties": 25,
+      "losses": 13,
+      "ci95": [
+        0.0010147492691650413,
+        0.029350860773465107
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@5",
+      "mean_diff": 0.0603448275862069,
+      "wins": 5,
+      "ties": 52,
+      "losses": 1,
+      "ci95": [
+        0.007243788819875778,
+        0.10144927536231885
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@10",
+      "mean_diff": 0.10057471264367815,
+      "wins": 8,
+      "ties": 50,
+      "losses": 0,
+      "ci95": [
+        0.037037037037037035,
+        0.1852182539682535
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "rn_fragment",
+      "label": "Representation effect on RepoNeedle",
+      "metric": "recall@20",
+      "mean_diff": 0.0,
+      "wins": 2,
+      "ties": 54,
+      "losses": 2,
+      "ci95": [
+        -0.0660377358490566,
+        0.05102040816326531
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "mrr",
+      "mean_diff": 0.03930691597347078,
+      "wins": 27,
+      "ties": 14,
+      "losses": 17,
+      "ci95": [
+        -0.01313046467065513,
+        0.08518529550254748
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@5",
+      "mean_diff": 0.05316091954022988,
+      "wins": 9,
+      "ties": 45,
+      "losses": 4,
+      "ci95": [
+        -0.05185272536687632,
+        0.13169634377967696
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@10",
+      "mean_diff": 0.08477011494252873,
+      "wins": 10,
+      "ties": 44,
+      "losses": 4,
+      "ci95": [
+        -0.022366962305986688,
+        0.1640286161412921
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "bm25_wholefile",
+      "b": "bm25_fragment",
+      "label": "Representation effect on BM25",
+      "metric": "recall@20",
+      "mean_diff": 0.08477011494252873,
+      "wins": 10,
+      "ties": 45,
+      "losses": 3,
+      "ci95": [
+        0.007243788819875777,
+        0.1388888888888889
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "mrr",
+      "mean_diff": -0.017888261619075557,
+      "wins": 28,
+      "ties": 9,
+      "losses": 21,
+      "ci95": [
+        -0.04721941782275427,
+        0.024518509812790378
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@5",
+      "mean_diff": 0.0660919540229885,
+      "wins": 11,
+      "ties": 42,
+      "losses": 5,
+      "ci95": [
+        -0.002314814814814816,
+        0.14713610926418438
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@10",
+      "mean_diff": 0.0646551724137931,
+      "wins": 10,
+      "ties": 41,
+      "losses": 7,
+      "ci95": [
+        -0.007579264870931543,
+        0.13580414653784217
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_fragment",
+      "b": "bm25_fragment",
+      "label": "RepoNeedle vs BM25, matched fragment input",
+      "metric": "recall@20",
+      "mean_diff": 0.16666666666666666,
+      "wins": 17,
+      "ties": 37,
+      "losses": 4,
+      "ci95": [
+        0.08609797297297297,
+        0.2518518518518518
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "mrr",
+      "mean_diff": -0.04165916173060611,
+      "wins": 29,
+      "ties": 5,
+      "losses": 24,
+      "ci95": [
+        -0.10948096093751378,
+        0.046604631402151465
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@5",
+      "mean_diff": 0.07327586206896551,
+      "wins": 11,
+      "ties": 43,
+      "losses": 4,
+      "ci95": [
+        -0.017442641910477626,
+        0.20353009259259253
+      ],
+      "excludes_zero": false
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@10",
+      "mean_diff": 0.08045977011494253,
+      "wins": 12,
+      "ties": 38,
+      "losses": 8,
+      "ci95": [
+        0.010822510822510824,
+        0.18269230769230768
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_wholefile",
+      "label": "RepoNeedle vs BM25, matched whole-file input",
+      "metric": "recall@20",
+      "mean_diff": 0.08189655172413791,
+      "wins": 10,
+      "ties": 43,
+      "losses": 5,
+      "ci95": [
+        0.014492753623188406,
+        0.17709297839506158
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "mrr",
+      "mean_diff": 0.07228464947672553,
+      "wins": 44,
+      "ties": 2,
+      "losses": 12,
+      "ci95": [
+        0.03172188015761804,
+        0.13107371202464824
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@5",
+      "mean_diff": 0.23419540229885055,
+      "wins": 19,
+      "ties": 37,
+      "losses": 2,
+      "ci95": [
+        0.10365853658536585,
+        0.3315612071513002
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@10",
+      "mean_diff": 0.28448275862068967,
+      "wins": 24,
+      "ties": 29,
+      "losses": 5,
+      "ci95": [
+        0.17575757575757575,
+        0.4231903792546946
+      ],
+      "excludes_zero": true
+    },
+    {
+      "a": "rn_wholefile",
+      "b": "bm25_chunks",
+      "label": "RepoNeedle whole-file vs official chunk BM25 (different BM25 unit)",
+      "metric": "recall@20",
+      "mean_diff": 0.16235632183908044,
+      "wins": 16,
+      "ties": 38,
+      "losses": 4,
+      "ci95": [
+        0.056961585794655406,
+        0.29259366925064595
+      ],
+      "excludes_zero": true
+    }
+  ]
+}

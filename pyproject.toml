@@ -36,7 +36,10 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.23",
 ]
+# Optional dependencies for the repository's public demonstration API (`api.py` at the repository
+# root; not part of the installed package). Published with 1.1.0; kept for installation compatibility.
 api = [
     "fastapi>=0.115,<1.0",
     "httpx>=0.24",
@@ -46,9 +49,13 @@ hf = [
     "huggingface_hub>=0.20.0",
     "gradio>=4.0.0",
 ]
+mcp = [
+    "mcp>=1.28,<2",
+]
 
 [project.scripts]
 reponeedle = "reponeedle.cli:main"
+reponeedle-mcp = "reponeedle.mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

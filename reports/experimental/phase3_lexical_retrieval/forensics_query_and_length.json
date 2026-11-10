@@ -1,0 +1,77 @@
+{
+  "comment2context": {
+    "n": 46,
+    "json": 46,
+    "rn_tokens_median": 139.0,
+    "arb_tokens_median": 92.5,
+    "unique_ratio_median": 0.4789915966386555,
+    "key_token_share_median": 0.1223021582733813,
+    "numeric_share_median": 0.06546233601354211,
+    "max_term_repeat_median": 7.0,
+    "field_token_share": {
+      "review_comment": 0.344,
+      "diff_hunk_context": 0.242,
+      "pr_title": 0.092,
+      "given_file": 0.079,
+      "path": 0.079,
+      "line": 0.013
+    },
+    "gold_length_percentile_median": 0.8657635467980296,
+    "top10_nongold_len_over_corpus_median": 6.46240648756047
+  },
+  "code2test": {
+    "n": 72,
+    "json": 72,
+    "rn_tokens_median": 204.0,
+    "arb_tokens_median": 135.0,
+    "unique_ratio_median": 0.40603603603603605,
+    "key_token_share_median": 0.05951388888888889,
+    "numeric_share_median": 0.03439886504271182,
+    "max_term_repeat_median": 9.5,
+    "field_token_share": {
+      "pr_body": 0.668,
+      "implementation_files": 0.081,
+      "pr_title": 0.065,
+      "changed_file_summary": 0.06,
+      "changed_file": 0.017,
+      "implementation_file_count": 0.003
+    },
+    "gold_length_percentile_median": 0.8955466071113621,
+    "top10_nongold_len_over_corpus_median": 6.662719683723761
+  },
+  "trace2code": {
+    "n": 14,
+    "json": 14,
+    "rn_tokens_median": 868.0,
+    "arb_tokens_median": 539.5,
+    "unique_ratio_median": 0.20748458626216387,
+    "key_token_share_median": 0.012698446475143736,
+    "numeric_share_median": 0.11391649583517138,
+    "max_term_repeat_median": 58.0,
+    "field_token_share": {
+      "failure_excerpt": 0.918,
+      "command": 0.014,
+      "run_strategy": 0.005,
+      "source_type": 0.005
+    },
+    "gold_length_percentile_median": 0.94818401937046,
+    "top10_nongold_len_over_corpus_median": 8.247719727267324
+  },
+  "edit2ripple": {
+    "n": 34,
+    "json": 34,
+    "rn_tokens_median": 1540.5,
+    "arb_tokens_median": 1020.0,
+    "unique_ratio_median": 0.18102944579428437,
+    "key_token_share_median": 0.005193277225937057,
+    "numeric_share_median": 0.018878626215066828,
+    "max_term_repeat_median": 184.0,
+    "field_token_share": {
+      "anchor_diff": 0.681,
+      "intent": 0.163,
+      "anchor_file": 0.01
+    },
+    "gold_length_percentile_median": 0.8933333333333333,
+    "top10_nongold_len_over_corpus_median": 10.011751061618082
+  }
+}

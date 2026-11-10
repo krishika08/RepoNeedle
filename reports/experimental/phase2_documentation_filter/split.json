@@ -1,0 +1,274 @@
+{
+  "accepted_attempt": 0,
+  "algorithm": "For attempt a = 0, 1, ...: shuffle the sorted repository list with random.Random(f'{seed}:{a}'); test = first 10. Accept the first attempt where, for every task with n repositories, the test count is within +-1 of round(0.4*n) and both splits contain >= 1 repository with that task.",
+  "assignment": {
+    "HypothesisWorks/hypothesis": "dev",
+    "astral-sh/ruff": "test",
+    "caddyserver/caddy": "dev",
+    "clap-rs/clap": "dev",
+    "eslint/eslint": "dev",
+    "etcd-io/etcd": "test",
+    "fastapi/fastapi": "dev",
+    "gin-gonic/gin": "test",
+    "huggingface/diffusers": "dev",
+    "huggingface/transformers": "dev",
+    "ipython/ipython": "dev",
+    "microsoft/playwright": "test",
+    "mockito/mockito": "test",
+    "numpy/numpy": "test",
+    "pallets/click": "test",
+    "pydantic/pydantic": "dev",
+    "pypa/pip": "dev",
+    "pytest-dev/pytest": "test",
+    "python/mypy": "dev",
+    "scrapy/scrapy": "test",
+    "spring-projects/spring-boot": "dev",
+    "tokio-rs/tokio": "dev",
+    "tox-dev/tox": "test",
+    "vitejs/vite": "dev",
+    "vuejs/core": "dev"
+  },
+  "queries_per_task": {
+    "code2test": {
+      "dev": 72,
+      "test": 34
+    },
+    "comment2context": {
+      "dev": 46,
+      "test": 34
+    },
+    "edit2ripple": {
+      "dev": 34,
+      "test": 24
+    },
+    "trace2code": {
+      "dev": 14,
+      "test": 87
+    }
+  },
+  "query_counts_not_used_for_selection": {
+    "HypothesisWorks/hypothesis": {
+      "comment2context": 1
+    },
+    "astral-sh/ruff": {
+      "comment2context": 6
+    },
+    "caddyserver/caddy": {
+      "edit2ripple": 6,
+      "trace2code": 7
+    },
+    "clap-rs/clap": {
+      "code2test": 4,
+      "edit2ripple": 5,
+      "trace2code": 1
+    },
+    "eslint/eslint": {
+      "comment2context": 1
+    },
+    "etcd-io/etcd": {
+      "code2test": 15,
+      "comment2context": 16,
+      "edit2ripple": 6,
+      "trace2code": 4
+    },
+    "fastapi/fastapi": {
+      "code2test": 3
+    },
+    "gin-gonic/gin": {
+      "code2test": 15,
+      "edit2ripple": 17,
+      "trace2code": 56
+    },
+    "huggingface/diffusers": {
+      "code2test": 6,
+      "comment2context": 9,
+      "edit2ripple": 1
+    },
+    "huggingface/transformers": {
+      "code2test": 15,
+      "comment2context": 13,
+      "edit2ripple": 8
+    },
+    "ipython/ipython": {
+      "comment2context": 2
+    },
+    "microsoft/playwright": {
+      "comment2context": 4
+    },
+    "mockito/mockito": {
+      "code2test": 1
+    },
+    "numpy/numpy": {
+      "comment2context": 1
+    },
+    "pallets/click": {
+      "trace2code": 26
+    },
+    "pydantic/pydantic": {
+      "comment2context": 1
+    },
+    "pypa/pip": {
+      "comment2context": 5
+    },
+    "pytest-dev/pytest": {
+      "code2test": 3,
+      "comment2context": 2,
+      "edit2ripple": 1,
+      "trace2code": 1
+    },
+    "python/mypy": {
+      "comment2context": 1
+    },
+    "scrapy/scrapy": {
+      "comment2context": 3
+    },
+    "spring-projects/spring-boot": {
+      "code2test": 5,
+      "edit2ripple": 3
+    },
+    "tokio-rs/tokio": {
+      "code2test": 15,
+      "comment2context": 11,
+      "edit2ripple": 6,
+      "trace2code": 6
+    },
+    "tox-dev/tox": {
+      "comment2context": 2
+    },
+    "vitejs/vite": {
+      "code2test": 19,
+      "comment2context": 1,
+      "edit2ripple": 5
+    },
+    "vuejs/core": {
+      "code2test": 5,
+      "comment2context": 1
+    }
+  },
+  "repositories_per_task": {
+    "code2test": {
+      "dev": 8,
+      "target_test": 5,
+      "test": 4,
+      "total": 12
+    },
+    "comment2context": {
+      "dev": 11,
+      "target_test": 7,
+      "test": 7,
+      "total": 18
+    },
+    "edit2ripple": {
+      "dev": 7,
+      "target_test": 4,
+      "test": 3,
+      "total": 10
+    },
+    "trace2code": {
+      "dev": 3,
+      "target_test": 3,
+      "test": 4,
+      "total": 7
+    }
+  },
+  "seed": "reponeedle-2B-split-v1",
+  "task_coverage": {
+    "HypothesisWorks/hypothesis": [
+      "comment2context"
+    ],
+    "astral-sh/ruff": [
+      "comment2context"
+    ],
+    "caddyserver/caddy": [
+      "edit2ripple",
+      "trace2code"
+    ],
+    "clap-rs/clap": [
+      "code2test",
+      "edit2ripple",
+      "trace2code"
+    ],
+    "eslint/eslint": [
+      "comment2context"
+    ],
+    "etcd-io/etcd": [
+      "code2test",
+      "comment2context",
+      "edit2ripple",
+      "trace2code"
+    ],
+    "fastapi/fastapi": [
+      "code2test"
+    ],
+    "gin-gonic/gin": [
+      "code2test",
+      "edit2ripple",
+      "trace2code"
+    ],
+    "huggingface/diffusers": [
+      "code2test",
+      "comment2context",
+      "edit2ripple"
+    ],
+    "huggingface/transformers": [
+      "code2test",
+      "comment2context",
+      "edit2ripple"
+    ],
+    "ipython/ipython": [
+      "comment2context"
+    ],
+    "microsoft/playwright": [
+      "comment2context"
+    ],
+    "mockito/mockito": [
+      "code2test"
+    ],
+    "numpy/numpy": [
+      "comment2context"
+    ],
+    "pallets/click": [
+      "trace2code"
+    ],
+    "pydantic/pydantic": [
+      "comment2context"
+    ],
+    "pypa/pip": [
+      "comment2context"
+    ],
+    "pytest-dev/pytest": [
+      "code2test",
+      "comment2context",
+      "edit2ripple",
+      "trace2code"
+    ],
+    "python/mypy": [
+      "comment2context"
+    ],
+    "scrapy/scrapy": [
+      "comment2context"
+    ],
+    "spring-projects/spring-boot": [
+      "code2test",
+      "edit2ripple"
+    ],
+    "tokio-rs/tokio": [
+      "code2test",
+      "comment2context",
+      "edit2ripple",
+      "trace2code"
+    ],
+    "tox-dev/tox": [
+      "comment2context"
+    ],
+    "vitejs/vite": [
+      "code2test",
+      "comment2context",
+      "edit2ripple"
+    ],
+    "vuejs/core": [
+      "code2test",
+      "comment2context"
+    ]
+  }
+}

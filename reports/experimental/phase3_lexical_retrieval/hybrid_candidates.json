@@ -1,0 +1,11 @@
+{
+  "candidates": [
+    "L5_no_duplicate_tokens",
+    "L6_json_values_only"
+  ],
+  "combined": true,
+  "combined_config": {
+    "dedupe": true,
+    "json_values_only": true
+  }
+}

@@ -28,8 +28,13 @@ def test_engine_end_to_end_retrieval():
     paths = [f.path for f in res_test.selected_files]
     assert "tests/test_auth.py" in paths
 
-    # 3. Out-of-repo counterfactual query should abstain
-    res_abs = engine.retrieve("Cargo.toml rust tokio async runtime memory leak", budget_tokens=2000)
+    # 3. Out-of-repo counterfactual query should abstain when the experimental heuristic is
+    #    explicitly enabled (opt-in since 1.2.0; see test_abstention_opt_in.py for the default).
+    res_abs = engine.retrieve(
+        "Cargo.toml rust tokio async runtime memory leak",
+        budget_tokens=2000,
+        enable_experimental_abstention=True,
+    )
     assert res_abs.abstained
     assert len(res_abs.selected_files) == 0
 

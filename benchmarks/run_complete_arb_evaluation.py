@@ -67,7 +67,7 @@ from agent_retrieval_bench.baseline import (
 )
 from agent_retrieval_bench.repomap_eval import build_repomap_index, rank_files_for_sample
 from agent_retrieval_bench.bcy_curve import count_tokens, pack_files, CorpusFileCache, load_corpus_manifest
-from reponeedle.models import FileDoc, TaskType
+from reponeedle.models import FileDoc, TaskType, BudgetConfig
 from reponeedle.engine import RepoNeedleEngine
 
 
@@ -494,7 +494,12 @@ def run_full_evaluation():
         else:
             docs = [FileDoc(path=f"{repo}/src/main.py", content=f"# {repo} main module")]
 
-        engine = RepoNeedleEngine.from_documents(docs)
+        # Abstention policy (1.2.0+): this phase measures the experimental abstention heuristic, so
+        # it is enabled explicitly (default threshold 0.12, unchanged). Phase 1 (positive retrieval)
+        # uses the 1.2 default (disabled). See docs/BENCHMARK_CONFIGURATION.md.
+        engine = RepoNeedleEngine.from_documents(
+            docs, budget_config=BudgetConfig(enable_experimental_abstention=True)
+        )
 
         for s in needed_sel:
             sample_id = s["id"]

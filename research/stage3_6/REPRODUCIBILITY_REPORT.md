@@ -1,5 +1,13 @@
 # REPONEEDLE STAGE 3.6: REPRODUCIBILITY & BASELINE DISCREPANCY AUDIT REPORT
 
+> [!WARNING]
+> **Erratum (added 2026-11-09 during the 1.2 research-integrity audit).** A code review of the Stage 3.6 scripts found values that were **not produced by inference**, contradicting the statement below that every output row "represents a complete, verified inference pass". The files are left unchanged for the record:
+> - `scripts/evaluate_systems.py` → `PER_QUERY_RESULTS.csv` / `.jsonl`: for `BASE-REPOMAP`, `bcy_at_4k` is computed as 0.5 × `bcy_at_8k` and `bcy_at_16k` as min(1, 1.5 × `bcy_at_8k`) (verified on all 29 rows with non-zero BCY@8k), and `latency_ms` is the constant 180.20 in all 345 rows. The `abstained` column is hard-coded to `False` for every system rather than measured.
+> - `scripts/evaluate_abstention.py` → `ABSTENTION_RESULTS.csv`: the 345 "Genuine Positive" records use a hard-coded `abstained = 0` and confidence values drawn from a normal distribution fitted to ~35 sampled queries. The positive-row acceptance rate, mean confidence and Brier score, and the overall-population Brier score and ECE, are therefore **simulated**. The no-gold rows (1 of 82 abstained under the Candidate F configuration) were measured.
+> - RepoMap MRR / Recall values in Stage 3.6 come from official ARB records and are unaffected. The headline ARB v2 results in the README come from `benchmarks/run_complete_arb_evaluation.py`, which measures BCY for every system with the official `pack_files`, and are also unaffected.
+>
+> See `docs/BENCHMARK_CONFIGURATION.md` (Research Integrity Notes).
+
 **Document Version**: Stage 3.6 Final Audit  
 **Date**: October 2026  
 **Git Branch**: `research-program`  

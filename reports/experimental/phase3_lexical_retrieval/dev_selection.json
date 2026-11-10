@@ -1,0 +1,19 @@
+{
+  "selected_arm": "H_C_combined",
+  "dev_supported": false,
+  "eligible": [
+    {
+      "arm": "H_L5_no_duplicate_tokens",
+      "c2c_recall20_gain": 0.02898550724637681
+    },
+    {
+      "arm": "H_C_combined",
+      "c2c_recall20_gain": 0.05072463768115942
+    }
+  ],
+  "selected_config": {
+    "dedupe": true,
+    "json_values_only": true
+  },
+  "note": "development evidence only (previously used development repositories); not confirmatory"
+}

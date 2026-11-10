@@ -1,0 +1,13 @@
+[
+  {
+    "sample_id": "9151d23c9630aed754b3355b",
+    "task": "trace2code",
+    "repo": "gin-gonic/gin",
+    "gold": "context.go",
+    "gold_is_doc": false,
+    "rank_off": 11,
+    "rank_on": 10,
+    "lost_top20": false,
+    "lost_packed": true
+  }
+]

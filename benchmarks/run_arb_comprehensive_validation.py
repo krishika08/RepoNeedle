@@ -153,7 +153,10 @@ def run_reponeedle_variant(
             is_test = "test" in path.lower()
             docs.append(FileDoc(path=path, content=text, is_test=is_test))
 
-        engine = RepoNeedleEngine.from_documents(docs)
+        # Explicit opt-in (1.2.0+) preserves the historical evaluation semantics.
+        engine = RepoNeedleEngine.from_documents(
+            docs, budget_config=BudgetConfig(enable_experimental_abstention=True)
+        )
 
         # Apply ablation modifications
         raw_task = sample.get("task_type", "auto")
@@ -435,7 +438,10 @@ def evaluate_abstention_pilot() -> Dict[str, Any]:
             # Fallback: synthesize dummy candidate from repo name
             docs = [FileDoc(path=f"{repo}/src/main.py", content=f"# {repo} main module")]
 
-        engine = RepoNeedleEngine.from_documents(docs)
+        # Explicit opt-in (1.2.0+): this selective evaluation measures the experimental heuristic.
+        engine = RepoNeedleEngine.from_documents(
+            docs, budget_config=BudgetConfig(enable_experimental_abstention=True)
+        )
         res = engine.retrieve(query=q_text, budget_tokens=8000)
 
         should_abstain = res.abstained

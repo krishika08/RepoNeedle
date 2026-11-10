@@ -72,7 +72,12 @@ class AblationEngine:
         self.disable_abstainer = disable_abstainer
         self.disable_skeletons = disable_skeletons
 
-        config = BudgetConfig(max_tokens=4000, allow_skeletons=not disable_skeletons)
+        # Explicit opt-in (1.2.0+): the "abstainer" ablation factor measures the experimental heuristic.
+        config = BudgetConfig(
+            max_tokens=4000,
+            allow_skeletons=not disable_skeletons,
+            enable_experimental_abstention=True,
+        )
         self.engine = RepoNeedleEngine.from_documents(docs, budget_config=config)
 
     def retrieve(self, sample: BenchmarkSample, budget_tokens: int = 4000):

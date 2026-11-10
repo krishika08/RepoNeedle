@@ -1,0 +1,50 @@
+{
+  "milestone": "2C lexical retrieval forensics and dev-only optimisation (EXPERIMENTAL; not an official ARB score)",
+  "data": "Milestone 2B DEVELOPMENT repositories only (previously used development data); 2B held-out repositories excluded",
+  "phase2_split_sha256": "6b8b0322ef70d5ffbd072c8a10d7b0154bc166dc3650df85c1cb30a154ba5bb4",
+  "framework": "Phase 1 product-aligned evaluation: whole-file input, file unit, full ranking",
+  "variants": {
+    "L0_baseline": {},
+    "L1_path_weight_1.0": {
+      "path_weight": 1.0
+    },
+    "L2_b_0.4": {
+      "b": 0.4
+    },
+    "L3_b_0.9": {
+      "b": 0.9
+    },
+    "L4_query_term_frequency": {
+      "query_tf": true
+    },
+    "L5_no_duplicate_tokens": {
+      "dedupe": true
+    },
+    "L6_json_values_only": {
+      "json_values_only": true
+    }
+  },
+  "variant_semantics": {
+    "path_weight / b": "existing BM25Index constructor parameters",
+    "query_tf": "multiply each query term's BM25 contribution by its query count (ARB BM25 behaviour)",
+    "dedupe": "emit each token at most once per source word (current tokenizer emits plain words twice: raw form and identical piece)",
+    "json_values_only": "if the query parses as a JSON object, score only its leaf values (key names dropped); otherwise unchanged"
+  },
+  "diagnostics": {
+    "D_path_field_only": {
+      "body_weight": 0.0
+    },
+    "D_body_field_only": {
+      "path_weight": 0.0
+    }
+  },
+  "stage1_rule": "Lexical-only, dev. A variant is a hybrid candidate if its dev mean (variant - L0) comment2context Recall@20 is > 0 and its dev mean for MRR and Recall@20 of every task is >= -0.02. At most the 3 candidates with the largest comment2context Recall@20 gain go to stage 2, plus 'C_combined' = all candidates applied together when >= 2 qualify.",
+  "stage2_rule": "Full hybrid, dev. Select the arm with the largest dev mean comment2context Recall@20 gain over the hybrid baseline among arms whose dev mean MRR and Recall@20 for every task (and comment2context MRR) is >= -0.02. The selection is 'dev-supported' only if its repository-clustered 95% CI for comment2context Recall@20 excludes zero (positive). If no arm is dev-supported, no default change is made; any implementation stays opt-in.",
+  "bootstrap": {
+    "type": "paired, repository-clustered percentile",
+    "resamples": 10000,
+    "seed": 20261109
+  },
+  "confirmatory_requirement": "Fresh repositories disjoint from all 25 ARB v2 repositories, independently labelled, covering all four tasks, split at repository level with a recorded hash, protocol registered before treatment results. If unavailable: no confirmatory claim (INCONCLUSIVE).",
+  "registered_at": "2026-11-09T19:47:28"
+}

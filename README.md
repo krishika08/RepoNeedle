@@ -9,11 +9,96 @@
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support%20RepoNeedle-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/krishika.x)
 
-**RepoNeedle** is an open-source, token-budget-aware repository context retrieval system designed to help AI coding agents discover the most critical files for a coding task under strict context-token constraints.
+**RepoNeedle finds the files an AI coding agent needs for a task, and packs them into a token budget you choose.**
+
+Give it a bug report, an error traceback, or a request like "find the tests for `SessionManager`", and it returns a ranked selection of files, focused code spans and structural outlines that fits inside the context window you specify. It runs locally on your CPU, with no GPU, API key, model download or network access.
 
 ---
 
-## ⚡ The Upstream Context Problem in AI Coding
+## 💡 Why RepoNeedle?
+
+- **Agents cannot read a whole repository.** Coding agents (Claude Code, Cursor, Aider, and others) have to decide which files to load into a limited context window. Loading too much wastes tokens and money and buries the relevant code; loading too little misses it.
+- **File size matters as much as relevance.** A search that ignores file size can spend an entire 4,000-token budget on one large file. RepoNeedle scores files by relevance *per token* and falls back to focused spans or signatures-only outlines when a full file does not fit. It never exceeds the budget, as measured by its own token model.
+- **Different tasks need different files.** A traceback points at specific frames, a "write tests" request needs test files, and a refactor needs dependent modules. RepoNeedle adapts its ranking to the kind of task.
+- **CPU-first and local.** It is plain Python (NumPy, SciPy, NetworkX), so it runs on laptops and CI machines, keeps your code on your machine, and needs no model weights.
+
+RepoNeedle is a research-oriented project: its benchmark results, including where it does **not** beat simpler baselines, are documented in detail [below](#-benchmark-validation) and in [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
+
+---
+
+## 📌 Release Status
+
+| Feature | 1.1.0 (released, PyPI) | Development branch (planned 1.2.0, **unreleased**) |
+| :--- | :---: | :---: |
+| CPU-first execution | ✅ | ✅ |
+| Python 3.10, 3.11, 3.12 | ✅ | ✅ |
+| Python API with five rankers (`legacy`, `bm25`, `arm101`, `cascade`, `change_impact`) | ✅ | ✅ |
+| CLI with Rich output (`--ranker`, `--task`, `--mode`, `--output-file`) | ✅ | ✅ |
+| CLI JSON output (`--json`) | — | ✅ |
+| CLI anchor files (`--anchors`) | — | ✅ |
+| MCP server over STDIO (`reponeedle-mcp`) | — | ✅ (protocol-tested; not yet validated in a live Claude Code / Cursor session) |
+| Selective abstention heuristic (experimental, uncalibrated) | Always on | **Disabled by default**, opt-in |
+| Indexing diagnostics & configurable file-size limit | — (fixed 500 KB limit, skipped files not reported) | ✅ |
+| Persistent index cache | Not implemented | Not implemented |
+| Automatic live filesystem updates | Not implemented | Not implemented |
+| HTTP / SSE MCP transport | Not implemented | Not implemented |
+| AST block slicing of large files | Not implemented | Not implemented |
+
+Features marked for the development branch require installing from source (see below) until 1.2.0 is published.
+
+---
+
+## 🚀 Quickstart
+
+### 1. Install
+
+```bash
+# Released version (1.1.0) from PyPI
+pip install reponeedle
+
+# Development branch: adds --json, --anchors, the MCP server and indexing diagnostics
+git clone https://github.com/krishika08/RepoNeedle.git
+cd RepoNeedle
+pip install -e .            # core
+pip install -e ".[mcp]"     # core + MCP server
+```
+
+### 2. Try the CLI
+
+```bash
+# Rank and pack context for a task (works with 1.1.0 and the development branch)
+reponeedle "where is the session cookie saved?" --repo ./my-project --budget 4000
+
+# Development branch: machine-readable JSON for scripts and agents
+reponeedle "fix token expiration in auth" --repo ./my-project --json
+```
+
+### 3. Use it from Python
+
+```python
+from reponeedle import RepoNeedleEngine
+
+engine = RepoNeedleEngine.from_directory("./my-project")
+result = engine.retrieve("Fix the session timeout bug", budget_tokens=4000)
+
+for f in result.selected_files:
+    print(f.path, f.tier.value, f.token_count)
+
+prompt_context = result.rendered_context   # ready-to-paste markdown for an LLM
+```
+
+### 4. Connect an MCP client (development branch)
+
+```bash
+pip install -e ".[mcp]"
+claude mcp add reponeedle -- python -m reponeedle.mcp --repo /absolute/path/to/your/project
+```
+
+The server exposes `reponeedle_retrieve`, `reponeedle_change_impact` and `reponeedle_inspect`. See the [MCP Integration Guide](docs/MCP_INTEGRATION.md) for Cursor and other clients. The server is tested at the protocol level (MCP Python SDK and a JSON-RPC STDIO handshake); it has not yet been validated in a live Claude Code or Cursor session.
+
+---
+
+## 🧩 How It Works (Technical Overview)
 
 Autonomous coding agents (e.g., Claude Code, Aider, OpenHands, Cline) face a severe upstream bottleneck: **Context Acquisition**.
 
@@ -27,15 +112,227 @@ RepoNeedle solves this upstream bottleneck by combining:
 1. **Multi-Signal Hybrid Scoring**: Field-weighted BM25 + Subword Semantic Vectors + AST Repository Graph Centrality.
 2. **Workflow-Adaptive Routing**: Automatic classification of query intent (`trace2code`, `code2test`, `edit2ripple`, `comment2context`, `selective`) with dynamic weight tuning.
 3. **Inverted Test-to-Target Mapping**: Dependency graph inversion and naming convention heuristics to locate regression test suites.
-4. **Calibrated Selective Abstention**: Peak-to-noise ($Z$-score) and repository symbol overlap gating to abstain from returning noise on counterfactual tasks.
+4. **Experimental Selective Abstention (opt-in, disabled by default)**: Peak-to-noise ($Z$-score), score-margin and repository symbol overlap heuristic that can abstain on out-of-scope queries. It is **not production-calibrated** (0/82 correct abstentions on the ARB v2 selective split; see Part B) and must be explicitly enabled.
 5. **CUD-Pack (Capacity-Sensitive Utility-Density Packing)**: Adaptive knapsack selection engine providing strict zero downstream overflows ($C_{\text{actual}} \le B_{\text{configured}}$) according to RepoNeedle's regex code token model across dual modes: **Compact Mode** ($\le 4\text{k}$ tokens, extracting high-density implementation spans and structural skeletons) and **Complete Context Mode** ($\ge 8\text{k}$ tokens, preserving whole source files).
 6. **Change-Impact Ranking Engine (V1.1 Opt-in)**: Seed-relative relationship scoring (evaluating static imports, symbol definitions, call sites, build manifests (`setup.py`, `setup.cfg`, `pyproject.toml`, `cargo.toml`, `package.json`, `go.mod`, `pom.xml`), test-stems, and directory proximity) designed for bug fixing and refactoring tasks.
+
+---
+
+## 📖 Usage Guide
+
+RepoNeedle is self-contained and requires standard Python dependencies (`numpy`, `scipy`, `networkx`, `pydantic`, `pathspec`, `rich`, and `tomli` on Python < 3.11).
+
+### 1. Installation Details
+
+| What you need | Command |
+| :--- | :--- |
+| Released 1.1.0 (Python API, Rich CLI) | `pip install reponeedle` |
+| Development branch (adds `--json`, `--anchors`, indexing diagnostics) | `pip install -e .` (from a clone) |
+| Development branch + MCP server | `pip install -e ".[mcp]"` |
+| Test and development tools | `pip install -e ".[dev]"` |
+
+> [!NOTE]
+> `pip install "reponeedle[mcp]"` from PyPI currently installs 1.1.0, which does not include the MCP server. Install from source for MCP support until 1.2.0 is published.
+
+> [!TIP]
+> On Python 3.10, `tomli>=2.0.1` is automatically installed via conditional dependency. On Python 3.11 and 3.12, native standard library `tomllib` is used with zero extra dependencies.
+
+---
+
+### 2. Python API
+
+#### Standard Retrieval (Default Legacy Ranker):
+```python
+from reponeedle import RepoNeedleEngine, BudgetConfig
+
+# 1. Initialize engine on a local codebase (uses default 'legacy' ranker)
+engine = RepoNeedleEngine.from_directory(
+    repo_dir="./my-project",
+    budget_config=BudgetConfig(max_tokens=4000, allow_skeletons=True, mode="auto"),
+)
+
+# 2. Retrieve context for a task (auto-resolves to compact mode for <= 4k)
+result = engine.retrieve(
+    query="Add support for blueprint url_prefix inheritance in route registration",
+    budget_tokens=4000,
+)
+
+if result.abstained:
+    print(f"Abstained: {result.explanation}")
+else:
+    print(f"Retrieved {len(result.selected_files)} files ({result.total_tokens} / {result.budget_tokens} tokens):")
+    for f in result.selected_files:
+        print(f"[{f.tier.value.upper()}] {f.path} (score: {f.score:.3f}, tokens: {f.token_count})")
+
+    # Access the exact fenced-markdown serialized prompt ready for LLM consumption:
+    llm_prompt_context = result.rendered_context
+```
+
+> [!NOTE]
+> With default settings `result.abstained` is `True` only for an empty repository (no candidate files). Heuristic out-of-scope abstention is opt-in; see below.
+
+#### Experimental Abstention (Opt-In)
+
+> [!WARNING]
+> **Behavior change on the development branch (planned 1.2.0, unreleased)**: the selective abstention heuristic is **disabled by default**. In released 1.1.x it runs on every query. Because it is not production-calibrated (0 of 82 negative samples correctly abstained on the ARB v2 selective split), leaving it on gave a misleading impression that out-of-scope queries were being filtered. With it disabled, retrieval always returns ranked results (except for an empty repository) and **out-of-scope queries are not detected**. If you relied on the 1.1.x behavior, opt in explicitly as shown below.
+
+```python
+from reponeedle import RepoNeedleEngine, BudgetConfig, TaskType
+
+# Engine-wide opt-in (abstention_threshold keeps working as before)
+engine = RepoNeedleEngine.from_directory(
+    repo_dir="./my-project",
+    budget_config=BudgetConfig(enable_experimental_abstention=True, abstention_threshold=0.12),
+)
+
+# ...or per call, overriding the engine setting in either direction
+result = engine.retrieve("Cargo.toml tokio runtime leak", enable_experimental_abstention=True)
+
+print(result.abstained)               # decided by the heuristic only because we opted in
+print(result.abstention.status)       # "disabled" | "evaluated" | "empty_repository"
+print(result.abstention.experimental) # always True
+print(result.abstention.calibrated)   # always False
+```
+
+- **`TaskType.SELECTIVE` does not enable abstention.** Selecting the `selective` task only changes routing weights; the opt-in flag is the only switch.
+- `confidence_score` is still computed with the unchanged heuristic formula for every result. It is an **uncalibrated signal**, not a probability that the answer is in the repository.
+- Empty repositories always return `abstained=True` (`abstention.status == "empty_repository"`), independent of the flag, because there is nothing to return.
+
+#### Confidence Scores Are Diagnostic, Not Probabilities
+
+`RetrievalResult.confidence_score` (also reported by the CLI `--json` output and the MCP `reponeedle_retrieve` tool) is the raw output of the experimental abstention heuristic: a weighted mix of vocabulary overlap, score peakiness and score margin.
+
+- It is **not calibrated** and is **not** a probability that the repository contains the answer. On the ARB v2 no-gold queries it was 0.53–0.89, overlapping the values seen on in-scope queries.
+- It is computed on every query, whether or not abstention is enabled, so its value does not depend on the opt-in flag.
+- With abstention disabled (the development-branch default), it **never** prevents normal retrieval.
+- Whether the heuristic was applied is reported explicitly in `result.abstention` (`enabled`, `status`, `experimental: true`, `calibrated: false`) in the Python API, in the `abstention` object of CLI `--json` output, and in the MCP retrieve response.
+
+Do not use `confidence_score` to decide whether an answer exists in the repository.
+
+#### Indexing Limits & Diagnostics
+
+`from_directory` skips files **strictly larger** than `max_file_size_bytes` (default `500_000`; a file exactly at the limit is indexed). Skipped files are never silently dropped: they are recorded in `engine.indexing_diagnostics` and summarized by a `WARNING` on the `reponeedle.engine` logger (stderr by default). Diagnostics contain repository-relative paths and counts only, never file contents.
+
+```python
+from reponeedle import RepoNeedleEngine
+
+engine = RepoNeedleEngine.from_directory("./my-project", max_file_size_bytes=1_000_000)
+
+diag = engine.indexing_diagnostics
+print(diag.indexed_files, diag.skipped_large_files, diag.max_file_size_bytes)
+print(diag.skipped_paths)      # e.g. ["generated/large_module.py", "vendor/huge_source.cpp"]
+print(diag.unreadable_paths)   # files that could not be read
+print(diag.symlink_outside_repository_paths)  # links resolving outside the repo (target never read)
+print(diag.max_files_reached)  # True if indexing stopped at max_files (default 3000)
+```
+
+`max_file_size_bytes` must be a positive integer: `0` and negative values raise `ValueError`, non-integers raise `TypeError`. The default is unchanged and is never raised automatically. Only files with a supported extension and not excluded by ignore rules (`.gitignore` and the built-in patterns) are counted.
+
+#### Opt-In: Seed-Based Change-Impact Retrieval:
+```python
+from reponeedle import RepoNeedleEngine, Query
+
+# Initialize engine with Change-Impact ranking
+engine = RepoNeedleEngine.from_directory(
+    repo_dir="./my-project",
+    ranker="change_impact",
+)
+
+# Populate anchor_files with the seed path to activate relationship scoring
+query = Query(
+    text="Fix authentication session expiration",
+    anchor_files=["auth/session.py"],
+    budget_tokens=4000,
+)
+
+result = engine.retrieve(query)
+
+for f in result.selected_files:
+    print(f"[{f.tier.value.upper()}] {f.path} (score: {f.score:.3f}, tokens: {f.token_count})")
+    if f.explanation:
+        print(f"       Attribution: {f.explanation}")
+```
+
+> [!NOTE]
+> **Behavior of Plain-String (Seedless) Change-Impact Queries**:
+> The Change-Impact ranking engine reads seed file paths from `query.anchor_files`. When `engine.retrieve()` is called with a plain string query (or without `anchor_files`):
+> - **Lexical and semantic scoring remain active**: Candidate files continue to be retrieved and scored using combined BM25 lexical matching and subword semantic retrieval.
+> - **Seed suppression is inactive without `anchor_files`**: Seed File Suppression (SFS) is not triggered since there are no designated seed files to down-weight.
+> - **Seed-relative relationship boosts are inactive without `anchor_files`**: Relationship scoring across dependencies (static imports, symbols, calls, build manifests, test-stems, and directory proximity) is skipped.
+> - **Test Intent Prior adjustments remain available according to detected query intent**: Test files receive boosts or penalties (`tip_multiplier_test` / `tip_multiplier_non_test`) based on detected test intent in the query text.
+>
+> To activate seed-relative relationship boosts and seed suppression, pass seed paths via `Query(text=..., anchor_files=['path/to/seed.py'])`.
+
+---
+
+### 3. Command Line Interface (CLI)
+
+```bash
+# Default 'legacy' retrieval under a 4000 token limit
+reponeedle "Fix AttributeError in SecureCookieSessionInterface cookie saving" --repo ./flask --budget 4000
+
+# Seed-based Change-Impact retrieval with anchor files
+reponeedle "Assess session timeout refactor" --repo ./my-project --ranker change_impact --anchors auth/session.py --budget 4000
+
+# Machine-readable JSON output for AI agent pipelines
+reponeedle "Fix authentication expiration" --repo ./my-project --json
+
+# Task-conditioned retrieval for finding regression tests
+reponeedle "test suite for HTTPBasicAuth" --repo ./requests --task code2test --budget 2000
+
+# Serialize packaged markdown directly to a file
+reponeedle "blueprints and route registration" --repo ./flask --budget 4000 --output-file prompt.md
+
+# Opt in to the EXPERIMENTAL (uncalibrated) abstention heuristic
+reponeedle "tokio runtime leak" --repo ./flask --json --enable-experimental-abstention
+
+# Raise the per-file size limit (default 500000 bytes); skipped files are reported
+reponeedle "parser entry point" --repo ./my-project --json --max-file-size-bytes 1000000
+```
+
+- `--task selective` does **not** enable abstention; only `--enable-experimental-abstention` does.
+- With `--json`, stdout is strictly one JSON document. It contains an `abstention` object (`enabled`, `status`, `experimental`, `calibrated`, `threshold`, `reason`) and an `indexing` object (`indexed_files`, `skipped_large_files`, `skipped_paths`, `max_file_size_bytes`, `unreadable_paths`, …). Warnings about skipped files go to **stderr** only.
+- Without `--json`, a yellow "Indexing notice" listing skipped paths is printed to **stderr**.
+- An invalid `--max-file-size-bytes` (zero or negative) exits with code `1` and an error on stderr.
+
+---
+
+### 4. Model Context Protocol (MCP) Server
+
+*Development branch only (planned 1.2.0; install with `pip install -e ".[mcp]"`).* RepoNeedle includes a local **MCP server** that lets MCP-capable coding agents call it over STDIO. It is tested with the MCP Python SDK and a JSON-RPC STDIO handshake; it has not yet been validated in a live Claude Code, Cursor, Cline or Windsurf session.
+
+```bash
+# Launch the MCP server pointing to your project
+reponeedle-mcp --repo /absolute/path/to/project --budget 4000
+
+# Or via Python module
+python -m reponeedle.mcp --repo /absolute/path/to/project
+```
+
+#### Supported MCP Tools:
+- `reponeedle_retrieve`: Retrieves ranked source files, focus spans, and structural skeletons packed strictly within the token budget.
+- `reponeedle_change_impact`: Analyzes modified anchor files to discover downstream affected modules and regression test suites using Seed File Suppression (SFS).
+- `reponeedle_inspect`: Returns repository metadata, indexed file counts, sample paths, active engine configuration, **indexing diagnostics** (files skipped for exceeding `--max-file-size-bytes` or being unreadable) and the experimental abstention status, without dumping file contents.
+
+`reponeedle_retrieve` accepts an optional `enable_experimental_abstention` boolean (default `false`). The server's file-size limit is set at launch with `--max-file-size-bytes`.
+
+For client configuration examples (Claude Code, Cursor), see the [MCP Integration Guide](docs/MCP_INTEGRATION.md).
 
 ---
 
 ## 📊 Benchmark Validation
 
 To maintain strict scientific integrity, **Official External Benchmark Results** are reported separately from **Independent Research Evaluations**. Dataset sizes, query counts ($N$), candidate pool properties, and evaluation methodologies are explicitly documented for every measurement.
+
+> [!IMPORTANT]
+> **Which engine these numbers describe.** Parts A–C and the latency table in Part D come from the ARB v2 run of 2026-10-28, made with the engine at commit `8e00425` (tag `v0.1.0-baseline`); that code reproduced the published per-query records exactly on every query checked (all 82 selective and 53 of 345 positive queries). Engine changes made before the 1.1.0 release altered RepoNeedle's rankings, so these results do **not** describe released 1.1.0. The current engine (1.1.0, identical to the development branch) was re-measured on the same ARB v2 positive split on 2026-11-09:
+>
+> | ARB v2 positive (N=345) | MRR | Recall@5 | Recall@10 | Recall@20 | BCY@4k | BCY@8k |
+> | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+> | **RepoNeedle, current engine (1.1.0)** | **0.2153** | **0.3032** | **0.3677** | **0.3842** | **0.2400** | **0.3443** |
+> | RepoNeedle, 2026-10-28 engine (Part A) | 0.2287 | 0.3011 | 0.4110 | 0.4279 | 0.2436 | 0.3450 |
+>
+> The qualitative conclusions below still hold for the current engine: significantly higher MRR than BM25 (+0.0633, repository-clustered 95% CI [+0.0111, +0.0980]) and Lexical, parity with RepoMap on MRR, much lower deep recall than RepoMap, the strongest `code2test` MRR, and a `comment2context` deficit against BM25 (−16.0%). The current engine is somewhat weaker than the 2026-10-28 engine (MRR −0.0134, CI excludes zero). Full tables, per-task results and method: [docs/BENCHMARK_CONFIGURATION.md](docs/BENCHMARK_CONFIGURATION.md#73-current-engine-re-measurement-arb-v2-positive-n345).
 
 ---
 
@@ -66,6 +363,9 @@ Evaluated with **10,000 bootstrap resamples** (repository-clustered bootstrap ac
 
 > [!IMPORTANT]
 > **Scientific Disclosure on RepoMap Comparison**: RepoNeedle does **NOT** achieve statistically significant overall superiority over RepoMap on MRR ($p = 0.4089$, repository-clustered 95% CI crosses zero: `[-0.0466, +0.0619]`). Furthermore, **RepoMap achieves substantially higher deep recall** (Recall@20: `0.6306` vs `0.4279`, a +47.4% relative advantage for RepoMap) and higher BCY@8k (`0.3788` vs `0.3450`, +9.8% relative advantage). RepoNeedle demonstrates a focused advantage under strict low-token budgets (BCY@4k: `0.2436` vs `0.2024`, +20.4% relative advantage) and specialized regression test discovery (`code2test`).
+
+> [!NOTE]
+> **Lexical comparison caveat**: The RepoNeedle vs Lexical difference is significant under the paired $t$-test and the repository-clustered bootstrap, but **not** under the Wilcoxon signed-rank test ($p = 0.1215$), and RepoNeedle wins fewer individual queries than it loses (133 / 29 / 183). The mean gain comes from a smaller number of large wins.
 
 #### Per-Task Track Breakdown ($N=345$ Positive Samples)
 
@@ -108,8 +408,9 @@ Evaluated on the complete official Agent Retrieval Bench Selective Retrieval spl
 
 > [!CAUTION]
 > **Heuristic Abstention Failure Analysis**: In production benchmark conditions, RepoNeedle's heuristic confidence gating ($Z$-score + repository symbol overlap) achieved **0% abstention accuracy (0/82)**. 
-> - *Root Cause*: Heuristic confidence scores ranged between `0.64` and `0.86`, far exceeding the default threshold (`0.12` / `0.38`). Natural GitHub issue descriptions filed against a repository inherently contain valid repository vocabulary. Counterfactual queries similarly contain ubiquitous software engineering terminology (`error`, `parse`, `client`, `handler`).
+> - *Root Cause*: Heuristic confidence on the 82 no-gold queries ranged from `0.532` to `0.891` (5th–95th percentile `0.635`–`0.851`), far above the engine's default threshold of `0.12`. Natural GitHub issue descriptions filed against a repository inherently contain valid repository vocabulary. Counterfactual queries similarly contain ubiquitous software engineering terminology (`error`, `parse`, `client`, `handler`).
 > - *Recommendation*: Heuristic score thresholds are insufficient for reliable abstention in large codebases. Selective retrieval requires a dedicated, trained neural discriminator rather than surface lexical statistics.
+> - *Consequence*: In released 1.1.0 the heuristic is always on. On the development branch (planned 1.2.0, unreleased) it is **disabled by default** and only applied when explicitly enabled. See [Experimental Abstention](#experimental-abstention-opt-in).
 
 ---
 
@@ -159,7 +460,8 @@ Empirically measured across the full Agent Retrieval Bench evaluation suite:
 ### Part E: System Architecture & Deployment Status
 
 - **CPU Native Architecture**: RepoNeedle runs entirely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
-- **Release Status**: **V1.1.0 source integrated on main; formal release publication pending.** Features default `legacy` ranker with backwards-compatible contract preservation, and opt-in `change_impact` ranking engine for seed-relative relationship scoring.
+- **Release Status**: **1.1.0 is published on PyPI (2026-11-03)**, with the default `legacy` ranker and the opt-in `change_impact` ranker. The development branch adds the features listed in [Release Status](#-release-status) and is planned for 1.2.0; it is **not yet released**.
+- **Abstention during these evaluations**: Parts A–C, the Part D latency table and Part F were measured with code in which the abstention heuristic was always on. A full re-run on ARB v2 (2026-11-09) verified that the heuristic would abstain on **0 of 345** positive queries and that selected files are identical with and without it, so the new opt-in default does not change any ARB v2 result. See [docs/BENCHMARK_CONFIGURATION.md](docs/BENCHMARK_CONFIGURATION.md).
 
 ---
 
@@ -185,113 +487,25 @@ Statistical inference was conducted using **repository-clustered statistical mod
 
 ---
 
-## 🚀 Quickstart & Installation
+### Part G: Supplemental Product-Aligned Evaluation (Not an Official ARB Score)
 
-RepoNeedle is self-contained and requires standard Python dependencies (`numpy`, `scipy`, `networkx`, `pydantic`, `pathspec`, `rich`, and `tomli` on Python < 3.11).
+> [!WARNING]
+> **Supplemental evaluation, separate from the official results above.** Parts A–C are official ARB v2 harness results. This part uses a supplemental evaluator to answer a different question: how good is RepoNeedle's **actual full ranking** when it reads **whole files**, as it does in real use?
 
-### 1. Installation
+The official harness gives RepoNeedle a single fragment per file (while its BM25 baseline ranks every chunk) and scores files RepoNeedle did not pack in corpus order. The supplemental evaluation (2026-11-09, current engine) instead ranks **files** for every system and compares RepoNeedle and BM25 on the **same** input representation. It reports full-ranking metrics without remainder positions, and packed-context coverage separately.
 
-```bash
-# Clone the verified repository
-git clone https://github.com/krishika08/RepoNeedle.git
-cd RepoNeedle
+| ARB v2 positive (345 queries, 25 repositories), file-level full ranking | MRR | Recall@5 | Recall@10 | Recall@20 |
+| :--- | :---: | :---: | :---: | :---: |
+| RepoNeedle, whole-file input | 0.2789 | 0.4270 | 0.5862 | 0.7042 |
+| BM25, whole-file input | 0.1717 | 0.2290 | 0.3498 | 0.5138 |
+| RepoNeedle, fragment input (official harness input) | 0.2379 | 0.3061 | 0.4407 | 0.5803 |
+| BM25, fragment input | 0.1439 | 0.1650 | 0.2389 | 0.3604 |
 
-# Install package in editable mode
-pip install -e .
+- **Matched whole-file input, overall**: RepoNeedle − BM25 = MRR +0.1073 (repository-clustered 95% CI [+0.0647, +0.1596]); Recall@20 +0.1904 [+0.1114, +0.2715].
+- **By task**: significantly better on `code2test` (every metric) and on `edit2ripple` Recall@10/20. Inconclusive on `trace2code` (only 7 repositories). On `comment2context`, level on MRR but **significantly worse on Recall@20** (−0.0896 [−0.1779, −0.0056]).
+- **Packed context** (8,000 tokens): gold-file coverage rises from 38.3% (fragments) to 59.8% (whole files); queries with at least one gold file packed rise from 45.8% to 68.4%.
 
-# Or install with development and test dependencies
-pip install -e ".[dev]"
-```
-
-> [!TIP]
-> On Python 3.10, `tomli>=2.0.1` is automatically installed via conditional dependency. On Python 3.11 and 3.12, native standard library `tomllib` is used with zero extra dependencies.
-
----
-
-### 2. Python API
-
-#### Standard Retrieval (Default Legacy Ranker):
-```python
-from reponeedle import RepoNeedleEngine, BudgetConfig
-
-# 1. Initialize engine on a local codebase (uses default 'legacy' ranker)
-engine = RepoNeedleEngine.from_directory(
-    repo_dir="./my-project",
-    budget_config=BudgetConfig(max_tokens=4000, allow_skeletons=True, mode="auto"),
-)
-
-# 2. Retrieve context for a task (auto-resolves to compact mode for <= 4k)
-result = engine.retrieve(
-    query="Add support for blueprint url_prefix inheritance in route registration",
-    budget_tokens=4000,
-)
-
-if result.abstained:
-    print(f"Abstained: {result.explanation}")
-else:
-    print(f"Retrieved {len(result.selected_files)} files ({result.total_tokens} / {result.budget_tokens} tokens):")
-    for f in result.selected_files:
-        print(f"[{f.tier.value.upper()}] {f.path} (score: {f.score:.3f}, tokens: {f.token_count})")
-
-    # Access the exact fenced-markdown serialized prompt ready for LLM consumption:
-    llm_prompt_context = result.rendered_context
-```
-
-#### Opt-In: Seed-Based Change-Impact Retrieval:
-```python
-from reponeedle import RepoNeedleEngine, Query
-
-# Initialize engine with Change-Impact ranking
-engine = RepoNeedleEngine.from_directory(
-    repo_dir="./my-project",
-    ranker="change_impact",
-)
-
-# Populate anchor_files with the seed path to activate relationship scoring
-query = Query(
-    text="Fix authentication session expiration",
-    anchor_files=["auth/session.py"],
-    budget_tokens=4000,
-)
-
-result = engine.retrieve(query)
-
-for f in result.selected_files:
-    print(f"[{f.tier.value.upper()}] {f.path} (score: {f.score:.3f}, tokens: {f.token_count})")
-    if f.explanation:
-        print(f"       Attribution: {f.explanation}")
-```
-
-> [!NOTE]
-> **Behavior of Plain-String (Seedless) Change-Impact Queries**:
-> The Change-Impact ranking engine reads seed file paths from `query.anchor_files`. When `engine.retrieve()` is called with a plain string query (or without `anchor_files`):
-> - **Lexical and semantic scoring remain active**: Candidate files continue to be retrieved and scored using combined BM25 lexical matching and subword semantic retrieval.
-> - **Seed suppression is inactive without `anchor_files`**: Seed File Suppression (SFS) is not triggered since there are no designated seed files to down-weight.
-> - **Seed-relative relationship boosts are inactive without `anchor_files`**: Relationship scoring across dependencies (static imports, symbols, calls, build manifests, test-stems, and directory proximity) is skipped.
-> - **Test Intent Prior adjustments remain available according to detected query intent**: Test files receive boosts or penalties (`tip_multiplier_test` / `tip_multiplier_non_test`) based on detected test intent in the query text.
-> 
-> To activate seed-relative relationship boosts and seed suppression, pass seed paths via `Query(text=..., anchor_files=['path/to/seed.py'])`.
-
----
-
-### 3. Command Line Interface (CLI)
-
-```bash
-# Default 'legacy' retrieval under a 4000 token limit
-reponeedle "Fix AttributeError in SecureCookieSessionInterface cookie saving" --repo ./flask --budget 4000
-
-# Opt-in Change-Impact retrieval (applies Test Intent Prior scoring)
-reponeedle "fix token expiration in auth/session.py" --repo ./my-project --budget 4000 --ranker change_impact
-
-# Task-conditioned retrieval for finding regression tests
-reponeedle "test suite for HTTPBasicAuth" --repo ./requests --task code2test --budget 2000
-
-# Serialize packaged markdown directly to a file
-reponeedle "blueprints and route registration" --repo ./flask --budget 4000 --output-file prompt.md
-```
-
-> [!NOTE]
-> **CLI Seed-File Limitation**: The current CLI accepts query text as a positional string and does not currently expose a seed-file argument. Standard CLI queries run with `--ranker change_impact` execute as seedless queries: lexical and semantic scoring remain active, and Test Intent Prior adjustments remain available according to detected query intent, while seed suppression and seed-relative relationship boosts are inactive without `anchor_files`. Full seed-based relationship scoring is available via the Python API (`Query(anchor_files=[...])`). CLI seed-file support is planned as a separate future enhancement.
+These figures are not comparable to Part A and do not replace it. Method, fidelity checks (including exact reproduction of the official harness on 345/345 queries) and limitations: [reports/experimental/phase1_product_aligned_evaluation/REPORT.md](reports/experimental/phase1_product_aligned_evaluation/REPORT.md).
 
 ---
 
@@ -315,21 +529,26 @@ RepoNeedle integrates the **CUD-Pack** context optimization engine, replacing he
 
 ## 🔬 Reproducing Benchmark Results
 
-Run the complete deterministic test suite and benchmarks:
-
 ```bash
-# 1. Run automated test suite (271 passed tests locally, 245 in clean CI checkouts)
-pytest -q -rs
+# 1. Run the automated test suite (the count changes as tests are added; CI reports the current number)
+python -m pytest -q -rs
 
-# 2. Run component ablation study with 95% Bootstrap CI
+# 2. Re-verify the ARB v2 abstention results and positive-query reproducibility
+#    (needs external/agent-retrieval-bench; read-only; add --positives for the slower N=345 check)
+python scripts/verify_abstention_reproducibility.py
+
+# 3. Run the component ablation study with 95% bootstrap CI
+#    (overwrites benchmarks/results/ablation_study_results.json; compare with `git diff`)
 python benchmarks/run_ablations.py
 
-# 3. Verify actual BPE token payload reduction and latency
+# 4. Verify BPE token payload reduction and latency
 python scripts/verify_token_savings_and_latency.py
 
-# 4. Build distribution packages
-python -m build --no-isolation
+# 5. Build distribution packages into a scratch directory
+python -m build --no-isolation --outdir /tmp/reponeedle-dist
 ```
+
+Which scripts enable the experimental abstention heuristic, which do not, and which historical results were measured under the old always-on default are documented in [docs/BENCHMARK_CONFIGURATION.md](docs/BENCHMARK_CONFIGURATION.md). That file also lists known reproducibility gaps; for example, the synthetic `benchmarks/results/benchmark_results.json` from v0.1.0 is not reproduced by later code.
 
 ---
 

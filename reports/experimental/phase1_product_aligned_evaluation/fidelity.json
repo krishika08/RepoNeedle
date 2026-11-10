@@ -1,0 +1,22 @@
+{
+  "queries_expected": 345,
+  "queries_present": 345,
+  "missing": [],
+  "unexpected": [],
+  "duplicate_rows": 0,
+  "missing_gold_labels": 0,
+  "task_counts": {
+    "comment2context": 80,
+    "edit2ripple": 58,
+    "trace2code": 101,
+    "code2test": 106
+  },
+  "task_and_repo_match_dataset": 345,
+  "independent_metric_agreement": 345,
+  "official_sequence_vs_official_current_engine_run": 345,
+  "bm25_chunks_vs_historical_official_bm25": 345,
+  "rn_fragment_vs_phase0_audit": "345/345",
+  "rn_wholefile_vs_phase0_audit": "238/238",
+  "bm25_wholefile_vs_phase0_audit": "238/238",
+  "bm25_fragment_vs_phase0_audit": "238/238"
+}

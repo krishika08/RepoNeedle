@@ -1,0 +1,1203 @@
+{
+  "contrasts": {
+    "on_p0.5": {
+      "overall": {
+        "n_queries": 166,
+        "n_repositories": 15,
+        "metrics": {
+          "mrr": {
+            "off": 0.27435321551724434,
+            "on": 0.29448127632085375,
+            "mean_diff": 0.020128060803609422,
+            "wins": 75,
+            "ties": 89,
+            "losses": 2,
+            "ci95": [
+              0.004683625110702226,
+              0.034080757390239594
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.37399598393574296,
+            "on": 0.377008032128514,
+            "mean_diff": 0.003012048192771084,
+            "wins": 3,
+            "ties": 162,
+            "losses": 1,
+            "ci95": [
+              -0.023255813953488372,
+              0.014200298953662182
+            ],
+            "p_regression_one_sided": 0.6435356464353564
+          },
+          "recall@10": {
+            "off": 0.518574297188755,
+            "on": 0.5245983935742973,
+            "mean_diff": 0.006024096385542169,
+            "wins": 3,
+            "ties": 162,
+            "losses": 1,
+            "ci95": [
+              -0.015625,
+              0.028985507246376812
+            ],
+            "p_regression_one_sided": 0.7963203679632037
+          },
+          "recall@20": {
+            "off": 0.6159638554216867,
+            "on": 0.6410642570281124,
+            "mean_diff": 0.0251004016064257,
+            "wins": 7,
+            "ties": 158,
+            "losses": 1,
+            "ci95": [
+              0.008695652173913044,
+              0.05208903588807778
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.6325301204819277,
+          "docs_top10": 1.1626506024096386,
+          "docs_top20": 2.2289156626506026,
+          "packed_gold_coverage": 0.520582329317269,
+          "packed_success": 0.608433734939759,
+          "packed_utilisation": 0.9940015060240964,
+          "latency_ms_mean": 1166.8384168696791,
+          "latency_ms_p50": 745.4486999777146
+        },
+        "on_p0.5": {
+          "docs_top5": 0.006024096385542169,
+          "docs_top10": 0.024096385542168676,
+          "docs_top20": 0.04819277108433735,
+          "packed_gold_coverage": 0.554718875502008,
+          "packed_success": 0.6445783132530121,
+          "packed_utilisation": 0.9934593373493976,
+          "latency_ms_mean": 365.68510541811594,
+          "latency_ms_p50": 94.99235000112094
+        }
+      },
+      "comment2context": {
+        "n_queries": 46,
+        "n_repositories": 11,
+        "metrics": {
+          "mrr": {
+            "off": 0.17209103211259577,
+            "on": 0.18153435128353224,
+            "mean_diff": 0.009443319170936507,
+            "wins": 30,
+            "ties": 16,
+            "losses": 0,
+            "ci95": [
+              0.0053001974935715035,
+              0.017283672932867006
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.2391304347826087,
+            "on": 0.25362318840579706,
+            "mean_diff": 0.014492753623188404,
+            "wins": 1,
+            "ties": 45,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0392156862745098
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.3115942028985507,
+            "on": 0.33333333333333337,
+            "mean_diff": 0.021739130434782608,
+            "wins": 1,
+            "ties": 45,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.1
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.38043478260869557,
+            "on": 0.4384057971014493,
+            "mean_diff": 0.05797101449275362,
+            "wins": 4,
+            "ties": 42,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.14285714285714285
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.8043478260869565,
+          "docs_top10": 1.8478260869565217,
+          "docs_top20": 3.9130434782608696,
+          "packed_gold_coverage": 0.28623188405797106,
+          "packed_success": 0.391304347826087,
+          "packed_utilisation": 0.9938532608695653,
+          "latency_ms_mean": 1098.547539128365,
+          "latency_ms_p50": 857.5121999892872
+        },
+        "on_p0.5": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.3659420289855072,
+          "packed_success": 0.4782608695652174,
+          "packed_utilisation": 0.993570652173913,
+          "latency_ms_mean": 462.4279782608779,
+          "latency_ms_p50": 177.31525000999682
+        }
+      },
+      "code2test": {
+        "n_queries": 72,
+        "n_repositories": 8,
+        "metrics": {
+          "mrr": {
+            "off": 0.38103385698199516,
+            "on": 0.4174189313500318,
+            "mean_diff": 0.036385074368036625,
+            "wins": 24,
+            "ties": 47,
+            "losses": 1,
+            "ci95": [
+              0.0014516432721149565,
+              0.0745745497811652
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.49537037037037035,
+            "on": 0.4930555555555556,
+            "mean_diff": -0.002314814814814816,
+            "wins": 2,
+            "ties": 69,
+            "losses": 1,
+            "ci95": [
+              -0.05457070707070705,
+              0.027472527472527472
+            ],
+            "p_regression_one_sided": 0.45195480451954806
+          },
+          "recall@10": {
+            "off": 0.6921296296296297,
+            "on": 0.6851851851851852,
+            "mean_diff": -0.006944444444444444,
+            "wins": 1,
+            "ties": 70,
+            "losses": 1,
+            "ci95": [
+              -0.056818181818181816,
+              0.01639344262295082
+            ],
+            "p_regression_one_sided": 0.44385561443855615
+          },
+          "recall@20": {
+            "off": 0.7939814814814814,
+            "on": 0.7939814814814815,
+            "mean_diff": 0.0,
+            "wins": 1,
+            "ties": 70,
+            "losses": 1,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.6111111111111112,
+          "docs_top10": 0.9444444444444444,
+          "docs_top20": 1.5416666666666667,
+          "packed_gold_coverage": 0.7083333333333334,
+          "packed_success": 0.7777777777777778,
+          "packed_utilisation": 0.9946267361111111,
+          "latency_ms_mean": 1003.2641736138935,
+          "latency_ms_p50": 441.3946999993641
+        },
+        "on_p0.5": {
+          "docs_top5": 0.013888888888888888,
+          "docs_top10": 0.05555555555555555,
+          "docs_top20": 0.09722222222222222,
+          "packed_gold_coverage": 0.7291666666666666,
+          "packed_success": 0.7916666666666666,
+          "packed_utilisation": 0.9942621527777776,
+          "latency_ms_mean": 178.45462916011456,
+          "latency_ms_p50": 41.48820001864806
+        }
+      },
+      "trace2code": {
+        "n_queries": 14,
+        "n_repositories": 3,
+        "metrics": {
+          "mrr": {
+            "off": 0.2956080625723483,
+            "on": 0.30968899602439975,
+            "mean_diff": 0.01408093345205146,
+            "wins": 8,
+            "ties": 6,
+            "losses": 0,
+            "ci95": [
+              0.004220763149334579,
+              0.05194805194805194
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.35714285714285715,
+            "on": 0.35714285714285715,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 14,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.4642857142857143,
+            "on": 0.5,
+            "mean_diff": 0.03571428571428571,
+            "wins": 1,
+            "ties": 13,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.5
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.6785714285714286,
+            "on": 0.7142857142857143,
+            "mean_diff": 0.03571428571428571,
+            "wins": 1,
+            "ties": 13,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.5
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 1.0714285714285714,
+          "docs_top10": 1.7142857142857142,
+          "docs_top20": 2.5,
+          "packed_gold_coverage": 0.5357142857142857,
+          "packed_success": 0.6428571428571429,
+          "packed_utilisation": 0.9908482142857142,
+          "latency_ms_mean": 1213.0631499998603,
+          "latency_ms_p50": 1268.181999999797
+        },
+        "on_p0.5": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.07142857142857142,
+          "packed_gold_coverage": 0.5714285714285714,
+          "packed_success": 0.7142857142857143,
+          "packed_utilisation": 0.9903571428571426,
+          "latency_ms_mean": 269.70420000309656,
+          "latency_ms_p50": 61.653450015001
+        }
+      },
+      "edit2ripple": {
+        "n_queries": 34,
+        "n_repositories": 7,
+        "metrics": {
+          "mrr": {
+            "off": 0.17804399176372454,
+            "on": 0.18069125613751066,
+            "mean_diff": 0.0026472643737860996,
+            "wins": 13,
+            "ties": 20,
+            "losses": 1,
+            "ci95": [
+              0.0004887999896656945,
+              0.006012006281506004
+            ],
+            "p_regression_one_sided": 0.9865013498650135
+          },
+          "recall@5": {
+            "off": 0.3063725490196078,
+            "on": 0.3063725490196078,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 34,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.4534313725490196,
+            "on": 0.4534313725490196,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 34,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.5318627450980392,
+            "on": 0.5612745098039216,
+            "mean_diff": 0.029411764705882353,
+            "wins": 1,
+            "ties": 33,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0967741935483871
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.2647058823529412,
+          "docs_top10": 0.47058823529411764,
+          "docs_top20": 1.2941176470588236,
+          "packed_gold_coverage": 0.4338235294117647,
+          "packed_success": 0.5294117647058824,
+          "packed_utilisation": 0.9941764705882353,
+          "latency_ms_mean": 1586.5907588312814,
+          "latency_ms_p50": 1333.009249996394
+        },
+        "on_p0.5": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.4338235294117647,
+          "packed_success": 0.5294117647058824,
+          "packed_utilisation": 0.9928860294117647,
+          "latency_ms_mean": 670.8073058775078,
+          "latency_ms_p50": 316.6046000260394
+        }
+      }
+    },
+    "on_p0.25": {
+      "overall": {
+        "n_queries": 166,
+        "n_repositories": 15,
+        "metrics": {
+          "mrr": {
+            "off": 0.27435321551724434,
+            "on": 0.294509680187436,
+            "mean_diff": 0.020156464670191637,
+            "wins": 75,
+            "ties": 89,
+            "losses": 2,
+            "ci95": [
+              0.004704259496536385,
+              0.034132243815832845
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.37399598393574296,
+            "on": 0.377008032128514,
+            "mean_diff": 0.003012048192771084,
+            "wins": 3,
+            "ties": 162,
+            "losses": 1,
+            "ci95": [
+              -0.023255813953488372,
+              0.014200298953662182
+            ],
+            "p_regression_one_sided": 0.6435356464353564
+          },
+          "recall@10": {
+            "off": 0.518574297188755,
+            "on": 0.5245983935742973,
+            "mean_diff": 0.006024096385542169,
+            "wins": 3,
+            "ties": 162,
+            "losses": 1,
+            "ci95": [
+              -0.015625,
+              0.028985507246376812
+            ],
+            "p_regression_one_sided": 0.7963203679632037
+          },
+          "recall@20": {
+            "off": 0.6159638554216867,
+            "on": 0.6410642570281124,
+            "mean_diff": 0.0251004016064257,
+            "wins": 7,
+            "ties": 158,
+            "losses": 1,
+            "ci95": [
+              0.008695652173913044,
+              0.05208903588807778
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.6325301204819277,
+          "docs_top10": 1.1626506024096386,
+          "docs_top20": 2.2289156626506026,
+          "packed_gold_coverage": 0.520582329317269,
+          "packed_success": 0.608433734939759,
+          "packed_utilisation": 0.9940015060240964,
+          "latency_ms_mean": 1166.8384168696791,
+          "latency_ms_p50": 745.4486999777146
+        },
+        "on_p0.25": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.554718875502008,
+          "packed_success": 0.6445783132530121,
+          "packed_utilisation": 0.9935346385542169,
+          "latency_ms_mean": 102.36669156569931,
+          "latency_ms_p50": 32.62660003383644
+        }
+      },
+      "comment2context": {
+        "n_queries": 46,
+        "n_repositories": 11,
+        "metrics": {
+          "mrr": {
+            "off": 0.17209103211259577,
+            "on": 0.18154232665038475,
+            "mean_diff": 0.009451294537788953,
+            "wins": 30,
+            "ties": 16,
+            "losses": 0,
+            "ci95": [
+              0.005307742537229814,
+              0.017302078195515935
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.2391304347826087,
+            "on": 0.25362318840579706,
+            "mean_diff": 0.014492753623188404,
+            "wins": 1,
+            "ties": 45,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0392156862745098
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.3115942028985507,
+            "on": 0.33333333333333337,
+            "mean_diff": 0.021739130434782608,
+            "wins": 1,
+            "ties": 45,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.1
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.38043478260869557,
+            "on": 0.4384057971014493,
+            "mean_diff": 0.05797101449275362,
+            "wins": 4,
+            "ties": 42,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.14285714285714285
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.8043478260869565,
+          "docs_top10": 1.8478260869565217,
+          "docs_top20": 3.9130434782608696,
+          "packed_gold_coverage": 0.28623188405797106,
+          "packed_success": 0.391304347826087,
+          "packed_utilisation": 0.9938532608695653,
+          "latency_ms_mean": 1098.547539128365,
+          "latency_ms_p50": 857.5121999892872
+        },
+        "on_p0.25": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.3659420289855072,
+          "packed_success": 0.4782608695652174,
+          "packed_utilisation": 0.993570652173913,
+          "latency_ms_mean": 80.19634999547397,
+          "latency_ms_p50": 43.45850000390783
+        }
+      },
+      "code2test": {
+        "n_queries": 72,
+        "n_repositories": 8,
+        "metrics": {
+          "mrr": {
+            "off": 0.38103385698199516,
+            "on": 0.41747915338606023,
+            "mean_diff": 0.03644529640406511,
+            "wins": 24,
+            "ties": 47,
+            "losses": 1,
+            "ci95": [
+              0.0014753806891824512,
+              0.07467452660925264
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.49537037037037035,
+            "on": 0.4930555555555556,
+            "mean_diff": -0.002314814814814816,
+            "wins": 2,
+            "ties": 69,
+            "losses": 1,
+            "ci95": [
+              -0.05457070707070705,
+              0.027472527472527472
+            ],
+            "p_regression_one_sided": 0.45195480451954806
+          },
+          "recall@10": {
+            "off": 0.6921296296296297,
+            "on": 0.6851851851851852,
+            "mean_diff": -0.006944444444444444,
+            "wins": 1,
+            "ties": 70,
+            "losses": 1,
+            "ci95": [
+              -0.056818181818181816,
+              0.01639344262295082
+            ],
+            "p_regression_one_sided": 0.44385561443855615
+          },
+          "recall@20": {
+            "off": 0.7939814814814814,
+            "on": 0.7939814814814815,
+            "mean_diff": 0.0,
+            "wins": 1,
+            "ties": 70,
+            "losses": 1,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.6111111111111112,
+          "docs_top10": 0.9444444444444444,
+          "docs_top20": 1.5416666666666667,
+          "packed_gold_coverage": 0.7083333333333334,
+          "packed_success": 0.7777777777777778,
+          "packed_utilisation": 0.9946267361111111,
+          "latency_ms_mean": 1003.2641736138935,
+          "latency_ms_p50": 441.3946999993641
+        },
+        "on_p0.25": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.7291666666666666,
+          "packed_success": 0.7916666666666666,
+          "packed_utilisation": 0.994435763888889,
+          "latency_ms_mean": 90.55170555883605,
+          "latency_ms_p50": 32.594400021480396
+        }
+      },
+      "trace2code": {
+        "n_queries": 14,
+        "n_repositories": 3,
+        "metrics": {
+          "mrr": {
+            "off": 0.2956080625723483,
+            "on": 0.30968899602439975,
+            "mean_diff": 0.01408093345205146,
+            "wins": 8,
+            "ties": 6,
+            "losses": 0,
+            "ci95": [
+              0.004220763149334579,
+              0.05194805194805194
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.35714285714285715,
+            "on": 0.35714285714285715,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 14,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.4642857142857143,
+            "on": 0.5,
+            "mean_diff": 0.03571428571428571,
+            "wins": 1,
+            "ties": 13,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.5
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.6785714285714286,
+            "on": 0.7142857142857143,
+            "mean_diff": 0.03571428571428571,
+            "wins": 1,
+            "ties": 13,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.5
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 1.0714285714285714,
+          "docs_top10": 1.7142857142857142,
+          "docs_top20": 2.5,
+          "packed_gold_coverage": 0.5357142857142857,
+          "packed_success": 0.6428571428571429,
+          "packed_utilisation": 0.9908482142857142,
+          "latency_ms_mean": 1213.0631499998603,
+          "latency_ms_p50": 1268.181999999797
+        },
+        "on_p0.25": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.5714285714285714,
+          "packed_success": 0.7142857142857143,
+          "packed_utilisation": 0.9903571428571426,
+          "latency_ms_mean": 24.169935707634846,
+          "latency_ms_p50": 17.520149995107204
+        }
+      },
+      "edit2ripple": {
+        "n_queries": 34,
+        "n_repositories": 7,
+        "metrics": {
+          "mrr": {
+            "off": 0.17804399176372454,
+            "on": 0.1806916146193749,
+            "mean_diff": 0.0026476228556503393,
+            "wins": 13,
+            "ties": 20,
+            "losses": 1,
+            "ci95": [
+              0.0004900022552257451,
+              0.006000672179436806
+            ],
+            "p_regression_one_sided": 0.9864013598640136
+          },
+          "recall@5": {
+            "off": 0.3063725490196078,
+            "on": 0.3063725490196078,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 34,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.4534313725490196,
+            "on": 0.4534313725490196,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 34,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.5318627450980392,
+            "on": 0.5612745098039216,
+            "mean_diff": 0.029411764705882353,
+            "wins": 1,
+            "ties": 33,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0967741935483871
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.2647058823529412,
+          "docs_top10": 0.47058823529411764,
+          "docs_top20": 1.2941176470588236,
+          "packed_gold_coverage": 0.4338235294117647,
+          "packed_success": 0.5294117647058824,
+          "packed_utilisation": 0.9941764705882353,
+          "latency_ms_mean": 1586.5907588312814,
+          "latency_ms_p50": 1333.009249996394
+        },
+        "on_p0.25": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.4338235294117647,
+          "packed_success": 0.5294117647058824,
+          "packed_utilisation": 0.9928860294117647,
+          "latency_ms_mean": 189.58049411680003,
+          "latency_ms_p50": 53.110400040168315
+        }
+      }
+    },
+    "on_p0.0": {
+      "overall": {
+        "n_queries": 166,
+        "n_repositories": 15,
+        "metrics": {
+          "mrr": {
+            "off": 0.27435321551724434,
+            "on": 0.29448924864877696,
+            "mean_diff": 0.020136033131532567,
+            "wins": 75,
+            "ties": 89,
+            "losses": 2,
+            "ci95": [
+              0.004675527166175296,
+              0.034098967750122354
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.37399598393574296,
+            "on": 0.377008032128514,
+            "mean_diff": 0.003012048192771084,
+            "wins": 3,
+            "ties": 162,
+            "losses": 1,
+            "ci95": [
+              -0.023255813953488372,
+              0.014200298953662182
+            ],
+            "p_regression_one_sided": 0.6435356464353564
+          },
+          "recall@10": {
+            "off": 0.518574297188755,
+            "on": 0.5245983935742973,
+            "mean_diff": 0.006024096385542169,
+            "wins": 3,
+            "ties": 162,
+            "losses": 1,
+            "ci95": [
+              -0.015625,
+              0.028985507246376812
+            ],
+            "p_regression_one_sided": 0.7963203679632037
+          },
+          "recall@20": {
+            "off": 0.6159638554216867,
+            "on": 0.6410642570281124,
+            "mean_diff": 0.0251004016064257,
+            "wins": 7,
+            "ties": 158,
+            "losses": 1,
+            "ci95": [
+              0.008695652173913044,
+              0.05208903588807778
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.6325301204819277,
+          "docs_top10": 1.1626506024096386,
+          "docs_top20": 2.2289156626506026,
+          "packed_gold_coverage": 0.520582329317269,
+          "packed_success": 0.608433734939759,
+          "packed_utilisation": 0.9940015060240964,
+          "latency_ms_mean": 1166.8384168696791,
+          "latency_ms_p50": 745.4486999777146
+        },
+        "on_p0.0": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.554718875502008,
+          "packed_success": 0.6445783132530121,
+          "packed_utilisation": 0.9935346385542169,
+          "latency_ms_mean": 102.18852770855617,
+          "latency_ms_p50": 33.555450005223975
+        }
+      },
+      "comment2context": {
+        "n_queries": 46,
+        "n_repositories": 11,
+        "metrics": {
+          "mrr": {
+            "off": 0.17209103211259577,
+            "on": 0.18154232665038475,
+            "mean_diff": 0.009451294537788953,
+            "wins": 30,
+            "ties": 16,
+            "losses": 0,
+            "ci95": [
+              0.005307742537229814,
+              0.017302078195515935
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.2391304347826087,
+            "on": 0.25362318840579706,
+            "mean_diff": 0.014492753623188404,
+            "wins": 1,
+            "ties": 45,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0392156862745098
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.3115942028985507,
+            "on": 0.33333333333333337,
+            "mean_diff": 0.021739130434782608,
+            "wins": 1,
+            "ties": 45,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.1
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.38043478260869557,
+            "on": 0.4384057971014493,
+            "mean_diff": 0.05797101449275362,
+            "wins": 4,
+            "ties": 42,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.14285714285714285
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.8043478260869565,
+          "docs_top10": 1.8478260869565217,
+          "docs_top20": 3.9130434782608696,
+          "packed_gold_coverage": 0.28623188405797106,
+          "packed_success": 0.391304347826087,
+          "packed_utilisation": 0.9938532608695653,
+          "latency_ms_mean": 1098.547539128365,
+          "latency_ms_p50": 857.5121999892872
+        },
+        "on_p0.0": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.3659420289855072,
+          "packed_success": 0.4782608695652174,
+          "packed_utilisation": 0.993570652173913,
+          "latency_ms_mean": 91.47766739276804,
+          "latency_ms_p50": 35.66314998897724
+        }
+      },
+      "code2test": {
+        "n_queries": 72,
+        "n_repositories": 8,
+        "metrics": {
+          "mrr": {
+            "off": 0.38103385698199516,
+            "on": 0.4174324704726215,
+            "mean_diff": 0.03639861349062642,
+            "wins": 24,
+            "ties": 47,
+            "losses": 1,
+            "ci95": [
+              0.0014364567548178166,
+              0.07467452660925264
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.49537037037037035,
+            "on": 0.4930555555555556,
+            "mean_diff": -0.002314814814814816,
+            "wins": 2,
+            "ties": 69,
+            "losses": 1,
+            "ci95": [
+              -0.05457070707070705,
+              0.027472527472527472
+            ],
+            "p_regression_one_sided": 0.45195480451954806
+          },
+          "recall@10": {
+            "off": 0.6921296296296297,
+            "on": 0.6851851851851852,
+            "mean_diff": -0.006944444444444444,
+            "wins": 1,
+            "ties": 70,
+            "losses": 1,
+            "ci95": [
+              -0.056818181818181816,
+              0.01639344262295082
+            ],
+            "p_regression_one_sided": 0.44385561443855615
+          },
+          "recall@20": {
+            "off": 0.7939814814814814,
+            "on": 0.7939814814814815,
+            "mean_diff": 0.0,
+            "wins": 1,
+            "ties": 70,
+            "losses": 1,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.6111111111111112,
+          "docs_top10": 0.9444444444444444,
+          "docs_top20": 1.5416666666666667,
+          "packed_gold_coverage": 0.7083333333333334,
+          "packed_success": 0.7777777777777778,
+          "packed_utilisation": 0.9946267361111111,
+          "latency_ms_mean": 1003.2641736138935,
+          "latency_ms_p50": 441.3946999993641
+        },
+        "on_p0.0": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.7291666666666666,
+          "packed_success": 0.7916666666666666,
+          "packed_utilisation": 0.994435763888889,
+          "latency_ms_mean": 83.77800416039665,
+          "latency_ms_p50": 34.0672500024084
+        }
+      },
+      "trace2code": {
+        "n_queries": 14,
+        "n_repositories": 3,
+        "metrics": {
+          "mrr": {
+            "off": 0.2956080625723483,
+            "on": 0.30968899602439975,
+            "mean_diff": 0.01408093345205146,
+            "wins": 8,
+            "ties": 6,
+            "losses": 0,
+            "ci95": [
+              0.004220763149334579,
+              0.05194805194805194
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@5": {
+            "off": 0.35714285714285715,
+            "on": 0.35714285714285715,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 14,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.4642857142857143,
+            "on": 0.5,
+            "mean_diff": 0.03571428571428571,
+            "wins": 1,
+            "ties": 13,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.5
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.6785714285714286,
+            "on": 0.7142857142857143,
+            "mean_diff": 0.03571428571428571,
+            "wins": 1,
+            "ties": 13,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.5
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 1.0714285714285714,
+          "docs_top10": 1.7142857142857142,
+          "docs_top20": 2.5,
+          "packed_gold_coverage": 0.5357142857142857,
+          "packed_success": 0.6428571428571429,
+          "packed_utilisation": 0.9908482142857142,
+          "latency_ms_mean": 1213.0631499998603,
+          "latency_ms_p50": 1268.181999999797
+        },
+        "on_p0.0": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.5714285714285714,
+          "packed_success": 0.7142857142857143,
+          "packed_utilisation": 0.9903571428571426,
+          "latency_ms_mean": 21.945107146166265,
+          "latency_ms_p50": 19.037999998545274
+        }
+      },
+      "edit2ripple": {
+        "n_queries": 34,
+        "n_repositories": 7,
+        "metrics": {
+          "mrr": {
+            "off": 0.17804399176372454,
+            "on": 0.1806907185708508,
+            "mean_diff": 0.002646726807126237,
+            "wins": 13,
+            "ties": 20,
+            "losses": 1,
+            "ci95": [
+              0.000489983214194608,
+              0.005995982072819857
+            ],
+            "p_regression_one_sided": 0.9864013598640136
+          },
+          "recall@5": {
+            "off": 0.3063725490196078,
+            "on": 0.3063725490196078,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 34,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@10": {
+            "off": 0.4534313725490196,
+            "on": 0.4534313725490196,
+            "mean_diff": 0.0,
+            "wins": 0,
+            "ties": 34,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "p_regression_one_sided": 1.0
+          },
+          "recall@20": {
+            "off": 0.5318627450980392,
+            "on": 0.5612745098039216,
+            "mean_diff": 0.029411764705882353,
+            "wins": 1,
+            "ties": 33,
+            "losses": 0,
+            "ci95": [
+              0.0,
+              0.0967741935483871
+            ],
+            "p_regression_one_sided": 1.0
+          }
+        },
+        "off": {
+          "docs_top5": 0.2647058823529412,
+          "docs_top10": 0.47058823529411764,
+          "docs_top20": 1.2941176470588236,
+          "packed_gold_coverage": 0.4338235294117647,
+          "packed_success": 0.5294117647058824,
+          "packed_utilisation": 0.9941764705882353,
+          "latency_ms_mean": 1586.5907588312814,
+          "latency_ms_p50": 1333.009249996394
+        },
+        "on_p0.0": {
+          "docs_top5": 0.0,
+          "docs_top10": 0.0,
+          "docs_top20": 0.0,
+          "packed_gold_coverage": 0.4338235294117647,
+          "packed_success": 0.5294117647058824,
+          "packed_utilisation": 0.9928860294117647,
+          "latency_ms_mean": 188.70809117523845,
+          "latency_ms_p50": 53.40889998478815
+        }
+      }
+    }
+  },
+  "gold_effects": {
+    "on_p0.5": {
+      "gold_doc:lost_packed": 1,
+      "gold_doc:lost_top20": 1,
+      "gold_doc:total": 4,
+      "gold_nondoc:gained_top20": 7,
+      "gold_nondoc:total": 248
+    },
+    "on_p0.25": {
+      "gold_doc:lost_packed": 1,
+      "gold_doc:lost_top20": 1,
+      "gold_doc:total": 4,
+      "gold_nondoc:gained_top20": 7,
+      "gold_nondoc:total": 248
+    },
+    "on_p0.0": {
+      "gold_doc:lost_packed": 1,
+      "gold_doc:lost_top20": 1,
+      "gold_doc:total": 4,
+      "gold_nondoc:gained_top20": 7,
+      "gold_nondoc:total": 248
+    }
+  }
+}

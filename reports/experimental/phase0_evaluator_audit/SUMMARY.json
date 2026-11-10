@@ -1,0 +1,563 @@
+{
+  "n_samples": 345,
+  "fidelity": {
+    "official_sequence_reproduces_current_engine_run": "345/345",
+    "bm25_reproduces_historical_official_bm25": "345/345",
+    "bm25_bcy8k_reproduces_historical": "345/345"
+  },
+  "overall": {
+    "n": 345,
+    "official": {
+      "mrr": 0.21532780783702646,
+      "recall@5": 0.3032367149758454,
+      "recall@10": 0.36772946859903377,
+      "recall@20": 0.38415458937198066
+    },
+    "rn_full": {
+      "mrr": 0.23793594320609768,
+      "recall@5": 0.3061352657004831,
+      "recall@10": 0.4406763285024154,
+      "recall@20": 0.5802898550724638
+    },
+    "rn_lexical_only": {
+      "mrr": 0.17087695517451676,
+      "recall@5": 0.18768115942028984,
+      "recall@10": 0.3113526570048309,
+      "recall@20": 0.4481642512077295
+    },
+    "rn_semantic_only": {
+      "mrr": 0.171413342403652,
+      "recall@5": 0.20966183574879227,
+      "recall@10": 0.2920289855072464,
+      "recall@20": 0.45444444444444454
+    },
+    "bm25_full": {
+      "mrr": 0.1520385836822835,
+      "recall@5": 0.18985507246376812,
+      "recall@10": 0.3033816425120773,
+      "recall@20": 0.4451690821256038
+    },
+    "packed": {
+      "n_files": 8.866666666666667,
+      "utilisation": 0.995877536231884,
+      "gold_coverage": 0.38270531400966185,
+      "success": 0.4579710144927536,
+      "skipped_in_full_top_k": 0.7072463768115942
+    },
+    "bcy8k": {
+      "rn_official_seq": 0.34429951690821253,
+      "rn_full_ranking": 0.3500966183574879,
+      "bm25": 0.20507246376811594
+    },
+    "remainder": {
+      "gold_not_packed": 331,
+      "official_top20_hits_from_remainder": 1,
+      "full_top20_hits_lost_officially": 96,
+      "rn_gold_zero_score": 0,
+      "bm25_gold_zero_score": 0
+    },
+    "n_gold": 514,
+    "auto_route": {
+      "comment2context": 158,
+      "code2test": 118,
+      "trace2code": 49,
+      "edit2ripple": 20
+    },
+    "paired": {
+      "rn_full-bm25_full:mrr": {
+        "mean": 0.0858973595238142,
+        "wins": 215,
+        "ties": 20,
+        "losses": 110,
+        "repo_clustered_ci95": [
+          0.03724751618810147,
+          0.11860075018086814
+        ]
+      },
+      "rn_full-bm25_full:recall@20": {
+        "mean": 0.1351207729468599,
+        "wins": 98,
+        "ties": 199,
+        "losses": 48,
+        "repo_clustered_ci95": [
+          0.017849725852486106,
+          0.21845455514585996
+        ]
+      },
+      "official-bm25_full:mrr": {
+        "mean": 0.06328922415474296,
+        "wins": 132,
+        "ties": 17,
+        "losses": 196,
+        "repo_clustered_ci95": [
+          0.010729995692777793,
+          0.09882000295867682
+        ]
+      },
+      "rn_full-official:mrr": {
+        "mean": 0.022608135369071244,
+        "wins": 178,
+        "ties": 152,
+        "losses": 15,
+        "repo_clustered_ci95": [
+          0.016884758892849867,
+          0.028429421813992866
+        ]
+      },
+      "rn_full-official:recall@20": {
+        "mean": 0.19613526570048306,
+        "wins": 88,
+        "ties": 256,
+        "losses": 1,
+        "repo_clustered_ci95": [
+          0.1188076858533311,
+          0.25208497492836673
+        ]
+      }
+    }
+  },
+  "by_task": {
+    "code2test": {
+      "n": 106,
+      "official": {
+        "mrr": 0.2545504129994005,
+        "recall@5": 0.3823899371069182,
+        "recall@10": 0.500314465408805,
+        "recall@20": 0.5176100628930816
+      },
+      "rn_full": {
+        "mrr": 0.2735597637780833,
+        "recall@5": 0.39182389937106915,
+        "recall@10": 0.5742138364779874,
+        "recall@20": 0.6433962264150944
+      },
+      "rn_lexical_only": {
+        "mrr": 0.07031966415500468,
+        "recall@5": 0.04874213836477987,
+        "recall@10": 0.16037735849056603,
+        "recall@20": 0.3069182389937107
+      },
+      "rn_semantic_only": {
+        "mrr": 0.06771129564348427,
+        "recall@5": 0.0660377358490566,
+        "recall@10": 0.1540880503144654,
+        "recall@20": 0.27547169811320754
+      },
+      "bm25_full": {
+        "mrr": 0.1056916559515172,
+        "recall@5": 0.13050314465408805,
+        "recall@10": 0.21855345911949683,
+        "recall@20": 0.30660377358490565
+      },
+      "packed": {
+        "n_files": 9.0,
+        "utilisation": 0.9957264150943396,
+        "gold_coverage": 0.5176100628930816,
+        "success": 0.5849056603773585,
+        "skipped_in_full_top_k": 0.7830188679245284
+      },
+      "bcy8k": {
+        "rn_official_seq": 0.4720125786163522,
+        "rn_full_ranking": 0.4908805031446541,
+        "bm25": 0.15408805031446543
+      },
+      "remainder": {
+        "gold_not_packed": 76,
+        "official_top20_hits_from_remainder": 0,
+        "full_top20_hits_lost_officially": 17,
+        "rn_gold_zero_score": 0,
+        "bm25_gold_zero_score": 0
+      },
+      "n_gold": 148,
+      "auto_route": {
+        "comment2context": 70,
+        "edit2ripple": 10,
+        "trace2code": 4,
+        "code2test": 22
+      },
+      "paired": {
+        "rn_full-bm25_full:mrr": {
+          "mean": 0.1678681078265661,
+          "wins": 87,
+          "ties": 4,
+          "losses": 15,
+          "repo_clustered_ci95": [
+            0.1070241141367095,
+            0.22398609348283446
+          ]
+        },
+        "rn_full-bm25_full:recall@20": {
+          "mean": 0.3367924528301887,
+          "wins": 45,
+          "ties": 57,
+          "losses": 4,
+          "repo_clustered_ci95": [
+            0.1987156357388316,
+            0.46418058034932963
+          ]
+        },
+        "official-bm25_full:mrr": {
+          "mean": 0.14885875704788334,
+          "wins": 54,
+          "ties": 3,
+          "losses": 49,
+          "repo_clustered_ci95": [
+            0.08288166101265294,
+            0.2094100268830752
+          ]
+        },
+        "rn_full-official:mrr": {
+          "mean": 0.019009350778682786,
+          "wins": 44,
+          "ties": 56,
+          "losses": 6,
+          "repo_clustered_ci95": [
+            0.012434497133346226,
+            0.027162045906471966
+          ]
+        },
+        "rn_full-official:recall@20": {
+          "mean": 0.12578616352201258,
+          "wins": 15,
+          "ties": 91,
+          "losses": 0,
+          "repo_clustered_ci95": [
+            0.051778540341479745,
+            0.22549019607843135
+          ]
+        }
+      }
+    },
+    "comment2context": {
+      "n": 80,
+      "official": {
+        "mrr": 0.16584190273761829,
+        "recall@5": 0.1645833333333333,
+        "recall@10": 0.18125,
+        "recall@20": 0.19375
+      },
+      "rn_full": {
+        "mrr": 0.18572605525508434,
+        "recall@5": 0.1645833333333333,
+        "recall@10": 0.225,
+        "recall@20": 0.3145833333333333
+      },
+      "rn_lexical_only": {
+        "mrr": 0.1586764146103304,
+        "recall@5": 0.14791666666666664,
+        "recall@10": 0.2375,
+        "recall@20": 0.2875
+      },
+      "rn_semantic_only": {
+        "mrr": 0.19420009481517458,
+        "recall@5": 0.16458333333333333,
+        "recall@10": 0.24374999999999997,
+        "recall@20": 0.3895833333333333
+      },
+      "bm25_full": {
+        "mrr": 0.19738857922492611,
+        "recall@5": 0.21458333333333335,
+        "recall@10": 0.4041666666666666,
+        "recall@20": 0.5291666666666667
+      },
+      "packed": {
+        "n_files": 10.125,
+        "utilisation": 0.9952453125,
+        "gold_coverage": 0.19375,
+        "success": 0.325,
+        "skipped_in_full_top_k": 0.6375
+      },
+      "bcy8k": {
+        "rn_official_seq": 0.18958333333333333,
+        "rn_full_ranking": 0.18958333333333333,
+        "bm25": 0.2604166666666667
+      },
+      "remainder": {
+        "gold_not_packed": 111,
+        "official_top20_hits_from_remainder": 0,
+        "full_top20_hits_lost_officially": 17,
+        "rn_gold_zero_score": 0,
+        "bm25_gold_zero_score": 0
+      },
+      "n_gold": 140,
+      "auto_route": {
+        "comment2context": 55,
+        "code2test": 20,
+        "trace2code": 1,
+        "edit2ripple": 4
+      },
+      "paired": {
+        "rn_full-bm25_full:mrr": {
+          "mean": -0.011662523969841753,
+          "wins": 27,
+          "ties": 6,
+          "losses": 47,
+          "repo_clustered_ci95": [
+            -0.09907237409234947,
+            0.0634727403777682
+          ]
+        },
+        "rn_full-bm25_full:recall@20": {
+          "mean": -0.21458333333333335,
+          "wins": 8,
+          "ties": 41,
+          "losses": 31,
+          "repo_clustered_ci95": [
+            -0.3719848123883264,
+            -0.10111608174966488
+          ]
+        },
+        "official-bm25_full:mrr": {
+          "mean": -0.031546676487307794,
+          "wins": 15,
+          "ties": 6,
+          "losses": 59,
+          "repo_clustered_ci95": [
+            -0.11615423704977682,
+            0.041938383115958426
+          ]
+        },
+        "rn_full-official:mrr": {
+          "mean": 0.01988415251746604,
+          "wins": 50,
+          "ties": 26,
+          "losses": 4,
+          "repo_clustered_ci95": [
+            0.012571487702099777,
+            0.025946339933590027
+          ]
+        },
+        "rn_full-official:recall@20": {
+          "mean": 0.12083333333333332,
+          "wins": 15,
+          "ties": 65,
+          "losses": 0,
+          "repo_clustered_ci95": [
+            0.03613839975285758,
+            0.19414008321775308
+          ]
+        }
+      }
+    },
+    "trace2code": {
+      "n": 101,
+      "official": {
+        "mrr": 0.22621407753926634,
+        "recall@5": 0.2854785478547855,
+        "recall@10": 0.3448844884488449,
+        "recall@20": 0.3547854785478548
+      },
+      "rn_full": {
+        "mrr": 0.25773100793072873,
+        "recall@5": 0.2854785478547855,
+        "recall@10": 0.4537953795379538,
+        "recall@20": 0.6782178217821783
+      },
+      "rn_lexical_only": {
+        "mrr": 0.24731464326736166,
+        "recall@5": 0.2722772277227723,
+        "recall@10": 0.4537953795379538,
+        "recall@20": 0.6600660066006601
+      },
+      "rn_semantic_only": {
+        "mrr": 0.22423737601123797,
+        "recall@5": 0.29537953795379535,
+        "recall@10": 0.38283828382838286,
+        "recall@20": 0.6138613861386139
+      },
+      "bm25_full": {
+        "mrr": 0.16384832699974178,
+        "recall@5": 0.22277227722772278,
+        "recall@10": 0.3217821782178218,
+        "recall@20": 0.4933993399339934
+      },
+      "packed": {
+        "n_files": 8.05940594059406,
+        "utilisation": 0.9970754950495049,
+        "gold_coverage": 0.3547854785478548,
+        "success": 0.37623762376237624,
+        "skipped_in_full_top_k": 0.8514851485148515
+      },
+      "bcy8k": {
+        "rn_official_seq": 0.2953795379537954,
+        "rn_full_ranking": 0.2953795379537954,
+        "bm25": 0.19306930693069307
+      },
+      "remainder": {
+        "gold_not_packed": 86,
+        "official_top20_hits_from_remainder": 0,
+        "full_top20_hits_lost_officially": 41,
+        "rn_gold_zero_score": 0,
+        "bm25_gold_zero_score": 0
+      },
+      "n_gold": 127,
+      "auto_route": {
+        "code2test": 59,
+        "trace2code": 42
+      },
+      "paired": {
+        "rn_full-bm25_full:mrr": {
+          "mean": 0.09388268093098699,
+          "wins": 65,
+          "ties": 6,
+          "losses": 30,
+          "repo_clustered_ci95": [
+            -0.0332621243591625,
+            0.15685516104576092
+          ]
+        },
+        "rn_full-bm25_full:recall@20": {
+          "mean": 0.1848184818481848,
+          "wins": 27,
+          "ties": 67,
+          "losses": 7,
+          "repo_clustered_ci95": [
+            -0.02964646464646464,
+            0.29577464788732394
+          ]
+        },
+        "official-bm25_full:mrr": {
+          "mean": 0.06236575053952463,
+          "wins": 35,
+          "ties": 4,
+          "losses": 62,
+          "repo_clustered_ci95": [
+            -0.07508194232364987,
+            0.1322844062006484
+          ]
+        },
+        "rn_full-official:mrr": {
+          "mean": 0.03151693039146237,
+          "wins": 61,
+          "ties": 38,
+          "losses": 2,
+          "repo_clustered_ci95": [
+            0.022707080412528738,
+            0.052759783185661914
+          ]
+        },
+        "rn_full-official:recall@20": {
+          "mean": 0.32343234323432346,
+          "wins": 39,
+          "ties": 62,
+          "losses": 0,
+          "repo_clustered_ci95": [
+            0.28185080850522026,
+            0.4083333333333333
+          ]
+        }
+      }
+    },
+    "edit2ripple": {
+      "n": 58,
+      "official": {
+        "mrr": 0.1929444116441776,
+        "recall@5": 0.38074712643678166,
+        "recall@10": 0.4224137931034483,
+        "recall@20": 0.4540229885057471
+      },
+      "rn_full": {
+        "mrr": 0.21037326248649182,
+        "recall@5": 0.38074712643678166,
+        "recall@10": 0.47126436781609193,
+        "recall@20": 0.660919540229885
+      },
+      "rn_lexical_only": {
+        "mrr": 0.2383753964818591,
+        "recall@5": 0.34913793103448276,
+        "recall@10": 0.4410919540229884,
+        "recall@20": 0.5589080459770115
+      },
+      "rn_semantic_only": {
+        "mrr": 0.23752109015002773,
+        "recall@5": 0.38505747126436785,
+        "recall@10": 0.4525862068965517,
+        "recall@20": 0.5933908045977012
+      },
+      "bm25_full": {
+        "mrr": 0.15362462887170653,
+        "recall@5": 0.20689655172413793,
+        "recall@10": 0.28735632183908044,
+        "recall@20": 0.49856321839080453
+      },
+      "packed": {
+        "n_files": 8.293103448275861,
+        "utilisation": 0.9949396551724138,
+        "gold_coverage": 0.4454022988505747,
+        "success": 0.5517241379310345,
+        "skipped_in_full_top_k": 0.41379310344827586
+      },
+      "bcy8k": {
+        "rn_official_seq": 0.40948275862068967,
+        "rn_full_ranking": 0.40948275862068967,
+        "bm25": 0.24281609195402296
+      },
+      "remainder": {
+        "gold_not_packed": 58,
+        "official_top20_hits_from_remainder": 1,
+        "full_top20_hits_lost_officially": 21,
+        "rn_gold_zero_score": 0,
+        "bm25_gold_zero_score": 0
+      },
+      "n_gold": 99,
+      "auto_route": {
+        "comment2context": 33,
+        "code2test": 17,
+        "edit2ripple": 6,
+        "trace2code": 2
+      },
+      "paired": {
+        "rn_full-bm25_full:mrr": {
+          "mean": 0.056748633614785285,
+          "wins": 36,
+          "ties": 4,
+          "losses": 18,
+          "repo_clustered_ci95": [
+            0.01785112392672954,
+            0.11937985867337268
+          ]
+        },
+        "rn_full-bm25_full:recall@20": {
+          "mean": 0.16235632183908044,
+          "wins": 18,
+          "ties": 34,
+          "losses": 6,
+          "repo_clustered_ci95": [
+            0.035072595281306726,
+            0.326770050125313
+          ]
+        },
+        "official-bm25_full:mrr": {
+          "mean": 0.03931978277247112,
+          "wins": 28,
+          "ties": 4,
+          "losses": 26,
+          "repo_clustered_ci95": [
+            -0.0034685948604605155,
+            0.10367543529674822
+          ]
+        },
+        "rn_full-official:mrr": {
+          "mean": 0.017428850842314166,
+          "wins": 23,
+          "ties": 32,
+          "losses": 3,
+          "repo_clustered_ci95": [
+            0.010736142505476456,
+            0.027114288613380885
+          ]
+        },
+        "rn_full-official:recall@20": {
+          "mean": 0.20689655172413793,
+          "wins": 19,
+          "ties": 38,
+          "losses": 1,
+          "repo_clustered_ci95": [
+            0.1522957271364318,
+            0.2928063063063061
+          ]
+        }
+      }
+    }
+  }
+}

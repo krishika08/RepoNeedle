@@ -1,5 +1,8 @@
 # FINAL RELEASE AUDIT: REPONEEDLE
 
+> [!NOTE]
+> **Historical record (2026-10-28) of the v0.1.0 research-preview release audit.** It has not been updated for later versions. For current status see [README.md](README.md), [CLAIMS_AND_EVIDENCE.md](CLAIMS_AND_EVIDENCE.md) and [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
+
 **Audit Date**: 2026-10-28  
 **Auditor**: Independent Senior Retrieval & Benchmark Auditor  
 **Workspace**: `F:\RepoNeedle`  
