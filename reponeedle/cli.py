@@ -42,16 +42,25 @@ def resolve_and_validate_anchors(repo_dir: str, anchors: Optional[List[str]]) ->
             continue
         raw_anchor = a.strip()
 
-        # Check path interpretation 1: Relative to repo_dir (e.g. "auth/session.py" with --repo "dir")
-        candidate_1 = os.path.normpath(os.path.join(abs_repo, raw_anchor))
-        # Check path interpretation 2: Relative to current working directory or absolute
-        candidate_2 = os.path.normpath(os.path.abspath(raw_anchor))
+        # The exact spelling is tried first. On POSIX, a Windows-style spelling ("src\\a.py") is then
+        # retried with forward slashes, consistent with retrieve(anchor_files=...). A real file whose
+        # name contains a backslash still takes precedence. Containment checks below apply either way.
+        spellings = [raw_anchor]
+        if os.sep == "/" and "\\" in raw_anchor:
+            spellings.append(raw_anchor.replace("\\", "/"))
 
         resolved_target = None
-        if os.path.exists(candidate_1) and os.path.isfile(candidate_1):
-            resolved_target = candidate_1
-        elif os.path.exists(candidate_2) and os.path.isfile(candidate_2):
-            resolved_target = candidate_2
+        for spelling in spellings:
+            # Interpretation 1: relative to repo_dir (e.g. "auth/session.py" with --repo "dir").
+            candidate_1 = os.path.normpath(os.path.join(abs_repo, spelling))
+            # Interpretation 2: relative to the current working directory, or absolute.
+            candidate_2 = os.path.normpath(os.path.abspath(spelling))
+            if os.path.isfile(candidate_1):
+                resolved_target = candidate_1
+            elif os.path.isfile(candidate_2):
+                resolved_target = candidate_2
+            if resolved_target is not None:
+                break
 
         if resolved_target is None:
             raise ValueError(

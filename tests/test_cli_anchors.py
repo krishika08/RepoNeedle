@@ -110,6 +110,13 @@ class TestCLIAnchorSupport:
         with pytest.raises(ValueError, match="resolves outside repository root"):
             resolve_and_validate_anchors(str(change_impact_repo), [str(outside_file)])
 
+    def test_resolve_and_validate_anchors_backslash_traversal_rejected(self, change_impact_repo: Path):
+        # The backslash-to-slash retry (POSIX) must not open a traversal route.
+        outside_file = change_impact_repo.parent / "outside_bs.py"
+        outside_file.write_text("print('outside')", encoding="utf-8")
+        with pytest.raises(ValueError, match="resolves outside repository root"):
+            resolve_and_validate_anchors(str(change_impact_repo), ["..\\outside_bs.py"])
+
     def test_cli_change_impact_single_anchor(self, change_impact_repo: Path, capsys: pytest.CaptureFixture):
         exit_code = main([
             "Fix payment gateway timeout",
