@@ -44,6 +44,7 @@ This release does **not** change retrieval quality. No ranking algorithm, fusion
   - skipped oversized files (paths only);
   - unreadable files;
   - links resolving outside the repository;
+  - directory links and junctions that were not traversed;
   - whether the `max_files` cap was reached.
 - `RetrievalResult.abstention` (`AbstentionDiagnostics`): whether the heuristic was applied, with `experimental: true` and `calibrated: false`.
 - `BudgetConfig.enable_experimental_abstention` and `retrieve(..., enable_experimental_abstention=...)`.
@@ -68,6 +69,7 @@ This release does **not** change retrieval quality. No ranking algorithm, fusion
 - **Indexing no longer reads files outside the repository through links.** `from_directory` resolves every file before opening it. Files whose canonical location is outside the repository root (symlinks, and junctions on Windows) are skipped without reading the target. Each skipped link is listed by its in-repository path in `indexing_diagnostics.symlink_outside_repository_paths` (reason `symlink_outside_repository`).
   - In 1.1.0 such files were indexed, and their contents could be returned by retrieval, including through any tool built on it.
   - Links resolving inside the repository are still indexed.
+- **Directory links are never traversed, and traversal is bounded.** Directory symlinks and Windows junctions are not followed on any platform, and no physical directory is entered twice. In 1.1.0, Windows junctions were followed (`os.path.islink` is False for them): a junction to an ancestor directory caused repeated traversal and duplicate index entries until the path length limit, and a junction to an outside directory caused its listings to be traversed. Skipped directories are recorded by in-repository path only (`skipped_directory_paths`, `skipped_directories_outside_repository`), with a count-only warning for those resolving outside the repository. Files under an in-repository link target are indexed once, under their real path. A directory reachable **only** through a directory link (for example a link or junction to a sibling checkout, or to a directory excluded by ignore rules) is therefore not indexed. On Windows this is a change from 1.1.0; on Linux and macOS directory symlinks were already not followed.
 - CLI anchors use the same canonical containment check: an anchor that links outside the repository is rejected.
 
 ### Fixed
@@ -92,9 +94,10 @@ The core runtime dependencies are unchanged from 1.1.0: `numpy`, `scipy`, `netwo
 - All 1.1.0 public call signatures, `RetrievalResult` fields and CLI options keep working. New parameters are optional keywords, and new result fields are additions.
 - The default ranker (`legacy`) and all ranking, fusion, routing and packing defaults are unchanged. On every ARB v2 query compared (82 selective and 53 positive), the pre-release development branch produced rankings bit-identical to 1.1.0. Later changes in 1.2.0 do not touch the ranking path; they were not re-measured.
 - `change_impact` results for `AUTO` queries report the router-classified task, as in 1.1.0. This is now covered by regression tests.
-- Behaviour differs from 1.1.0 in three places:
+- Behaviour differs from 1.1.0 in four places:
   - abstention is off by default;
   - links resolving outside the repository are no longer indexed;
+  - directory links and Windows junctions are not traversed (on Linux and macOS this was already the case);
   - skipped files produce a logged warning.
 
 ### Migrating from 1.1.x
@@ -104,7 +107,7 @@ The core runtime dependencies are unchanged from 1.1.0: `numpy`, `scipy`, `netwo
   - Python, per call: `engine.retrieve(..., enable_experimental_abstention=True)`
   - CLI: `--enable-experimental-abstention`
   - MCP: `"enable_experimental_abstention": true`
-- **If you relied on indexing files through links that point outside the repository:** move or copy those files into the repository, or point `--repo` / `from_directory` at the directory that actually contains them. Check `engine.indexing_diagnostics.symlink_outside_repository_paths` to see what was skipped.
+- **If you relied on indexing files through links that point outside the repository** (file links, directory symlinks or Windows junctions): move or copy those files into the repository, or point `--repo` / `from_directory` at the directory that actually contains them. Check `engine.indexing_diagnostics.symlink_outside_repository_paths` and `skipped_directory_paths` to see what was skipped.
 - **If large files are skipped:** raise the limit with `max_file_size_bytes` (Python) or `--max-file-size-bytes` (CLI and MCP).
 - **If the new indexing warning is unwanted:** adjust the `reponeedle.engine` logger level with the standard `logging` configuration.
 

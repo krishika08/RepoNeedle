@@ -111,6 +111,16 @@ class IndexingDiagnostics(BaseModel):
     # is recorded; the target path and contents are never read or stored.
     skipped_symlink_outside_repository: int = 0
     symlink_outside_repository_paths: List[str] = Field(default_factory=list)
+    # Directories that were not traversed. Directory symlinks and Windows junctions are never
+    # followed (on every platform); files beneath an in-repository link target are still indexed
+    # through their real path. Directories that would revisit an already-traversed directory
+    # (cycles) or whose canonical location is outside the repository root are also skipped.
+    # Only the in-repository path is recorded; link targets are never listed or stored.
+    skipped_directories: int = 0
+    skipped_directory_paths: List[str] = Field(default_factory=list)
+    # Subset of skipped_directories whose canonical location is outside the repository root
+    # (or cannot be resolved, e.g. broken links).
+    skipped_directories_outside_repository: int = 0
     max_files: Optional[int] = None
     max_files_reached: bool = False
 

@@ -224,6 +224,7 @@ print(diag.indexed_files, diag.skipped_large_files, diag.max_file_size_bytes)
 print(diag.skipped_paths)      # e.g. ["generated/large_module.py", "vendor/huge_source.cpp"]
 print(diag.unreadable_paths)   # files that could not be read
 print(diag.symlink_outside_repository_paths)  # links resolving outside the repo (target never read)
+print(diag.skipped_directory_paths)  # directory links/junctions not traversed (never followed)
 print(diag.max_files_reached)  # True if indexing stopped at max_files (default 3000)
 ```
 

@@ -102,10 +102,130 @@ class TestIndexingContainment:
         repo, outside = layout
         kind = _dir_link(repo / "linked", outside)
         engine = RepoNeedleEngine.from_directory(str(repo))
+        diag = engine.indexing_diagnostics
         assert not any(d.path.startswith("linked/") for d in engine.docs)
-        if kind == "junction":  # os.walk descends junctions: the escape is detected and recorded
-            assert engine.indexing_diagnostics.symlink_outside_repository_paths == ["linked/secret.py"]
+        # Directory links (symlinks and junctions alike) are never traversed: only the link's own
+        # in-repository path is recorded, so names of files outside the repository are not listed.
+        assert diag.skipped_directory_paths == ["linked"], kind
+        assert diag.skipped_directories == 1
+        assert diag.skipped_directories_outside_repository == 1
+        assert diag.symlink_outside_repository_paths == []
         _assert_sentinel_unreachable(engine)
+
+    def test_nested_directories_are_indexed_normally(self, layout):
+        repo, _ = layout
+        deep = repo / "pkg" / "a" / "b" / "c"
+        deep.mkdir(parents=True)
+        (deep / "leaf.py").write_text("def leaf():\n    return 'leaf'\n", encoding="utf-8")
+        (repo / "pkg" / "a" / "mid.py").write_text("def mid():\n    return 1\n", encoding="utf-8")
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        paths = sorted(d.path for d in engine.docs)
+        assert paths == ["pkg/a/b/c/leaf.py", "pkg/a/mid.py", "src/app.py", "src/real_module.py"]
+        assert engine.indexing_diagnostics.skipped_directories == 0
+        assert engine.indexing_diagnostics.skipped_directory_paths == []
+
+    def test_directory_link_inside_repository_indexed_once_by_real_path(self, layout, caplog):
+        """Policy: a directory link resolving inside the repository is not traversed; its target's
+        files are indexed exactly once, under their real path. No warning is emitted."""
+        repo, _ = layout
+        _dir_link(repo / "alias_dir", repo / "src")
+        with caplog.at_level("WARNING", logger="reponeedle.engine"):
+            engine = RepoNeedleEngine.from_directory(str(repo))
+        paths = sorted(d.path for d in engine.docs)
+        assert paths == ["src/app.py", "src/real_module.py"]
+        diag = engine.indexing_diagnostics
+        assert diag.skipped_directory_paths == ["alias_dir"]
+        assert diag.skipped_directories_outside_repository == 0
+        assert not [r for r in caplog.records if "directory link" in r.getMessage()]
+
+    def test_directory_link_cycle_to_ancestor_is_bounded(self, layout):
+        repo, _ = layout
+        _dir_link(repo / "src" / "up", repo)  # cycle: repo/src/up -> repo
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        paths = sorted(d.path for d in engine.docs)
+        assert paths == ["src/app.py", "src/real_module.py"]  # each file once; no src/up/... copies
+        diag = engine.indexing_diagnostics
+        assert diag.skipped_directory_paths == ["src/up"]
+        assert diag.skipped_directories_outside_repository == 0
+        assert diag.skipped_unreadable_files == 0
+
+    def test_directory_link_cycle_through_parent_does_not_escape(self, layout, tmp_path: Path):
+        """repo/src/out -> tmp_path (contains both the repository and the outside directory)."""
+        repo, _ = layout
+        _dir_link(repo / "src" / "out", tmp_path)
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        assert sorted(d.path for d in engine.docs) == ["src/app.py", "src/real_module.py"]
+        diag = engine.indexing_diagnostics
+        assert diag.skipped_directory_paths == ["src/out"]
+        assert diag.skipped_directories_outside_repository == 1
+        assert diag.symlink_outside_repository_paths == []  # outside names never listed
+        _assert_sentinel_unreachable(engine)
+
+    def test_mutual_directory_link_cycle(self, layout):
+        repo, _ = layout
+        (repo / "d1").mkdir()
+        (repo / "d2").mkdir()
+        (repo / "d1" / "one.py").write_text("ONE = 1\n", encoding="utf-8")
+        (repo / "d2" / "two.py").write_text("TWO = 2\n", encoding="utf-8")
+        _dir_link(repo / "d1" / "to_d2", repo / "d2")
+        _dir_link(repo / "d2" / "to_d1", repo / "d1")
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        paths = sorted(d.path for d in engine.docs)
+        assert paths == ["d1/one.py", "d2/two.py", "src/app.py", "src/real_module.py"]
+        assert engine.indexing_diagnostics.skipped_directory_paths == ["d1/to_d2", "d2/to_d1"]
+
+    def test_broken_directory_link_is_safe(self, layout):
+        repo, _ = layout
+        gone = repo / "gone_target"
+        gone.mkdir()
+        _dir_link(repo / "dangling", gone)
+        gone.rmdir()
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        assert sorted(d.path for d in engine.docs) == ["src/app.py", "src/real_module.py"]
+        assert not any(p.startswith("dangling/") for p in engine.indexing_diagnostics.skipped_directory_paths)
+
+    def test_link_detection_error_fails_closed(self, layout, monkeypatch):
+        """If a directory entry cannot be inspected (os.lstat raises), it is treated as a link:
+        not traversed, and recorded."""
+        import reponeedle.engine as eng
+        repo, _ = layout
+        (repo / "uninspectable").mkdir()
+        (repo / "uninspectable" / "hidden.py").write_text("HIDDEN = 1\n", encoding="utf-8")
+        real_lstat = os.lstat
+
+        def failing_lstat(path, *args, **kwargs):
+            if os.path.basename(os.fspath(path)) == "uninspectable":
+                raise PermissionError("simulated lstat failure")
+            return real_lstat(path, *args, **kwargs)
+
+        monkeypatch.setattr(eng.os, "lstat", failing_lstat)
+        assert eng.is_directory_link(str(repo / "uninspectable")) is True
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        assert "uninspectable/hidden.py" not in {d.path for d in engine.docs}
+        assert engine.indexing_diagnostics.skipped_directory_paths == ["uninspectable"]
+
+    def test_revisited_physical_directory_is_skipped(self, layout, monkeypatch):
+        """Cycle guard independent of link detection: a directory whose physical identity
+        (st_dev, st_ino) was already traversed is not entered again. SIMULATED: os.stat is patched
+        so that one directory reports the repository root's identity, as a bind mount of the root
+        would. No real bind mount is created (that needs root privileges)."""
+        import reponeedle.engine as eng
+        repo, _ = layout
+        (repo / "mount_like").mkdir()
+        (repo / "mount_like" / "dup.py").write_text("DUP = 1\n", encoding="utf-8")
+        real_stat = os.stat
+        root_stat = real_stat(str(repo))
+
+        def fake_stat(path, *args, **kwargs):
+            if os.path.basename(os.fspath(path)) == "mount_like":
+                return root_stat  # same identity as the repository root, as a bind mount would have
+            return real_stat(path, *args, **kwargs)
+
+        monkeypatch.setattr(eng.os, "stat", fake_stat)
+        engine = RepoNeedleEngine.from_directory(str(repo))
+        assert "mount_like/dup.py" not in {d.path for d in engine.docs}
+        assert engine.indexing_diagnostics.skipped_directory_paths == ["mount_like"]
+        assert engine.indexing_diagnostics.skipped_directories_outside_repository == 0
 
     def test_symlink_inside_repository_still_works(self, layout):
         """Policy: links that resolve inside the repository are indexed under the link path."""

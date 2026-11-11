@@ -63,12 +63,14 @@ def create_mcp_server(
     )
     diag = engine.indexing_diagnostics
     if (diag.skipped_large_files or diag.skipped_unreadable_files or diag.max_files_reached
-            or diag.skipped_symlink_outside_repository):
+            or diag.skipped_symlink_outside_repository or diag.skipped_directories_outside_repository):
         sys.stderr.write(
             f"[reponeedle-mcp] Indexing exclusions: {diag.skipped_large_files} file(s) over "
             f"{diag.max_file_size_bytes} bytes, {diag.skipped_unreadable_files} unreadable"
             + (f", {diag.skipped_symlink_outside_repository} linked outside the repository (not read)"
                if diag.skipped_symlink_outside_repository else "")
+            + (f", {diag.skipped_directories_outside_repository} directory link(s) outside the repository "
+               f"(not traversed)" if diag.skipped_directories_outside_repository else "")
             + (f", stopped at max_files={diag.max_files}" if diag.max_files_reached else "")
             + ". Call reponeedle_inspect for the skipped paths.\n"
         )
