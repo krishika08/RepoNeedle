@@ -1,5 +1,7 @@
 # RepoNeedle 1.2.0 — Proposed Changelog (draft, not yet released)
 
+> **Superseded** by the root-level [CHANGELOG.md](../../CHANGELOG.md), which was reviewed against the code and adds the POSIX anchor fix, backward-compatibility and migration notes. This draft is kept for the audit record.
+
 ## Highlights
 
 - **Native MCP server** (`reponeedle-mcp`, optional `mcp` extra) for MCP-capable coding agents over STDIO.

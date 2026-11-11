@@ -1,6 +1,6 @@
 # KNOWN LIMITATIONS AND ARCHITECTURAL BOUNDARIES: REPONEEDLE
 
-**Applies to**: Released 1.1.0 (PyPI) and the current development branch (planned for 1.2.0, unreleased). Differences between the two are called out explicitly.  
+**Applies to**: Released 1.1.0 (PyPI) and 1.2.0 (upcoming; PyPI publication pending). Differences between the two are called out explicitly.  
 **Originally written for**: 0.1.0 Research Preview (October 2026); last reconciled with the source code on 2026-11-09.  
 **Primary Benchmark**: Agent Retrieval Bench v2 ($N=427$ samples, 25 repositories, 271 unique snapshots)
 
@@ -40,8 +40,8 @@ Measured on the 82 ARB v2 no-gold queries (source: `reports/full_arb_validation/
 ### Required Resolution
 Heuristic confidence scoring based on surface lexical overlap is scientifically inadequate for repository abstention. Future versions will require a dedicated, fine-tuned cross-encoder or neural classifier trained specifically to discriminate internal bugs from out-of-scope issues. Until then, RepoNeedle's selective abstention feature must be treated as purely experimental.
 
-### Mitigation on the Development Branch (planned 1.2.0): Disabled by Default (Behavior Change)
-In released 1.1.0 the heuristic runs on every query. On the development branch it is no longer applied unless explicitly requested. The algorithm, confidence formula and threshold semantics are unchanged; only the default changed.
+### Mitigation in 1.2.0: Disabled by Default (Behavior Change)
+In released 1.1.0 the heuristic runs on every query. From 1.2.0 it is no longer applied unless explicitly requested. The algorithm, confidence formula and threshold semantics are unchanged; only the default changed.
 
 | Surface | How to opt in |
 | :--- | :--- |
@@ -63,7 +63,7 @@ Consequences users must understand:
 ## 3. Deep Recall Deficit Compared to RepoMap
 
 > [!NOTE]
-> Figures in this section come from the 2026-10-28 engine (README Part A). On the current engine (1.1.0 / development branch, re-measured 2026-11-09) the gap is larger: Recall@20 is 0.3842 vs RepoMap 0.6306 (RepoMap +64.2%), and BCY@8k is 0.3443 vs 0.3788 (RepoMap +10.0%). MRR remains at parity (+0.0013, repository-clustered CI [−0.0597, +0.0517]). See [docs/BENCHMARK_CONFIGURATION.md §7.3](docs/BENCHMARK_CONFIGURATION.md#73-current-engine-re-measurement-arb-v2-positive-n345).
+> Figures in this section come from the 2026-10-28 engine (README Part A). On the current engine (1.1.0 and the pre-release 1.2.0 development branch, identical rankings; re-measured 2026-11-09) the gap is larger: Recall@20 is 0.3842 vs RepoMap 0.6306 (RepoMap +64.2%), and BCY@8k is 0.3443 vs 0.3788 (RepoMap +10.0%). MRR remains at parity (+0.0013, repository-clustered CI [−0.0597, +0.0517]). See [docs/BENCHMARK_CONFIGURATION.md §7.3](docs/BENCHMARK_CONFIGURATION.md#73-current-engine-re-measurement-arb-v2-positive-n345).
 
 ### The Observed Defect
 While RepoNeedle matches or slightly exceeds RepoMap on top-rank precision (MRR: `0.2287` vs `0.2140`, a non-significant +6.9% difference, $p=0.4089$), **RepoMap substantially outperforms RepoNeedle at high recall depth**:
@@ -124,11 +124,11 @@ In repositories containing large monolithic source files (>2,000 lines of code, 
 `RepoNeedleEngine.from_directory` does not index every file in a repository:
 1. **File-size limit**: files **strictly larger** than `max_file_size_bytes` (default `500_000` bytes) are excluded. A file exactly at the limit is indexed. The limit is configurable (`from_directory(..., max_file_size_bytes=...)`, CLI/MCP `--max-file-size-bytes`) and must be a positive integer. It is never raised automatically.
 2. **Unreadable files**: files whose size or contents cannot be read are excluded (including broken links and link loops).
-2b. **Links resolving outside the repository** (development branch): files whose canonical location (following symlinks, and junctions on Windows) is outside the repository root are excluded without reading the target and recorded by link path (`symlink_outside_repository_paths`). In released 1.1.0 such files were read and indexed.
+2b. **Links resolving outside the repository** (1.2.0): files whose canonical location (following symlinks, and junctions on Windows) is outside the repository root are excluded without reading the target and recorded by link path (`symlink_outside_repository_paths`). In released 1.1.0 such files were read and indexed.
 3. **`max_files` cap**: indexing stops after `max_files` (default `3000`) files.
 4. **Ignore rules and extensions**: `.gitignore` entries, built-in ignore patterns (`node_modules`, `dist`, `build`, …) and unsupported extensions are excluded by design and are **not** reported as skipped.
 
-### Visibility (development branch, planned 1.2.0)
+### Visibility (1.2.0)
 Exclusions in categories 1–3 are recorded in `engine.indexing_diagnostics` (`skipped_paths`, `unreadable_paths`, `max_files_reached`, plus counts), exposed in CLI `--json` output under `indexing`, and returned by the MCP `reponeedle_inspect` tool. A summary `WARNING` is emitted on the `reponeedle.engine` logger (stderr by default; never on JSON stdout). Diagnostics and log records contain repository-relative paths and counts only, never file contents.
 
 ### Remaining Limitations
@@ -165,8 +165,8 @@ To ensure that headline gains over BM25 (+50.5%) were not simply driven by large
 
 | Limitation | Impact | Severity | Planned Mitigation |
 | :--- | :--- | :---: | :--- |
-| **Heuristic Abstention Failure** | 0.0% accuracy on no-gold tasks; always on in 1.1.0, disabled by default on the development branch (planned 1.2.0), where out-of-scope queries are therefore not detected | **HIGH** | Fine-tuned neural cross-encoder discriminator |
-| **Indexing Exclusions** | Files > 500 KB (configurable via `max_file_size_bytes` on the development branch), unreadable files, or beyond `max_files` are not searchable. Silent in 1.1.0; reported in diagnostics on the development branch | **MEDIUM** | Configurable limit; future span-level indexing of large files |
+| **Heuristic Abstention Failure** | 0.0% accuracy on no-gold tasks; always on in 1.1.0, disabled by default from 1.2.0, where out-of-scope queries are therefore not detected | **HIGH** | Fine-tuned neural cross-encoder discriminator |
+| **Indexing Exclusions** | Files > 500 KB (configurable via `max_file_size_bytes` from 1.2.0), unreadable files, or beyond `max_files` are not searchable. Silent in 1.1.0; reported in diagnostics from 1.2.0 | **MEDIUM** | Configurable limit; future span-level indexing of large files |
 | **Deep Tail Recall Deficit** | Recall@20 lags RepoMap by -32.1% | **MEDIUM** | Multi-hop graph diffusion for tail ranks |
 | **`comment2context` Deficit** | MRR lags pure BM25 by -13.5% | **MEDIUM** | Dynamic BM25 up-weighting on colloquial inputs |
 | **Monolithic File Saturation** | 2k+ line files crowd budget | **MEDIUM** | AST block/span-level context slicing |
@@ -177,7 +177,7 @@ To ensure that headline gains over BM25 (+50.5%) were not simply driven by large
 
 ## 9. Capabilities Not Implemented
 
-These are frequently assumed but are **not** part of RepoNeedle (neither 1.1.0 nor the current development branch):
+These are frequently assumed but are **not** part of RepoNeedle (neither 1.1.0 nor 1.2.0):
 
 | Capability | Status |
 | :--- | :--- |

@@ -1,8 +1,8 @@
 # RepoNeedle Research & Engineering Roadmap
 
-This roadmap is grounded in empirical limitations observed during benchmark evaluations. Status labels distinguish what has been **released**, what exists only on the **development branch**, and what is **not implemented**.
+This roadmap is grounded in empirical limitations observed during benchmark evaluations. Status labels distinguish what has been **released**, what is in the **upcoming 1.2.0** release (this repository's current version; PyPI publication pending), and what is **not implemented**.
 
-*Last reconciled with the source code: 2026-11-09.*
+*Last reconciled with the source code: 2026-11-10.*
 
 ---
 
@@ -17,14 +17,15 @@ This roadmap is grounded in empirical limitations observed during benchmark eval
 - [x] Selective abstention heuristic, **always on in 1.1.0**. It is **experimental and uncalibrated**: on the ARB v2 selective split it correctly abstained on **0 of 82** no-gold queries.
 - [x] Hugging Face release assets prepared in `hf_artifacts/` (dataset card, Gradio Playground Space bundling the 1.1.0 engine, where abstention is always on).
 
-## Development branch (planned for 1.2.0, not yet released)
+## Upcoming: RepoNeedle 1.2.0 (PyPI publication pending)
 - [x] CLI machine-readable output (`--json`) and anchor files (`--anchors`).
 - [x] Native MCP server over STDIO (`reponeedle-mcp`, optional `mcp` extra) with `reponeedle_retrieve`, `reponeedle_change_impact` and `reponeedle_inspect`. Verified with the MCP Python SDK and a raw JSON-RPC STDIO handshake; **not yet validated in a live Claude Code or Cursor session**.
 - [x] Experimental abstention made **opt-in (disabled by default)**, with explicit diagnostics (`experimental: true`, `calibrated: false`) on every result.
 - [x] Indexing diagnostics: configurable file-size limit (`max_file_size_bytes`, default 500,000 bytes) with recorded skipped and unreadable paths.
+- [x] Indexing security: files reached through symlinks (or Windows junctions) that resolve outside the repository root are no longer read; they are recorded in the diagnostics instead.
 - [x] Benchmark reproducibility audit: explicit abstention policy per script ([BENCHMARK_CONFIGURATION.md](BENCHMARK_CONFIGURATION.md)).
 
-Test coverage is measured, not assumed: on the development branch, line coverage of the `reponeedle` package is **87%** (`pytest --cov=reponeedle`, 2026-11-09). Earlier claims of "100% test coverage" were incorrect.
+Test coverage is measured, not assumed: on the pre-release 1.2.0 development branch, line coverage of the `reponeedle` package is **87%** (`pytest --cov=reponeedle`, 2026-11-09). Earlier claims of "100% test coverage" were incorrect.
 
 ## Not implemented
 | Capability | Status |

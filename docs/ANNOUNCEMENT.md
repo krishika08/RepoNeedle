@@ -2,8 +2,8 @@
 
 > [!CAUTION]
 > **Historical document with corrections (corrected 2026-11-09).** This announcement was written for the **v0.1.0 research preview** (October 2026). It is kept for the record, but several of its original claims were not supported by later evaluation and have been corrected in place below:
-> - **Selective abstention**: The original text described a "calibrated" abstention mechanism with perfect accuracy. That figure came from a synthetic benchmark containing only **3** selective samples. On the official Agent Retrieval Bench v2 selective split (**N = 82** no-gold queries) the heuristic correctly abstained on **0 of 82 (0.0%)**. The heuristic is uncalibrated and experimental, and on the current development branch (planned for 1.2.0, unreleased) it is **disabled by default**.
-> - **Benchmark table**: The table below reports the v0.1.0 synthetic **RepoNeedle-Bench** run (15 samples). The stored result file (`benchmarks/results/benchmark_results.json`) is **not reproducible** by any later code version (1.1.0 or the current branch); current re-run values are shown alongside.
+> - **Selective abstention**: The original text described a "calibrated" abstention mechanism with perfect accuracy. That figure came from a synthetic benchmark containing only **3** selective samples. On the official Agent Retrieval Bench v2 selective split (**N = 82** no-gold queries) the heuristic correctly abstained on **0 of 82 (0.0%)**. The heuristic is uncalibrated and experimental, and from 1.2.0 (upcoming) it is **disabled by default**.
+> - **Benchmark table**: The table below reports the v0.1.0 synthetic **RepoNeedle-Bench** run (15 samples). The stored result file (`benchmarks/results/benchmark_results.json`) is **not reproducible** by any later code version (1.1.0 or the pre-release 1.2.0 development branch); current re-run values are shown alongside.
 > - **Latency**: Sub-millisecond latency was measured on tiny synthetic corpora. On real repositories (ARB v2) mean query latency is ~318 ms (see README, Part D).
 >
 > For current, evidence-backed results see [README.md](../README.md), [CLAIMS_AND_EVIDENCE.md](../CLAIMS_AND_EVIDENCE.md), [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md) and [BENCHMARK_CONFIGURATION.md](BENCHMARK_CONFIGURATION.md).
@@ -51,7 +51,7 @@ Evaluated on the synthetic **RepoNeedle-Bench** (`benchmarks/runner.py`): **15 s
 | **BM25 (Sparse Lexical)** | 0.819 | 0.417 | 0.861 | 0.784 | 693.6 | 1/3 | 0.15 ms |
 | **RepoNeedle (Adaptive + Budget)** | 0.917 | 0.528 | 1.000 | 0.936 | 581.0 | 3/3 | 0.80 ms |
 
-**Re-run on 2026-11-09** with the same harness and data. Identical values from the released 1.1.0 code and from the current development branch (experimental abstention explicitly enabled for the 3 selective samples only):
+**Re-run on 2026-11-09** with the same harness and data. Identical values from the released 1.1.0 code and from the pre-release 1.2.0 development branch (experimental abstention explicitly enabled for the 3 selective samples only):
 
 | Retrieval System | MRR | Recall@1 | Recall@3 | nDCG@3 | Irrelevant Tokens (4k) | Selective (N=3) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |

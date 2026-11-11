@@ -177,19 +177,36 @@ class TestReleaseAndInstallDocs:
         assert PYPROJECT["project"]["version"] == reponeedle.__version__
 
     def test_unreleased_version_is_never_described_as_released(self):
-        version = tuple(int(x) for x in PYPROJECT["project"]["version"].split(".")[:2])
-        if version >= (1, 2):
-            pytest.skip("1.2 is the packaged version; release wording is no longer forward-looking")
+        # Any minor version newer than the packaged one is unreleased and must carry a qualifier.
+        packaged = tuple(int(x) for x in PYPROJECT["project"]["version"].split(".")[:2])
         qualifier = re.compile(
             r"planned|unreleased|not yet|development branch|until|once|upcoming|pending|candidate", re.I
         )
         offenders = []
         for doc in CURRENT_DOCS:
             for no, line in enumerate(_read(doc).splitlines(), start=1):
-                if re.search(r"\b1\.2(\.0)?\b", line) and not qualifier.search(line):
-                    if re.search(r"releas|availab|ship|production|since|in 1\.2", line, re.I):
+                newer = [m for m in re.findall(r"\b1\.(\d+)(?:\.\d+)?\b", line) if (1, int(m)) > packaged]
+                if newer and not qualifier.search(line):
+                    if re.search(r"releas|availab|ship|production|since|in 1\.\d", line, re.I):
                         offenders.append(f"{doc.relative_to(ROOT)}:{no}: {line.strip()[:120]}")
-        assert not offenders, "Lines presenting unreleased 1.2 as released:\n" + "\n".join(offenders)
+        assert not offenders, "Lines presenting an unreleased version as released:\n" + "\n".join(offenders)
+
+    def test_packaged_version_is_not_described_as_planned(self):
+        # After a version bump, pre-bump wording ("planned for 1.2.0", "development branch only")
+        # must not remain in the current documentation.
+        major_minor = ".".join(PYPROJECT["project"]["version"].split(".")[:2])
+        stale = re.compile(
+            rf"planned (for )?{re.escape(major_minor)}\b|development branch only|"
+            rf"until {re.escape(major_minor)}(\.0)? is published, install from source",
+            re.I,
+        )
+        offenders = [
+            f"{doc.relative_to(ROOT)}:{no}: {line.strip()[:120]}"
+            for doc in CURRENT_DOCS
+            for no, line in enumerate(_read(doc).splitlines(), start=1)
+            if stale.search(line)
+        ]
+        assert not offenders, "Pre-bump wording for the packaged version remains:\n" + "\n".join(offenders)
 
     def test_no_hard_coded_test_counts_in_user_docs(self):
         for doc in [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]:

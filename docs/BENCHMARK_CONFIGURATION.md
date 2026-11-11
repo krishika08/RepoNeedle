@@ -1,6 +1,6 @@
 # Benchmark Configuration & Reproducibility
 
-This document records **how each benchmark and research script configures RepoNeedle**, which historical results were measured under which defaults, and known reproducibility gaps. It exists because the development branch (planned 1.2.0, unreleased) changed a default that some evaluations depend on.
+This document records **how each benchmark and research script configures RepoNeedle**, which historical results were measured under which defaults, and known reproducibility gaps. It exists because 1.2.0 (upcoming; PyPI publication pending) changed a default that some evaluations depend on.
 
 *Last audited: 2026-11-09. Machine-checked by `tests/test_documentation_consistency.py`.*
 
@@ -11,7 +11,7 @@ This document records **how each benchmark and research script configures RepoNe
 | Version | Selective abstention heuristic |
 | :--- | :--- |
 | ≤ 1.1.0 (released) | **Always on.** Every `retrieve()` call could abstain (return no files) on heuristic grounds. |
-| Development branch (planned 1.2.0) | **Off by default.** Enabled only via `BudgetConfig(enable_experimental_abstention=True)`, `retrieve(..., enable_experimental_abstention=True)`, the CLI flag `--enable-experimental-abstention`, or the MCP argument of the same name. |
+| 1.2.0 | **Off by default.** Enabled only via `BudgetConfig(enable_experimental_abstention=True)`, `retrieve(..., enable_experimental_abstention=True)`, the CLI flag `--enable-experimental-abstention`, or the MCP argument of the same name. |
 
 The heuristic itself (formula, threshold semantics, default threshold `0.12`) is unchanged. Empty repositories always return `abstained=True` regardless of the flag, because there are no candidates.
 
@@ -97,12 +97,13 @@ The same script reported that current confidence values (2/82) and top-20 lists 
 | :--- | :---: | :---: |
 | Commit `8e00425` (tag `v0.1.0-baseline`, 2026-10-28; produced the historical reports) | **82 / 82** (bit-identical) | **53 / 53** |
 | Released 1.1.0 (`HEAD` of `main`) | 2 / 82 (max diff 0.031) | 1 / 53 |
-| Development branch (planned 1.2.0) | identical to 1.1.0 (max diff 0.0) | identical to 1.1.0 (53 / 53) |
+| Pre-release 1.2.0 development branch (2026-11-09) | identical to 1.1.0 (max diff 0.0) | identical to 1.1.0 (53 / 53) |
 
 Conclusions:
 - The evaluation pipeline and data are sound: the producing engine reproduces the published records exactly on every query checked.
 - Engine changes made between 2026-10-28 and the 1.1.0 release changed RepoNeedle's rankings. **README Part A and the ARB-derived claims in `CLAIMS_AND_EVIDENCE.md` describe the 2026-10-28 engine.**
 - Milestones 1A–1C (CLI JSON, anchors, MCP, abstention opt-in, indexing diagnostics) changed no ranking result: the development branch is bit-identical to 1.1.0 on every query compared.
+- Changes merged into 1.2.0 after these measurements were not re-measured. They do not touch the ranking path used here: all benchmark scripts build the engine with `from_documents`, while the outside-repository link check applies only to `from_directory`; the CLI anchor path handling is CLI-only; and the `change_impact` change affects the reported task label only (ranking equality is covered by `tests/test_release_compat.py`).
 
 ### 7.3 Current-engine re-measurement (ARB v2 positive, N=345)
 

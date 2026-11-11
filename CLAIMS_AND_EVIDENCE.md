@@ -1,6 +1,6 @@
 # CLAIMS AND EVIDENCE: SCIENTIFIC RECONCILIATION FOR REPONEEDLE
 
-**Version**: Evidence originally compiled for the 0.1.0 Research Preview. Claims C11–C13 and corrections to C2, C4 and C6 were added on 2026-11-09 and cover released 1.1.0 and the unreleased development branch planned for 1.2.0.  
+**Version**: Evidence originally compiled for the 0.1.0 Research Preview. Claims C11–C13 and corrections to C2, C4 and C6 were added on 2026-11-09 and cover released 1.1.0 and the pre-release development branch that became 1.2.0 (upcoming; PyPI publication pending).  
 **Benchmark Suite**: Official Agent Retrieval Bench (ARB v2, $N=427$ total samples, $N=345$ positive retrieval samples across 25 repositories and 271 unique repository snapshots)  
 **Evaluator**: `agent_retrieval_bench` v0.2.1, Commit `9e4d68937f29`  
 **Evaluation Date**: 2026-10-28  
@@ -29,7 +29,7 @@ This document provides a line-by-line verification of all scientific, empirical,
 
 ### Re-check on the Current Engine (2026-11-09)
 
-The ARB-derived evidence for C1–C8 and C10 was measured on 2026-10-28 with the engine at commit `8e00425` (tag `v0.1.0-baseline`). Engine changes made before the 1.1.0 release altered the rankings, so the ARB v2 positive split was re-measured with the current engine (1.1.0, identical to the development branch). Method and full tables: [docs/BENCHMARK_CONFIGURATION.md §7](docs/BENCHMARK_CONFIGURATION.md#7-verification-performed-2026-11-09).
+The ARB-derived evidence for C1–C8 and C10 was measured on 2026-10-28 with the engine at commit `8e00425` (tag `v0.1.0-baseline`). Engine changes made before the 1.1.0 release altered the rankings, so the ARB v2 positive split was re-measured with the current engine (1.1.0, and the pre-release 1.2.0 development branch of 2026-11-09, which produced identical rankings). Method and full tables: [docs/BENCHMARK_CONFIGURATION.md §7](docs/BENCHMARK_CONFIGURATION.md#7-verification-performed-2026-11-09).
 
 | # | Status on the current engine | Current evidence |
 | :-: | :---: | :--- |
