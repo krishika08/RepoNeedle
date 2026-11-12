@@ -1,12 +1,35 @@
 name: Release & Publish
 
+run-name: "Release ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }} (${{ github.event_name }})"
+
 on:
+  # Normal release path: pushing a version tag.
   push:
     tags:
       - 'v*'
+  # Manual path for a tag that already exists (for example, a release whose tag-push run used an
+  # older version of this workflow). It must be dispatched from `main`. Both the validation and
+  # build jobs check out the requested tag, never the `main` tree.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to validate, build and publish (for example v1.2.0). Dispatch from main."
+        required: true
+        type: string
 
 permissions:
   contents: read
+
+env:
+  # The release tag for this run: the pushed tag, or the `tag` input of a manual dispatch.
+  # Shell steps read it only through this environment variable, never through `${{ }}`
+  # interpolation inside a script.
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+# Never run two releases of the same tag at the same time (for example a tag push and a dispatch).
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
   validate:
@@ -15,10 +38,74 @@ jobs:
     # Test job: read-only, no OIDC token, no publishing credentials.
     permissions:
       contents: read
+    outputs:
+      commit: ${{ steps.release-commit.outputs.commit }}
 
     steps:
-      - name: Checkout repository
+      - name: Check release trigger and tag name
+        run: |
+          set -euo pipefail
+          tag_pattern='^v[0-9]+\.[0-9]+\.[0-9]+((a|b|rc)[0-9]+)?(\.post[0-9]+)?$'
+          if ! [[ "${RELEASE_TAG}" =~ $tag_pattern ]]; then
+            echo "::error::Release tag must look like v1.2.3 (optionally with a1/b1/rc1 or .post1); refusing to release."
+            exit 1
+          fi
+          echo "event=${GITHUB_EVENT_NAME} ref=${GITHUB_REF} release_tag=${RELEASE_TAG}"
+          case "${GITHUB_EVENT_NAME}" in
+            push)
+              if [ "${GITHUB_REF}" != "refs/tags/${RELEASE_TAG}" ]; then
+                echo "::error::Tag-push run for ${GITHUB_REF} does not match release tag ${RELEASE_TAG}."
+                exit 1
+              fi
+              ;;
+            workflow_dispatch)
+              if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+                echo "::error::Manual releases must be dispatched from main, not ${GITHUB_REF}."
+                exit 1
+              fi
+              ;;
+            *)
+              echo "::error::Unsupported release trigger: ${GITHUB_EVENT_NAME}."
+              exit 1
+              ;;
+          esac
+
+      - name: Checkout the release tag (full history and tags)
         uses: actions/checkout@v4
+        with:
+          # Full history and all tags: the test suite verifies historical tags and commits
+          # (for example v0.1.0-baseline), which a shallow checkout does not contain.
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify the checked-out commit is the release tag
+        id: release-commit
+        run: |
+          set -euo pipefail
+          if ! tag_commit="$(git rev-parse --verify --quiet "refs/tags/${RELEASE_TAG}^{commit}")"; then
+            echo "::error::Tag ${RELEASE_TAG} does not exist."
+            exit 1
+          fi
+          head_commit="$(git rev-parse HEAD)"
+          if [ "${tag_commit}" != "${head_commit}" ]; then
+            echo "::error::Checked-out HEAD ${head_commit} is not tag ${RELEASE_TAG} (${tag_commit})."
+            exit 1
+          fi
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            pushed_commit="$(git rev-parse --verify --quiet "${GITHUB_SHA}^{commit}")" || pushed_commit=""
+            if [ "${pushed_commit}" != "${head_commit}" ]; then
+              echo "::error::Tag ${RELEASE_TAG} now points to ${head_commit}, not the pushed commit ${GITHUB_SHA}."
+              exit 1
+            fi
+          else
+            if ! git merge-base --is-ancestor "${head_commit}" refs/remotes/origin/main; then
+              echo "::error::Tag ${RELEASE_TAG} (${head_commit}) is not on main; refusing a manual release."
+              exit 1
+            fi
+          fi
+          echo "Release ${RELEASE_TAG} -> ${head_commit}"
+          echo "commit=${head_commit}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,13 +119,11 @@ jobs:
           pip install -e ".[dev,mcp,api]"
 
       - name: Verify tag, pyproject version and package __version__ match
-        env:
-          TAG_NAME: ${{ github.ref_name }}
         run: |
           python - <<'EOF'
           import os, sys, tomllib
           import reponeedle
-          tag = os.environ["TAG_NAME"]
+          tag = os.environ["RELEASE_TAG"]
           tag_version = tag[1:] if tag.startswith("v") else tag
           project_version = tomllib.load(open("pyproject.toml", "rb"))["project"]["version"]
           package_version = reponeedle.__version__
@@ -70,10 +155,28 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout repository
+      - name: Checkout the release tag (full history and tags)
         uses: actions/checkout@v4
         with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify the checked-out commit is the validated release commit
+        env:
+          VALIDATED_COMMIT: ${{ needs.validate.outputs.commit }}
+        run: |
+          set -euo pipefail
+          if ! tag_commit="$(git rev-parse --verify --quiet "refs/tags/${RELEASE_TAG}^{commit}")"; then
+            echo "::error::Tag ${RELEASE_TAG} does not exist."
+            exit 1
+          fi
+          head_commit="$(git rev-parse HEAD)"
+          if [ -z "${VALIDATED_COMMIT}" ] || [ "${head_commit}" != "${tag_commit}" ] || [ "${head_commit}" != "${VALIDATED_COMMIT}" ]; then
+            echo "::error::Build checkout ${head_commit} does not match tag ${RELEASE_TAG} (${tag_commit}) and the validated commit (${VALIDATED_COMMIT:-none})."
+            exit 1
+          fi
+          echo "Building ${RELEASE_TAG} from ${head_commit}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -95,10 +198,8 @@ jobs:
           python -m twine check --strict dist/*
 
       - name: Verify built artifacts carry the tagged version
-        env:
-          TAG_NAME: ${{ github.ref_name }}
         run: |
-          VERSION="${TAG_NAME#v}"
+          VERSION="${RELEASE_TAG#v}"
           test -f "dist/reponeedle-${VERSION}-py3-none-any.whl" || { echo "Wheel for ${VERSION} not found"; ls dist; exit 1; }
           test -f "dist/reponeedle-${VERSION}.tar.gz" || { echo "sdist for ${VERSION} not found"; ls dist; exit 1; }
 
