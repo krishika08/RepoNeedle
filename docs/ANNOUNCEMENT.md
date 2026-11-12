@@ -2,7 +2,7 @@
 
 > [!CAUTION]
 > **Historical document with corrections (corrected 2026-11-09).** This announcement was written for the **v0.1.0 research preview** (October 2026). It is kept for the record, but several of its original claims were not supported by later evaluation and have been corrected in place below:
-> - **Selective abstention**: The original text described a "calibrated" abstention mechanism with perfect accuracy. That figure came from a synthetic benchmark containing only **3** selective samples. On the official Agent Retrieval Bench v2 selective split (**N = 82** no-gold queries) the heuristic correctly abstained on **0 of 82 (0.0%)**. The heuristic is uncalibrated and experimental, and from 1.2.0 (upcoming) it is **disabled by default**.
+> - **Selective abstention**: The original text described a "calibrated" abstention mechanism with perfect accuracy. That figure came from a synthetic benchmark containing only **3** selective samples. On the official Agent Retrieval Bench v2 selective split (**N = 82** no-gold queries) the heuristic correctly abstained on **0 of 82 (0.0%)**. The heuristic is uncalibrated and experimental, and from 1.2.0 it is **disabled by default**.
 > - **Benchmark table**: The table below reports the v0.1.0 synthetic **RepoNeedle-Bench** run (15 samples). The stored result file (`benchmarks/results/benchmark_results.json`) is **not reproducible** by any later code version (1.1.0 or the pre-release 1.2.0 development branch); current re-run values are shown alongside.
 > - **Latency**: Sub-millisecond latency was measured on tiny synthetic corpora. On real repositories (ARB v2) mean query latency is ~318 ms (see README, Part D).
 >
@@ -32,7 +32,7 @@ RepoNeedle solves these bottlenecks through four complementary innovations:
 
 1. **Workflow-Adaptive Routing**: Automatically classifies task intent (`trace2code`, `code2test`, `edit2ripple`, `comment2context`, `selective`) and dynamically adjusts retrieval weights between AST symbols, inverted dependency graphs, dense subwords, and lexical matching.
 2. **Inverted Test-to-Target Mapping**: Connects production code to its corresponding test suites via import reversal and naming conventions, achieving a **1.000 MRR on test discovery** on the synthetic benchmark (where RepoMap scores 0.122). *On real repositories (ARB v2 `code2test`, N=106) the measured MRR is 0.2660 vs RepoMap 0.1942; see README.*
-3. **Selective Abstention (experimental heuristic, corrected)**: A heuristic combining repository vocabulary overlap, score peakiness ($Z$-score) and score margin was intended to abstain on out-of-scope queries. *Correction: it is not calibrated. It correctly abstained on 0 of 82 no-gold queries on ARB v2 and is disabled by default on the current development branch.*
+3. **Selective Abstention (experimental heuristic, corrected)**: A heuristic combining repository vocabulary overlap, score peakiness ($Z$-score) and score margin was intended to abstain on out-of-scope queries. *Correction: it is not calibrated. It correctly abstained on 0 of 82 no-gold queries on ARB v2 and is disabled by default from 1.2.0.*
 4. **Token-Budget Knapsack Optimization**: Uses marginal utility density packing with multi-tier structural skeletons (extracting signatures, docstrings, and query matches) to fit more relevant context into fixed token budgets (2k, 4k, 8k tokens). *The original "3-4x more files" figure was not backed by a recorded measurement and has been removed.*
 
 ---

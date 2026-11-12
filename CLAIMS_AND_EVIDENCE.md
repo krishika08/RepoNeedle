@@ -1,6 +1,6 @@
 # CLAIMS AND EVIDENCE: SCIENTIFIC RECONCILIATION FOR REPONEEDLE
 
-**Version**: Evidence originally compiled for the 0.1.0 Research Preview. Claims C11–C13 and corrections to C2, C4 and C6 were added on 2026-11-09 and cover released 1.1.0 and the pre-release development branch that became 1.2.0 (upcoming; PyPI publication pending).  
+**Version**: Evidence originally compiled for the 0.1.0 Research Preview. Claims C11–C13 and corrections to C2, C4 and C6 were added on 2026-11-09 and cover released 1.1.0 and the pre-release development branch that became 1.2.0 (published to PyPI on 2026-11-12).  
 **Benchmark Suite**: Official Agent Retrieval Bench (ARB v2, $N=427$ total samples, $N=345$ positive retrieval samples across 25 repositories and 271 unique repository snapshots)  
 **Evaluator**: `agent_retrieval_bench` v0.2.1, Commit `9e4d68937f29`  
 **Evaluation Date**: 2026-10-28  

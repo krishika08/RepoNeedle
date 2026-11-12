@@ -28,7 +28,7 @@ RepoNeedle is a research-oriented project: its benchmark results, including wher
 
 ## 📌 Release Status
 
-| Feature | 1.1.0 (released, PyPI) | 1.2.0 (**upcoming**; publication to PyPI pending) |
+| Feature | 1.1.0 (PyPI, 2026-11-03) | 1.2.0 (PyPI, 2026-11-12) |
 | :--- | :---: | :---: |
 | CPU-first execution | ✅ | ✅ |
 | Python 3.10, 3.11, 3.12 | ✅ | ✅ |
@@ -44,7 +44,7 @@ RepoNeedle is a research-oriented project: its benchmark results, including wher
 | HTTP / SSE MCP transport | Not implemented | Not implemented |
 | AST block slicing of large files | Not implemented | Not implemented |
 
-Until 1.2.0 appears on [PyPI](https://pypi.org/project/reponeedle/), `pip install reponeedle` still installs 1.1.0; install from source (see below) to use the 1.2.0 features before then.
+Both versions are published on [PyPI](https://pypi.org/project/reponeedle/), and `pip install reponeedle` installs the latest. Behaviour changes from 1.1.0 and migration steps are listed in [CHANGELOG.md](CHANGELOG.md#migrating-from-11x).
 
 ---
 
@@ -57,7 +57,7 @@ Until 1.2.0 appears on [PyPI](https://pypi.org/project/reponeedle/), `pip instal
 pip install "reponeedle>=1.2.0"          # core: Python API and CLI
 pip install "reponeedle[mcp]>=1.2.0"     # core + MCP server
 
-# Before 1.2.0 is published on PyPI: install from a clone
+# For local development: install from a clone
 git clone https://github.com/krishika08/RepoNeedle.git
 cd RepoNeedle
 pip install -e ".[mcp]"
@@ -129,11 +129,11 @@ RepoNeedle is self-contained and requires standard Python dependencies (`numpy`,
 | Core: Python API and CLI (incl. `--json`, `--anchors`, indexing diagnostics) | `pip install "reponeedle>=1.2.0"` |
 | Core + MCP server | `pip install "reponeedle[mcp]>=1.2.0"` |
 | Demo HTTP API dependencies (`fastapi`, `httpx`, `uvicorn`; only for the repository's `api.py`) | `pip install "reponeedle[api]"` |
-| From a clone (before 1.2.0 is on PyPI, or for development) | `pip install -e ".[mcp]"` |
+| From a clone, for development (core + MCP server) | `pip install -e ".[mcp]"` |
 | Test and development tools | `pip install -e ".[dev]"` |
 
 > [!NOTE]
-> 1.2.0 is **upcoming**. Until it is published on PyPI, the PyPI commands above fail to resolve `>=1.2.0` (an unpinned `pip install reponeedle` installs 1.1.0, which has no MCP server, `--json` or `--anchors`). Install from a clone in the meantime.
+> The `>=1.2.0` pin also upgrades an existing 1.1.0 installation. 1.1.0 has no MCP server, `--json` or `--anchors`.
 
 > [!TIP]
 > On Python 3.10, `tomli>=2.0.1` is automatically installed via conditional dependency. On Python 3.11 and 3.12, native standard library `tomllib` is used with zero extra dependencies.
@@ -301,7 +301,7 @@ reponeedle "parser entry point" --repo ./my-project --json --max-file-size-bytes
 
 ### 4. Model Context Protocol (MCP) Server
 
-*New in 1.2.0 (upcoming; install with `pip install "reponeedle[mcp]>=1.2.0"`, or `pip install -e ".[mcp]"` from a clone until 1.2.0 is on PyPI).* RepoNeedle includes a local **MCP server** that lets MCP-capable coding agents call it over STDIO. It is tested with the MCP Python SDK and a JSON-RPC STDIO handshake; it has not yet been validated in a live Claude Code, Cursor, Cline or Windsurf session.
+*New in 1.2.0 (install with `pip install "reponeedle[mcp]>=1.2.0"`, or `pip install -e ".[mcp]"` from a clone for development).* RepoNeedle includes a local **MCP server** that lets MCP-capable coding agents call it over STDIO. It is tested with the MCP Python SDK and a JSON-RPC STDIO handshake; it has not yet been validated in a live Claude Code, Cursor, Cline or Windsurf session.
 
 ```bash
 # Launch the MCP server pointing to your project
@@ -462,7 +462,7 @@ Empirically measured across the full Agent Retrieval Bench evaluation suite:
 ### Part E: System Architecture & Deployment Status
 
 - **CPU Native Architecture**: RepoNeedle runs entirely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
-- **Release Status**: **1.1.0 is published on PyPI (2026-11-03)**, with the default `legacy` ranker and the opt-in `change_impact` ranker. 1.2.0 adds the features listed in [Release Status](#-release-status); it is **upcoming** (this repository's version; PyPI publication pending).
+- **Release Status**: **1.2.0 is published on PyPI (2026-11-12)** and adds the features listed in [Release Status](#-release-status). 1.1.0 (PyPI, 2026-11-03) introduced the opt-in `change_impact` ranker; the default ranker is `legacy` in both.
 - **Abstention during these evaluations**: Parts A–C, the Part D latency table and Part F were measured with code in which the abstention heuristic was always on. A full re-run on ARB v2 (2026-11-09) verified that the heuristic would abstain on **0 of 345** positive queries and that selected files are identical with and without it, so the new opt-in default does not change any ARB v2 result. See [docs/BENCHMARK_CONFIGURATION.md](docs/BENCHMARK_CONFIGURATION.md).
 
 ---

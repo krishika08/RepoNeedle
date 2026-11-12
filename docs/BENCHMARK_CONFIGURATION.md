@@ -1,6 +1,6 @@
 # Benchmark Configuration & Reproducibility
 
-This document records **how each benchmark and research script configures RepoNeedle**, which historical results were measured under which defaults, and known reproducibility gaps. It exists because 1.2.0 (upcoming; PyPI publication pending) changed a default that some evaluations depend on.
+This document records **how each benchmark and research script configures RepoNeedle**, which historical results were measured under which defaults, and known reproducibility gaps. It exists because 1.2.0 (PyPI, 2026-11-12) changed a default that some evaluations depend on.
 
 *Last audited: 2026-11-09. Machine-checked by `tests/test_documentation_consistency.py`.*
 

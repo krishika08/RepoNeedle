@@ -1,6 +1,6 @@
 # RepoNeedle Research & Engineering Roadmap
 
-This roadmap is grounded in empirical limitations observed during benchmark evaluations. Status labels distinguish what has been **released**, what is in the **upcoming 1.2.0** release (this repository's current version; PyPI publication pending), and what is **not implemented**.
+This roadmap is grounded in empirical limitations observed during benchmark evaluations. Status labels distinguish what has been **released** (1.1.0 and 1.2.0) and what is **not implemented**.
 
 *Last reconciled with the source code: 2026-11-10.*
 
@@ -17,7 +17,7 @@ This roadmap is grounded in empirical limitations observed during benchmark eval
 - [x] Selective abstention heuristic, **always on in 1.1.0**. It is **experimental and uncalibrated**: on the ARB v2 selective split it correctly abstained on **0 of 82** no-gold queries.
 - [x] Hugging Face release assets prepared in `hf_artifacts/` (dataset card, Gradio Playground Space bundling the 1.1.0 engine, where abstention is always on).
 
-## Upcoming: RepoNeedle 1.2.0 (PyPI publication pending)
+## Released: RepoNeedle 1.2.0 (PyPI, 2026-11-12)
 - [x] CLI machine-readable output (`--json`) and anchor files (`--anchors`).
 - [x] Native MCP server over STDIO (`reponeedle-mcp`, optional `mcp` extra) with `reponeedle_retrieve`, `reponeedle_change_impact` and `reponeedle_inspect`. Verified with the MCP Python SDK and a raw JSON-RPC STDIO handshake; **not yet validated in a live Claude Code or Cursor session**.
 - [x] Experimental abstention made **opt-in (disabled by default)**, with explicit diagnostics (`experimental: true`, `calibrated: false`) on every result.
