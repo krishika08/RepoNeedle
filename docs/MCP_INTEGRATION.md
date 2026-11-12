@@ -1,6 +1,6 @@
 # RepoNeedle Model Context Protocol (MCP) Integration Guide
 
-**Status**: New in RepoNeedle 1.2.0 (**upcoming**; PyPI publication pending). The earlier PyPI release 1.1.0 does **not** include the MCP server.  
+**Status**: Released in RepoNeedle 1.2.0 (PyPI, 2026-11-12). The earlier release 1.1.0 does **not** include the MCP server.  
 **Transport**: STDIO JSON-RPC 2.0 (HTTP/SSE transport is not implemented)  
 **SDK Requirement**: `mcp>=1.28,<2` (Optional dependency group: `mcp`)  
 **Validation**: Verified with the MCP Python SDK (in-process tool calls) and a raw JSON-RPC STDIO handshake (`initialize`, `tools/list`, `tools/call`) in the test suite. **Not yet validated in a live Claude Code, Cursor, Cline or Windsurf session**; the client configuration examples below follow each client's documented MCP configuration format.
@@ -30,13 +30,15 @@ pip install "reponeedle[mcp]>=1.2.0"
 ```
 
 > [!NOTE]
-> 1.2.0 is **upcoming**. Until it is published on PyPI, the command above cannot be resolved (1.1.0, the latest version on PyPI until then, contains neither the MCP server nor the `mcp` extra). In the meantime, install from a clone:
->
-> ```bash
-> git clone https://github.com/krishika08/RepoNeedle.git
-> cd RepoNeedle
-> pip install -e ".[mcp]"
-> ```
+> 1.1.0 contains neither the MCP server nor the `mcp` extra. The `>=1.2.0` pin also upgrades an existing 1.1.0 installation.
+
+For local development, install from a clone:
+
+```bash
+git clone https://github.com/krishika08/RepoNeedle.git
+cd RepoNeedle
+pip install -e ".[mcp]"
+```
 
 To verify that the MCP server executable is available:
 

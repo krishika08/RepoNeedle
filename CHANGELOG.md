@@ -2,9 +2,7 @@
 
 All notable changes to RepoNeedle are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
-## [1.2.0] — Unreleased (upcoming)
-
-> 1.2.0 has not yet been published to PyPI. Until it is, `pip install reponeedle` installs 1.1.0.
+## [1.2.0] — 2026-11-12
 
 ### Highlights
 

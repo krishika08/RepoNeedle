@@ -1,6 +1,6 @@
 # KNOWN LIMITATIONS AND ARCHITECTURAL BOUNDARIES: REPONEEDLE
 
-**Applies to**: Released 1.1.0 (PyPI) and 1.2.0 (upcoming; PyPI publication pending). Differences between the two are called out explicitly.  
+**Applies to**: Released 1.1.0 (PyPI, 2026-11-03) and 1.2.0 (PyPI, 2026-11-12). Differences between the two are called out explicitly.  
 **Originally written for**: 0.1.0 Research Preview (October 2026); last reconciled with the source code on 2026-11-09.  
 **Primary Benchmark**: Agent Retrieval Bench v2 ($N=427$ samples, 25 repositories, 271 unique snapshots)
 
