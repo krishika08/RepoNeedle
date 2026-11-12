@@ -8,9 +8,9 @@ pinned: false
 license: mit
 ---
 
-# RepoNeedle Playground (V1.1.0)
+# RepoNeedle Playground (V1.2.0)
 
-This is the static browser interface for the RepoNeedle V1.1.0 public demonstration. It calls a separately hosted FastAPI service; the static Space does not execute the Python retrieval engine itself.
+This is the static browser interface for the RepoNeedle 1.2.0 public demonstration. It calls a separately hosted FastAPI service; the static Space does not execute the Python retrieval engine itself.
 
 **Live backend:** `https://reponeedle.onrender.com`  
 **Source repository:** https://github.com/krishika08/RepoNeedle  
@@ -24,6 +24,8 @@ If you find RepoNeedle useful, consider supporting its continued development.
 ## Demonstration scope
 
 The public Playground uses small embedded demonstration snapshots for `pallets/flask` and `psf/requests`. It does not clone arbitrary GitHub repositories, accept repository uploads, or reproduce the complete ARB v2 evaluation. Benchmark results described in the source repository were obtained in separate documented evaluations; this web demo is not itself a benchmark reproduction.
+
+In RepoNeedle 1.2.0 the experimental abstention heuristic is **off by default**, so ranked context is returned for every query. The **Experimental abstention** checkbox (unchecked by default) opts in. The heuristic is uncalibrated: on the ARB v2 selective split it correctly abstained on 0 of 82 out-of-scope queries.
 
 The browser sends retrieval requests to the public API. Queries are processed in memory and are not persisted by the demo API. The API is unauthenticated and intended for demonstration use, not production workloads. The free backend may sleep after inactivity, causing a cold-start delay.
 

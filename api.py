@@ -5,6 +5,7 @@ It does not accept repository uploads and does not persist visitor queries.
 """
 from __future__ import annotations
 
+import logging
 import sys
 import time
 from functools import lru_cache
@@ -22,19 +23,24 @@ sys.path.insert(0, str(SPACE_DIR))
 
 # app.py handles Gradio as optional; it can be imported without installing Gradio.
 from app import CORPORA  # noqa: E402
+import reponeedle  # noqa: E402
 from reponeedle.engine import RepoNeedleEngine  # noqa: E402
 from reponeedle.models import Query, TaskType  # noqa: E402
 from reponeedle.core.lexical import BM25Index  # noqa: E402
 from reponeedle.core.graph import RepoGraph  # noqa: E402
 
+# Single source of truth: the version of the bundled engine this API actually imports.
+ENGINE_VERSION = reponeedle.__version__
+
+logger = logging.getLogger("reponeedle.demo_api")
 
 app = FastAPI(
     title="RepoNeedle Demo API",
     description=(
-        "Browser-facing API for the RepoNeedle V1.1.0 demonstration. "
+        f"Browser-facing API for the RepoNeedle {ENGINE_VERSION} demonstration. "
         "Uses embedded sample snapshots of Flask and Requests."
     ),
-    version="1.1.0",
+    version=ENGINE_VERSION,
 )
 
 # Hugging Face Static Spaces are served from a different origin.
@@ -56,6 +62,9 @@ class RetrieveRequest(BaseModel):
     budget_tokens: int = Field(default=4000, ge=500, le=8000)
     seed_files: list[str] = Field(default_factory=list, max_length=10)
     query: str = Field(min_length=2, max_length=3000)
+    # Experimental, uncalibrated out-of-scope abstention heuristic. Off unless the caller opts in
+    # (the RepoNeedle 1.2.0 default).
+    enable_experimental_abstention: bool = False
 
 
 @lru_cache(maxsize=2)
@@ -78,7 +87,7 @@ def get_baselines(repo_name: str):
 def root():
     return {
         "name": "RepoNeedle Demo API",
-        "version": "1.1.0",
+        "version": ENGINE_VERSION,
         "health": "/health",
         "docs": "/docs",
         "disclosure": "Embedded demonstration snapshots only; not full upstream repositories.",
@@ -87,7 +96,7 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "reponeedle-demo-api", "version": "1.1.0"}
+    return {"status": "ok", "service": "reponeedle-demo-api", "version": ENGINE_VERSION}
 
 
 @app.post("/api/retrieve")
@@ -112,7 +121,11 @@ def retrieve_context(payload: RetrieveRequest):
         )
 
         started = time.perf_counter()
-        result = engine.retrieve(query=query_obj, ranker=payload.ranker)
+        result = engine.retrieve(
+            query=query_obj,
+            ranker=payload.ranker,
+            enable_experimental_abstention=payload.enable_experimental_abstention,
+        )
         elapsed_ms = (time.perf_counter() - started) * 1000
 
         selected = []
@@ -152,6 +165,14 @@ def retrieve_context(payload: RetrieveRequest):
         else:
             ranker_note = "Legacy ranking is active (the backwards-compatible default ranker)."
 
+        diag = result.abstention
+        abstention = {
+            "enabled": bool(diag.enabled) if diag else bool(payload.enable_experimental_abstention),
+            "status": diag.status if diag else ("evaluated" if payload.enable_experimental_abstention else "disabled"),
+            "experimental": True,
+            "calibrated": False,
+        }
+
         return {
             "query": query_text,
             "repository": payload.repo_name,
@@ -169,9 +190,12 @@ def retrieve_context(payload: RetrieveRequest):
             "selected_files": selected,
             "comparison": comparison,
             "preview": selected[0] if selected else None,
+            "abstention": abstention,
         }
     except HTTPException:
         raise
     except Exception as exc:
-        # Do not return stack traces or local filesystem details to public callers.
-        raise HTTPException(status_code=500, detail=f"Retrieval failed: {type(exc).__name__}: {exc}") from exc
+        # Do not return exception messages, stack traces or local filesystem details to public
+        # callers; keep the details in the server log only.
+        logger.exception("Demo retrieval failed")
+        raise HTTPException(status_code=500, detail="Retrieval failed due to an internal error.") from exc

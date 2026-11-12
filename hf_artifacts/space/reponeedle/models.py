@@ -67,6 +67,64 @@ class ScoredFile(BaseModel):
     explanation: str = ""
 
 
+class AbstentionDiagnostics(BaseModel):
+    """
+    Describes how (and whether) the experimental abstention heuristic influenced a retrieval.
+
+    status values:
+        "disabled"          - Heuristic not applied (default). Results are returned regardless of
+                              whether the query is in scope for the repository.
+        "evaluated"         - Caller opted in; the heuristic decided whether to abstain.
+        "empty_repository"  - No candidate files exist; the result is abstained structurally,
+                              independent of the heuristic and of the opt-in flag.
+
+    The heuristic is experimental and NOT production-calibrated (ARB v2 selective split:
+    0 of 82 negative samples correctly abstained). `experimental` and `calibrated` are
+    reported on every result so downstream consumers never mistake it for a calibrated signal.
+    """
+    enabled: bool = False
+    status: str = "disabled"
+    experimental: bool = True
+    calibrated: bool = False
+    threshold: float = 0.12
+    reason: str = ""
+
+
+class IndexingDiagnostics(BaseModel):
+    """
+    Records what was (and was not) indexed. Never stores file contents: only
+    repository-relative paths and counts.
+
+    source:
+        "directory" - built by RepoNeedleEngine.from_directory (scan statistics are populated).
+        "documents" - built from in-memory FileDoc objects (no scan was performed).
+    """
+    source: str = "documents"
+    indexed_files: int = 0
+    max_file_size_bytes: Optional[int] = None
+    skipped_large_files: int = 0
+    skipped_paths: List[str] = Field(default_factory=list)
+    skipped_unreadable_files: int = 0
+    unreadable_paths: List[str] = Field(default_factory=list)
+    # Files (symlinks or, on Windows, junction members) whose canonical location is outside the
+    # repository root. Reason code: "symlink_outside_repository". Only the in-repository link path
+    # is recorded; the target path and contents are never read or stored.
+    skipped_symlink_outside_repository: int = 0
+    symlink_outside_repository_paths: List[str] = Field(default_factory=list)
+    # Directories that were not traversed. Directory symlinks and Windows junctions are never
+    # followed (on every platform); files beneath an in-repository link target are still indexed
+    # through their real path. Directories that would revisit an already-traversed directory
+    # (cycles) or whose canonical location is outside the repository root are also skipped.
+    # Only the in-repository path is recorded; link targets are never listed or stored.
+    skipped_directories: int = 0
+    skipped_directory_paths: List[str] = Field(default_factory=list)
+    # Subset of skipped_directories whose canonical location is outside the repository root
+    # (or cannot be resolved, e.g. broken links).
+    skipped_directories_outside_repository: int = 0
+    max_files: Optional[int] = None
+    max_files_reached: bool = False
+
+
 class RetrievalResult(BaseModel):
     query: str
     task_type: TaskType
@@ -81,6 +139,8 @@ class RetrievalResult(BaseModel):
     ranker: Optional[str] = "legacy"
     ranked_files: Optional[List[str]] = None
     rendered_context: str = ""
+    # Added in 1.2.0 (optional; None for results built outside RepoNeedleEngine.retrieve).
+    abstention: Optional[AbstentionDiagnostics] = None
 
     @property
     def packed_files(self) -> List[ScoredFile]:
@@ -94,6 +154,11 @@ class BudgetConfig(BaseModel):
     skeleton_token_cap: int = 350
     density_exponent: float = 0.75
     abstention_threshold: float = 0.12
+    # Experimental, uncalibrated out-of-scope abstention heuristic. Disabled by default since 1.2.0.
+    # When False, retrieval never abstains on heuristic grounds (empty repositories still abstain).
+    # Selecting TaskType.SELECTIVE does NOT enable it; this flag (or the per-call override on
+    # RepoNeedleEngine.retrieve) is the only opt-in.
+    enable_experimental_abstention: bool = False
     mode: str = "auto"  # "auto", "compact", "complete"
     capacity_elasticity: Optional[float] = None
     candidate_pool_cutoff: int = 85

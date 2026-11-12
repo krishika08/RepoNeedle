@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#10141c" />
   <meta name="description" content="RepoNeedle — token-budget-aware repository context retrieval for AI coding agents." />
-  <title>RepoNeedle Playground · V1.1.0</title>
+  <title>RepoNeedle Playground · V1.2.0</title>
   <style>
     :root {
       color-scheme: dark;
@@ -70,6 +70,9 @@
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .range-row { display: flex; align-items: center; gap: 12px; }
     input[type="range"] { padding: 0; accent-color: var(--accent); }
+    .check { display: flex; gap: 10px; align-items: flex-start; }
+    .check input[type="checkbox"] { width: 16px; height: 16px; flex: none; margin: 1px 0 0; padding: 0; accent-color: var(--accent); }
+    .check label { margin: 0; cursor: pointer; }
     .range-value { min-width: 74px; text-align: right; color: var(--accent-2); font-variant-numeric: tabular-nums; font-size: 12px; }
     .examples { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 17px; }
     .example { border: 1px solid #34445b; background: #172233; color: var(--soft); border-radius: 999px; padding: 7px 10px; font-size: 11px; font-weight: 600; }
@@ -125,7 +128,7 @@
         <div class="mark">🪡</div>
         <div><div class="brand-name">RepoNeedle</div><div class="brand-sub">Repository context retrieval</div></div>
       </div>
-      <div class="version">PLAYGROUND · V1.1.0</div>
+      <div class="version">PLAYGROUND · V1.2.0</div>
     </header>
 
     <section class="hero">
@@ -178,6 +181,13 @@
             <label for="query">CODING TASK / ISSUE / STACK TRACE</label>
             <textarea id="query" placeholder="Describe the bug, code change, traceback, or tests you want to locate..."></textarea>
           </div>
+          <div class="field">
+            <div class="check">
+              <input id="abstention" type="checkbox">
+              <label for="abstention">EXPERIMENTAL ABSTENTION <span style="color:var(--muted);font-weight:400">(opt-in, off by default)</span></label>
+            </div>
+            <div class="hint">Off by default in RepoNeedle 1.2.0, so ranked context is returned for every query. The heuristic is experimental and uncalibrated: it correctly abstained on 0 of 82 out-of-scope queries in the ARB v2 selective split. Choosing the Selective task does not enable it.</div>
+          </div>
           <div class="examples" aria-label="Example queries">
             <button class="example" type="button" data-example="Fix cookie attribute handling during session modification in SecureCookieSessionInterface.">Session change</button>
             <button class="example" type="button" data-example="Find unit and regression tests for SecureCookieSessionInterface cookie saving and modification.">Find tests</button>
@@ -210,7 +220,7 @@
     </section>
 
     <footer class="footer">
-      RepoNeedle V1.1.0 · MIT License · <a href="https://github.com/krishika08/RepoNeedle" target="_blank" rel="noopener">GitHub repository</a> · <a href="https://huggingface.co/datasets/RepoNeedle/RepoNeedle-Bench" target="_blank" rel="noopener">Demo benchmark dataset</a><br>
+      RepoNeedle V1.2.0 · MIT License · <a href="https://github.com/krishika08/RepoNeedle" target="_blank" rel="noopener">GitHub repository</a> · <a href="https://huggingface.co/datasets/RepoNeedle/RepoNeedle-Bench" target="_blank" rel="noopener">Demo benchmark dataset</a><br>
       Free backend hosting may sleep after inactivity; the first request can take about a minute to wake up.
     </footer>
   </main>
@@ -284,7 +294,11 @@
       document.getElementById('mTokens').textContent = Number(data.tokens_used).toLocaleString() + ' / ' + Number(data.token_budget).toLocaleString();
       document.getElementById('mConfidence').textContent = Number(data.confidence).toFixed(3);
       document.getElementById('mLatency').textContent = Number(data.latency_ms).toFixed(1) + ' ms';
-      document.getElementById('diagnostics').textContent = [data.ranker_note, data.explanation, 'Inferred task: ' + data.task_type + ' · Candidates: ' + data.candidate_count].filter(Boolean).join(' ');
+      const abstention = data.abstention || {};
+      const abstentionNote = abstention.enabled
+        ? 'Experimental abstention: opt-in enabled (uncalibrated; treat an abstention as a diagnostic).'
+        : 'Experimental abstention: disabled (default).';
+      document.getElementById('diagnostics').textContent = [data.ranker_note, abstentionNote, data.explanation, 'Inferred task: ' + data.task_type + ' · Candidates: ' + data.candidate_count].filter(Boolean).join(' ');
 
       const filesBody = document.getElementById('filesBody');
       filesBody.innerHTML = data.selected_files.length ? data.selected_files.map(file =>
@@ -298,7 +312,7 @@
 
       const preview = data.preview;
       document.getElementById('previewPath').textContent = preview ? preview.path + ' · ' + preview.tier : 'No selected file';
-      document.getElementById('previewCode').textContent = preview ? (preview.content || 'No preview content available.') : 'The engine abstained or no files were selected.';
+      document.getElementById('previewCode').textContent = preview ? (preview.content || 'No preview content available.') : (data.abstained ? 'The opt-in experimental abstention heuristic abstained on this query.' : 'No files were selected.');
     }
 
     async function runRetrieval() {
@@ -312,7 +326,8 @@
         task_mode: document.getElementById('task').value,
         budget_tokens: Number(budget.value),
         seed_files: seedFiles,
-        query
+        query,
+        enable_experimental_abstention: document.getElementById('abstention').checked
       };
       runBtn.disabled = true;
       runBtn.textContent = 'Retrieving context…';
