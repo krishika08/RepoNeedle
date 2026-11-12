@@ -1,6 +1,6 @@
 # RepoNeedle Model Context Protocol (MCP) Integration Guide
 
-**Status**: Available on the development branch; **planned for RepoNeedle 1.2.0 (not yet released)**. The published PyPI release (1.1.0) does **not** include the MCP server.  
+**Status**: New in RepoNeedle 1.2.0 (**upcoming**; PyPI publication pending). The earlier PyPI release 1.1.0 does **not** include the MCP server.  
 **Transport**: STDIO JSON-RPC 2.0 (HTTP/SSE transport is not implemented)  
 **SDK Requirement**: `mcp>=1.28,<2` (Optional dependency group: `mcp`)  
 **Validation**: Verified with the MCP Python SDK (in-process tool calls) and a raw JSON-RPC STDIO handshake (`initialize`, `tools/list`, `tools/call`) in the test suite. **Not yet validated in a live Claude Code, Cursor, Cline or Windsurf session**; the client configuration examples below follow each client's documented MCP configuration format.
@@ -23,16 +23,20 @@ The **Model Context Protocol (MCP)** is an open specification enabling AI coding
 
 ## 2. Installation
 
-RepoNeedle core requires Python 3.10+. MCP support is currently available **from source only** (development branch, planned for 1.2.0):
+RepoNeedle core requires Python 3.10+. Install RepoNeedle 1.2.0 or later with the optional `mcp` extra:
 
 ```bash
-git clone https://github.com/krishika08/RepoNeedle.git
-cd RepoNeedle
-pip install -e ".[mcp]"
+pip install "reponeedle[mcp]>=1.2.0"
 ```
 
 > [!NOTE]
-> `pip install "reponeedle[mcp]"` from PyPI currently installs **1.1.0**, which does not contain the MCP server or the `mcp` extra (pip only warns about the unknown extra). Use the PyPI command once a release that includes MCP support has been published.
+> 1.2.0 is **upcoming**. Until it is published on PyPI, the command above cannot be resolved (1.1.0, the latest version on PyPI until then, contains neither the MCP server nor the `mcp` extra). In the meantime, install from a clone:
+>
+> ```bash
+> git clone https://github.com/krishika08/RepoNeedle.git
+> cd RepoNeedle
+> pip install -e ".[mcp]"
+> ```
 
 To verify that the MCP server executable is available:
 
@@ -267,6 +271,9 @@ Takes no arguments (`{}`).
     "unreadable_paths": [],
     "skipped_symlink_outside_repository": 0,
     "symlink_outside_repository_paths": [],
+    "skipped_directories": 0,
+    "skipped_directory_paths": [],
+    "skipped_directories_outside_repository": 0,
     "max_files": 3000,
     "max_files_reached": false
   },
@@ -285,6 +292,7 @@ The `indexing` object reports what the startup index excluded, so an agent can t
 - `skipped_paths` / `skipped_large_files`: supported-extension files strictly larger than `max_file_size_bytes` (set with `--max-file-size-bytes`). A file exactly at the limit is indexed.
 - `unreadable_paths` / `skipped_unreadable_files`: files that could not be read (including broken links and link loops).
 - `symlink_outside_repository_paths` / `skipped_symlink_outside_repository`: in-repository links whose target resolves outside the repository root. Their targets are never read; only the link path is listed.
+- `skipped_directory_paths` / `skipped_directories`: directories that were not traversed. Directory symlinks and Windows junctions are never followed (files under a link target inside the repository are indexed once, under their real path), and a physical directory is never entered twice, so link cycles cannot cause repeated traversal. `skipped_directories_outside_repository` counts the links that resolve outside the repository root (or cannot be resolved); their contents are never listed or read.
 - `max_files_reached`: `true` if indexing stopped at the `max_files` cap.
 
 Paths are repository-relative with forward slashes and sorted. File contents are never included. Files excluded by `.gitignore`, built-in ignore patterns, or unsupported extensions are excluded by design and are not listed. Diagnostics describe the index built at server startup; restart the server to refresh them.

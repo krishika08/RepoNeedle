@@ -28,7 +28,7 @@ RepoNeedle is a research-oriented project: its benchmark results, including wher
 
 ## 📌 Release Status
 
-| Feature | 1.1.0 (released, PyPI) | Development branch (planned 1.2.0, **unreleased**) |
+| Feature | 1.1.0 (released, PyPI) | 1.2.0 (**upcoming**; publication to PyPI pending) |
 | :--- | :---: | :---: |
 | CPU-first execution | ✅ | ✅ |
 | Python 3.10, 3.11, 3.12 | ✅ | ✅ |
@@ -44,7 +44,7 @@ RepoNeedle is a research-oriented project: its benchmark results, including wher
 | HTTP / SSE MCP transport | Not implemented | Not implemented |
 | AST block slicing of large files | Not implemented | Not implemented |
 
-Features marked for the development branch require installing from source (see below) until 1.2.0 is published.
+Until 1.2.0 appears on [PyPI](https://pypi.org/project/reponeedle/), `pip install reponeedle` still installs 1.1.0; install from source (see below) to use the 1.2.0 features before then.
 
 ---
 
@@ -53,23 +53,23 @@ Features marked for the development branch require installing from source (see b
 ### 1. Install
 
 ```bash
-# Released version (1.1.0) from PyPI
-pip install reponeedle
+# From PyPI
+pip install "reponeedle>=1.2.0"          # core: Python API and CLI
+pip install "reponeedle[mcp]>=1.2.0"     # core + MCP server
 
-# Development branch: adds --json, --anchors, the MCP server and indexing diagnostics
+# Before 1.2.0 is published on PyPI: install from a clone
 git clone https://github.com/krishika08/RepoNeedle.git
 cd RepoNeedle
-pip install -e .            # core
-pip install -e ".[mcp]"     # core + MCP server
+pip install -e ".[mcp]"
 ```
 
 ### 2. Try the CLI
 
 ```bash
-# Rank and pack context for a task (works with 1.1.0 and the development branch)
+# Rank and pack context for a task (1.1.0 and later)
 reponeedle "where is the session cookie saved?" --repo ./my-project --budget 4000
 
-# Development branch: machine-readable JSON for scripts and agents
+# 1.2.0: machine-readable JSON for scripts and agents
 reponeedle "fix token expiration in auth" --repo ./my-project --json
 ```
 
@@ -87,10 +87,10 @@ for f in result.selected_files:
 prompt_context = result.rendered_context   # ready-to-paste markdown for an LLM
 ```
 
-### 4. Connect an MCP client (development branch)
+### 4. Connect an MCP client (1.2.0)
 
 ```bash
-pip install -e ".[mcp]"
+pip install "reponeedle[mcp]>=1.2.0"
 claude mcp add reponeedle -- python -m reponeedle.mcp --repo /absolute/path/to/your/project
 ```
 
@@ -126,13 +126,14 @@ RepoNeedle is self-contained and requires standard Python dependencies (`numpy`,
 
 | What you need | Command |
 | :--- | :--- |
-| Released 1.1.0 (Python API, Rich CLI) | `pip install reponeedle` |
-| Development branch (adds `--json`, `--anchors`, indexing diagnostics) | `pip install -e .` (from a clone) |
-| Development branch + MCP server | `pip install -e ".[mcp]"` |
+| Core: Python API and CLI (incl. `--json`, `--anchors`, indexing diagnostics) | `pip install "reponeedle>=1.2.0"` |
+| Core + MCP server | `pip install "reponeedle[mcp]>=1.2.0"` |
+| Demo HTTP API dependencies (`fastapi`, `httpx`, `uvicorn`; only for the repository's `api.py`) | `pip install "reponeedle[api]"` |
+| From a clone (before 1.2.0 is on PyPI, or for development) | `pip install -e ".[mcp]"` |
 | Test and development tools | `pip install -e ".[dev]"` |
 
 > [!NOTE]
-> `pip install "reponeedle[mcp]"` from PyPI currently installs 1.1.0, which does not include the MCP server. Install from source for MCP support until 1.2.0 is published.
+> 1.2.0 is **upcoming**. Until it is published on PyPI, the PyPI commands above fail to resolve `>=1.2.0` (an unpinned `pip install reponeedle` installs 1.1.0, which has no MCP server, `--json` or `--anchors`). Install from a clone in the meantime.
 
 > [!TIP]
 > On Python 3.10, `tomli>=2.0.1` is automatically installed via conditional dependency. On Python 3.11 and 3.12, native standard library `tomllib` is used with zero extra dependencies.
@@ -174,7 +175,7 @@ else:
 #### Experimental Abstention (Opt-In)
 
 > [!WARNING]
-> **Behavior change on the development branch (planned 1.2.0, unreleased)**: the selective abstention heuristic is **disabled by default**. In released 1.1.x it runs on every query. Because it is not production-calibrated (0 of 82 negative samples correctly abstained on the ARB v2 selective split), leaving it on gave a misleading impression that out-of-scope queries were being filtered. With it disabled, retrieval always returns ranked results (except for an empty repository) and **out-of-scope queries are not detected**. If you relied on the 1.1.x behavior, opt in explicitly as shown below.
+> **Behavior change in 1.2.0**: the selective abstention heuristic is **disabled by default**. In released 1.1.x it runs on every query. Because it is not production-calibrated (0 of 82 negative samples correctly abstained on the ARB v2 selective split), leaving it on gave a misleading impression that out-of-scope queries were being filtered. With it disabled, retrieval always returns ranked results (except for an empty repository) and **out-of-scope queries are not detected**. If you relied on the 1.1.x behavior, opt in explicitly as shown below.
 
 ```python
 from reponeedle import RepoNeedleEngine, BudgetConfig, TaskType
@@ -223,6 +224,7 @@ print(diag.indexed_files, diag.skipped_large_files, diag.max_file_size_bytes)
 print(diag.skipped_paths)      # e.g. ["generated/large_module.py", "vendor/huge_source.cpp"]
 print(diag.unreadable_paths)   # files that could not be read
 print(diag.symlink_outside_repository_paths)  # links resolving outside the repo (target never read)
+print(diag.skipped_directory_paths)  # directory links/junctions not traversed (never followed)
 print(diag.max_files_reached)  # True if indexing stopped at max_files (default 3000)
 ```
 
@@ -299,7 +301,7 @@ reponeedle "parser entry point" --repo ./my-project --json --max-file-size-bytes
 
 ### 4. Model Context Protocol (MCP) Server
 
-*Development branch only (planned 1.2.0; install with `pip install -e ".[mcp]"`).* RepoNeedle includes a local **MCP server** that lets MCP-capable coding agents call it over STDIO. It is tested with the MCP Python SDK and a JSON-RPC STDIO handshake; it has not yet been validated in a live Claude Code, Cursor, Cline or Windsurf session.
+*New in 1.2.0 (upcoming; install with `pip install "reponeedle[mcp]>=1.2.0"`, or `pip install -e ".[mcp]"` from a clone until 1.2.0 is on PyPI).* RepoNeedle includes a local **MCP server** that lets MCP-capable coding agents call it over STDIO. It is tested with the MCP Python SDK and a JSON-RPC STDIO handshake; it has not yet been validated in a live Claude Code, Cursor, Cline or Windsurf session.
 
 ```bash
 # Launch the MCP server pointing to your project
@@ -325,7 +327,7 @@ For client configuration examples (Claude Code, Cursor), see the [MCP Integratio
 To maintain strict scientific integrity, **Official External Benchmark Results** are reported separately from **Independent Research Evaluations**. Dataset sizes, query counts ($N$), candidate pool properties, and evaluation methodologies are explicitly documented for every measurement.
 
 > [!IMPORTANT]
-> **Which engine these numbers describe.** Parts A–C and the latency table in Part D come from the ARB v2 run of 2026-10-28, made with the engine at commit `8e00425` (tag `v0.1.0-baseline`); that code reproduced the published per-query records exactly on every query checked (all 82 selective and 53 of 345 positive queries). Engine changes made before the 1.1.0 release altered RepoNeedle's rankings, so these results do **not** describe released 1.1.0. The current engine (1.1.0, identical to the development branch) was re-measured on the same ARB v2 positive split on 2026-11-09:
+> **Which engine these numbers describe.** Parts A–C and the latency table in Part D come from the ARB v2 run of 2026-10-28, made with the engine at commit `8e00425` (tag `v0.1.0-baseline`); that code reproduced the published per-query records exactly on every query checked (all 82 selective and 53 of 345 positive queries). Engine changes made before the 1.1.0 release altered RepoNeedle's rankings, so these results do **not** describe released 1.1.0. The current engine (1.1.0, and the pre-release 1.2.0 development branch of 2026-11-09, which produced identical rankings) was re-measured on the same ARB v2 positive split on 2026-11-09:
 >
 > | ARB v2 positive (N=345) | MRR | Recall@5 | Recall@10 | Recall@20 | BCY@4k | BCY@8k |
 > | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -410,7 +412,7 @@ Evaluated on the complete official Agent Retrieval Bench Selective Retrieval spl
 > **Heuristic Abstention Failure Analysis**: In production benchmark conditions, RepoNeedle's heuristic confidence gating ($Z$-score + repository symbol overlap) achieved **0% abstention accuracy (0/82)**. 
 > - *Root Cause*: Heuristic confidence on the 82 no-gold queries ranged from `0.532` to `0.891` (5th–95th percentile `0.635`–`0.851`), far above the engine's default threshold of `0.12`. Natural GitHub issue descriptions filed against a repository inherently contain valid repository vocabulary. Counterfactual queries similarly contain ubiquitous software engineering terminology (`error`, `parse`, `client`, `handler`).
 > - *Recommendation*: Heuristic score thresholds are insufficient for reliable abstention in large codebases. Selective retrieval requires a dedicated, trained neural discriminator rather than surface lexical statistics.
-> - *Consequence*: In released 1.1.0 the heuristic is always on. On the development branch (planned 1.2.0, unreleased) it is **disabled by default** and only applied when explicitly enabled. See [Experimental Abstention](#experimental-abstention-opt-in).
+> - *Consequence*: In released 1.1.0 the heuristic is always on. From 1.2.0 it is **disabled by default** and only applied when explicitly enabled. See [Experimental Abstention](#experimental-abstention-opt-in).
 
 ---
 
@@ -460,7 +462,7 @@ Empirically measured across the full Agent Retrieval Bench evaluation suite:
 ### Part E: System Architecture & Deployment Status
 
 - **CPU Native Architecture**: RepoNeedle runs entirely in Python/NumPy/SciPy/NetworkX without requiring CUDA GPUs or heavy deep learning runtime dependencies.
-- **Release Status**: **1.1.0 is published on PyPI (2026-11-03)**, with the default `legacy` ranker and the opt-in `change_impact` ranker. The development branch adds the features listed in [Release Status](#-release-status) and is planned for 1.2.0; it is **not yet released**.
+- **Release Status**: **1.1.0 is published on PyPI (2026-11-03)**, with the default `legacy` ranker and the opt-in `change_impact` ranker. 1.2.0 adds the features listed in [Release Status](#-release-status); it is **upcoming** (this repository's version; PyPI publication pending).
 - **Abstention during these evaluations**: Parts A–C, the Part D latency table and Part F were measured with code in which the abstention heuristic was always on. A full re-run on ARB v2 (2026-11-09) verified that the heuristic would abstain on **0 of 345** positive queries and that selected files are identical with and without it, so the new opt-in default does not change any ARB v2 result. See [docs/BENCHMARK_CONFIGURATION.md](docs/BENCHMARK_CONFIGURATION.md).
 
 ---

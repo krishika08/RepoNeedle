@@ -204,6 +204,11 @@ def _indexing_notice_lines(diag) -> List[str]:
         )
         for p in diag.symlink_outside_repository_paths[:_MAX_SKIPPED_PATHS_SHOWN]:
             lines.append(f"  - {p}")
+    if diag.skipped_directories_outside_repository:
+        lines.append(
+            f"{diag.skipped_directories_outside_repository} directory link(s) resolve outside the repository "
+            f"(or cannot be resolved) and were not traversed (see skipped_directory_paths in --json)."
+        )
     if diag.max_files_reached:
         lines.append(f"Indexing stopped at the max_files limit ({diag.max_files}); remaining files were not indexed.")
     return lines

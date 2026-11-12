@@ -8,6 +8,7 @@ import time
 import logging
 import pathlib
 import numbers
+import stat
 from typing import List, Optional, Union, Dict, Set
 import numpy as np
 import pathspec
@@ -78,6 +79,26 @@ def resolve_within_root(path: str, real_root: str) -> Optional[str]:
     """
     resolved = os.path.realpath(path, strict=True)
     return resolved if is_path_within_root(resolved, real_root) else None
+
+
+def is_directory_link(path: str) -> bool:
+    """True if `path` is a symlink or a Windows junction (mount-point reparse point).
+
+    ``os.walk(followlinks=False)`` relies on ``os.path.islink``, which is False for Windows
+    junctions, so junctions would otherwise be descended into. The check uses ``os.lstat``
+    directly (the same reparse-tag test as ``os.path.isjunction``, which Python < 3.12 lacks), so
+    every Python version takes the same path. Fail-closed: if the entry cannot be inspected it
+    counts as a link, and the directory is not traversed. (``os.path.islink``/``isjunction``
+    would instead report False on errors.)"""
+    try:
+        st = os.lstat(path)
+    except (OSError, ValueError):
+        return True
+    if stat.S_ISLNK(st.st_mode):
+        return True
+    if os.name == "nt":
+        return getattr(st, "st_reparse_tag", 0) == getattr(stat, "IO_REPARSE_TAG_MOUNT_POINT", 0xA0000003)
+    return False
 
 
 def validate_max_file_size_bytes(value) -> int:
@@ -292,8 +313,18 @@ class RepoNeedleEngine:
         max_files_reached = False
         # Canonical repository root: every indexed file must resolve beneath it.
         real_root = os.path.realpath(repo_dir)
+        # Directory traversal is bounded by the real directory tree: links are never followed and
+        # each physical directory (st_dev, st_ino) is entered at most once.
+        skipped_dirs: List[str] = []
+        skipped_dirs_outside = 0
+        visited_dirs: Set = set()
+        try:
+            root_st = os.stat(repo_dir)
+            visited_dirs.add((root_st.st_dev, root_st.st_ino))
+        except OSError:
+            pass
 
-        for root, dirs, files in os.walk(repo_dir):
+        for root, dirs, files in os.walk(repo_dir, followlinks=False):
             # Prune ignored directories
             rel_root = os.path.relpath(root, repo_dir).replace("\\", "/")
             if rel_root == ".":
@@ -304,6 +335,37 @@ class RepoNeedleEngine:
                 if not spec.match_file(f"{rel_root}/{d}" if rel_root else d)
                 and d not in DEFAULT_IGNORE_PATTERNS
             ]
+
+            # Prune directory links / junctions, cycles and directories outside the canonical root.
+            # Only the in-repository path is recorded; link targets are never listed or read.
+            kept_dirs = []
+            for d in dirs:
+                child = os.path.join(root, d)
+                rel_child = f"{rel_root}/{d}" if rel_root else d
+                outside = False
+                if is_directory_link(child):
+                    keep = False
+                    try:
+                        outside = resolve_within_root(child, real_root) is None
+                    except (OSError, RuntimeError, ValueError):  # broken link or loop
+                        outside = True
+                else:
+                    # A plain directory beneath an in-root directory is itself in-root; the
+                    # (st_dev, st_ino) set catches cycles that are not links (e.g. bind mounts).
+                    try:
+                        child_st = os.stat(child)
+                        key = (child_st.st_dev, child_st.st_ino)
+                        keep = key not in visited_dirs
+                        if keep:
+                            visited_dirs.add(key)
+                    except OSError:
+                        keep = False
+                if keep:
+                    kept_dirs.append(d)
+                else:
+                    skipped_dirs.append(rel_child)
+                    skipped_dirs_outside += int(outside)
+            dirs[:] = kept_dirs
 
             for file in files:
                 rel_path = os.path.relpath(os.path.join(root, file), repo_dir).replace("\\", "/")
@@ -392,6 +454,7 @@ class RepoNeedleEngine:
         skipped_large.sort()
         unreadable.sort()
         outside_root.sort()
+        skipped_dirs.sort()
         engine.indexing_diagnostics = IndexingDiagnostics(
             source="directory",
             indexed_files=len(engine.docs),
@@ -402,6 +465,9 @@ class RepoNeedleEngine:
             unreadable_paths=unreadable,
             skipped_symlink_outside_repository=len(outside_root),
             symlink_outside_repository_paths=outside_root,
+            skipped_directories=len(skipped_dirs),
+            skipped_directory_paths=skipped_dirs,
+            skipped_directories_outside_repository=skipped_dirs_outside,
             max_files=max_files,
             max_files_reached=max_files_reached,
         )
@@ -411,6 +477,14 @@ class RepoNeedleEngine:
                 "(reason: symlink_outside_repository); their targets were not read. See indexing "
                 "diagnostics (symlink_outside_repository_paths) for the in-repository link paths.",
                 len(outside_root),
+            )
+
+        if skipped_dirs_outside:
+            logger.warning(
+                "RepoNeedle did not traverse %d directory link(s) that resolve outside the repository "
+                "root (or cannot be resolved); their contents were not listed or read. See indexing "
+                "diagnostics (skipped_directory_paths) for the in-repository paths.",
+                skipped_dirs_outside,
             )
 
         # Summaries only (counts + limit): no paths or contents in log records.
