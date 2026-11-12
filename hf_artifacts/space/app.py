@@ -89,6 +89,7 @@ EXAMPLES = [
         4000,
         "",
         "Traceback (most recent call last):\n  File \"src/flask/app.py\", line 28, in wsgi_app\n    response = self.dispatch_request()\n  File \"src/flask/wrappers.py\", line 14, in get_json\nAttributeError: 'NoneType' object has no attribute 'get'",
+        False,
     ],
     [
         "pallets/flask",
@@ -97,6 +98,7 @@ EXAMPLES = [
         4000,
         "src/flask/sessions.py",
         "Fix cookie attribute handling during session modification in SecureCookieSessionInterface.",
+        False,
     ],
     [
         "pallets/flask",
@@ -105,6 +107,7 @@ EXAMPLES = [
         4000,
         "",
         "Fix cookie attribute handling during session modification without specifying a seed file.",
+        False,
     ],
     [
         "pallets/flask",
@@ -113,6 +116,7 @@ EXAMPLES = [
         4000,
         "",
         "Find unit and regression tests for SecureCookieSessionInterface cookie saving and modification.",
+        False,
     ],
     [
         "psf/requests",
@@ -121,6 +125,7 @@ EXAMPLES = [
         4000,
         "",
         "Find test suites that verify HTTPBasicAuth headers and authentication credentials formatting.",
+        False,
     ],
     [
         "pallets/flask",
@@ -129,6 +134,8 @@ EXAMPLES = [
         4000,
         "",
         "Fix compilation error in Cargo.toml regarding serde_json feature flag dependency in rust kernel.",
+        # Explicit opt-in: the experimental abstention heuristic is disabled by default in 1.2.0.
+        True,
     ],
 ]
 
@@ -140,6 +147,7 @@ def run_reponeedle_demo(
     budget: int,
     seed_files_input: str,
     query: str,
+    enable_experimental_abstention: bool = False,
 ):
     if not query.strip():
         return (
@@ -158,7 +166,7 @@ def run_reponeedle_demo(
     # Parse optional seed / anchor files
     seed_list = [s.strip() for s in seed_files_input.replace("\n", ",").split(",") if s.strip()]
 
-    # Construct V1.1.0 Query object
+    # Construct the Query object
     query_obj = Query(
         text=query.strip(),
         anchor_files=seed_list,
@@ -167,7 +175,12 @@ def run_reponeedle_demo(
     )
 
     t0 = time.perf_counter()
-    res = engine.retrieve(query=query_obj, ranker=effective_ranker)
+    abstention_opt_in = bool(enable_experimental_abstention)
+    res = engine.retrieve(
+        query=query_obj,
+        ranker=effective_ranker,
+        enable_experimental_abstention=abstention_opt_in,
+    )
     elapsed_ms = (time.perf_counter() - t0) * 1000
 
     # Format diagnostic notes based on ranker and seeds
@@ -190,19 +203,31 @@ def run_reponeedle_demo(
             f"- **Behavior**: Standard multi-signal hybrid scoring with workflow routing and AST centrality.\n"
         )
 
+    if abstention_opt_in:
+        ranker_note += (
+            "- **Experimental Abstention**: **opt-in enabled**. The heuristic is experimental and "
+            "uncalibrated (it correctly abstained on 0 of 82 out-of-scope queries in the ARB v2 "
+            "selective split); treat an abstention as a diagnostic, not a reliable out-of-scope signal.\n"
+        )
+    else:
+        ranker_note += (
+            "- **Experimental Abstention**: disabled (the 1.2.0 default). Ranked context is returned "
+            "even for out-of-scope queries.\n"
+        )
+
     # Decision summary
     if res.abstained:
         status_md = (
-            f"### 🛑 Decision: **ABSTAINED (Selective Abstention)**\n\n"
+            f"### 🛑 Decision: **ABSTAINED (experimental abstention, opt-in)**\n\n"
             f"{ranker_note}\n"
-            f"- **Confidence Score**: `{res.confidence_score:.3f}` (Below threshold)\n"
+            f"- **Confidence Score**: `{res.confidence_score:.3f}` (below the experimental threshold; uncalibrated)\n"
             f"- **Inferred Task**: `{res.task_type.value}`\n"
             f"- **Tokens Consumed**: `0 / {budget}`\n"
             f"- **Latency**: `{elapsed_ms:.2f} ms`\n\n"
             f"> **Diagnostic Reason**: {res.explanation}\n"
         )
         rn_rows = []
-        file_preview = "System abstained from context retrieval to prevent context window dilution."
+        file_preview = "No context returned: the opt-in experimental abstention heuristic abstained on this query."
     else:
         # Tier counts
         tier_counts: Dict[str, int] = {}
@@ -265,7 +290,7 @@ def build_interface():
     theme = gr.themes.Soft(primary_hue="blue")
     with gr.Blocks(theme=theme, title="RepoNeedle Playground") as demo:
         gr.Markdown(
-            "# 🪡 RepoNeedle Playground (V1.1.0)\n"
+            "# 🪡 RepoNeedle Playground (V1.2.0)\n"
             "### Token-Budget-Aware, Workflow-Adaptive Repository Context Retrieval for AI Coding Agents\n\n"
             "> ⚠️ **Methodological Disclosure**: This Playground uses embedded demonstration repository snapshots. "
             "It is an interactive demonstration, not a reproduction of the complete ARB v2 evaluation. "
@@ -308,6 +333,14 @@ def build_interface():
                     placeholder="Enter an issue description, traceback, or test retrieval request...",
                     lines=4,
                 )
+                abstention_checkbox = gr.Checkbox(
+                    label="Enable experimental abstention (opt-in)",
+                    value=False,
+                    info=(
+                        "Off by default in RepoNeedle 1.2.0. The heuristic is experimental and uncalibrated: "
+                        "it correctly abstained on 0 of 82 out-of-scope queries in the ARB v2 selective split."
+                    ),
+                )
                 submit_btn = gr.Button("🔍 Retrieve Context", variant="primary")
 
             with gr.Column(scale=2):
@@ -327,7 +360,7 @@ def build_interface():
 
         gr.Examples(
             examples=EXAMPLES,
-            inputs=[repo_select, ranker_select, task_select, budget_slider, seed_input, query_input],
+            inputs=[repo_select, ranker_select, task_select, budget_slider, seed_input, query_input, abstention_checkbox],
             outputs=[status_box, table_rn, table_comp, preview_box],
             fn=run_reponeedle_demo,
             cache_examples=False,
@@ -335,7 +368,7 @@ def build_interface():
 
         submit_btn.click(
             fn=run_reponeedle_demo,
-            inputs=[repo_select, ranker_select, task_select, budget_slider, seed_input, query_input],
+            inputs=[repo_select, ranker_select, task_select, budget_slider, seed_input, query_input, abstention_checkbox],
             outputs=[status_box, table_rn, table_comp, preview_box],
         )
 

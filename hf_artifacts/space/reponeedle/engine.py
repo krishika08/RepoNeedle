@@ -5,6 +5,10 @@ Provides an integrated, token-budget-aware repository context retrieval system.
 
 import os
 import time
+import logging
+import pathlib
+import numbers
+import stat
 from typing import List, Optional, Union, Dict, Set
 import numpy as np
 import pathspec
@@ -19,6 +23,8 @@ from reponeedle.models import (
     BudgetConfig,
     AblationConfig,
     ContextTier,
+    AbstentionDiagnostics,
+    IndexingDiagnostics,
 )
 from reponeedle.core.function_graph import FunctionGraphEngine
 from reponeedle.core.arm101 import ARM101Ranker
@@ -39,6 +45,78 @@ DEFAULT_IGNORE_PATTERNS = [
     "*.png", "*.jpg", "*.jpeg", "*.gif", "*.ico", "*.pdf", "*.zip", "*.tar.gz",
     "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "poetry.lock",
 ]
+
+# Files strictly larger than this many bytes are excluded from the index (a file exactly at
+# the limit is indexed). Exclusions are recorded in RepoNeedleEngine.indexing_diagnostics.
+DEFAULT_MAX_FILE_SIZE_BYTES = 500_000
+
+logger = logging.getLogger(__name__)
+
+
+def relpath_escapes_root(rel_path: str) -> bool:
+    """True if a relative path climbs out of its base (first component is '..').
+
+    Component-aware: names that merely start with '..' (e.g. '..cache/x') do not escape."""
+    parts = pathlib.PurePath(rel_path).parts
+    return bool(parts) and parts[0] == os.pardir
+
+
+def is_path_within_root(path: str, real_root: str) -> bool:
+    """True if the canonical `path` is `real_root` itself or lies beneath it (component-aware)."""
+    try:
+        root_n = os.path.normcase(real_root)
+        return os.path.commonpath([root_n, os.path.normcase(path)]) == root_n
+    except ValueError:  # different drives / mixed absolute-relative paths
+        return False
+
+
+def resolve_within_root(path: str, real_root: str) -> Optional[str]:
+    """
+    Resolve `path` to its canonical location (following symlinks and, on Windows, junctions).
+
+    Returns the resolved path if it stays inside `real_root`, or None if it resolves outside.
+    Raises OSError (or RuntimeError/ValueError) if resolution fails, e.g. broken links or loops.
+    """
+    resolved = os.path.realpath(path, strict=True)
+    return resolved if is_path_within_root(resolved, real_root) else None
+
+
+def is_directory_link(path: str) -> bool:
+    """True if `path` is a symlink or a Windows junction (mount-point reparse point).
+
+    ``os.walk(followlinks=False)`` relies on ``os.path.islink``, which is False for Windows
+    junctions, so junctions would otherwise be descended into. The check uses ``os.lstat``
+    directly (the same reparse-tag test as ``os.path.isjunction``, which Python < 3.12 lacks), so
+    every Python version takes the same path. Fail-closed: if the entry cannot be inspected it
+    counts as a link, and the directory is not traversed. (``os.path.islink``/``isjunction``
+    would instead report False on errors.)"""
+    try:
+        st = os.lstat(path)
+    except (OSError, ValueError):
+        return True
+    if stat.S_ISLNK(st.st_mode):
+        return True
+    if os.name == "nt":
+        return getattr(st, "st_reparse_tag", 0) == getattr(stat, "IO_REPARSE_TAG_MOUNT_POINT", 0xA0000003)
+    return False
+
+
+def validate_max_file_size_bytes(value) -> int:
+    """
+    Validates a file-size limit. The contract is a strictly positive integer number of bytes.
+
+    Raises:
+        TypeError: If the value is not an integer (bool is rejected).
+        ValueError: If the value is zero or negative.
+    """
+    if isinstance(value, bool) or not isinstance(value, numbers.Integral):
+        raise TypeError(
+            f"max_file_size_bytes must be a positive integer number of bytes, got {type(value).__name__}."
+        )
+    value = int(value)
+    if value <= 0:
+        raise ValueError(f"max_file_size_bytes must be a positive integer (> 0), got {value}.")
+    return value
 
 
 class RepoNeedleEngine:
@@ -86,6 +164,9 @@ class RepoNeedleEngine:
         self.change_impact_config = change_impact_config or ChangeImpactConfig()
         self.change_impact_ranker = ChangeImpactRanker(self.change_impact_config)
 
+        # Populated with scan statistics by from_directory(); "documents" source otherwise.
+        self.indexing_diagnostics = IndexingDiagnostics(source="documents", indexed_files=0)
+
         if docs:
             self._fit(docs)
 
@@ -116,6 +197,7 @@ class RepoNeedleEngine:
         self.repo_graph.fit(clean_docs)
         self.function_graph.build_graph(clean_docs)
         self.abstainer.fit(clean_docs)
+        self.indexing_diagnostics.indexed_files = len(clean_docs)
 
     def update_document(self, doc: FileDoc):
         """
@@ -154,6 +236,7 @@ class RepoNeedleEngine:
         self.repo_graph.fit(clean_docs)
         self.function_graph.build_graph(clean_docs)
         self.abstainer.fit(clean_docs)
+        self.indexing_diagnostics.indexed_files = len(clean_docs)
 
     def query(self, *args, **kwargs) -> RetrievalResult:
         """Alias for retrieve() to provide intuitive querying API."""
@@ -192,10 +275,20 @@ class RepoNeedleEngine:
         ranker: Optional[Union[str, RankerType]] = RankerType.LEGACY,
         ranking_engine: Optional[Union[str, RankerType]] = None,
         change_impact_config: Optional[ChangeImpactConfig] = None,
+        max_file_size_bytes: int = DEFAULT_MAX_FILE_SIZE_BYTES,
     ) -> "RepoNeedleEngine":
         """
         Scans a local repository directory, parses files, and builds the retrieval index.
+
+        Files strictly larger than ``max_file_size_bytes`` (default 500,000) are excluded from
+        the index. Every exclusion (oversized or unreadable) is recorded by repository-relative
+        path in ``engine.indexing_diagnostics`` and summarized via a WARNING on the
+        ``reponeedle.engine`` logger (stderr by default). File contents are never recorded.
+
+        Raises:
+            TypeError / ValueError: If ``max_file_size_bytes`` is not a positive integer.
         """
+        max_file_size_bytes = validate_max_file_size_bytes(max_file_size_bytes)
         repo_dir = os.path.abspath(repo_dir)
         ignore_patterns = list(DEFAULT_IGNORE_PATTERNS)
         if extra_ignore:
@@ -214,8 +307,24 @@ class RepoNeedleEngine:
 
         spec = pathspec.PathSpec.from_lines("gitwildmatch", ignore_patterns)
         docs: List[FileDoc] = []
+        skipped_large: List[str] = []
+        unreadable: List[str] = []
+        outside_root: List[str] = []
+        max_files_reached = False
+        # Canonical repository root: every indexed file must resolve beneath it.
+        real_root = os.path.realpath(repo_dir)
+        # Directory traversal is bounded by the real directory tree: links are never followed and
+        # each physical directory (st_dev, st_ino) is entered at most once.
+        skipped_dirs: List[str] = []
+        skipped_dirs_outside = 0
+        visited_dirs: Set = set()
+        try:
+            root_st = os.stat(repo_dir)
+            visited_dirs.add((root_st.st_dev, root_st.st_ino))
+        except OSError:
+            pass
 
-        for root, dirs, files in os.walk(repo_dir):
+        for root, dirs, files in os.walk(repo_dir, followlinks=False):
             # Prune ignored directories
             rel_root = os.path.relpath(root, repo_dir).replace("\\", "/")
             if rel_root == ".":
@@ -226,6 +335,37 @@ class RepoNeedleEngine:
                 if not spec.match_file(f"{rel_root}/{d}" if rel_root else d)
                 and d not in DEFAULT_IGNORE_PATTERNS
             ]
+
+            # Prune directory links / junctions, cycles and directories outside the canonical root.
+            # Only the in-repository path is recorded; link targets are never listed or read.
+            kept_dirs = []
+            for d in dirs:
+                child = os.path.join(root, d)
+                rel_child = f"{rel_root}/{d}" if rel_root else d
+                outside = False
+                if is_directory_link(child):
+                    keep = False
+                    try:
+                        outside = resolve_within_root(child, real_root) is None
+                    except (OSError, RuntimeError, ValueError):  # broken link or loop
+                        outside = True
+                else:
+                    # A plain directory beneath an in-root directory is itself in-root; the
+                    # (st_dev, st_ino) set catches cycles that are not links (e.g. bind mounts).
+                    try:
+                        child_st = os.stat(child)
+                        key = (child_st.st_dev, child_st.st_ino)
+                        keep = key not in visited_dirs
+                        if keep:
+                            visited_dirs.add(key)
+                    except OSError:
+                        keep = False
+                if keep:
+                    kept_dirs.append(d)
+                else:
+                    skipped_dirs.append(rel_child)
+                    skipped_dirs_outside += int(outside)
+            dirs[:] = kept_dirs
 
             for file in files:
                 rel_path = os.path.relpath(os.path.join(root, file), repo_dir).replace("\\", "/")
@@ -238,13 +378,31 @@ class RepoNeedleEngine:
                     continue
 
                 full_path = os.path.join(root, file)
+                # Containment: resolve links BEFORE touching the target, and read only the
+                # validated canonical path (never the link itself). Links resolving outside the
+                # repository are skipped and recorded by their in-repository path only.
                 try:
-                    # Skip large files (> 500KB)
-                    if os.path.getsize(full_path) > 500_000:
-                        continue
-                    with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+                    resolved = resolve_within_root(full_path, real_root)
+                except (OSError, RuntimeError, ValueError):  # broken link, loop, permission error
+                    unreadable.append(rel_path)
+                    continue
+                if resolved is None:
+                    outside_root.append(rel_path)
+                    continue
+                try:
+                    file_size = os.path.getsize(resolved)
+                except OSError:
+                    unreadable.append(rel_path)
+                    continue
+                # Exclude oversized files (strictly greater than the limit), but record them.
+                if file_size > max_file_size_bytes:
+                    skipped_large.append(rel_path)
+                    continue
+                try:
+                    with open(resolved, "r", encoding="utf-8", errors="ignore") as f:
                         content = f.read()
                 except Exception:
+                    unreadable.append(rel_path)
                     continue
 
                 # Detect if test file
@@ -278,11 +436,13 @@ class RepoNeedleEngine:
                 )
 
                 if len(docs) >= max_files:
+                    max_files_reached = True
                     break
             if len(docs) >= max_files:
+                max_files_reached = True
                 break
 
-        return cls(
+        engine = cls(
             docs=docs,
             budget_config=budget_config,
             ablation_config=ablation_config,
@@ -290,6 +450,64 @@ class RepoNeedleEngine:
             ranking_engine=ranking_engine,
             change_impact_config=change_impact_config,
         )
+
+        skipped_large.sort()
+        unreadable.sort()
+        outside_root.sort()
+        skipped_dirs.sort()
+        engine.indexing_diagnostics = IndexingDiagnostics(
+            source="directory",
+            indexed_files=len(engine.docs),
+            max_file_size_bytes=max_file_size_bytes,
+            skipped_large_files=len(skipped_large),
+            skipped_paths=skipped_large,
+            skipped_unreadable_files=len(unreadable),
+            unreadable_paths=unreadable,
+            skipped_symlink_outside_repository=len(outside_root),
+            symlink_outside_repository_paths=outside_root,
+            skipped_directories=len(skipped_dirs),
+            skipped_directory_paths=skipped_dirs,
+            skipped_directories_outside_repository=skipped_dirs_outside,
+            max_files=max_files,
+            max_files_reached=max_files_reached,
+        )
+        if outside_root:
+            logger.warning(
+                "RepoNeedle skipped %d linked file(s) that resolve outside the repository root "
+                "(reason: symlink_outside_repository); their targets were not read. See indexing "
+                "diagnostics (symlink_outside_repository_paths) for the in-repository link paths.",
+                len(outside_root),
+            )
+
+        if skipped_dirs_outside:
+            logger.warning(
+                "RepoNeedle did not traverse %d directory link(s) that resolve outside the repository "
+                "root (or cannot be resolved); their contents were not listed or read. See indexing "
+                "diagnostics (skipped_directory_paths) for the in-repository paths.",
+                skipped_dirs_outside,
+            )
+
+        # Summaries only (counts + limit): no paths or contents in log records.
+        if skipped_large:
+            logger.warning(
+                "RepoNeedle skipped %d file(s) larger than max_file_size_bytes=%d; they are not "
+                "indexed or searchable. See indexing diagnostics (skipped_paths) for details.",
+                len(skipped_large),
+                max_file_size_bytes,
+            )
+        if unreadable:
+            logger.warning(
+                "RepoNeedle could not read %d file(s) during indexing. See indexing diagnostics "
+                "(unreadable_paths) for details.",
+                len(unreadable),
+            )
+        if max_files_reached:
+            logger.warning(
+                "RepoNeedle stopped indexing at max_files=%d; remaining files were not indexed.",
+                max_files,
+            )
+
+        return engine
 
     def retrieve(
         self,
@@ -300,13 +518,26 @@ class RepoNeedleEngine:
         ranker: Optional[Union[str, RankerType]] = None,
         ranking_engine: Optional[Union[str, RankerType]] = None,
         change_impact_config: Optional[ChangeImpactConfig] = None,
+        anchor_files: Optional[List[str]] = None,
+        enable_experimental_abstention: Optional[bool] = None,
     ) -> RetrievalResult:
         """
         Executes workflow-adaptive retrieval and packs results within the token budget.
         Supports controlled ablation overrides and modular ranker architectures.
+
+        enable_experimental_abstention:
+            Per-call override for the experimental, uncalibrated abstention heuristic.
+            None (default) uses ``budget_config.enable_experimental_abstention`` (False unless
+            configured). Passing ``task_type=TaskType.SELECTIVE`` does NOT enable abstention.
+            Empty repositories always return an abstained result regardless of this flag.
         """
         start_time = time.perf_counter()
         ablation = ablation_config or self.ablation_config or AblationConfig()
+        if enable_experimental_abstention is None:
+            abstention_enabled = bool(getattr(self.budget_config, "enable_experimental_abstention", False))
+        else:
+            abstention_enabled = bool(enable_experimental_abstention)
+        abstention_threshold = float(self.abstainer.confidence_threshold)
 
         raw_ranker = ranking_engine if ranking_engine is not None else ranker
         if raw_ranker is not None:
@@ -322,10 +553,19 @@ class RepoNeedleEngine:
                 f"Unknown ranker '{effective_ranker}'. Valid rankers are: 'legacy', 'bm25', 'arm101', 'cascade', 'change_impact'."
             )
 
-        if isinstance(query, str):
+        if anchor_files:
+            norm_anchors = [a.replace("\\", "/") for a in anchor_files]
+            if isinstance(query, str):
+                query_obj = Query(text=query, anchor_files=norm_anchors)
+            else:
+                query_obj = query
+                query_obj.anchor_files = norm_anchors
+        elif isinstance(query, str):
             query_obj = Query(text=query)
         else:
             query_obj = query
+            if query_obj.anchor_files:
+                query_obj.anchor_files = [a.replace("\\", "/") for a in query_obj.anchor_files]
 
         if task_type:
             query_obj.task_type = task_type
@@ -349,6 +589,12 @@ class RepoNeedleEngine:
                 execution_time_ms=(time.perf_counter() - start_time) * 1000,
                 ranker=effective_ranker,
                 ranked_files=[],
+                abstention=AbstentionDiagnostics(
+                    enabled=abstention_enabled,
+                    status="empty_repository",
+                    threshold=abstention_threshold,
+                    reason="Repository contains no candidate files (structural; independent of the experimental heuristic).",
+                ),
             )
 
         num_docs = len(self.docs)
@@ -394,6 +640,9 @@ class RepoNeedleEngine:
             workflow_boosts = np.zeros(num_docs, dtype=np.float32)
 
         elif effective_ranker == "change_impact":
+            # AUTO queries report the router-classified task (1.1.0 behaviour on main); explicit task
+            # types are reported unchanged. Reporting only: the change-impact ranker receives `query_obj`,
+            # which is not modified here.
             if query_obj.task_type == TaskType.AUTO:
                 inferred_task, _ = self.router.classify_intent(query_obj)
             else:
@@ -508,15 +757,37 @@ class RepoNeedleEngine:
 
         ranked_paths = [self.docs[i].path for i in ranked_indices]
 
-        # 3. Selective Abstention Check
-        abstained, confidence, reason = self.abstainer.evaluate_abstention(
+        # 3. Experimental Selective Abstention Check (opt-in only).
+        # The heuristic score is always computed so `confidence_score` keeps its existing meaning
+        # (an uncalibrated signal), but it only decides the outcome when explicitly enabled.
+        heuristic_abstained, confidence, reason = self.abstainer.evaluate_abstention(
             query=query_obj.text,
             fused_scores=fused_scores,
         )
 
         exec_time = (time.perf_counter() - start_time) * 1000
 
-        if abstained:
+        if abstention_enabled:
+            abstention_diag = AbstentionDiagnostics(
+                enabled=True,
+                status="evaluated",
+                threshold=abstention_threshold,
+                reason=reason,
+            )
+            outcome_note = f"Experimental abstention check passed (uncalibrated heuristic): {reason}"
+        else:
+            abstention_diag = AbstentionDiagnostics(
+                enabled=False,
+                status="disabled",
+                threshold=abstention_threshold,
+                reason=(
+                    "Experimental abstention disabled (default); out-of-scope queries are not "
+                    "detected and results are returned regardless of query scope."
+                ),
+            )
+            outcome_note = "Experimental abstention disabled."
+
+        if abstention_enabled and heuristic_abstained:
             return RetrievalResult(
                 query=query_obj.text,
                 task_type=inferred_task,
@@ -526,10 +797,11 @@ class RepoNeedleEngine:
                 total_tokens=0,
                 budget_tokens=eff_budget,
                 candidate_count=num_docs,
-                explanation=f"Abstained: {reason}",
+                explanation=f"Abstained: {reason} (Experimental abstention heuristic; not production-calibrated.)",
                 execution_time_ms=exec_time,
                 ranker=effective_ranker,
                 ranked_files=ranked_paths,
+                abstention=abstention_diag,
             )
 
         # 4. Budget-Aware Context Packing (ordered by ranked_indices)
@@ -572,9 +844,10 @@ class RepoNeedleEngine:
             total_tokens=total_tokens_used,
             budget_tokens=eff_budget,
             candidate_count=num_docs,
-            explanation=f"Retrieved {len(selected)} files ({total_tokens_used}/{eff_budget} tokens). Ranker: {effective_ranker}. Task: {inferred_task.value}. {reason}",
+            explanation=f"Retrieved {len(selected)} files ({total_tokens_used}/{eff_budget} tokens). Ranker: {effective_ranker}. Task: {inferred_task.value}. {outcome_note}",
             execution_time_ms=(time.perf_counter() - start_time) * 1000,
             ranker=effective_ranker,
             ranked_files=ranked_paths,
             rendered_context=rendered_context,
+            abstention=abstention_diag,
         )

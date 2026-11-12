@@ -1,6 +1,12 @@
 """
-Calibrated selective abstention engine for no-gold and out-of-repository queries.
-Addresses the selective retrieval calibration gap identified in Agent Retrieval Bench.
+EXPERIMENTAL selective abstention heuristic for no-gold and out-of-repository queries.
+
+Status: experimental, NOT production-calibrated. On the official Agent Retrieval Bench v2
+selective split (N=82 negative samples) it correctly abstained on 0 of 82. Since 1.2.0 the
+engine only applies it when explicitly enabled (BudgetConfig.enable_experimental_abstention,
+the per-call `enable_experimental_abstention` override, the CLI flag
+`--enable-experimental-abstention`, or the MCP retrieve argument of the same name).
+See KNOWN_LIMITATIONS.md for details.
 """
 
 from typing import List, Dict, Set, Tuple
@@ -76,7 +82,8 @@ class SelectiveAbstainer:
         Evaluates abstention criteria.
         Returns:
             abstained (bool): True if system should abstain.
-            confidence (float): Calibrated confidence score in [0, 1].
+            confidence (float): Uncalibrated heuristic score in [0, 1]. It is a diagnostic
+                signal, not a probability that the repository contains the answer.
             reason (str): Diagnostic explanation.
         """
         if len(fused_scores) == 0:
@@ -114,7 +121,7 @@ class SelectiveAbstainer:
         median_score = float(np.median(fused_scores))
         margin = max(0.0, max_score - median_score)
 
-        # Calibrated composite confidence score
+        # Composite heuristic confidence score (uncalibrated; weights are fixed, not fitted)
         confidence = (
             0.30 * z_component +
             0.45 * overlap_ratio +

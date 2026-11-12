@@ -1,7 +1,7 @@
 # HUGGING FACE & OPEN-SOURCE RELEASE CHECKLIST: REPONEEDLE
 
 > [!NOTE]
-> **Historical record (2026-10-28) of the v0.1.0 release checklist.** It has not been updated for later versions. The Hugging Face Space in `hf_artifacts/space/` bundles the 1.1.0 engine, in which the uncalibrated abstention heuristic is always on.
+> **Historical record (2026-10-28) of the v0.1.0 release checklist.** It has not been updated for later versions. When this note was added (2026-11-10), the Hugging Face Space in `hf_artifacts/space/` bundled the 1.1.0 engine, in which the uncalibrated abstention heuristic is always on. The Space bundle has since been synchronised with RepoNeedle 1.2.0, where the heuristic is opt-in; see `docs/STATIC_PLAYGROUND_DEPLOYMENT.md`.
 
 **Version**: `0.1.0` (Research Preview)  
 **Date**: 2026-10-28  
