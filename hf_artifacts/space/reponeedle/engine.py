@@ -158,7 +158,7 @@ class RepoNeedleEngine:
         self.abstainer = SelectiveAbstainer(
             confidence_threshold=self.budget_config.abstention_threshold
         )
-        self.function_graph = FunctionGraphEngine()
+        self.function_graph = FunctionGraphEngine(structural_parser=self.ablation_config.structural_parser)
         self.arm101_ranker = ARM101Ranker()
         self.cascaded_ranker = CascadedRanker()
         self.change_impact_config = change_impact_config or ChangeImpactConfig()

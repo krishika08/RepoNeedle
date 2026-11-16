@@ -1,0 +1,1483 @@
+{
+ "python": {
+  "files": {
+   "checks/cart_check.py": {
+    "functions": [
+     [
+      "check_rule",
+      null,
+      false,
+      false,
+      4,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "Rule",
+      null,
+      false,
+      "check_rule",
+      5
+     ],
+     [
+      "apply",
+      "rule",
+      true,
+      "check_rule",
+      6
+     ],
+     [
+      "apply_discount",
+      null,
+      false,
+      "check_rule",
+      6
+     ]
+    ],
+    "symbols": [
+     "Rule",
+     "apply_discount",
+     "check_rule"
+    ],
+    "imports": [
+     "shop.pricing",
+     "shop.pricing.Rule",
+     "shop.pricing.apply_discount"
+    ]
+   },
+   "shop/broken.py": {
+    "functions": [
+     [
+      "ok",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "ok",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "helper",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "broken",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "ok"
+    ],
+    "imports": []
+   },
+   "shop/pricing.py": {
+    "functions": [
+     [
+      "apply_discount",
+      null,
+      false,
+      false,
+      5,
+      [
+       "price",
+       "pct"
+      ]
+     ],
+     [
+      "__init__",
+      "Rule",
+      true,
+      false,
+      10,
+      [
+       "self",
+       "pct"
+      ]
+     ],
+     [
+      "apply",
+      "Rule",
+      true,
+      false,
+      13,
+      [
+       "self",
+       "price"
+      ]
+     ]
+    ],
+    "calls": [
+     [
+      "round2",
+      null,
+      false,
+      "apply_discount",
+      6
+     ],
+     [
+      "apply_discount",
+      null,
+      false,
+      "apply",
+      14
+     ]
+    ],
+    "symbols": [
+     "round2",
+     "apply_discount",
+     "Rule",
+     "__init__",
+     "apply"
+    ],
+    "imports": [
+     "shop.util",
+     "shop.util.round2"
+    ]
+   },
+   "shop/util.py": {
+    "functions": [
+     [
+      "round2",
+      null,
+      false,
+      false,
+      1,
+      [
+       "value"
+      ]
+     ]
+    ],
+    "calls": [
+     [
+      "round",
+      null,
+      false,
+      "round2",
+      4
+     ]
+    ],
+    "symbols": [
+     "round2"
+    ],
+    "imports": []
+   }
+  },
+  "edges": [
+   [
+    "checks/cart_check.py",
+    "shop/pricing.py",
+    "check_rule",
+    "Rule",
+    "verified_call",
+    1.0
+   ],
+   [
+    "checks/cart_check.py",
+    "shop/pricing.py",
+    "check_rule",
+    "apply",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "checks/cart_check.py",
+    "shop/pricing.py",
+    "check_rule",
+    "apply_discount",
+    "verified_call",
+    1.0
+   ],
+   [
+    "shop/pricing.py",
+    "shop/util.py",
+    "apply_discount",
+    "round2",
+    "verified_call",
+    1.0
+   ]
+  ]
+ },
+ "typescript": {
+  "files": {
+   "src/broken.ts": {
+    "functions": [
+     [
+      "ok",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "broken",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "afterError",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "ok",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "helperBefore",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "broken",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "afterError",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "ok",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "ok",
+     "broken",
+     "afterError"
+    ],
+    "imports": []
+   },
+   "src/components/CartView.tsx": {
+    "functions": [
+     [
+      "CartView",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "CartView",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "createCart",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "label",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "label",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "CartView"
+    ],
+    "imports": []
+   },
+   "src/empty.ts": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/models/cart.ts": {
+    "functions": [
+     [
+      "createCart",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "constructor",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "super",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "add",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "push",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "emit",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "total",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "reduce",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "roundValue",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "formatPrice",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "formatPrice",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "total",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "createCart",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Cart",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "createCart"
+    ],
+    "imports": []
+   },
+   "src/models/item.ts": {
+    "functions": [
+     [
+      "makeItem",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "makeItem",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "makeItem"
+    ],
+    "imports": []
+   },
+   "src/util/format.ts": {
+    "functions": [
+     [
+      "formatPrice",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "round",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "fakeCommentFn",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "notCalled",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "formatPrice",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "round",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "toFixed",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "round",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "round",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "formatPrice",
+     "round"
+    ],
+    "imports": []
+   },
+   "tests/cart.test.ts": {
+    "functions": [],
+    "calls": [
+     [
+      "createCart",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "add",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "makeItem",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "total",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "toBe",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [],
+    "imports": []
+   }
+  },
+  "edges": [
+   [
+    "src/components/CartView.tsx",
+    "src/models/cart.ts",
+    null,
+    "createCart",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "src/models/cart.ts",
+    "src/util/format.ts",
+    null,
+    "formatPrice",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "src/models/cart.ts",
+    "src/util/format.ts",
+    null,
+    "formatPrice",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "tests/cart.test.ts",
+    "src/models/cart.ts",
+    null,
+    "createCart",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "tests/cart.test.ts",
+    "src/models/item.ts",
+    null,
+    "makeItem",
+    "unique_global_call",
+    0.9
+   ]
+  ]
+ },
+ "go": {
+  "files": {
+   "broken.go": {
+    "functions": [
+     [
+      "Good",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "Bad",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "After",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "Good",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Bad",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "After",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Good",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "Good",
+     "Bad",
+     "After"
+    ],
+    "imports": []
+   },
+   "cart/cart.go": {
+    "functions": [
+     [
+      "New",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "Total",
+      "Cart",
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "sum",
+      "Cart",
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "String",
+      "Cart",
+      true,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "New",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Total",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "ApplyDiscount",
+      "pricing",
+      true,
+      null,
+      1
+     ],
+     [
+      "AddTax",
+      "pr",
+      true,
+      null,
+      1
+     ],
+     [
+      "String",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Sprintf",
+      "fmt",
+      true,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "New",
+     "Total",
+     "sum",
+     "String"
+    ],
+    "imports": []
+   },
+   "cart/cart_test.go": {
+    "functions": [
+     [
+      "TestTotal",
+      null,
+      false,
+      true,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "TestTotal",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "New",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Total",
+      "c",
+      true,
+      null,
+      1
+     ],
+     [
+      "Fatalf",
+      "t",
+      true,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "TestTotal"
+    ],
+    "imports": [
+     "testing"
+    ]
+   },
+   "empty.go": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "go.mod": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "pricing/pricing.go": {
+    "functions": [
+     [
+      "ApplyDiscount",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "Apply",
+      "Rule",
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "round2",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "FakeFromComment",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Called",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "NotReal",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "ApplyDiscount",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "Apply",
+      null,
+      false,
+      null,
+      1
+     ],
+     [
+      "ApplyDiscount",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "ApplyDiscount",
+     "Apply",
+     "round2"
+    ],
+    "imports": []
+   },
+   "pricing/tax.go": {
+    "functions": [
+     [
+      "AddTax",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "AddTax",
+      null,
+      false,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "AddTax"
+    ],
+    "imports": []
+   }
+  },
+  "edges": [
+   [
+    "cart/cart.go",
+    "pricing/pricing.go",
+    null,
+    "ApplyDiscount",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "cart/cart.go",
+    "pricing/tax.go",
+    null,
+    "AddTax",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "cart/cart_test.go",
+    "cart/cart.go",
+    null,
+    "New",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "cart/cart_test.go",
+    "cart/cart.go",
+    null,
+    "Total",
+    "unique_global_call",
+    0.9
+   ]
+  ]
+ },
+ "rust": {
+  "files": {
+   "Cargo.toml": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/broken.rs": {
+    "functions": [
+     [
+      "good",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "bad",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "after",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "good",
+     "bad",
+     "after"
+    ],
+    "imports": []
+   },
+   "src/cart/mod.rs": {
+    "functions": [
+     [
+      "new",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "total",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "local_helper",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "sum",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "new",
+      "Vec",
+      true,
+      null,
+      1
+     ],
+     [
+      "new",
+      "Rule",
+      true,
+      null,
+      1
+     ],
+     [
+      "apply_discount",
+      "pricing",
+      true,
+      null,
+      1
+     ],
+     [
+      "round2",
+      "util",
+      true,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "new",
+     "total",
+     "local_helper",
+     "sum"
+    ],
+    "imports": []
+   },
+   "src/empty.rs": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/lib.rs": {
+    "functions": [
+     [
+      "version",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "version"
+    ],
+    "imports": []
+   },
+   "src/pricing.rs": {
+    "functions": [
+     [
+      "apply_discount",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "new",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "validate",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "apply",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "gr",
+      null,
+      false,
+      false,
+      1,
+      []
+     ],
+     [
+      "discount_works",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "validate",
+      "Self",
+      true,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "apply_discount",
+     "new",
+     "validate",
+     "apply",
+     "gr",
+     "discount_works"
+    ],
+    "imports": []
+   },
+   "src/util.rs": {
+    "functions": [
+     [
+      "round2",
+      null,
+      false,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "round2"
+    ],
+    "imports": []
+   },
+   "tests/cart_tests.rs": {
+    "functions": [
+     [
+      "empty_cart_total_is_zero",
+      null,
+      false,
+      true,
+      1,
+      []
+     ]
+    ],
+    "calls": [
+     [
+      "new",
+      "Cart",
+      true,
+      null,
+      1
+     ]
+    ],
+    "symbols": [
+     "empty_cart_total_is_zero"
+    ],
+    "imports": []
+   }
+  },
+  "edges": [
+   [
+    "src/cart/mod.rs",
+    "src/pricing.rs",
+    null,
+    "apply_discount",
+    "unique_global_call",
+    0.9
+   ],
+   [
+    "src/cart/mod.rs",
+    "src/util.rs",
+    null,
+    "round2",
+    "unique_global_call",
+    0.9
+   ]
+  ]
+ },
+ "java": {
+  "files": {
+   "src/main/java/com/shop/Broken.java": {
+    "functions": [
+     [
+      "good",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "bad",
+      null,
+      true,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "good",
+     "bad"
+    ],
+    "imports": []
+   },
+   "src/main/java/com/shop/cart/Cart.java": {
+    "functions": [
+     [
+      "Cart",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "Cart",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "total",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "sum",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "price",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "listener",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "Runnable",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "run",
+      null,
+      true,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "Cart",
+     "total",
+     "sum",
+     "price",
+     "listener",
+     "Runnable",
+     "run"
+    ],
+    "imports": []
+   },
+   "src/main/java/com/shop/Empty.java": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/main/java/com/shop/pricing/PriceCalculator.java": {
+    "functions": [
+     [
+      "fakeFromJavadoc",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "applyDiscount",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "withTax",
+      null,
+      true,
+      false,
+      1,
+      []
+     ],
+     [
+      "round",
+      null,
+      true,
+      false,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "fakeFromJavadoc",
+     "applyDiscount",
+     "withTax",
+     "round"
+    ],
+    "imports": []
+   },
+   "src/test/java/com/shop/cart/CartTest.java": {
+    "functions": [
+     [
+      "totals",
+      null,
+      true,
+      true,
+      1,
+      []
+     ]
+    ],
+    "calls": [],
+    "symbols": [
+     "totals"
+    ],
+    "imports": []
+   }
+  },
+  "edges": []
+ },
+ "cpp": {
+  "files": {
+   "include/shop/pricing.h": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/broken.cpp": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/cart.cpp": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/cart.h": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/empty.cpp": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "src/pricing.cpp": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   },
+   "tests/cart_test.cpp": {
+    "functions": [],
+    "calls": [],
+    "symbols": [],
+    "imports": []
+   }
+  },
+  "edges": []
+ }
+}

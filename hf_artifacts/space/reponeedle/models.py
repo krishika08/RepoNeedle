@@ -3,7 +3,7 @@ Pydantic data models and schemas for RepoNeedle.
 """
 
 from enum import Enum
-from typing import List, Optional, Dict, Any
+from typing import List, Literal, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 
@@ -193,6 +193,11 @@ class AblationConfig(BaseModel):
     decouple_bm25_symbols: bool = True
     # Stage 3.12 Cascaded Reranking:
     candidate_pool_size: Optional[int] = None
+    # V2 (opt-in): structural extractor for the function-level call graph (used by the `arm101` ranker).
+    # "regex" is the 1.2.0 behaviour. "tree_sitter" parses TypeScript/TSX, Go, Rust, Java and C++ with
+    # Tree-sitter when the optional `treesitter` extra is installed, falling back to "regex" per file
+    # when a parser is unavailable. Python always uses the `ast` extractor.
+    structural_parser: Literal["regex", "tree_sitter"] = "regex"
 
     @classmethod
     def candidate_a(cls) -> "AblationConfig":

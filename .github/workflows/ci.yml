@@ -96,13 +96,100 @@ jobs:
             tests/test_release_compat.py \
             tests/test_abstention_opt_in.py \
             tests/test_indexing_diagnostics.py \
-            tests/test_documentation_consistency.py
+            tests/test_documentation_consistency.py \
+            tests/test_tree_sitter_fallback.py
 
       - name: MCP STDIO smoke test (initialize; reports RepoNeedle version)
         run: |
           printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}' \
             | timeout 120 python -m reponeedle.mcp --repo . 2>/dev/null | head -n 1 > init.json
           python -c "import json, reponeedle; r = json.load(open('init.json')); info = r['result']['serverInfo']; assert info == {'name': 'reponeedle', 'version': reponeedle.__version__}, info; print('serverInfo OK:', info)"
+
+  tree-sitter-optional:
+    name: Tree-sitter extraction (${{ matrix.label }}, skips fail)
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, python-version: "3.10", label: "Linux, Python 3.10", minimum: false }
+          - { os: ubuntu-latest, python-version: "3.11", label: "Linux, Python 3.11", minimum: false }
+          - { os: ubuntu-latest, python-version: "3.12", label: "Linux, Python 3.12", minimum: false }
+          - { os: ubuntu-latest, python-version: "3.10", label: "Linux, Python 3.10, minimum versions", minimum: true }
+          - { os: macos-latest, python-version: "3.12", label: "macOS, Python 3.12", minimum: false }
+          - { os: windows-latest, python-version: "3.12", label: "Windows, Python 3.12", minimum: false }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install package with the treesitter extra (prebuilt wheels only)
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          BINARY="tree-sitter,tree-sitter-typescript,tree-sitter-go,tree-sitter-rust,tree-sitter-java,tree-sitter-cpp"
+          if [ "${{ matrix.minimum }}" = "true" ]; then
+            # Lower bounds of the `treesitter` extra.
+            printf '%s\n' tree-sitter==0.25.2 tree-sitter-typescript==0.23.2 tree-sitter-go==0.25.0 \
+              tree-sitter-rust==0.24.2 tree-sitter-java==0.23.5 tree-sitter-cpp==0.23.4 > ts-constraints.txt
+            pip install --only-binary="$BINARY" -c ts-constraints.txt -e ".[dev,treesitter]"
+          else
+            pip install --only-binary="$BINARY" -e ".[dev,treesitter]"
+          fi
+          pip list | grep -i "tree-sitter"
+
+      - name: Report parser availability (fails if any grammar cannot load)
+        run: |
+          python -c "import json; from reponeedle.core.tree_sitter_extraction import tree_sitter_status as s; st = s(); print(json.dumps(st, indent=1)); assert st['runtime']['available'] and all(v['available'] for v in st['languages'].values())"
+
+      - name: Run Tree-sitter and function-graph suites (any skip fails the job)
+        env:
+          REPONEEDLE_FAIL_ON_SKIP: "1"
+        run: |
+          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py
+
+  package-install:
+    name: Wheel install with and without the treesitter extra (Linux, Python 3.12)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --wheel
+
+      - name: Base install (no Tree-sitter packages)
+        run: |
+          python -m venv /tmp/base
+          /tmp/base/bin/pip install dist/*.whl
+          if /tmp/base/bin/pip list 2>/dev/null | grep -i "tree-sitter"; then
+            echo "::error::A base install must not pull Tree-sitter packages"; exit 1
+          fi
+          cd /tmp && /tmp/base/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/tree_sitter/install_smoke.py" absent
+
+      - name: Install with the treesitter extra
+        run: |
+          python -m venv /tmp/ts
+          WHEEL=$(ls dist/*.whl)
+          /tmp/ts/bin/pip install --only-binary=tree-sitter,tree-sitter-typescript,tree-sitter-go,tree-sitter-rust,tree-sitter-java,tree-sitter-cpp "${WHEEL}[treesitter]"
+          /tmp/ts/bin/pip list | grep -i "tree-sitter"
+          cd /tmp && /tmp/ts/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/tree_sitter/install_smoke.py" present
 
   research-parity:
     name: Research Benchmark Parity (Python 3.11)
