@@ -1,0 +1,342 @@
+{
+  "command": "cd <workflow-fixture> && claude -p \"<prompt>\" --mcp-config '<inline JSON: reponeedle-mcp.exe --repo <workflow-fixture>>' --allowedTools \"mcp__reponeedle__reponeedle_inspect,mcp__reponeedle__reponeedle_retrieve,mcp__reponeedle__reponeedle_change_impact,Read,Edit,Bash(python -m pytest:*)\" --strict-mcp-config --permission-mode dontAsk --output-format stream-json --verbose --no-session-persistence --max-budget-usd 3",
+  "prompt": "Bug report for this shopcart repository: a discount above 100% (for example 150) makes cart totals negative. Fix it so that apply_discount raises ValueError for percentages above 100, and add a regression test.\nWork this way:\n1. Before reading any file, call the reponeedle_retrieve tool with a query describing the bug, to locate the relevant implementation and tests.\n2. Call reponeedle_change_impact on the file you plan to modify, to find the modules and tests that depend on it.\n3. Make the smallest fix and add a regression test in the most appropriate existing test file.\n4. Run `python -m pytest -q` and report the result.\nIn your final answer, state which RepoNeedle results you used to decide what to change and which tests to run.\n",
+  "init": {
+    "claude_code_version": "2.1.81",
+    "model": "claude-opus-4-6",
+    "permissionMode": "dontAsk",
+    "mcp_servers": [
+      {
+        "name": "reponeedle",
+        "status": "connected"
+      }
+    ],
+    "mcp_tools_discovered": [
+      "mcp__reponeedle__reponeedle_retrieve",
+      "mcp__reponeedle__reponeedle_change_impact",
+      "mcp__reponeedle__reponeedle_inspect"
+    ],
+    "builtin_tool_count": 26
+  },
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "num_turns": 9,
+    "duration_ms": 38878,
+    "total_cost_usd": 0.20117224999999997,
+    "permission_denials": []
+  },
+  "events": [
+    {
+      "event": "tool_use",
+      "tool": "ToolSearch",
+      "input": {
+        "query": "select:mcp__reponeedle__reponeedle_retrieve,mcp__reponeedle__reponeedle_change_impact,Bash,Read,Edit,Grep,Write",
+        "max_results": 7
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": "\n\n\n\n\n\n"
+    },
+    {
+      "event": "assistant_text",
+      "text": "Starting with RepoNeedle to locate the relevant code."
+    },
+    {
+      "event": "tool_use",
+      "tool": "mcp__reponeedle__reponeedle_retrieve",
+      "input": {
+        "query": "apply_discount function that applies a percentage discount to cart totals, bug where discount above 100% makes totals negative",
+        "budget_tokens": 4000
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": {
+        "result": {
+          "status": "success",
+          "query": "apply_discount function that applies a percentage discount to cart totals, bug where discount above 100% makes totals negative",
+          "ranker": "legacy",
+          "task_type": "comment2context",
+          "abstained": false,
+          "explanation": "Retrieved 9 files (1114/4000 tokens). Ranker: legacy. Task: comment2context. Experimental abstention disabled.",
+          "budget_tokens": 4000,
+          "total_tokens": 1114,
+          "execution_time_ms": 7.42,
+          "confidence_score": 0.5603,
+          "selected_files": [
+            {
+              "rank": 1,
+              "path": "shopcart/pricing.py",
+              "tier": "full",
+              "token_count": 172,
+              "score": 0.5444,
+              "explanation": "Primary compact full file (172 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 2,
+              "path": "tests/test_pricing.py",
+              "tier": "focus_span",
+              "token_count": 102,
+              "score": 0.5126,
+              "explanation": "High-density implementation span (102 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 3,
+              "path": "shopcart/cart.py",
+              "tier": "focus_span",
+              "token_count": 216,
+              "score": 0.3823,
+              "explanation": "High-density implementation span (216 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 4,
+              "path": "tests/test_cart.py",
+              "tier": "focus_span",
+              "token_count": 112,
+              "score": 0.156,
+              "explanation": "High-density implementation span (112 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 5,
+              "path": "shopcart/checkout.py",
+              "tier": "focus_span",
+              "token_count": 190,
+              "score": 0.1226,
+              "explanation": "High-density implementation span (190 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 6,
+              "path": "tests/test_checkout.py",
+              "tier": "focus_span",
+              "token_count": 108,
+              "score": 0.1198,
+              "explanation": "High-density implementation span (108 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 7,
+              "path": "shopcart/__init__.py",
+              "tier": "focus_span",
+              "token_count": 31,
+              "score": 0.0878,
+              "explanation": "High-density implementation span (31 tokens, overhead: 15 tokens)"
+            },
+            {
+              "rank": 8,
+              "path": "README.md",
+              "tier": "focus_span",
+              "token_count": 57,
+              "score": 0.0461,
+              "explanation": "High-density implementation span (57 tokens, overhead: 13 tokens)"
+            },
+            {
+              "rank": 9,
+              "path": "shopcart/inventory.py",
+              "tier": "focus_span",
+              "token_count": 126,
+              "score": 0.0147,
+              "explanation": "High-density implementation span (126 tokens, overhead: 15 tokens)"
+            }
+          ],
+          "rendered_context": "# File: shopcart/pricing.py\n```py\n\"\"\"Pricing utilities: discounts, sales tax and currency rounding.\"\"\"\n\nTAX_RATE = 0.08\n\n\ndef round_currency(amount: float) -> float:\n    \"\"\"Round a monetary amount to cents.\"\"\"\n    return round(amount + 1e-9, 2)\n\n\ndef apply_discount(price: float, percent: float) -> float:\n    \"\"\"Return the price after a percentage discount.\"\"\"\n    if percent < 0:\n        raise ValueError(\"discount percent cannot be negative\")\n    return round_currency(price * (1 - percent / 100))\n\n\ndef add_tax(amount: float, rate: float = TAX_RATE) -> float:\n    \"\"\"Return the amount including sales tax.\"\"\"\n    return round_currency(amount * (1 + rate))\n\n```\n\n# File: tests/test_pricing.py\n```py\nimport pytest\n\nfrom shopcart.pricing import add_tax, apply_discount, round_currency\n\n\ndef test_round_currency():\n    assert round_currency(1.005) == 1.01\n\n\ndef test_apply_discount():\n    assert apply_discount(200.0, 10) == 180.0\n\n\ndef test_negative_discount_rejected():\n    with pytest.raises(ValueError):\n        apply_discount(10.0, -5)\n\n\ndef test_add_tax():\n    assert add_tax(100.0) == 108.0\n\n```\n\n# File: shopcart/cart.py\n```py\n\"\"\"Shopping cart that totals line items using the pricing utilities.\"\"\"\n\nfrom dataclasses import dataclass, field\nfrom typing import List\n\nfrom shopcart.pricing import add_tax, apply_discount, round_currency\n\n\n@dataclass\nclass LineItem:\n    sku: str\n    unit_price: float\n    quantity: int = 1\n\n\n@dataclass\nclass Cart:\n    items: List[LineItem] = field(default_factory=list)\n\n    def add_item(self, sku: str, unit_price: float, quantity: int = 1) -> None:\n        if quantity <= 0:\n            raise ValueError(\"quantity must be positive\")\n        self.items.append(LineItem(sku, unit_price, quantity))\n\n    def subtotal(self) -> float:\n        return round_currency(sum(i.unit_price * i.quantity for i in self.items))\n\n    def total(self, discount_percent: float = 0.0) -> float:\n        \"\"\"Subtotal, minus the discount, plus sales tax.\"\"\"\n        return add_tax(apply_discount(self.subtotal(), discount_percent))\n\n```\n\n# File: tests/test_cart.py\n```py\nimport pytest\n\nfrom shopcart.cart import Cart\n\n\ndef test_subtotal_and_total():\n    cart = Cart()\n    cart.add_item(\"apple\", 2.50, 4)\n    assert cart.subtotal() == 10.0\n    assert cart.total() == 10.8\n    assert cart.total(discount_percent=50) == 5.4\n\n\ndef test_quantity_must_be_positive():\n    with pytest.raises(ValueError):\n        Cart().add_item(\"apple\", 1.0, 0)\n\n```\n\n# File: shopcart/checkout.py\n```py\n\"\"\"Checkout flow: validates coupon codes and produces a receipt.\"\"\"\n\nfrom shopcart.cart import Cart\nfrom shopcart.pricing import TAX_RATE\n\nCOUPONS = {\"WELCOME10\": 10, \"HALFOFF\": 50, \"STAFF\": 30}\n\n\ndef coupon_percent(code: str) -> float:\n    if not code:\n        return 0.0\n    try:\n        return float(COUPONS[code.strip().upper()])\n    except KeyError:\n        raise ValueError(f\"unknown coupon code: {code}\")\n\n\ndef checkout(cart: Cart, coupon: str = \"\") -> dict:\n    percent = coupon_percent(coupon)\n    return {\n        \"items\": len(cart.items),\n        \"subtotal\": cart.subtotal(),\n        \"discount_percent\": percent,\n        \"tax_rate\": TAX_RATE,\n        \"total\": cart.total(percent),\n    }\n\n```\n\n# File: tests/test_checkout.py\n```py\nimport pytest\n\nfrom shopcart.cart import Cart\nfrom shopcart.checkout import checkout\n\n\ndef test_checkout_with_coupon():\n    cart = Cart()\n    cart.add_item(\"melon\", 20.0)\n    receipt = checkout(cart, \"welcome10\")\n    assert receipt[\"discount_percent\"] == 10.0\n    assert receipt[\"total\"] == 19.44\n\n\ndef test_unknown_coupon():\n    with pytest.raises(ValueError):\n        checkout(Cart(), \"BOGUS\")\n\n```\n\n# File: shopcart/__init__.py\n```py\n\"\"\"Synthetic shopping-cart package for MCP client validation.\"\"\"\n\n```\n\n# File: README.md\n```md\n# shopcart (synthetic fixture)\n\nA tiny shopping-cart library used to validate RepoNeedle's MCP server inside real coding\nclients. It contains no real data.\n\nRun the tests with `python -m pytest -q`.\n\n```\n\n# File: shopcart/inventory.py\n```py\n\"\"\"Warehouse stock levels. Independent of pricing.\"\"\"\n\nSTOCK = {\"apple\": 12, \"pear\": 0, \"melon\": 3}\n\n\ndef in_stock(sku: str) -> bool:\n    return STOCK.get(sku, 0) > 0\n\n\ndef reserve(sku: str, quantity: int) -> None:\n    available = STOCK.get(sku, 0)\n    if quantity > available:\n        raise ValueError(f\"only {available} of {sku} available\")\n    STOCK[sku] = available - quantity\n\n```\n\n",
+          "abstention": {
+            "enabled": false,
+            "status": "disabled",
+            "experimental": true,
+            "calibrated": false,
+            "threshold": 0.12,
+            "reason": "Experimental abstention disabled (default); out-of-scope queries are not detected and results are returned regardless of query scope."
+          }
+        }
+      }
+    },
+    {
+      "event": "assistant_text",
+      "text": "RepoNeedle returned the full source. The bug is in `shopcart/pricing.py:apply_discount` — it checks for negative percentages but not for values above 100. Now let me check change impact."
+    },
+    {
+      "event": "tool_use",
+      "tool": "mcp__reponeedle__reponeedle_change_impact",
+      "input": {
+        "anchor_files": [
+          "shopcart/pricing.py"
+        ],
+        "query": "Adding validation to apply_discount to reject discount percent above 100"
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": {
+        "result": {
+          "status": "success",
+          "query": "Adding validation to apply_discount to reject discount percent above 100",
+          "anchor_files": [
+            "shopcart/pricing.py"
+          ],
+          "budget_tokens": 4000,
+          "total_tokens": 1114,
+          "execution_time_ms": 6.18,
+          "explanation": "Retrieved 9 files (1114/4000 tokens). Ranker: change_impact. Task: edit2ripple. Experimental abstention disabled.",
+          "affected_files": [
+            {
+              "rank": 1,
+              "path": "tests/test_pricing.py",
+              "tier": "full",
+              "token_count": 102,
+              "score": 3.2956,
+              "explanation": "Confirmed AST import from seed 'pricing.py' (+0.75); Confirmed AST public symbol 'apply_discount' (+0.80)"
+            },
+            {
+              "rank": 2,
+              "path": "shopcart/cart.py",
+              "tier": "focus_span",
+              "token_count": 216,
+              "score": 3.0818,
+              "explanation": "Confirmed AST import from seed 'pricing.py' (+0.75); Confirmed AST public symbol 'apply_discount' (+0.80)"
+            },
+            {
+              "rank": 3,
+              "path": "shopcart/__init__.py",
+              "tier": "focus_span",
+              "token_count": 31,
+              "score": 2.7813,
+              "explanation": "Directory sibling in 'shopcart' (+0.75)"
+            },
+            {
+              "rank": 4,
+              "path": "shopcart/checkout.py",
+              "tier": "focus_span",
+              "token_count": 190,
+              "score": 2.512,
+              "explanation": "Confirmed AST import from seed 'pricing.py' (+0.75)"
+            },
+            {
+              "rank": 5,
+              "path": "shopcart/inventory.py",
+              "tier": "focus_span",
+              "token_count": 126,
+              "score": 2.2556,
+              "explanation": "Directory sibling in 'shopcart' (+0.75)"
+            },
+            {
+              "rank": 6,
+              "path": "README.md",
+              "tier": "focus_span",
+              "token_count": 57,
+              "score": 0.9126,
+              "explanation": "Directory hierarchy containment (+0.30)"
+            },
+            {
+              "rank": 7,
+              "path": "tests/test_cart.py",
+              "tier": "focus_span",
+              "token_count": 112,
+              "score": 0.15,
+              "explanation": "Lexical/semantic relevance"
+            },
+            {
+              "rank": 8,
+              "path": "tests/test_checkout.py",
+              "tier": "focus_span",
+              "token_count": 108,
+              "score": 0.147,
+              "explanation": "Lexical/semantic relevance"
+            },
+            {
+              "rank": 9,
+              "path": "shopcart/pricing.py",
+              "tier": "focus_span",
+              "token_count": 172,
+              "score": 0.0103,
+              "explanation": "Suppressed query seed (0.01x)"
+            }
+          ],
+          "rendered_context": "# File: tests/test_pricing.py\n```py\nimport pytest\n\nfrom shopcart.pricing import add_tax, apply_discount, round_currency\n\n\ndef test_round_currency():\n    assert round_currency(1.005) == 1.01\n\n\ndef test_apply_discount():\n    assert apply_discount(200.0, 10) == 180.0\n\n\ndef test_negative_discount_rejected():\n    with pytest.raises(ValueError):\n        apply_discount(10.0, -5)\n\n\ndef test_add_tax():\n    assert add_tax(100.0) == 108.0\n\n```\n\n# File: shopcart/cart.py\n```py\n\"\"\"Shopping cart that totals line items using the pricing utilities.\"\"\"\n\nfrom dataclasses import dataclass, field\nfrom typing import List\n\nfrom shopcart.pricing import add_tax, apply_discount, round_currency\n\n\n@dataclass\nclass LineItem:\n    sku: str\n    unit_price: float\n    quantity: int = 1\n\n\n@dataclass\nclass Cart:\n    items: List[LineItem] = field(default_factory=list)\n\n    def add_item(self, sku: str, unit_price: float, quantity: int = 1) -> None:\n        if quantity <= 0:\n            raise ValueError(\"quantity must be positive\")\n        self.items.append(LineItem(sku, unit_price, quantity))\n\n    def subtotal(self) -> float:\n        return round_currency(sum(i.unit_price * i.quantity for i in self.items))\n\n    def total(self, discount_percent: float = 0.0) -> float:\n        \"\"\"Subtotal, minus the discount, plus sales tax.\"\"\"\n        return add_tax(apply_discount(self.subtotal(), discount_percent))\n\n```\n\n# File: shopcart/__init__.py\n```py\n\"\"\"Synthetic shopping-cart package for MCP client validation.\"\"\"\n\n```\n\n# File: shopcart/checkout.py\n```py\n\"\"\"Checkout flow: validates coupon codes and produces a receipt.\"\"\"\n\nfrom shopcart.cart import Cart\nfrom shopcart.pricing import TAX_RATE\n\nCOUPONS = {\"WELCOME10\": 10, \"HALFOFF\": 50, \"STAFF\": 30}\n\n\ndef coupon_percent(code: str) -> float:\n    if not code:\n        return 0.0\n    try:\n        return float(COUPONS[code.strip().upper()])\n    except KeyError:\n        raise ValueError(f\"unknown coupon code: {code}\")\n\n\ndef checkout(cart: Cart, coupon: str = \"\") -> dict:\n    percent = coupon_percent(coupon)\n    return {\n        \"items\": len(cart.items),\n        \"subtotal\": cart.subtotal(),\n        \"discount_percent\": percent,\n        \"tax_rate\": TAX_RATE,\n        \"total\": cart.total(percent),\n    }\n\n```\n\n# File: shopcart/inventory.py\n```py\n\"\"\"Warehouse stock levels. Independent of pricing.\"\"\"\n\nSTOCK = {\"apple\": 12, \"pear\": 0, \"melon\": 3}\n\n\ndef in_stock(sku: str) -> bool:\n    return STOCK.get(sku, 0) > 0\n\n\ndef reserve(sku: str, quantity: int) -> None:\n    available = STOCK.get(sku, 0)\n    if quantity > available:\n        raise ValueError(f\"only {available} of {sku} available\")\n    STOCK[sku] = available - quantity\n\n```\n\n# File: README.md\n```md\n# shopcart (synthetic fixture)\n\nA tiny shopping-cart library used to validate RepoNeedle's MCP server inside real coding\nclients. It contains no real data.\n\nRun the tests with `python -m pytest -q`.\n\n```\n\n# File: tests/test_cart.py\n```py\nimport pytest\n\nfrom shopcart.cart import Cart\n\n\ndef test_subtotal_and_total():\n    cart = Cart()\n    cart.add_item(\"apple\", 2.50, 4)\n    assert cart.subtotal() == 10.0\n    assert cart.total() == 10.8\n    assert cart.total(discount_percent=50) == 5.4\n\n\ndef test_quantity_must_be_positive():\n    with pytest.raises(ValueError):\n        Cart().add_item(\"apple\", 1.0, 0)\n\n```\n\n# File: tests/test_checkout.py\n```py\nimport pytest\n\nfrom shopcart.cart import Cart\nfrom shopcart.checkout import checkout\n\n\ndef test_checkout_with_coupon():\n    cart = Cart()\n    cart.add_item(\"melon\", 20.0)\n    receipt = checkout(cart, \"welcome10\")\n    assert receipt[\"discount_percent\"] == 10.0\n    assert receipt[\"total\"] == 19.44\n\n\ndef test_unknown_coupon():\n    with pytest.raises(ValueError):\n        checkout(Cart(), \"BOGUS\")\n\n```\n\n# File: shopcart/pricing.py\n```py\n\"\"\"Pricing utilities: discounts, sales tax and currency rounding.\"\"\"\n\nTAX_RATE = 0.08\n\n\ndef round_currency(amount: float) -> float:\n    \"\"\"Round a monetary amount to cents.\"\"\"\n    return round(amount + 1e-9, 2)\n\n\ndef apply_discount(price: float, percent: float) -> float:\n    \"\"\"Return the price after a percentage discount.\"\"\"\n    if percent < 0:\n        raise ValueError(\"discount percent cannot be negative\")\n    return round_currency(price * (1 - percent / 100))\n\n\ndef add_tax(amount: float, rate: float = TAX_RATE) -> float:\n    \"\"\"Return the amount including sales tax.\"\"\"\n    return round_currency(amount * (1 + rate))\n\n```\n\n"
+        }
+      }
+    },
+    {
+      "event": "assistant_text",
+      "text": "Change impact confirms `tests/test_pricing.py` is the top affected test file, and `cart.py`/`checkout.py` are the downstream consumers. Now I'll apply the fix and add the regression test."
+    },
+    {
+      "event": "tool_use",
+      "tool": "Read",
+      "input": {
+        "file_path": "<SCRATCH>/mcpval/shopcart_workflow/shopcart/pricing.py"
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": "     1→\"\"\"Pricing utilities: discounts, sales tax and currency rounding.\"\"\"\n     2→\n     3→TAX_RATE = 0.08\n     4→\n     5→\n     6→def round_currency(amount: float) -> float:\n     7→    \"\"\"Round a monetary amount to cents.\"\"\"\n     8→    return round(amount + 1e-9, 2)\n     9→\n    10→\n    11→def apply_discount(price: float, percent: float) -> float:\n    12→    \"\"\"Return the price after a percentage discount.\"\"\"\n    13→    if percent < 0:\n    14→        raise ValueError(\"discount percent cannot be negative\")\n    15→    return round_currency(price * (1 - percent / 100))\n    16→\n    17→\n    18→def add_tax(amount: float, rate: float = TAX_RATE) -> float:\n    19→    \"\"\"Return the amount including sales tax.\"\"\"\n    20→    return round_currency(amount * (1 + rate))\n    21→"
+    },
+    {
+      "event": "tool_use",
+      "tool": "Read",
+      "input": {
+        "file_path": "<SCRATCH>/mcpval/shopcart_workflow/tests/test_pricing.py"
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": "     1→import pytest\n     2→\n     3→from shopcart.pricing import add_tax, apply_discount, round_currency\n     4→\n     5→\n     6→def test_round_currency():\n     7→    assert round_currency(1.005) == 1.01\n     8→\n     9→\n    10→def test_apply_discount():\n    11→    assert apply_discount(200.0, 10) == 180.0\n    12→\n    13→\n    14→def test_negative_discount_rejected():\n    15→    with pytest.raises(ValueError):\n    16→        apply_discount(10.0, -5)\n    17→\n    18→\n    19→def test_add_tax():\n    20→    assert add_tax(100.0) == 108.0\n    21→"
+    },
+    {
+      "event": "tool_use",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "<SCRATCH>/mcpval/shopcart_workflow/shopcart/pricing.py",
+        "old_string": "    if percent < 0:\n        raise ValueError(\"discount percent cannot be negative\")",
+        "new_string": "    if percent < 0:\n        raise ValueError(\"discount percent cannot be negative\")\n    if percent > 100:\n        raise ValueError(\"discount percent cannot exceed 100\")"
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": "The file <SCRATCH>/mcpval/shopcart_workflow/shopcart/pricing.py has been updated successfully."
+    },
+    {
+      "event": "tool_use",
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "<SCRATCH>/mcpval/shopcart_workflow/tests/test_pricing.py",
+        "old_string": "def test_add_tax():\n    assert add_tax(100.0) == 108.0",
+        "new_string": "def test_discount_above_100_rejected():\n    with pytest.raises(ValueError):\n        apply_discount(10.0, 150)\n\n\ndef test_add_tax():\n    assert add_tax(100.0) == 108.0"
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": "The file <SCRATCH>/mcpval/shopcart_workflow/tests/test_pricing.py has been updated successfully."
+    },
+    {
+      "event": "assistant_text",
+      "text": "Now let's run the tests."
+    },
+    {
+      "event": "tool_use",
+      "tool": "Bash",
+      "input": {
+        "command": "cd \"<SCRATCH>/mcpval/shopcart_workflow\" && python -m pytest -q",
+        "description": "Run pytest on the shopcart project"
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": ".........                                                                [100%]\r\n9 passed in 0.04s"
+    },
+    {
+      "event": "assistant_text",
+      "text": "All 9 tests pass.\n\n**Summary of changes:**\n\n1. **`shopcart/pricing.py:15`** — Added a guard `if percent > 100: raise ValueError(...)` in `apply_discount`, right after the existing negative-percent check. This prevents discounts above 100% from producing negative totals.\n\n2. **`tests/test_pricing.py`** — Added `test_discount_above_100_rejected` which asserts that `apply_discount(10.0, 150)` raises `ValueError`.\n\n**RepoNeedle results used:**\n\n- **`reponeedle_retrieve`** identified `shopcart/pricing.py` (rank 1, score 0.54) as the file containing `apply_discount`, and `tests/test_pricing.py` (rank 2) as the matching test file. This told me exactly where the bug was and where to add the regression test.\n- **`reponeedle_change_impact`** on `shopcart/pricing.py` confirmed that `tests/test_pricing.py` (rank 1, score 3.30) is the primary test file, and that `cart.py` and `checkout.py` are downstream consumers — but since existing coupons in `checkout.py` max out at 50%, no existing code paths are broken by the new validation."
+    }
+  ]
+}

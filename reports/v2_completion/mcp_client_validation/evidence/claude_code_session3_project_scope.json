@@ -1,0 +1,141 @@
+{
+  "command": "cd <fixture> && claude -p \"Call the reponeedle_inspect tool from the reponeedle MCP server and report indexed_file_count and default_ranker. Do not use any other tool.\" --allowedTools \"mcp__reponeedle__reponeedle_inspect\" --permission-mode dontAsk --output-format stream-json --verbose --no-session-persistence --max-budget-usd 1   # project-scope .mcp.json, no --mcp-config",
+  "prompt": null,
+  "init": {
+    "claude_code_version": "2.1.81",
+    "model": "claude-opus-4-6",
+    "permissionMode": "dontAsk",
+    "mcp_servers": [
+      {
+        "name": "reponeedle",
+        "status": "connected"
+      },
+      {
+        "name": "claude.ai Claude Docs",
+        "status": "pending"
+      }
+    ],
+    "mcp_tools_discovered": [
+      "mcp__reponeedle__reponeedle_retrieve",
+      "mcp__reponeedle__reponeedle_change_impact",
+      "mcp__reponeedle__reponeedle_inspect"
+    ],
+    "builtin_tool_count": 26
+  },
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "num_turns": 3,
+    "duration_ms": 6229,
+    "total_cost_usd": 0.024873000000000003,
+    "permission_denials": []
+  },
+  "events": [
+    {
+      "event": "tool_use",
+      "tool": "ToolSearch",
+      "input": {
+        "query": "select:mcp__reponeedle__reponeedle_inspect",
+        "max_results": 1
+      }
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": ""
+    },
+    {
+      "event": "tool_use",
+      "tool": "mcp__reponeedle__reponeedle_inspect",
+      "input": {}
+    },
+    {
+      "event": "tool_result",
+      "is_error": false,
+      "content": {
+        "result": {
+          "status": "ready",
+          "repository_root": "<SCRATCH>\\mcpval\\shopcart_fixture",
+          "indexed_file_count": 11,
+          "supported_file_types": [
+            ".py",
+            ".ts",
+            ".js",
+            ".tsx",
+            ".jsx",
+            ".go",
+            ".rs",
+            ".java",
+            ".c",
+            ".cpp",
+            ".h",
+            ".md",
+            ".toml",
+            ".yaml",
+            ".yml",
+            ".json"
+          ],
+          "indexed_path_examples": [
+            ".mcp.json",
+            "README.md",
+            "shopcart/cart.py",
+            "shopcart/checkout.py",
+            "shopcart/inventory.py",
+            "shopcart/pricing.py",
+            "shopcart/__init__.py",
+            "tests/test_cart.py",
+            "tests/test_checkout.py",
+            "tests/test_pricing.py",
+            "tests/__init__.py"
+          ],
+          "sample_count": 11,
+          "active_rankers": [
+            "arm101",
+            "bm25",
+            "cascade",
+            "change_impact",
+            "legacy"
+          ],
+          "default_ranker": "legacy",
+          "budget_config": {
+            "max_tokens": 4000,
+            "allow_skeletons": true,
+            "mode": "auto"
+          },
+          "index_initialization": {
+            "status": "initialized",
+            "init_time_ms": 105.87,
+            "message": "Repository indexed in-memory at server startup. Restart server to refresh index."
+          },
+          "indexing": {
+            "source": "directory",
+            "indexed_files": 11,
+            "max_file_size_bytes": 500000,
+            "skipped_large_files": 0,
+            "skipped_paths": [],
+            "skipped_unreadable_files": 0,
+            "unreadable_paths": [],
+            "skipped_symlink_outside_repository": 0,
+            "symlink_outside_repository_paths": [],
+            "skipped_directories": 0,
+            "skipped_directory_paths": [],
+            "skipped_directories_outside_repository": 0,
+            "max_files": 3000,
+            "max_files_reached": false
+          },
+          "abstention": {
+            "default_enabled": false,
+            "experimental": true,
+            "calibrated": false,
+            "threshold": 0.12,
+            "opt_in": "Pass enable_experimental_abstention=true to reponeedle_retrieve."
+          }
+        }
+      }
+    },
+    {
+      "event": "assistant_text",
+      "text": "Here are the two requested values:\n\n- **indexed_file_count**: 11\n- **default_ranker**: `legacy`"
+    }
+  ]
+}
