@@ -3,7 +3,9 @@
 **Status**: Released in RepoNeedle 1.2.0 (PyPI, 2026-11-12). The earlier release 1.1.0 does **not** include the MCP server.  
 **Transport**: STDIO JSON-RPC 2.0 (HTTP/SSE transport is not implemented)  
 **SDK Requirement**: `mcp>=1.28,<2` (Optional dependency group: `mcp`)  
-**Validation**: Verified with the MCP Python SDK (in-process tool calls) and a raw JSON-RPC STDIO handshake (`initialize`, `tools/list`, `tools/call`) in the test suite. **Not yet validated in a live Claude Code, Cursor, Cline or Windsurf session**; the client configuration examples below follow each client's documented MCP configuration format.
+**Validation**: Verified with the MCP Python SDK (in-process tool calls) and a raw JSON-RPC STDIO handshake (`initialize`, `tools/list`, `tools/call`) in the test suite. Live client status (2026-11-16, Windows 11; see [the validation report](../reports/v2_completion/mcp_client_validation/REPORT.md)):
+- **Claude Code 2.1.81: VERIFIED** in non-interactive (`-p`) sessions. Claude Code discovered and called all three tools and used the results in a coding workflow. Interactive sessions and macOS/Linux were not tested.
+- **Cursor, Cline, Windsurf: NOT TESTED.** No tool call was made; the Cursor example below has not been validated.
 
 ---
 
@@ -81,6 +83,13 @@ If files are excluded at startup, the server writes a one-line summary to `STDER
 
 ## 4. Client Configuration Examples
 
+| Client | Status | Notes |
+| :--- | :--- | :--- |
+| Claude Code 2.1.81 (Windows 11, STDIO) | **VERIFIED** | Non-interactive (`-p`) sessions with `--mcp-config` and with a project-scope `.mcp.json`. Interactive sessions: NOT TESTED. |
+| Cursor | **NOT TESTED** | Cursor 2.6.20 was installed, but MCP tools can only be called from its interactive Agent chat, which was not exercised. |
+| Cline | **NOT TESTED** | Not installed on the validation host. |
+| Windsurf | **NOT TESTED** | Not installed on the validation host. |
+
 ### 4.1 Claude Code CLI Integration
 
 To add RepoNeedle as an MCP tool server in **Claude Code**, run (the `--` separates Claude Code's own options from the server command and its arguments):
@@ -89,7 +98,21 @@ To add RepoNeedle as an MCP tool server in **Claude Code**, run (the `--` separa
 claude mcp add reponeedle -- python -m reponeedle.mcp --repo /absolute/path/to/your/project
 ```
 
-Or add an `mcpServers` entry to a Claude Code MCP configuration file (see the Claude Code documentation for the project- and user-scope file locations):
+`claude mcp add` accepts `--scope local` (the default), `user` or `project`. The validation used `--scope project`, run inside the project, which writes the server to a `.mcp.json` file in the project root:
+
+```bash
+claude mcp add --scope project reponeedle -- /absolute/path/to/python -m reponeedle.mcp --repo /absolute/path/to/your/project
+claude mcp list        # health check; expect "reponeedle: ... - ✓ Connected"
+claude mcp remove reponeedle -s project
+```
+
+Verified behaviour (Claude Code 2.1.81):
+- **Tool names.** Claude Code exposes the tools as `mcp__reponeedle__reponeedle_retrieve`, `mcp__reponeedle__reponeedle_change_impact` and `mcp__reponeedle__reponeedle_inspect`. Use these names in `--allowedTools` or permission rules.
+- **One-off sessions.** `claude -p ... --mcp-config <file-or-json> --strict-mcp-config` loads only the given server, without registering it anywhere.
+- **Windows.** Use the absolute path of `python.exe`. On hosts with Smart App Control, Windows may block unsigned pip launchers (`reponeedle.exe`, and once `reponeedle-mcp.exe`); `python -m reponeedle.mcp` is not affected.
+- **Indexing of `.mcp.json`.** A project `.mcp.json` sits inside the repository, so RepoNeedle indexes it like any other JSON file. It can then appear in retrieved context together with the server command and its paths. Do not put secrets in its `env` entries.
+
+Or add an `mcpServers` entry to a Claude Code MCP configuration file (`claude mcp add --scope project` writes this form, with `"type": "stdio"`, to `.mcp.json`):
 
 ```json
 {
@@ -110,6 +133,9 @@ Or add an `mcpServers` entry to a Claude Code MCP configuration file (see the Cl
 ```
 
 ### 4.2 Cursor IDE Integration
+
+> [!WARNING]
+> **NOT TESTED.** No RepoNeedle tool has been called from Cursor. Cursor 2.6.20's installed files reference a `.cursor/mcp.json` configuration file with an `mcpServers` map, but the steps below have not been checked against a running Cursor.
 
 In Cursor:
 1. Open **Cursor Settings** $\to$ **Features** $\to$ **MCP**.

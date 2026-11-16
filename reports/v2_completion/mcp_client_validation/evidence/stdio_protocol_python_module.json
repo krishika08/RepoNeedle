@@ -1,0 +1,233 @@
+{
+  "started_utc": "2026-11-16T16:44:38.180372+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10",
+  "command": [
+    "<HOME>/AppData/Local/Programs/Python/Python312/python.exe",
+    "-m",
+    "reponeedle.mcp",
+    "--repo",
+    "<fixture>"
+  ],
+  "checks": [
+    {
+      "check": "initialize: serverInfo",
+      "ok": true,
+      "detail": {
+        "name": "reponeedle",
+        "version": "1.2.0"
+      }
+    },
+    {
+      "check": "initialize: protocolVersion negotiated",
+      "ok": true,
+      "detail": "2025-06-18"
+    },
+    {
+      "check": "initialize: tools capability advertised",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "tools/list: exactly the three RepoNeedle tools",
+      "ok": true,
+      "detail": [
+        "reponeedle_change_impact",
+        "reponeedle_inspect",
+        "reponeedle_retrieve"
+      ]
+    },
+    {
+      "check": "tools/call reponeedle_inspect",
+      "ok": true,
+      "detail": "10 files indexed"
+    },
+    {
+      "check": "tools/call reponeedle_retrieve: implementation and tests found",
+      "ok": true,
+      "detail": [
+        "tests/test_cart.py",
+        "tests/test_checkout.py",
+        "shopcart/cart.py",
+        "shopcart/checkout.py",
+        "tests/test_pricing.py",
+        "README.md",
+        "shopcart/pricing.py",
+        "shopcart/__init__.py",
+        "shopcart/inventory.py"
+      ]
+    },
+    {
+      "check": "tools/call reponeedle_change_impact: dependants of pricing.py",
+      "ok": true,
+      "detail": [
+        "shopcart/cart.py",
+        "tests/test_pricing.py",
+        "shopcart/__init__.py",
+        "shopcart/checkout.py",
+        "shopcart/inventory.py",
+        "README.md",
+        "tests/test_checkout.py",
+        "tests/test_cart.py",
+        "shopcart/pricing.py"
+      ]
+    },
+    {
+      "check": "path traversal anchor rejected as a tool error",
+      "ok": true,
+      "detail": "Error executing tool reponeedle_change_impact: Path '../outside.py' does not exist or is not a regular file within repository '<SCRATCH>\\mcpval\\shopcart_fixture'."
+    },
+    {
+      "check": "existing file outside the root refused (relative path)",
+      "ok": true,
+      "detail": "Error executing tool reponeedle_change_impact: Security boundary violation: Path '../outside_marker.py' resolv"
+    },
+    {
+      "check": "existing file outside the root refused (absolute path)",
+      "ok": true,
+      "detail": "Error executing tool reponeedle_change_impact: Security boundary violation: Path '<HOME>\\AppData\\Local"
+    },
+    {
+      "check": "empty query rejected as a tool error",
+      "ok": true,
+      "detail": "Error executing tool reponeedle_retrieve: Query string cannot be empty."
+    },
+    {
+      "check": "unknown tool rejected",
+      "ok": true,
+      "detail": "Unknown tool: no_such_tool"
+    },
+    {
+      "check": "clean shutdown on stdin close",
+      "ok": true,
+      "detail": "exit code 0 after 0.42s"
+    },
+    {
+      "check": "stdout carries only JSON-RPC 2.0 messages",
+      "ok": true,
+      "detail": "10 lines, 0 invalid"
+    },
+    {
+      "check": "diagnostics on stderr",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "check": "read-only: fixture unchanged (no files added, removed or modified)",
+      "ok": true,
+      "detail": "10 files before, 10 after"
+    },
+    {
+      "check": "invalid repository path fails safely",
+      "ok": true,
+      "detail": "exit 1; stderr: Error: Repository directory '<SCRATCH>\\mcpval\\does-not-exist' does not exist or is not a directory."
+    }
+  ],
+  "tools": [
+    {
+      "name": "reponeedle_retrieve",
+      "required": [
+        "query"
+      ],
+      "properties": [
+        "anchor_files",
+        "budget_tokens",
+        "enable_experimental_abstention",
+        "query",
+        "ranker",
+        "task_type"
+      ]
+    },
+    {
+      "name": "reponeedle_change_impact",
+      "required": [
+        "anchor_files"
+      ],
+      "properties": [
+        "anchor_files",
+        "budget_tokens",
+        "query"
+      ]
+    },
+    {
+      "name": "reponeedle_inspect",
+      "required": [],
+      "properties": []
+    }
+  ],
+  "inspect": {
+    "indexed_file_count": 10,
+    "indexed_path_examples": [
+      "README.md",
+      "shopcart/cart.py",
+      "shopcart/checkout.py",
+      "shopcart/inventory.py",
+      "shopcart/pricing.py",
+      "shopcart/__init__.py",
+      "tests/test_cart.py",
+      "tests/test_checkout.py",
+      "tests/test_pricing.py",
+      "tests/__init__.py"
+    ],
+    "default_ranker": "legacy",
+    "abstention_default_enabled": false
+  },
+  "retrieve": {
+    "status": "success",
+    "task_type": "comment2context",
+    "total_tokens": 1114,
+    "selected_files": [
+      "tests/test_cart.py",
+      "tests/test_checkout.py",
+      "shopcart/cart.py",
+      "shopcart/checkout.py",
+      "tests/test_pricing.py",
+      "README.md",
+      "shopcart/pricing.py",
+      "shopcart/__init__.py",
+      "shopcart/inventory.py"
+    ],
+    "abstention": {
+      "enabled": false,
+      "status": "disabled",
+      "experimental": true,
+      "calibrated": false,
+      "threshold": 0.12,
+      "reason": "Experimental abstention disabled (default); out-of-scope queries are not detected and results are returned regardless of query scope."
+    }
+  },
+  "change_impact": {
+    "anchor_files": [
+      "shopcart/pricing.py"
+    ],
+    "affected_files": [
+      "shopcart/cart.py",
+      "tests/test_pricing.py",
+      "shopcart/__init__.py",
+      "shopcart/checkout.py",
+      "shopcart/inventory.py",
+      "README.md",
+      "tests/test_checkout.py",
+      "tests/test_cart.py",
+      "shopcart/pricing.py"
+    ],
+    "explanations": {
+      "shopcart/cart.py": "Confirmed AST import from seed 'pricing.py' (+0.75)",
+      "tests/test_pricing.py": "Confirmed AST import from seed 'pricing.py' (+0.75)",
+      "shopcart/__init__.py": "Directory sibling in 'shopcart' (+0.75)",
+      "shopcart/checkout.py": "Confirmed AST import from seed 'pricing.py' (+0.75)",
+      "shopcart/inventory.py": "Directory sibling in 'shopcart' (+0.75)",
+      "README.md": "Directory hierarchy containment (+0.30)",
+      "tests/test_checkout.py": "Lexical/semantic relevance",
+      "tests/test_cart.py": "Lexical/semantic relevance",
+      "shopcart/pricing.py": "Suppressed query seed (0.01x)"
+    }
+  },
+  "stderr_reponeedle_lines": [
+    "[reponeedle-mcp] Indexing repository: <SCRATCH>\\mcpval\\shopcart_fixture ...",
+    "[reponeedle-mcp] Repository indexed successfully (10 files in 100.0ms).",
+    "[reponeedle-mcp] Server ready. Listening for JSON-RPC messages on STDIO..."
+  ],
+  "finished_utc": "2026-11-16T16:44:40.609434+00:00",
+  "all_passed": true
+}
