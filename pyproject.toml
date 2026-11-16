@@ -52,6 +52,18 @@ hf = [
 mcp = [
     "mcp>=1.28,<2",
 ]
+# Optional Tree-sitter structural extraction for the function-level call graph (opt-in with
+# AblationConfig(structural_parser="tree_sitter")). The grammars are installed without their `[core]`
+# extras: the Go and Rust grammars are ABI 15 and need runtime >= 0.25, although their `[core]` extras
+# allow older runtimes. Bounds are the tested versions (see reports/v2_completion/tree_sitter/REPORT.md).
+treesitter = [
+    "tree-sitter>=0.25.2,<0.27",
+    "tree-sitter-typescript>=0.23.2,<0.24",
+    "tree-sitter-go>=0.25.0,<0.26",
+    "tree-sitter-rust>=0.24.2,<0.25",
+    "tree-sitter-java>=0.23.5,<0.24",
+    "tree-sitter-cpp>=0.23.4,<0.24",
+]
 
 [project.scripts]
 reponeedle = "reponeedle.cli:main"

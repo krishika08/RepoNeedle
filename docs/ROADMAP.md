@@ -46,7 +46,8 @@ The current heuristic (repository vocabulary overlap + $Z$-score peakiness + top
 - [ ] Third-party package boundary disambiguation (e.g. `urllib3` vs `requests`) using dependency manifests.
 
 ## Phase 2: Multi-Language & Protocol Integration
-- [ ] **Tree-sitter & SCIP Indexing**: optional Tree-sitter parsers for TypeScript, Go, Rust, Java and C++; SCIP index ingest for large codebases.
+- [x] **Tree-sitter structural extraction** (opt-in, optional `treesitter` extra; on `main`, not in a published release yet): syntax-tree extraction of functions, methods, imports and call sites for TypeScript/TSX, Go, Rust, Java and C++ in the function-level call graph, with per-file fallback to the regex extractor. Syntax-aware only, not semantic code intelligence; it affects only the opt-in `arm101` ranker, and no retrieval improvement has been measured. See [TREE_SITTER.md](TREE_SITTER.md).
+- [ ] **SCIP index ingestion** for large codebases (semantic, compiler-derived references). Not implemented.
 - [ ] **Dynamic Dependency Tracking**: optional pytest / coverage runtime traces to bridge dynamic dispatch and reflection.
 - [ ] **Live client validation** of the MCP server in Claude Code, Cursor and Cline, recorded as reproducible integration tests.
 

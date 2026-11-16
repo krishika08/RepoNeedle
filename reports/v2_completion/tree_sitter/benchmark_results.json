@@ -1,0 +1,112 @@
+{
+  "environment": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "tree_sitter": "0.26.1",
+    "grammars": {
+      "typescript": "0.23.2",
+      "tsx": "0.23.2",
+      "go": "0.25.0",
+      "rust": "0.24.2",
+      "java": "0.23.5",
+      "cpp": "0.23.4"
+    },
+    "copies": 40,
+    "repeats": 5
+  },
+  "startup_ms": {
+    "import_reponeedle": 544.3,
+    "import_reponeedle_and_load_runtime_plus_go_grammar": 537.5,
+    "import_reponeedle_and_load_all_six_grammars": 548.2
+  },
+  "per_language": {
+    "typescript": {
+      "files": 280,
+      "kib": 75.3,
+      "tree_sitter_ms": 39.82,
+      "regex_ms": 4.4,
+      "tree_sitter_ms_per_kib": 0.529,
+      "regex_ms_per_kib": 0.058,
+      "tree_sitter_functions": 480,
+      "tree_sitter_calls": 960,
+      "regex_functions": 320,
+      "regex_calls": 1400
+    },
+    "go": {
+      "files": 240,
+      "kib": 53.9,
+      "tree_sitter_ms": 22.81,
+      "regex_ms": 5.42,
+      "tree_sitter_ms_per_kib": 0.423,
+      "regex_ms_per_kib": 0.101,
+      "tree_sitter_functions": 520,
+      "tree_sitter_calls": 640,
+      "regex_functions": 480,
+      "regex_calls": 840
+    },
+    "rust": {
+      "files": 280,
+      "kib": 67.3,
+      "tree_sitter_ms": 29.27,
+      "regex_ms": 3.96,
+      "tree_sitter_ms_per_kib": 0.435,
+      "regex_ms_per_kib": 0.059,
+      "tree_sitter_functions": 600,
+      "tree_sitter_calls": 640,
+      "regex_functions": 640,
+      "regex_calls": 240
+    },
+    "java": {
+      "files": 200,
+      "kib": 81.6,
+      "tree_sitter_ms": 26.7,
+      "regex_ms": 7.96,
+      "tree_sitter_ms_per_kib": 0.327,
+      "regex_ms_per_kib": 0.098,
+      "tree_sitter_functions": 640,
+      "tree_sitter_calls": 760,
+      "regex_functions": 600,
+      "regex_calls": 0
+    },
+    "cpp": {
+      "files": 280,
+      "kib": 62.5,
+      "tree_sitter_ms": 27.57,
+      "regex_ms": 0.22,
+      "tree_sitter_ms_per_kib": 0.441,
+      "regex_ms_per_kib": 0.004,
+      "tree_sitter_functions": 400,
+      "tree_sitter_calls": 480,
+      "regex_functions": 0,
+      "regex_calls": 0
+    }
+  },
+  "build_graph": {
+    "files": 1360,
+    "regex": {
+      "build_graph_cold_ms": 36.1,
+      "build_graph_repeated_ms": 10.87,
+      "python_peak_alloc_mb": 2.7,
+      "peak_rss_mb_before_build": 79.3,
+      "peak_rss_mb_after_build": 86.3,
+      "functions": 2040,
+      "call_sites": 2480,
+      "edges": 0,
+      "edge_types": {}
+    },
+    "tree_sitter": {
+      "build_graph_cold_ms": 209.55,
+      "build_graph_repeated_ms": 57.41,
+      "python_peak_alloc_mb": 5.64,
+      "peak_rss_mb_before_build": 88.0,
+      "peak_rss_mb_after_build": 98.1,
+      "functions": 2640,
+      "call_sites": 3480,
+      "edges": 520,
+      "edge_types": {
+        "verified_call": 520
+      }
+    }
+  }
+}

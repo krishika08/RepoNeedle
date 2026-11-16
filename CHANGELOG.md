@@ -2,6 +2,20 @@
 
 All notable changes to RepoNeedle are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **Optional Tree-sitter structural extraction** for the function-level call graph (opt-in with `AblationConfig(structural_parser="tree_sitter")`, optional `treesitter` extra). It covers TypeScript/TSX, Go, Rust, Java and C++, and extracts functions, methods with their containers, imports and call sites, with exact line numbers. Python keeps its `ast` extractor.
+  - Import-bound calls are resolved through their imports only; external or unresolvable imports produce no edge.
+  - Each file falls back to the existing regex extractor when its parser is unavailable, with the reason recorded in `function_graph.diagnostics["structural_parser"]`.
+  - It is syntax-aware extraction, not semantic analysis. It affects only the opt-in `arm101` ranker, and **no retrieval-quality improvement is claimed or measured**. See [docs/TREE_SITTER.md](docs/TREE_SITTER.md) and `reports/v2_completion/tree_sitter/REPORT.md`.
+- `CallSite.qualifier_path` (optional, default `None`): the full call qualifier, set by the Tree-sitter extractor only.
+
+### Not changed
+
+- The default extraction (`structural_parser="regex"`) reproduces 1.2.0 exactly; this is checked against a golden snapshot of the 1.2.0 implementation. Ranking weights, routing, packing, abstention defaults, the MCP tools and the core dependencies are unchanged.
+
 ## [1.2.0] — 2026-11-12
 
 ### Highlights
