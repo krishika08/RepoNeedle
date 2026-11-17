@@ -273,6 +273,22 @@ def test_multi_line_and_legacy_ranges_resolve(tmp_path):
     assert [(e[1], e[2], e[3]) for e in _resolved(engine)] == [("u", "m.ts", "g")]
 
 
+def test_reference_at_a_function_end_is_not_attributed_to_it(tmp_path):
+    # Enclosing ranges are half-open: a call that starts exactly where `a`'s range ends lies outside `a`.
+    a, b = P + "edge/a().", P + "edge/b()."
+    text = "function a() { return 1; }helper(0);\nfunction b() { return 2; }\nhelper(1);\n"
+    end_of_a = len("function a() { return 1; }")
+    edge_doc = doc("edge.ts", [
+        occ(a, at(text, 0, "a"), roles=ROLE_DEFINITION, enclosing=[0, 0, 0, end_of_a]),
+        occ(HELPER, at(text, 0, "helper")),
+        occ(b, at(text, 1, "b"), roles=ROLE_DEFINITION, enclosing=[1, 0, 2, 0]),   # ends at the start of line 2
+        occ(HELPER, at(text, 2, "helper")),
+    ], [sym(a), sym(b)])
+    engine = _engine(tmp_path, extra_files={"edge.ts": text}, index_docs=[util_doc(), edge_doc])
+    assert [e for e in _resolved(engine) if e[0] == "edge.ts"] == [("edge.ts", None, "util.ts", "helper")]
+    assert engine.scip_diagnostics["references"]["with_enclosing_definition"] == 0
+
+
 def test_no_duplicate_edges_and_determinism(tmp_path):
     root, path = _repo(tmp_path)
     runs = [_scip_edges(RepoNeedleEngine.from_directory(str(root), scip_config=ScipConfig(index_path=path)).function_graph)

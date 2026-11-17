@@ -136,6 +136,79 @@ def test_range_bounds_depend_on_encoding():
     assert not si.range_in_bounds(si.SourceRange(2, 0, 2, 0), lines, si.ENC_UTF8)
 
 
+# --- half-open [start, end) ranges (scip.proto: "the end position is exclusive") --------------
+
+def test_range_contains_its_start_position():
+    assert si.SourceRange(2, 4, 2, 9).contains(2, 4)
+    assert si.SourceRange(1, 3, 5, 0).contains(1, 3)
+
+
+def test_range_contains_interior_positions():
+    single = si.SourceRange(2, 4, 2, 9)
+    assert single.contains(2, 5) and single.contains(2, 8)        # last included character is end - 1
+    multi = si.SourceRange(1, 3, 5, 2)
+    assert multi.contains(1, 99) and multi.contains(3, 0) and multi.contains(5, 1)
+
+
+def test_range_excludes_its_end_position():
+    assert not si.SourceRange(2, 4, 2, 9).contains(2, 9)
+    assert not si.SourceRange(1, 3, 5, 2).contains(5, 2)
+    assert not si.SourceRange(1, 0, 4, 0).contains(4, 0)          # range ending at the start of a line
+
+
+def test_range_excludes_positions_outside():
+    r = si.SourceRange(1, 3, 5, 2)
+    assert not r.contains(1, 2) and not r.contains(0, 50)
+    assert not r.contains(5, 3) and not r.contains(6, 0)
+
+
+def test_empty_range_contains_nothing():
+    empty = si.SourceRange(3, 7, 3, 7)
+    assert not empty.contains(3, 7)
+    assert not empty.contains(3, 6) and not empty.contains(3, 8)
+
+
+def _callable_def(name: str, enclosing):
+    return si.ScipDefinition(symbol=f"synthetic npm repo 1.0 m/{name}().", path="m.ts",
+                             range=si.SourceRange(enclosing.start_line, enclosing.start_character,
+                                                  enclosing.start_line, enclosing.start_character + 1),
+                             enclosing=enclosing, callable=True, name=name)
+
+
+def test_innermost_attribution_at_function_boundaries():
+    # `function a() { return 1; }function b() { return helper(); }` on one line: a = [0:0, 0:26), b = [0:26, 0:60).
+    a = _callable_def("a", si.SourceRange(0, 0, 0, 26))
+    b = _callable_def("b", si.SourceRange(0, 26, 0, 60))
+    defs = [a, b]
+
+    def at(line, character):
+        return si.SourceRange(line, character, line, character + 1)
+
+    assert si._innermost(defs, at(0, 0)) is a        # start of a: included
+    assert si._innermost(defs, at(0, 25)) is a       # last character of a
+    assert si._innermost(defs, at(0, 26)) is b       # end of a is exclusive; start of b is inclusive
+    assert si._innermost(defs, at(0, 59)) is b       # last character of b
+    assert si._innermost(defs, at(0, 60)) is None    # end of b: outside every function
+
+
+def test_innermost_prefers_the_nested_function_but_not_past_its_end():
+    outer = _callable_def("outer", si.SourceRange(1, 0, 6, 1))
+    inner = _callable_def("inner", si.SourceRange(4, 2, 4, 39))
+    defs = [outer, inner]
+    ref = lambda line, character: si.SourceRange(line, character, line, character + 1)  # noqa: E731
+    assert si._innermost(defs, ref(4, 2)) is inner
+    assert si._innermost(defs, ref(4, 38)) is inner
+    assert si._innermost(defs, ref(4, 39)) is outer   # just past inner's end, still inside outer
+    assert si._innermost(defs, ref(6, 1)) is None     # outer's exclusive end
+
+
+def test_innermost_ignores_empty_and_missing_enclosing_ranges():
+    empty = _callable_def("empty", si.SourceRange(2, 5, 2, 5))
+    no_range = si.ScipDefinition(symbol="synthetic npm repo 1.0 m/n().", path="m.ts",
+                                 range=si.SourceRange(2, 5, 2, 6), enclosing=None, callable=True, name="n")
+    assert si._innermost([empty, no_range], si.SourceRange(2, 5, 2, 6)) is None
+
+
 # --- missing Protobuf ----------------------------------------------------------------------
 
 class _BlockProtobuf:
