@@ -73,8 +73,12 @@ class FunctionGraphEdge:
     target_path: str
     source_func: Optional[str]
     target_func: Optional[str]
-    edge_type: str  # 'verified_call', 'intra_file_call', 'unique_global_call', 'directory_local_call', 'structural_method_call'
+    edge_type: str  # 'verified_call', 'intra_file_call', 'unique_global_call', 'directory_local_call', 'structural_method_call', 'scip_reference'
     confidence: float
+    # SCIP-derived edges only: the exact SCIP symbol identifiers and the producing indexer.
+    source_symbol: Optional[str] = None
+    target_symbol: Optional[str] = None
+    provenance: Optional[str] = None
 
 
 class FunctionGraphEngine:
@@ -98,6 +102,9 @@ class FunctionGraphEngine:
         self.min_confidence = min_confidence
         self.structural_parser = structural_parser
         self._ts_cache: Dict[str, Tuple[str, Any]] = {}
+        # Optional SCIP evidence (reponeedle.core.scip_ingestion.ScipIndex, root already validated).
+        self.scip_index: Optional[Any] = None
+        self.scip_relationships: List[Any] = []
 
         self.graph = nx.DiGraph()
         self.docs: List[FileDoc] = []
@@ -572,7 +579,60 @@ class FunctionGraphEngine:
 
         if ts_mode:
             self._ts_finish_diagnostics(ts_diag)
+        if self.scip_index is not None:
+            self._apply_scip(docs)
         return self
+
+    # ------------------------------------------------------------------
+    # SCIP evidence (opt-in: RepoNeedleEngine(..., scip_config=ScipConfig(...)))
+    # ------------------------------------------------------------------
+
+    def _apply_scip(self, docs: List[FileDoc]) -> None:
+        """
+        Adds a ``scip_reference`` edge for each SCIP reference from one repository file to a callable
+        defined in another, unless an extracted edge already links the same files and function name.
+        Relationships (implementation, type definition, ...) are stored separately, never as edges.
+        """
+        from reponeedle.core.scip_ingestion import SCIP_REFERENCE_CONFIDENCE, SCIP_REFERENCE_EDGE_TYPE
+
+        resolution = self.scip_index.resolve(docs)
+        provenance = "scip:" + "@".join(p for p in (self.scip_index.tool_name, self.scip_index.tool_version) if p)
+        existing = {(e.source_path, e.target_path, e.target_func) for e in self.edges}
+        known_paths = set(self.path_to_idx)
+        added = corroborated = 0
+        for ref in resolution.edges:
+            if ref.source_path not in known_paths or ref.target_path not in known_paths:
+                continue
+            if (ref.source_path, ref.target_path, ref.target_name) in existing:
+                corroborated += 1
+                continue
+            e = FunctionGraphEdge(
+                source_path=ref.source_path,
+                target_path=ref.target_path,
+                source_func=ref.source_name,
+                target_func=ref.target_name,
+                edge_type=SCIP_REFERENCE_EDGE_TYPE,
+                confidence=SCIP_REFERENCE_CONFIDENCE,
+                source_symbol=ref.source_symbol,
+                target_symbol=ref.target_symbol,
+                provenance=provenance,
+            )
+            self.edges.append(e)
+            self.file_to_file_edges[(ref.source_path, ref.target_path)].append(e)
+            prev = self.graph.get_edge_data(ref.source_path, ref.target_path, default={}).get("weight", 0.0)
+            self.graph.add_edge(ref.source_path, ref.target_path, weight=max(prev, e.confidence))
+            self.callees_map[ref.source_path][ref.target_path] = max(
+                self.callees_map[ref.source_path].get(ref.target_path, 0.0), e.confidence)
+            self.callers_map[ref.target_path][ref.source_path] = max(
+                self.callers_map[ref.target_path].get(ref.source_path, 0.0), e.confidence)
+            added += 1
+        self.scip_relationships = resolution.relationships
+        diag = resolution.diagnostics
+        diag["status"] = "ingested"
+        diag["edges"].update(added_to_graph=added, already_present_from_extraction=corroborated,
+                             edge_type=SCIP_REFERENCE_EDGE_TYPE, confidence=SCIP_REFERENCE_CONFIDENCE,
+                             provenance=provenance)
+        self.diagnostics["scip"] = diag
 
     # ------------------------------------------------------------------
     # Tree-sitter structural extraction (opt-in: structural_parser="tree_sitter")

@@ -97,7 +97,7 @@ jobs:
             tests/test_abstention_opt_in.py \
             tests/test_indexing_diagnostics.py \
             tests/test_documentation_consistency.py \
-            tests/test_tree_sitter_fallback.py
+            tests/test_tree_sitter_fallback.py             tests/test_scip_core.py
 
       - name: MCP STDIO smoke test (initialize; reports RepoNeedle version)
         run: |
@@ -156,7 +156,7 @@ jobs:
           pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py
 
   package-install:
-    name: Wheel install with and without the treesitter extra (Linux, Python 3.12)
+    name: Wheel install with and without the optional extras (Linux, Python 3.12)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -174,7 +174,7 @@ jobs:
           python -m pip install --upgrade pip build
           python -m build --wheel
 
-      - name: Base install (no Tree-sitter packages)
+      - name: Base install (no optional extras)
         run: |
           python -m venv /tmp/base
           /tmp/base/bin/pip install dist/*.whl
@@ -182,6 +182,10 @@ jobs:
             echo "::error::A base install must not pull Tree-sitter packages"; exit 1
           fi
           cd /tmp && /tmp/base/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/tree_sitter/install_smoke.py" absent
+          if /tmp/base/bin/pip list 2>/dev/null | grep -i "^protobuf "; then
+            echo "::error::A base install must not pull protobuf"; exit 1
+          fi
+          cd /tmp && /tmp/base/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/scip_ingestion/install_smoke.py" absent "$GITHUB_WORKSPACE"
 
       - name: Install with the treesitter extra
         run: |
@@ -190,6 +194,78 @@ jobs:
           /tmp/ts/bin/pip install --only-binary=tree-sitter,tree-sitter-typescript,tree-sitter-go,tree-sitter-rust,tree-sitter-java,tree-sitter-cpp "${WHEEL}[treesitter]"
           /tmp/ts/bin/pip list | grep -i "tree-sitter"
           cd /tmp && /tmp/ts/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/tree_sitter/install_smoke.py" present
+
+      - name: Install with the scip extra only
+        run: |
+          python -m venv /tmp/scip
+          WHEEL=$(ls dist/*.whl)
+          /tmp/scip/bin/pip install --only-binary=protobuf "${WHEEL}[scip]"
+          /tmp/scip/bin/pip list | grep -i "^protobuf "
+          cd /tmp && /tmp/scip/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/scip_ingestion/install_smoke.py" present "$GITHUB_WORKSPACE"
+
+      - name: Install with both the scip and treesitter extras
+        run: |
+          python -m venv /tmp/both
+          WHEEL=$(ls dist/*.whl)
+          /tmp/both/bin/pip install --only-binary=:all: "${WHEEL}[scip,treesitter]"
+          cd /tmp && /tmp/both/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/scip_ingestion/install_smoke.py" present "$GITHUB_WORKSPACE"
+          cd /tmp && /tmp/both/bin/python "$GITHUB_WORKSPACE/reports/v2_completion/tree_sitter/install_smoke.py" present
+
+  scip-optional:
+    name: SCIP ingestion (${{ matrix.label }}${{ matrix.strict && ', skips fail' || '' }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, python-version: "3.10", label: "Linux, Python 3.10", extras: "dev,scip", pin: "", impl: "", strict: true }
+          - { os: ubuntu-latest, python-version: "3.11", label: "Linux, Python 3.11", extras: "dev,scip", pin: "", impl: "", strict: true }
+          - { os: ubuntu-latest, python-version: "3.12", label: "Linux, Python 3.12", extras: "dev,scip", pin: "", impl: "", strict: true }
+          - { os: ubuntu-latest, python-version: "3.10", label: "Linux, Python 3.10, protobuf 5.29.0 minimum", extras: "dev,scip", pin: "protobuf==5.29.0", impl: "", strict: true }
+          - { os: ubuntu-latest, python-version: "3.11", label: "Linux, Python 3.11, pure-Python protobuf", extras: "dev,scip", pin: "", impl: "python", strict: true }
+          - { os: ubuntu-latest, python-version: "3.12", label: "Linux, Python 3.12, scip + treesitter", extras: "dev,scip,treesitter", pin: "", impl: "", strict: true }
+          - { os: windows-latest, python-version: "3.12", label: "Windows, Python 3.12", extras: "dev,scip", pin: "", impl: "", strict: false }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install package with the optional extras (prebuilt wheels only)
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          if [ -n "${{ matrix.pin }}" ]; then
+            pip install --only-binary=protobuf "${{ matrix.pin }}" -e ".[${{ matrix.extras }}]"
+          else
+            pip install --only-binary=protobuf -e ".[${{ matrix.extras }}]"
+          fi
+          pip list | grep -i -E "^protobuf |tree-sitter" || true
+
+      - name: Report SCIP binding availability (fails if the bindings cannot load)
+        shell: bash
+        run: |
+          # An empty PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION is rejected by protobuf: export it only when set.
+          if [ -n "${{ matrix.impl }}" ]; then export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="${{ matrix.impl }}"; fi
+          python -c "from reponeedle.core.scip_ingestion import protobuf_status as s; st = s(); print(st); assert st['available']"
+
+      - name: Run SCIP suites
+        shell: bash
+        env:
+          REPONEEDLE_FAIL_ON_SKIP: ${{ matrix.strict && '1' || '0' }}
+        run: |
+          if [ -n "${{ matrix.impl }}" ]; then export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="${{ matrix.impl }}"; fi
+          TESTS="tests/test_scip_core.py tests/test_scip_parsing.py tests/test_scip_security.py tests/test_scip_graph.py"
+          if [[ "${{ matrix.extras }}" == *treesitter* ]]; then
+            TESTS="$TESTS tests/test_scip_tree_sitter.py tests/test_tree_sitter_graph.py"
+          fi
+          pytest -q -rs $TESTS
 
   research-parity:
     name: Research Benchmark Parity (Python 3.11)

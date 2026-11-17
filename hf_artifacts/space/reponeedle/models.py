@@ -355,3 +355,36 @@ class AblationConfig(BaseModel):
         )
 
 
+
+
+class ScipConfig(BaseModel):
+    """
+    Opt-in ingestion of an externally generated SCIP index (``index.scip``) into the function graph.
+
+    Requires the optional ``scip`` extra (Protobuf). RepoNeedle never runs an indexer: generate the
+    index with your language's SCIP indexer and regenerate it after source changes.
+    """
+    index_path: str = Field(description="Path to the .scip file to ingest.")
+    repo_root: Optional[str] = Field(
+        default=None,
+        description=(
+            "Repository the index must describe. from_directory() sets it to repo_dir; it is required "
+            "for engines built from in-memory documents."
+        ),
+    )
+    allow_project_root_mismatch: bool = Field(
+        default=False,
+        description=(
+            "Accept an index whose Metadata.project_root differs from repo_root (for example one built "
+            "in CI). Document paths are still validated against repo_root."
+        ),
+    )
+    max_index_bytes: int = Field(
+        default=256 * 1024 * 1024, gt=0,
+        description="Indexes larger than this are rejected before they are read.",
+    )
+    on_error: Literal["raise", "skip"] = Field(
+        default="raise",
+        description="'raise': a SCIP problem raises ScipIngestionError. 'skip': continue without SCIP; "
+                    "the reason is recorded in the SCIP diagnostics.",
+    )

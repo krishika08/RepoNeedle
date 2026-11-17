@@ -113,7 +113,8 @@ class ARM101Ranker:
         graph_boost: np.ndarray,
     ):
         path_to_idx = fg.path_to_idx
-        allowed = {"verified_call", "unique_global_call", "intra_file_call"}
+        # "scip_reference" edges exist only when a SCIP index was ingested (opt-in).
+        allowed = {"verified_call", "unique_global_call", "intra_file_call", "scip_reference"}
 
         for s_idx in seeds:
             seed_p = docs[s_idx].path

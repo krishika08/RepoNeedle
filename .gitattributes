@@ -1,0 +1,2 @@
+# SCIP indexes are binary Protobuf files.
+*.scip binary
