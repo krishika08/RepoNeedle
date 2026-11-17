@@ -1,0 +1,10 @@
+# SCIP indexes are binary Protobuf files.
+*.scip binary
+
+# Vendored SCIP schema: keep upstream bytes exactly (its SHA-256 is pinned in the tests),
+# so no end-of-line conversion on any platform.
+reponeedle/core/_scip/scip.proto -text
+hf_artifacts/space/reponeedle/core/_scip/scip.proto -text
+
+# Real producer fixture: sources must stay byte-identical to what the index was generated from.
+tests/fixtures/scip/real/** -text

@@ -47,7 +47,7 @@ The current heuristic (repository vocabulary overlap + $Z$-score peakiness + top
 
 ## Phase 2: Multi-Language & Protocol Integration
 - [x] **Tree-sitter structural extraction** (opt-in, optional `treesitter` extra; on `main`, not in a published release yet): syntax-tree extraction of functions, methods, imports and call sites for TypeScript/TSX, Go, Rust, Java and C++ in the function-level call graph, with per-file fallback to the regex extractor. Syntax-aware only, not semantic code intelligence; it affects only the opt-in `arm101` ranker, and no retrieval improvement has been measured. See [TREE_SITTER.md](TREE_SITTER.md).
-- [ ] **SCIP index ingestion** for large codebases (semantic, compiler-derived references). Not implemented.
+- [x] **SCIP index ingestion** (opt-in, optional `scip` extra; on `main`, not in a published release yet): consumes `index.scip` files produced by external indexers and adds producer-resolved references to callables as `scip_reference` edges, with repository-root, path and freshness validation. It is a SCIP consumer, not an indexer. Only scip-typescript has been validated with a real index, it affects only the opt-in `arm101` ranker, and no retrieval improvement has been measured. See [SCIP.md](SCIP.md).
 - [ ] **Dynamic Dependency Tracking**: optional pytest / coverage runtime traces to bridge dynamic dispatch and reflection.
 - [ ] **Live client validation** of the MCP server in Claude Code, Cursor and Cline, recorded as reproducible integration tests.
 

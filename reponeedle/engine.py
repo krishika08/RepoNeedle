@@ -9,7 +9,7 @@ import logging
 import pathlib
 import numbers
 import stat
-from typing import List, Optional, Union, Dict, Set
+from typing import Any, List, Optional, Union, Dict, Set
 import numpy as np
 import pathspec
 
@@ -25,6 +25,7 @@ from reponeedle.models import (
     ContextTier,
     AbstentionDiagnostics,
     IndexingDiagnostics,
+    ScipConfig,
 )
 from reponeedle.core.function_graph import FunctionGraphEngine
 from reponeedle.core.arm101 import ARM101Ranker
@@ -132,6 +133,7 @@ class RepoNeedleEngine:
         ranker: Optional[Union[str, RankerType]] = RankerType.LEGACY,
         ranking_engine: Optional[Union[str, RankerType]] = None,
         change_impact_config: Optional[ChangeImpactConfig] = None,
+        scip_config: Optional[ScipConfig] = None,
     ):
         self.budget_config = budget_config or BudgetConfig()
         self.ablation_config = ablation_config or AblationConfig()
@@ -167,8 +169,39 @@ class RepoNeedleEngine:
         # Populated with scan statistics by from_directory(); "documents" source otherwise.
         self.indexing_diagnostics = IndexingDiagnostics(source="documents", indexed_files=0)
 
+        self.scip_config = scip_config
+        if scip_config is not None:
+            self._attach_scip(scip_config)
+
         if docs:
             self._fit(docs)
+
+    def _attach_scip(self, config: ScipConfig) -> None:
+        """Loads and root-validates the SCIP index; the function graph resolves it on every fit."""
+        from reponeedle.core.scip_ingestion import ScipIndex, ScipIngestionError
+
+        try:
+            if not config.repo_root:
+                raise ScipIngestionError(
+                    "ScipConfig.repo_root is required for engines built from in-memory documents: it is the "
+                    "repository the SCIP index is validated against. RepoNeedleEngine.from_directory() sets it."
+                )
+            index = ScipIndex.load(config.index_path, config.max_index_bytes)
+            index.validate_root(config.repo_root, config.allow_project_root_mismatch)
+        except ScipIngestionError as exc:
+            if config.on_error == "raise":
+                raise
+            logger.warning("SCIP ingestion skipped: %s", exc)
+            self.function_graph.diagnostics["scip"] = {
+                "requested": True, "status": "skipped", "error": str(exc), "index_path": config.index_path,
+            }
+            return
+        self.function_graph.scip_index = index
+
+    @property
+    def scip_diagnostics(self) -> Optional[Dict[str, Any]]:
+        """SCIP ingestion diagnostics, or None if no SCIP index was requested."""
+        return self.function_graph.diagnostics.get("scip")
 
     def _fit(self, docs: List[FileDoc]):
         """
@@ -251,9 +284,12 @@ class RepoNeedleEngine:
         ranker: Optional[Union[str, RankerType]] = RankerType.LEGACY,
         ranking_engine: Optional[Union[str, RankerType]] = None,
         change_impact_config: Optional[ChangeImpactConfig] = None,
+        scip_config: Optional[ScipConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Instantiates engine from an in-memory list of FileDoc instances.
+
+        With ``scip_config``, ``ScipConfig.repo_root`` must name the repository the documents come from.
         """
         return cls(
             docs=docs,
@@ -262,6 +298,7 @@ class RepoNeedleEngine:
             ranker=ranker,
             ranking_engine=ranking_engine,
             change_impact_config=change_impact_config,
+            scip_config=scip_config,
         )
 
     @classmethod
@@ -276,6 +313,7 @@ class RepoNeedleEngine:
         ranking_engine: Optional[Union[str, RankerType]] = None,
         change_impact_config: Optional[ChangeImpactConfig] = None,
         max_file_size_bytes: int = DEFAULT_MAX_FILE_SIZE_BYTES,
+        scip_config: Optional[ScipConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Scans a local repository directory, parses files, and builds the retrieval index.
@@ -290,6 +328,15 @@ class RepoNeedleEngine:
         """
         max_file_size_bytes = validate_max_file_size_bytes(max_file_size_bytes)
         repo_dir = os.path.abspath(repo_dir)
+        if scip_config is not None:
+            # The SCIP index is validated against the directory actually being indexed.
+            if scip_config.repo_root is None:
+                scip_config = scip_config.model_copy(update={"repo_root": repo_dir})
+            elif os.path.normcase(os.path.realpath(scip_config.repo_root)) != os.path.normcase(os.path.realpath(repo_dir)):
+                raise ValueError(
+                    f"ScipConfig.repo_root {scip_config.repo_root!r} differs from repo_dir {repo_dir!r}; "
+                    "leave repo_root unset when using from_directory()."
+                )
         ignore_patterns = list(DEFAULT_IGNORE_PATTERNS)
         if extra_ignore:
             ignore_patterns.extend(extra_ignore)
@@ -449,6 +496,7 @@ class RepoNeedleEngine:
             ranker=ranker,
             ranking_engine=ranking_engine,
             change_impact_config=change_impact_config,
+            scip_config=scip_config,
         )
 
         skipped_large.sort()

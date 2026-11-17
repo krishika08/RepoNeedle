@@ -13,6 +13,7 @@ from reponeedle.models import (
     ContextTier,
     AbstentionDiagnostics,
     IndexingDiagnostics,
+    ScipConfig,
 )
 from reponeedle.engine import RepoNeedleEngine, DEFAULT_MAX_FILE_SIZE_BYTES
 from reponeedle.core.change_impact import ChangeImpactRanker, ChangeImpactConfig
@@ -36,6 +37,7 @@ __all__ = [
     "ContextTier",
     "AbstentionDiagnostics",
     "IndexingDiagnostics",
+    "ScipConfig",
     "DEFAULT_MAX_FILE_SIZE_BYTES",
     "ChangeImpactRanker",
     "ChangeImpactConfig",

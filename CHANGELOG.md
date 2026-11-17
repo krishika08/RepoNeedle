@@ -11,10 +11,16 @@ All notable changes to RepoNeedle are documented here. Versions follow [Semantic
   - Each file falls back to the existing regex extractor when its parser is unavailable, with the reason recorded in `function_graph.diagnostics["structural_parser"]`.
   - It is syntax-aware extraction, not semantic analysis. It affects only the opt-in `arm101` ranker, and **no retrieval-quality improvement is claimed or measured**. See [docs/TREE_SITTER.md](docs/TREE_SITTER.md) and `reports/v2_completion/tree_sitter/REPORT.md`.
 - `CallSite.qualifier_path` (optional, default `None`): the full call qualifier, set by the Tree-sitter extractor only.
+- **Optional SCIP index ingestion** (opt-in with `scip_config=ScipConfig(index_path=...)` on `from_directory`, `from_documents` or the engine constructor; optional `scip` extra, `protobuf>=5.29.0,<8`). It reads an `index.scip` produced by an external indexer using the official SCIP schema (v0.10.0, vendored generated bindings).
+  - It validates the index's `project_root`, every document path (canonical form, containment, symlinks), freshness (when `Document.text` is present) and every occurrence range against the repository.
+  - References to callables defined in another repository file become `scip_reference` edges (confidence 0.9, with SCIP symbol identifiers and producer provenance). Implementation and type-definition relationships are stored separately and are never converted into call edges.
+  - `engine.scip_diagnostics` reports the producer, root match, document and reference outcomes, and timings.
+  - It is a SCIP consumer, not an indexer. Only scip-typescript 0.6.2 was validated with a real index. It affects only the opt-in `arm101` ranker (which now also propagates over `scip_reference` edges), and **no retrieval-quality improvement is claimed or measured**. See [docs/SCIP.md](docs/SCIP.md) and `reports/v2_completion/scip_ingestion/REPORT.md`.
+- `FunctionGraphEdge.source_symbol`, `target_symbol` and `provenance` (optional, default `None`): set on SCIP-derived edges only.
 
 ### Not changed
 
-- The default extraction (`structural_parser="regex"`) reproduces 1.2.0 exactly; this is checked against a golden snapshot of the 1.2.0 implementation. Ranking weights, routing, packing, abstention defaults, the MCP tools and the core dependencies are unchanged.
+- The default extraction (`structural_parser="regex"`) reproduces 1.2.0 exactly; this is checked against a golden snapshot of the 1.2.0 implementation. Without `scip_config` no SCIP code or Protobuf import runs. Ranking weights, routing, packing, abstention defaults, the MCP tools and the core dependencies are unchanged.
 
 ## [1.2.0] — 2026-11-12
 

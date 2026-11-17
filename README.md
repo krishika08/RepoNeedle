@@ -132,6 +132,7 @@ RepoNeedle is self-contained and requires standard Python dependencies (`numpy`,
 | From a clone, for development (core + MCP server) | `pip install -e ".[mcp]"` |
 | Test and development tools | `pip install -e ".[dev]"` |
 | Optional Tree-sitter extraction for TypeScript/TSX, Go, Rust, Java and C++ (opt-in; on `main`, not in a published release yet; see [docs/TREE_SITTER.md](docs/TREE_SITTER.md)) | `pip install -e ".[treesitter]"` |
+| Optional ingestion of an externally generated SCIP index (`index.scip`) into the function graph (opt-in; on `main`, not in a published release yet; see [docs/SCIP.md](docs/SCIP.md)) | `pip install -e ".[scip]"` |
 
 > [!NOTE]
 > The `>=1.2.0` pin also upgrades an existing 1.1.0 installation. 1.1.0 has no MCP server, `--json` or `--anchors`.
