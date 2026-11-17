@@ -2,7 +2,7 @@
 
 This roadmap is grounded in empirical limitations observed during benchmark evaluations. Status labels distinguish what has been **released** (1.1.0 and 1.2.0) and what is **not implemented**.
 
-*Last reconciled with the source code: 2026-11-10.*
+*Last reconciled with the source code: 2026-11-17.*
 
 ---
 
@@ -19,7 +19,7 @@ This roadmap is grounded in empirical limitations observed during benchmark eval
 
 ## Released: RepoNeedle 1.2.0 (PyPI, 2026-11-12)
 - [x] CLI machine-readable output (`--json`) and anchor files (`--anchors`).
-- [x] Native MCP server over STDIO (`reponeedle-mcp`, optional `mcp` extra) with `reponeedle_retrieve`, `reponeedle_change_impact` and `reponeedle_inspect`. Verified with the MCP Python SDK and a raw JSON-RPC STDIO handshake; **not yet validated in a live Claude Code or Cursor session**.
+- [x] Native MCP server over STDIO (`reponeedle-mcp`, optional `mcp` extra) with `reponeedle_retrieve`, `reponeedle_change_impact` and `reponeedle_inspect`. Verified with the MCP Python SDK and a raw JSON-RPC STDIO handshake. Live clients were validated after the release (see Phase 2): **Claude Code verified; Cursor and Cline not tested**.
 - [x] Experimental abstention made **opt-in (disabled by default)**, with explicit diagnostics (`experimental: true`, `calibrated: false`) on every result.
 - [x] Indexing diagnostics: configurable file-size limit (`max_file_size_bytes`, default 500,000 bytes) with recorded skipped and unreadable paths.
 - [x] Indexing security: files reached through symlinks (or Windows junctions) that resolve outside the repository root are no longer read; they are recorded in the diagnostics instead.
@@ -49,13 +49,17 @@ The current heuristic (repository vocabulary overlap + $Z$-score peakiness + top
 - [x] **Tree-sitter structural extraction** (opt-in, optional `treesitter` extra; on `main`, not in a published release yet): syntax-tree extraction of functions, methods, imports and call sites for TypeScript/TSX, Go, Rust, Java and C++ in the function-level call graph, with per-file fallback to the regex extractor. Syntax-aware only, not semantic code intelligence; it affects only the opt-in `arm101` ranker, and no retrieval improvement has been measured. See [TREE_SITTER.md](TREE_SITTER.md).
 - [x] **SCIP index ingestion** (opt-in, optional `scip` extra; on `main`, not in a published release yet): consumes `index.scip` files produced by external indexers and adds producer-resolved references to callables as `scip_reference` edges, with repository-root, path and freshness validation. It is a SCIP consumer, not an indexer. Only scip-typescript has been validated with a real index, it affects only the opt-in `arm101` ranker, and no retrieval improvement has been measured. See [SCIP.md](SCIP.md).
 - [ ] **Dynamic Dependency Tracking**: optional pytest / coverage runtime traces to bridge dynamic dispatch and reflection.
-- [ ] **Live client validation** of the MCP server in Claude Code, Cursor and Cline, recorded as reproducible integration tests.
+- **Live client validation** of the MCP server (V2 Milestone 1; [validation report](../reports/v2_completion/mcp_client_validation/REPORT.md), [MCP_INTEGRATION.md](MCP_INTEGRATION.md)):
+  - [x] **Claude Code 2.1.81: verified** (PR #15, 2026-11-16) on Windows 11 over STDIO, in non-interactive (`-p`) sessions. Claude Code discovered and called all three tools and used the results in a coding workflow. Interactive sessions and macOS/Linux were not tested.
+  - [ ] **Cursor: not tested.** Cursor 2.6.20 was installed, but no RepoNeedle tool was called from it.
+  - [ ] **Cline: not tested** (not installed on the validation host).
+  - [ ] Recording client sessions as reproducible integration tests.
 
 ## Phase 3: Agent Scaffolding & Scale
 - [ ] **Aider Adapter**: drop-in alternative to Aider's RepoMap for workflow routing and test discovery.
 - **Persistent, incremental indexing** (opt-in on-disk cache for large repositories):
-  - [x] **Design** (Milestone 4A, design only): SQLite (standard library) storage of per-file derived artifacts with no raw source, fingerprints, a single-transaction publish protocol, dependency-scoped invalidation, a security and privacy model, an exact-equivalence acceptance harness and a staged plan. See [PERSISTENT_INDEXING_DESIGN.md](PERSISTENT_INDEXING_DESIGN.md) and the [architecture report](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md).
-  - [ ] Stage 0: prerequisites (function-graph state reset, document removal, stable digests, equivalence harness).
-  - [ ] Stage 1: persistent per-file artifacts with global structures recomputed in full ("persistent", not incremental).
-  - [ ] Stages 2–4: incremental global maintenance (BM25, graphs, then semantic), optional components, CLI/MCP surfaces.
+  - [x] **Design** (Milestone 4A, design only, revised after an architecture review): SQLite (standard library) storage of self-contained, checksummed per-file artifacts with no raw source; fingerprints including discovery metadata; a writer connection protocol and a single-transaction publish; dependency-scoped invalidation; a security and privacy model; an exact-equivalence acceptance harness; a staged plan; and decisions on all eight open questions. See [PERSISTENT_INDEXING_DESIGN.md](PERSISTENT_INDEXING_DESIGN.md) and the [architecture report](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md). Database sizes come from an isolated research prototype; the size limits are provisional.
+  - [ ] Stage 0: prerequisites (function-graph state reset, document removal, stable digests, equivalence harness). **Not started.**
+  - [ ] Stage 1: persistent per-file artifacts with global structures recomputed in full ("persistent", not incremental). **Not started.**
+  - [ ] Stages 2–4: incremental global maintenance (BM25 bookkeeping, graphs, then semantic), optional components, CLI/MCP surfaces. **Not started.**
 - [x] **AST block slicing** for monolithic files (opt-in `BudgetConfig(focus_span_strategy="ast_blocks")`; on `main`, not in a published release yet): CUD-Pack focus spans become the smallest complete functions, methods or declarations containing query matches, with relevant imports and enclosing class headers. Python uses `ast`; TypeScript/TSX, Go, Rust, Java and C++ use the optional Tree-sitter extra. Every other case falls back to the unchanged legacy extractor. The default packing is unchanged. In a packing-level comparison on frozen candidate lists, complete blocks cost more tokens per file, so compact mode packed fewer files. No retrieval improvement is claimed. See [AST_BLOCK_SLICING.md](AST_BLOCK_SLICING.md).

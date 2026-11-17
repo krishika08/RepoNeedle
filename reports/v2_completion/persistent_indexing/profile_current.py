@@ -4,7 +4,8 @@ changes indexing behaviour.
 
     python reports/v2_completion/persistent_indexing/profile_current.py [--out profile_results.json]
 
-Workloads: this repository's own checkout (default ignores, max_files raised so nothing is truncated) and
+Workloads: a pinned snapshot of this repository (``--snapshot``, default HEAD, exported with ``git archive`` to a
+temporary directory by snapshot.py; default ignores, max_files raised so nothing is truncated) and
 deterministic synthetic repositories (Python/TypeScript/Go files with cross-file imports and calls) of several sizes.
 For each, it times discovery+read+per-file extraction (from_directory minus its _fit, measured in the same call),
 every fit stage cold and then warm (per-document caches hot: the stage's global work only), and update_documents()
@@ -24,8 +25,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from reponeedle.engine import RepoNeedleEngine  # noqa: E402
 from reponeedle.models import FileDoc  # noqa: E402
+from snapshot import Snapshot, check_out_path, package_matches_commit  # noqa: E402
 
 
 def write_synthetic_repo(root: Path, n_files: int, seed: int = 7) -> None:
@@ -101,21 +105,27 @@ def profile(repo: str, repeats: int):
         for k, v in stages.items():
             best[k] = min(best.get(k, v), v)
     return {"files": len(docs), "bytes": sum(len(d.content.encode()) for d in docs),
-            "seconds": {k: round(v, 3) for k, v in best.items()}}
+            "seconds": {k: round(v, 3) for k, v in best.items()}}, docs
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--sizes", type=int, nargs="+", default=[1000, 3000])
+    ap.add_argument("--snapshot", default="HEAD", help="commit of this repository to measure")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
-    rows = {"this repository": profile(str(ROOT), args.repeats)}
+    with Snapshot(args.snapshot) as snap:
+        check_out_path(args.out, snap.path)
+        row, docs = profile(str(snap.path), args.repeats)
+        row["snapshot"] = snap.describe(docs)
+        row["snapshot"]["package_code_matches_commit"] = package_matches_commit(snap.commit)
+    rows = {"this repository (pinned snapshot)": row}
     for n in args.sizes:
         tmp = Path(tempfile.mkdtemp(prefix="rn_profile_"))
         try:
             write_synthetic_repo(tmp, n)
-            rows[f"synthetic {n} files"] = profile(str(tmp), args.repeats)
+            rows[f"synthetic {n} files"] = profile(str(tmp), args.repeats)[0]
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
     result = {"environment": {"python": sys.version.split()[0], "platform": platform.platform(),

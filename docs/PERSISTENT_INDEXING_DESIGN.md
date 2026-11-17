@@ -1,8 +1,8 @@
 # Persistent and Incremental Indexing: Design
 
 **Status:** design only. **Nothing in this document is implemented.** RepoNeedle still rebuilds every index in memory on each start, and `update_documents()` still refits every index over every document.
-**Milestone:** V2 Milestone 4A (architecture and research).
-**Evidence:** [reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md), with the measurements behind every number quoted here.
+**Milestone:** V2 Milestone 4A (architecture and research). **Revision 2** applies the corrections from an independent architecture review; the report's §14 maps each review point to its resolution.
+**Evidence:** [reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md), with the measurements behind every number quoted here. All repository measurements use one pinned snapshot (commit `bac30c8`, 890 files, 8,173,201 bytes of indexed text).
 
 ## Contents
 
@@ -21,7 +21,7 @@
 13. [API](#13-api)
 14. [Equivalence checking and acceptance criteria](#14-equivalence-checking-and-acceptance-criteria)
 15. [Staged implementation plan](#15-staged-implementation-plan)
-16. [Open questions](#16-open-questions)
+16. [Design decisions](#16-design-decisions)
 
 ---
 
@@ -75,7 +75,7 @@ flowchart TD
 | :--- | :--- | :--- | :--- |
 | Discovery | stat, containment, size, read, `is_test`, language | file set, **order**, `max_files` truncation, root `.gitignore` | Rescan every start (stat-level); diff against the manifest |
 | Symbols / imports (`FileDoc.symbols/imports`) | Python `ast` or polyglot extraction | none | Per file |
-| **BM25** (`lexical.py`) | weighted term counts (path ×2.5, symbols ×2.0, body ×1.0), effective length | N, `doc_frequencies`, IDF, `avg_doc_len`, `doc_len_norms`, postings (by document index) | Maintain df and postings by delta. Recompute N, IDF of query terms and `avg_doc_len` with the *identical* numeric procedure (§14.2) |
+| **BM25** (`lexical.py`) | weighted term counts (path ×2.5, symbols ×2.0, body ×1.0), effective length | N, `doc_frequencies`, IDF, `avg_doc_len`, `doc_len_norms`, postings (keyed by **positional** document index) | df by delta; IDF of changed-df terms. `avg_doc_len`, every `doc_len_norms` entry, and the positional postings (when N or order changes) are **global O(N)** work (§9.5) |
 | **Semantic** (`semantic.py`) | word and char-n-gram counts of `path + symbols + content[:8000]` | df, **vocabulary = top 15,000 by (df, len) with first-insertion tie order**, IDF (depends on N), L2-normalised CSR matrix | df by delta; vocabulary, IDF and normalised rows recomputed (cheap from persisted counts). Exact top-K maintenance only with canonical first-seen order (§9.3) |
 | **RepoGraph** (`graph.py`) | symbols/imports, manifest records (`Cargo.toml`, `go.mod`, `package.json`), production class catalog, **unfiltered** test-file call candidates, path stems | `module_to_path` (last/first wins), `symbol_to_paths`, `package_to_files`, `manifest_crates`, import edges, test↔target maps (stem matching), class-to-test edges, degree-matched control (seeded RNG over sorted sets), PageRank | Provider/consumer keys (§9.1) select files whose edges must be re-resolved. PageRank and the control graph are recomputed in full |
 | **FunctionGraph** (`function_graph.py`) | functions, call sites, imports (Python `ast`, polyglot regex, or Tree-sitter records) | `module_to_path`, `class_to_methods`, `func_name_to_defs` (**global uniqueness**), Tree-sitter `ImportResolver` (path set, `go.mod`, `Cargo.toml`), edge list order, `graph` edge weight (**last writer wins**), callers/callees maps | Provider/consumer keys (§9.2); re-resolve only affected callers; replay edges in canonical order |
@@ -83,16 +83,16 @@ flowchart TD
 | **Abstainer** (`abstention.py`) | token vocabulary per file | union of vocabularies | Per-token reference counts |
 | Query-time caches | none | semantic query vectors depend on vocabulary and IDF; CUD-Pack caches are digest-keyed | Invalidate on every published index change (generation id in keys) |
 
-**Measured on this repository** (885 files, 8.1 MB; report §3):
+**Measured on the pinned snapshot** (890 files, 8.17 MB; report §3.1, recorded run; absolute times vary by ±30–40% between runs on this machine, ratios do not):
 
 | | Lexical | Semantic | RepoGraph | Function graph | Abstainer | Scan and read |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Cold fit | 2.5 s | 12.6 s | 2.4 s | 4.4 s | 1.4 s | 1.5 s |
-| Warm refit (global work only) | 0.4 s | 4.3 s | 2.4 s | 0.8 s | 0.01 s | — |
+| Cold fit | 4.4 s | 19.2 s | 4.5 s | 5.4 s | 2.2 s | 3.9 s |
+| Warm refit (global work only) | 0.6 s | 6.3 s | 3.7 s | 1.1 s | 0.02 s | — |
 
-- A cold build totals 21.6 s.
-- Warm refits sum to about 7.9 s, matching `update_documents()` for one modified file (8.2 s).
-- Persisting per-file artifacts alone can therefore remove at most about 55–65% of a restart on this repository. The remainder is global work, dominated by the semantic index and by `RepoGraph` (which has no per-document cache).
+- A cold build totals 31.6 s in this run (21.6 s in revision 1's run).
+- Warm refits sum to about 11.7 s, matching `update_documents()` for one modified file (11.2 s).
+- Persisting per-file artifacts alone can therefore remove at most about half of a restart on this repository (49–57% across runs). The remainder is global work, dominated by the semantic index and by `RepoGraph` (which has no per-document cache).
 
 ## 4. Storage choice
 
@@ -107,11 +107,23 @@ flowchart TD
 | DuckDB | Columnar analytics | New dependency; analytical engine, single writer; nothing it does well is needed here |
 | Parquet / Arrow | Columnar arrays | New dependency; no transactional updates |
 
-**Payloads** are stored as BLOBs in an explicit, versioned binary format:
-- varint-packed `(string id, value)` pairs over a per-database string table, zlib-compressed;
-- raw little-endian arrays with a dtype/shape header.
+**Payloads** are stored as BLOBs in an explicit, versioned binary format. **Every payload is self-contained:**
+- strings are written inline (varint byte length, then UTF-8), followed by their varint values, and the whole payload is zlib-compressed;
+- arrays are raw little-endian with a dtype/shape header, zlib-compressed;
+- small structured records (function-graph records, symbol lists) are canonical JSON, zlib-compressed.
 
-There is never any pickle or `eval`, and every payload is length- and type-checked on decode.
+There is never any pickle or `eval`. Every payload is checksummed (§6.1) and length-, type- and range-checked on decode.
+
+**Why no shared string table (revision 2).** Revision 1 proposed varint string *ids* into one shared `strings` table. The isolated SQLite prototype (report §3.3) measured both encodings on the pinned snapshot:
+
+| Encoding | Payload bytes | String table in SQLite | Database file | Ratio to source | Write (FULL; one run) | Verify and decode all (one run) |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A: shared string table (revision 1) | 8.73 MB | 10.98 MB | 25.26 MB | 3.09× | 3.2 s | 2.2 s (strings 1.0 s + artifacts 1.2 s) |
+| **B: self-contained (revision 2)** | 11.92 MB | none | **18.30 MB** | **2.24×** | **0.3 s** | **1.6 s** |
+
+- The shared table saves payload bytes but costs more in SQLite than it saves: one row per string, a `UNIQUE` index that stores every string a second time, and a per-row checksum (168,006 strings here). Even without those checksums (32 bytes per string, about 5.4 MB), A would be about 19.9 MB (estimated by subtraction, not measured), still larger than B.
+- It also adds failure modes: unreferenced strings accumulate and need garbage collection (§12.3), and an artifact is only valid together with the exact string rows it references.
+- Self-contained payloads have neither problem. Strings die with the artifact that holds them.
 
 ## 5. Repository identity and cache location
 
@@ -137,20 +149,21 @@ There is never any pickle or `eval`, and every payload is length- and type-check
 
 **The schema is designed around one rule: nothing the engine trusts is written outside the publishing transaction.** Per-file artifacts are content-addressed and immutable, so they can be written in batches without affecting correctness. The manifest, global state and the "current index" marker are replaced in one final transaction.
 
+Connection settings (`journal_mode`, `synchronous`, `foreign_keys`, `auto_vacuum`, `busy_timeout`) are **not** part of the schema script. They are applied by the connection lifecycle of §10.1, outside any transaction, and verified. Only `application_id` and `user_version`, which are database-header values, are written inside the creation transaction.
+
 ```sql
+-- Creation transaction (§10.1): BEGIN IMMEDIATE; ...; COMMIT
 PRAGMA application_id = 0x524E4458;          -- 'RNDX'
 PRAGMA user_version  = 1;                    -- schema version (major); see §10.6
-PRAGMA journal_mode  = WAL;
-PRAGMA foreign_keys  = ON;
-PRAGMA auto_vacuum   = INCREMENTAL;          -- set at creation
 
-CREATE TABLE meta (                          -- small key/value facts, all set in the publish transaction
+CREATE TABLE meta (                          -- small key/value facts, set in the publish transaction
+                                             -- (except clean_shutdown: on writer open and close)
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
--- keys: repo_root, repo_id, created_by (reponeedle version), python (major.minor), platform,
---       current_generation, index_fingerprint, discovery_fingerprint, published_at,
---       clean_shutdown ('0' while a writer holds the database open)
+-- keys: repo_root, repo_id, created_by (reponeedle version), python (major.minor), sqlite_version, platform,
+--       current_generation, index_fingerprint, discovery_fingerprint, doc_meta_fingerprint, published_at,
+--       clean_shutdown ('0' while a writer holds the database open), next_file_id
 
 CREATE TABLE generations (                   -- one row per build/update attempt
   gen_id          INTEGER PRIMARY KEY,
@@ -160,17 +173,16 @@ CREATE TABLE generations (                   -- one row per build/update attempt
   published_at    TEXT,
   index_fingerprint     BLOB NOT NULL,       -- §7
   discovery_fingerprint BLOB NOT NULL,       -- §7
+  doc_meta_fingerprint  BLOB NOT NULL,       -- §7
   file_count      INTEGER,
+  manifest_sha256 BLOB,                      -- §6.1: digest of the published manifest, file_artifacts,
+                                             -- provides, consumes and excluded rows; set at publish
   work_counters   TEXT                       -- JSON: files re-extracted, keys re-resolved, postings touched ...
-);
-
-CREATE TABLE strings (                       -- shared string table for payload encoding
-  sid  INTEGER PRIMARY KEY,
-  text TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE manifest (                      -- the published file set; rewritten only by the publish transaction
   path            TEXT PRIMARY KEY,          -- repository-relative, '/'-separated, validated (§11.2)
+  file_id         INTEGER NOT NULL UNIQUE,   -- stable id: assigned on first sight, never reused (§9.5)
   ordinal         INTEGER NOT NULL UNIQUE,   -- position in discovery order (the fresh-build order)
   size            INTEGER NOT NULL,
   mtime_ns        INTEGER NOT NULL,
@@ -178,10 +190,12 @@ CREATE TABLE manifest (                      -- the published file set; rewritte
   inode           INTEGER,                   -- st_ino where meaningful; NULL on Windows/FAT
   content_sha256  BLOB NOT NULL,             -- of the bytes as read (before UTF-8 decoding)
   text_sha256     BLOB NOT NULL,             -- of the decoded str (errors='ignore'), what the indexes saw
-  language        TEXT NOT NULL,
+  language        TEXT NOT NULL,             -- discovery metadata, recomputed when doc_meta_fingerprint changes
   is_test         INTEGER NOT NULL,
   line_count      INTEGER NOT NULL,
   token_estimate  INTEGER NOT NULL,
+  doc_meta_sha256 BLOB NOT NULL,             -- sha256 of canonical (language, is_test, line_count, token_estimate,
+                                             -- symbols, imports): an input of every artifact key that reads them
   artifact_set    BLOB NOT NULL              -- sha256 over this file's artifact keys (detects mismatches)
 );
 
@@ -189,16 +203,18 @@ CREATE TABLE excluded (                      -- discovery diagnostics (paths and
   path   TEXT PRIMARY KEY,
   reason TEXT NOT NULL CHECK (reason IN ('skipped_large', 'unreadable', 'symlink_outside_repository',
                                          'directory_skipped', 'max_files'))
-);
+);                                           -- files matched by persist_exclude (§11.4) are NOT recorded anywhere
 
-CREATE TABLE artifacts (                     -- immutable, content-addressed per-file artifacts
-  artifact_key   BLOB PRIMARY KEY,           -- sha256(kind, extractor_fp, path, text_sha256, input digests)
+CREATE TABLE artifacts (                     -- immutable, content-addressed, self-contained per-file artifacts
+  artifact_key   BLOB PRIMARY KEY,           -- sha256(kind, extractor_fp, path, text_sha256, doc_meta_sha256,
+                                             --        other input digests)
   kind           TEXT NOT NULL,              -- 'symbols', 'lexical', 'semantic', 'abstainer', 'repo_graph_facts',
-                                             -- 'function_graph', 'tree_sitter', 'scip_doc' ...
+                                             -- 'function_graph', 'tree_sitter' ...
   extractor_fp   BLOB NOT NULL,              -- §7
   path           TEXT NOT NULL,              -- for diagnostics and GC; not trusted for reads
-  codec          TEXT NOT NULL,              -- e.g. 'varint-pairs+zlib/1'
-  payload        BLOB NOT NULL,
+  codec          TEXT NOT NULL,              -- e.g. 'inline-pairs+zlib/1'
+  payload        BLOB NOT NULL,              -- self-contained (§4): no references to other rows
+  checksum       BLOB NOT NULL,              -- §6.1: sha256("artifact" | artifact_key | codec | payload)
   created_gen    INTEGER NOT NULL,
   last_used_gen  INTEGER NOT NULL
 );
@@ -237,8 +253,8 @@ CREATE TABLE global_state (
                                              -- 'function_graph.edges', 'abstainer.refcounts', 'scip.resolution' ...
   gen_id   INTEGER NOT NULL,
   codec    TEXT NOT NULL,
-  payload  BLOB NOT NULL,
-  checksum BLOB NOT NULL                     -- sha256(payload), verified on load
+  payload  BLOB NOT NULL,                    -- self-contained, like artifacts
+  checksum BLOB NOT NULL                     -- §6.1: sha256("global" | name | gen_id | codec | payload)
 );
 
 CREATE TABLE optional_components (           -- Tree-sitter, SCIP and parser availability at build time
@@ -249,21 +265,45 @@ CREATE TABLE optional_components (           -- Tree-sitter, SCIP and parser ava
 );
 ```
 
-**Not stored:** file contents, query text, query results, diagnostics containing contents, or anything from outside the repository root.
+Revision 1 also had a shared `strings` table. Revision 2 removes it (§4, §12.3).
+
+**Not stored:** file contents, query text, query results, diagnostics containing contents, anything from outside the repository root, or anything about files matched by `persist_exclude` (§11.4).
 
 **What the stored artifacts can reconstruct.**
 - Artifacts plus the manifest reconstruct every index exactly (§14).
 - Today, only CUD-Pack rendering and SCIP range validation need raw text. Both read the current file from disk on demand and verify `text_sha256` (§8.4).
 
-**Semantic payload choice.** The semantic artifact can store either the n-gram counts (about 7.9 KB per file here), or the first-occurrence-ordered **word** counts from which the n-gram counts *and their insertion order* are reproduced exactly (much smaller, but n-gram generation costs CPU). Stage 1 stores n-gram counts and measures both (§15).
+**Semantic payload choice.** Decided in §16.3: Stage 1 stores the ordered n-gram feature counts (exact reconstruction with no recomputation). Regenerating them from ordered word counts is benchmarked separately before it can replace them.
+
+### 6.1 Integrity checksums
+
+SQLite does not checksum page contents by default. A payload whose bytes change inside a valid page, for example from a disk error, a bug or an editing tool, is not detected by SQLite. The cache therefore carries its own SHA-256 checksums. In the table, `|` means concatenation with a `\0` separator; integers are 8-byte little-endian.
+
+| Data | Checksum input | Computed | Verified |
+| :--- | :--- | :--- | :--- |
+| Artifact payload | `"artifact" \| artifact_key \| codec \| payload` | By the writer, from the in-memory bytes it is about to insert, never by reading the row back | **Every time a payload is read for use, before it is decoded.** `verify=True` and `cache verify` also check artifacts the published generation does not reference. |
+| Global-state payload | `"global" \| name \| gen_id \| codec \| payload` | By the writer, in the publish transaction | On load, before decoding |
+| Published manifest | `generations.manifest_sha256`: the canonical serialisation of the generation's `manifest`, `file_artifacts`, `provides`, `consumes` and `excluded` rows, each table sorted by primary key | By the writer, from the rows it inserts in the publish transaction | On open, before any reuse decision. Otherwise a forged `content_sha256` or a dropped `file_artifacts` row would make the engine reuse the wrong artifact. |
+| Shared strings | Not applicable: there is no shared string table (§4). If one is ever reintroduced, each row carries `sha256("string" \| sid \| text)`, verified when loaded, and ids are never reused (§12.3). | | |
+
+**Binding the context into the checksum.** Because the key, name or generation is included, a payload copied or swapped from another row fails verification even though it decodes. The prototype checks four structurally valid alterations: a re-encoded payload with one count changed, two swapped payloads, an altered or moved string, and an altered global-state array. All of them decode without error, and all of them are rejected (report §3.3).
+
+**Failure handling.** A checksum mismatch on any row read for the published generation makes the whole database unusable (§10.4): it is moved aside and rebuilt. The engine never skips the bad row and keeps the rest.
+
+**What checksums do not protect against.** The checksums are unkeyed. They detect corruption and bugs, not a deliberate local attacker who can write the file and recompute them. File permissions handle that threat (§11.3). A keyed MAC would need a secret stored outside the cache directory, which is out of scope.
+
+**Measured cost** (pinned snapshot, encoding B): verifying and decoding all 4,450 artifacts takes 1.6 s in pure Python. That fits the Stage 1 restart budget but is not negligible. Stage 1 must measure it again in the real reader, and may verify each kind lazily as its index is assembled. Every payload is still verified before it is used.
 
 ## 7. Fingerprints
 
-Every reuse decision is keyed by explicit fingerprints: SHA-256 over canonical JSON (sorted keys, no whitespace).
+Every reuse decision is keyed by explicit fingerprints: SHA-256 over canonical JSON (sorted keys, no whitespace). There are four levels. Each one names the algorithms it covers by **version constants in code**. Each constant must be bumped when that algorithm's output can change.
 
-**`extractor_fp[kind]`** (part of every artifact key) covers:
-- `ARTIFACT_VERSION[kind]`, an integer constant in code that must be bumped when the extractor's output changes;
-- the parameters of that extractor:
+### 7.1 Per-file artifacts: `extractor_fp[kind]`
+
+Part of every artifact key. It covers:
+- `ARTIFACT_VERSION[kind]`;
+- the parameters of that extractor;
+- the Python minor version and `unicodedata.unidata_version` for every kind that tokenises text, because `re` word classes, `str.lower()` and `str.splitlines()` follow the Unicode database.
 
 | Kind | Parameters |
 | :--- | :--- |
@@ -274,8 +314,40 @@ Every reuse decision is keyed by explicit fingerprints: SHA-256 over canonical J
 | `repo_graph_facts` | Python minor version, regex versions |
 | `abstainer` | tokenizer version, stemmer version, the 3,000-character truncation |
 
-**`index_fingerprint`** covers everything that changes *global* assembly:
-- all `extractor_fp` values;
+Artifact keys also include `doc_meta_sha256` (§6) for every kind that reads `FileDoc` metadata. Today that is every kind:
+- `lexical`, `semantic` and `abstainer` read `symbols`;
+- `repo_graph_facts` and `function_graph` read `symbols`, `imports` and `is_test`.
+
+A change in a file's derived metadata therefore re-extracts the artifacts that read it. `token_count` and `line_count` are read only at query time (packing and diagnostics), never by an artifact.
+
+### 7.2 Discovery-derived metadata: `doc_meta_fingerprint`
+
+This level is new in revision 2. It covers the algorithms that turn a file's path and bytes into the `FileDoc` fields stored in the manifest. Today they are inline in `from_directory()` and `tokenizer.py`:
+
+| Algorithm | Today's behaviour (preserved by default) | Version constant |
+| :--- | :--- | :--- |
+| Decoding | UTF-8 with `errors="ignore"`, text mode (universal newlines: `\r\n` and `\r` become `\n`) | `DECODE_VERSION` |
+| Language detection | `"python"` for `.py`, otherwise the extension without its dot | `LANGUAGE_VERSION` |
+| `is_test` classification | the lower-cased relative path contains `test` or `tests/`, starts with `test_`, or ends with `_test.py` | `IS_TEST_VERSION` |
+| Token estimation | `estimate_tokens(content)` | `TOKEN_ESTIMATE_VERSION` |
+| Line counting | `len(content.splitlines())` | `LINE_COUNT_VERSION` |
+| Symbol and import extraction | Python `ast`, or polyglot when enabled (also part of `extractor_fp["symbols"]`) | `SYMBOLS_VERSION` |
+
+The fingerprint also includes the Python minor version and `unidata_version`, because `lower()` and `splitlines()` follow them.
+
+### 7.3 The file set: `discovery_fingerprint`
+
+| Input | Covers |
+| :--- | :--- |
+| Traversal | `DISCOVERY_WALK_VERSION`: `os.walk(followlinks=False)`, link and junction pruning, the `(st_dev, st_ino)` cycle guard, containment through `resolve_within_root` |
+| Ignore matching | `IGNORE_MATCH_VERSION`, the `pathspec` version and the `gitwildmatch` dialect, `DEFAULT_IGNORE_PATTERNS`, `extra_ignore`, and the digest of the root `.gitignore` as read (the root file only; §16.6) |
+| Filtering | `FILTER_VERSION`: the extension allow-list, `max_file_size_bytes` and `max_files` |
+| Platform | path case-sensitivity |
+
+### 7.4 Global assembly: `index_fingerprint`
+
+This covers everything that changes *global* assembly:
+- all `extractor_fp` values and the `doc_meta_fingerprint`;
 - `max_features`;
 - `min_confidence`;
 - `enable_structural_edges`;
@@ -284,21 +356,23 @@ Every reuse decision is keyed by explicit fingerprints: SHA-256 over canonical J
 - SCIP configuration;
 - the schema version.
 
-**`discovery_fingerprint`** covers what changes the *file set*:
-- the default ignore list;
-- `extra_ignore`;
-- the root `.gitignore` bytes digest;
-- the extension allow-list;
-- `max_file_size_bytes`;
-- `max_files`;
-- path case-sensitivity of the platform.
+### 7.5 What each change invalidates
 
-**Query-time settings are deliberately excluded:** `BudgetConfig`, ranker choice, router weights, abstention settings and `focus_span_strategy`. They never invalidate the index.
+| Change | Manifest | Per-file artifacts | Global state |
+| :--- | :--- | :--- | :--- |
+| `discovery_fingerprint` (ignore rules, filters, traversal, `pathspec` version) | Rows are added and deleted by the new scan's diff. Surviving rows are kept. | Only those of added files are extracted. Those of deleted files become garbage. | Updated through the ordinary add and delete paths (§8.3). Not invalidated wholesale. |
+| `doc_meta_fingerprint` (decoding, language, `is_test`, tokens, lines, symbols) | **Every row's metadata is recomputed** from the current text. In `"stat"` mode this forces one read of every file. | Re-extracted only for files whose `doc_meta_sha256` changed. A decoding change changes `text_sha256`, so those files are re-extracted. | **Full reassembly** (it is part of `index_fingerprint`) |
+| One `extractor_fp[kind]` | Unchanged | That kind only, for every file | Full reassembly of the indexes that consume that kind |
+| `index_fingerprint` only (global parameters) | Unchanged | Reused | Full reassembly |
+| Query-time settings (`BudgetConfig`, ranker, router weights, abstention settings, `focus_span_strategy`) | Unchanged | Unchanged | Unchanged. These are deliberately excluded and never invalidate the index. |
 
-**Guarding the version constants.**
-- *Problem:* a forgotten `ARTIFACT_VERSION` bump would silently serve stale artifacts.
-- *Mitigation:* a test stores a digest of each extractor's source module and **fails when the source changes without a version bump**.
-- *Trade-off:* this is deliberately conservative, since false alarms only cost a bump.
+**Default behaviour is preserved.** The constants describe today's algorithms; defining them changes nothing in discovery or extraction. A future change to any of these algorithms is a separate, evaluated change that bumps its constant.
+
+### 7.6 Guarding the version constants
+
+- *Problem:* a forgotten bump would silently serve stale artifacts or metadata.
+- *Mitigation:* a test stores a digest of the source of each covered function or module (`engine.from_directory` discovery code, `tokenizer.py`, each extractor) and **fails when the source changes without a bump**.
+- *Trade-off:* this is deliberately conservative, since a false alarm only costs a bump.
 - *Backstop:* the equivalence harness (§14) catches mismatches the digest misses.
 
 ## 8. Startup, change detection and incremental update
@@ -313,7 +387,7 @@ sequenceDiagram
     E->>DB: open (read), check application_id, user_version, repo_root, fingerprints
     alt missing / incompatible / corrupt (§10.4)
         E->>FS: full scan + read
-        E->>DB: cold build (§10.1) and publish
+        E->>DB: cold build and publish (§10.2)
     else compatible
         E->>FS: scan (same rules and order as today) + stat every file
         E->>E: diff scan vs manifest → unchanged / modified / added / deleted (+ renames)
@@ -324,16 +398,24 @@ sequenceDiagram
     end
 ```
 
-**Discovery always runs.** It is the only way to learn the current file set and order. Its cost (stat plus walk) is a small part of a build: 1.5 s here including reads; stat-only is cheaper still.
+**Discovery always runs.** It is the only way to learn the current file set and order. Its cost (stat plus walk) is a small part of a build: 1.5–3.9 s here across runs including reads; stat-only is cheaper still.
 
 ### 8.2 Change detection (validation policy)
 
-| `validation` | A file is "unchanged" when | Cost | Risk |
+| `validation` | A file is "unchanged" when | Cost | Guarantee |
 | :--- | :--- | :--- | :--- |
-| `"content"` (default) | its bytes hash to the stored `content_sha256` | read and hash every file | none beyond SHA-256 |
-| `"stat"` | size, `mtime_ns` and (where meaningful) `inode`/`ctime_ns` match, **and** the file is not "racily clean" | read only changed files | stat can lie: coarse mtime (FAT 2 s), editors preserving mtime, `touch -m` |
+| **`"content"` (default)** | its bytes hash to the stored `content_sha256` | read and hash every file | **Detects every content change** (up to SHA-256 collisions). The §1 invariant holds unconditionally. |
+| `"stat"` (opt-in optimisation) | size, `mtime_ns` and (where meaningful) `inode`/`ctime_ns` match, **and** the file is not "racily clean" | stat every file; read only files whose metadata changed | **Weaker: detects only changes that also change the file's metadata.** The §1 invariant holds only under that assumption. |
+
+**`"stat"` is not equivalent to hashing.** It is a performance option. A modification that leaves size and timestamps unchanged is **not detected**, and the stale artifacts are served until the file changes again or the next `"content"` run. Known ways this happens:
+- **Metadata-preserving tools:** `touch -d`/`touch -r`, `cp -p`, `rsync -t` (and `-a`), `tar` and `unzip` extraction, and some editors and sync tools restore the original mtime. A same-size edit followed by an mtime restore is invisible to stat.
+- **Coarse or unreliable timestamps:** FAT (2 s), some network and VM shared folders, clock adjustments, and filesystems with 1-second granularity. Racily-clean handling covers same-tick edits *after* a publish, not timestamps that are restored or lost.
+- **`ctime` and `inode` are only partial guards.** On POSIX, `ctime` cannot be set by ordinary tools and catches most restored-mtime edits, but not on every filesystem. On Windows, Python 3.11 reports creation time as `st_ctime` and file indexes are not always stable, so neither helps there.
+- **Deliberate evasion:** anyone who can write the repository can make a change that stat does not see.
 
 **Racily clean** is borrowed from Git's index: a file whose `mtime_ns` is not strictly older than the published generation's timestamp is always hashed, because it may have changed within the same timestamp tick.
+
+**Reporting.** Diagnostics always state the validation mode used. A result produced under `"stat"` is labelled as validated by metadata only. `refresh(validation="content")` and `reponeedle cache verify` re-hash everything on demand. Benchmarks report the two modes separately (§14.5), and equivalence tests run under `"content"`. The `"stat"` tests assert detection only for changes that alter metadata, and document the undetected cases as expected behaviour.
 
 ### 8.3 Behaviour per change
 
@@ -349,10 +431,11 @@ sequenceDiagram
 | **`max_files` truncation changed** | Same as an ignore change: different file set. |
 | **Tokenizer or extractor parameters changed** | The affected `extractor_fp` changes, so only those kinds are re-extracted. Global state for those indexes is rebuilt. |
 | **Global parameters changed** (`max_features`, PageRank, `min_confidence` ...) | `index_fingerprint` changes; artifacts are reused and global assembly runs in full. |
-| **Python minor version changed** | `symbols`, `function_graph` and `repo_graph_facts` artifacts of `.py` files are re-extracted (`ast` differences). |
+| **Discovery metadata algorithm changed** (decoding, language, `is_test`, token estimate, line count; §7.2) | `doc_meta_fingerprint` changes. Every manifest row's metadata is recomputed, artifacts are re-extracted only for files whose `doc_meta_sha256` changed, and global assembly runs in full. |
+| **Python minor version or Unicode database changed** | Both are inputs of `doc_meta_fingerprint` and of every text-processing `extractor_fp` (§7.1), so in practice every artifact is re-extracted. This is effectively a cold build into the existing database, and diagnostics report it as one. |
 | **Tree-sitter runtime, grammar or ABI changed, or became (un)available** | Only Tree-sitter artifacts are re-extracted. Files that previously fell back to regex are re-extracted when a parser becomes available, and vice versa. |
 | **SCIP index changed** (digest or size differs) or SCIP config changed | The SCIP resolution is recomputed in full, and SCIP-derived function-graph edges are replaced. |
-| **SCIP index unchanged, covered documents changed** | The SCIP resolution is recomputed (it validates contents and ranges). Per-document reuse is a later optimisation (§16). |
+| **SCIP index unchanged, covered documents changed** | The SCIP resolution is recomputed in full (it validates contents and ranges). This is accepted for the initial implementation; per-document reuse is an optimisation only if measurements justify it (§16.4). |
 | **Database missing** | Cold build. |
 | **Database corrupt, foreign or incompatible** | §10.4: set aside, cold build, never partially trusted. |
 | **Repository root moved** | Different `repo_id`, so a new database. The old one ages out (§12). |
@@ -366,7 +449,7 @@ Persistent mode does not keep raw source on disk, but CUD-Pack must render text.
 | How | All indexed files are read during startup (required anyway by `validation="content"`); `FileDoc.content` stays as today | `FileDoc.content` is read on demand through the same containment checks as discovery (`resolve_within_root`) |
 | Content check | — | Verified against `text_sha256` on read |
 | If the file changed since the index was built | — | Excluded from that result and reported as stale, never silently packed |
-| Cost | Same memory as today | Requires an API change to `FileDoc` (§16) |
+| Cost | Same memory as today | Requires an API change to `FileDoc`; deferred (§16.2) |
 
 ## 9. Dependency invalidation
 
@@ -442,37 +525,122 @@ The vocabulary is the top `max_features` features by `(df, len)` descending. Tie
 - Insertion-order-sensitive structures are rebuilt by **replaying per-file contributions in that order**: dictionary construction, `module_to_path` first/last wins, edge lists, `graph.add_edge` weight overwrites, NetworkX node and edge insertion before PageRank.
 - Replay is O(N + E). Its cost is reported as global work.
 
+### 9.5 BM25: what is incremental and what stays global
+
+**Today's structures** ([lexical.py](../reponeedle/core/lexical.py), `BM25Index.fit`) are all **positional**:
+- `docs`, `doc_paths`, `doc_term_freqs` and `doc_lengths` are lists or arrays indexed by the document's position in discovery order;
+- the postings `inverted_index[term]` are lists of `(doc_idx, tf)` in ascending `doc_idx`;
+- `doc_len_norms[i] = k1 * (1 - b + b * doc_lengths[i] / avg_doc_len)` is a float32 array;
+- `avg_doc_len = float(np.mean(doc_lengths))`, a float32 reduction over every document;
+- `idf[t] = max(0, log((N - df + 0.5) / (df + 0.5) + 1))` depends on N.
+
+`score()` reads `doc_len_norms[doc_idx]` for each posting and accumulates into `scores[doc_idx]`.
+
+**Persisted form: no positional index is ever stored.**
+- The per-file `lexical` artifact holds the weighted term counts and the effective length, keyed by path through the manifest.
+- Global BM25 state, when it is persisted (Stage 2), is keyed by **term string** (`bm25.df`) or by **`file_id`**. `file_id` is assigned when a path is first seen, stored in the manifest and never reused (§6).
+- Postings are not persisted in Stage 1 or 2. They are rebuilt in memory from the artifacts.
+
+**Mapping to runtime indices.** At assembly the engine builds `runtime_index[file_id]`: the file's position in the *current* discovery order. That is an O(N) array, rebuilt on every load. Any persisted structure keyed by `file_id` is translated through it, and the runtime postings are then sorted by runtime index, so the in-memory structures are exactly those `fit()` builds today.
+
+**Cost of each operation:**
+
+| Operation | Modified file (N and order unchanged) | Added, deleted or reordered files (N or positions change) | Class |
+| :--- | :--- | :--- | :--- |
+| Term counts and effective length | re-extract the changed files | same | **Incremental**: O(changed files) |
+| `doc_frequencies` | ±1 for the terms in the symmetric difference of each changed file's old and new term sets | same | **Incremental**: O(changed terms) |
+| `idf` | recompute only the terms whose df changed | **every term**, because N changed | Incremental only while N is unchanged; otherwise **global O(V)** |
+| `doc_lengths` | update the changed entries | rebuilt in the new order | Incremental (modify); global O(N) (add/delete) |
+| `avg_doc_len` | `np.mean` over all N lengths **whenever any length changed** | same | **Global O(N)**. A float32 pairwise reduction cannot be updated by a running sum and stay bit-identical (§14.2). |
+| `doc_len_norms` | **every entry** when `avg_doc_len` changes (almost any edit that changes a token count); only the changed entries otherwise | every entry | **Global O(N)** in the common case (vectorised) |
+| Postings | for each term the file had or has: find, replace, insert or remove its entry, which costs O(len(postings[t])) for list insertion or removal. Common terms have postings close to N long. | every entry after the first shifted position is renumbered; in practice the postings are rebuilt from the artifacts | Bounded by **O(total postings)**. Not proportional to the change. |
+
+**What Stage 2 may claim.**
+- *Proportional to the change:* only per-file extraction, df maintenance, and IDF for changed-df terms while N is unchanged.
+- *Global, linear work recorded on every update:* `avg_doc_len`, `doc_len_norms` and positional postings are O(N) or O(total postings).
+- *Counters:* `bm25.terms_df_updated`, `bm25.idf_recomputed` (count, and `full` when N changed), `bm25.norms_recomputed`, and `bm25.postings_entries_rewritten`. BM25 is reported as **"partially incremental"**, never as incremental.
+- *Expected benefit:* the measured warm BM25 refit, which is all of BM25's global work, is about 0.4–0.6 s on this repository (report §3.1). If Stage 2's bookkeeping does not beat simply reassembling BM25 from persisted artifacts, BM25 stays "persistent, globally reassembled". Benchmarks decide this.
+
+**Not proposed:** keying runtime postings by `file_id` and translating at query time. It would make additions and deletions cheaper, but it changes `score()` and its data structures. That is a retrieval-code change, which needs its own equivalence proof and is out of scope for this design.
+
 ## 10. Transactions, crash recovery and concurrency
 
-### 10.1 Cold build
+### 10.1 Connection lifecycle and settings
 
-1. `BEGIN IMMEDIATE`; insert `generations(state='building', kind='cold')`; commit. This marks intent only; the row is never trusted.
-2. Write artifacts in batches of about 500 files per transaction, using `INSERT OR IGNORE` because they are immutable and content-addressed. A crash here loses only unreferenced artifacts.
-3. Assemble global state in memory.
-4. **Publish transaction** (§10.2).
+**Correction from revision 1.** Revision 1 issued `PRAGMA synchronous=FULL` *inside* the publish transaction. SQLite rejects that (`Safety level may not be changed inside a transaction`), and the prototype reproduces the error (report §3.3). Some other settings fail *silently* inside a transaction or after the first table exists. Settings are therefore owned by the connection lifecycle below, never by a transaction.
 
-### 10.2 Publish (the only way an index becomes valid)
+**Behaviour the protocol relies on** (SQLite 3.45.1 under Python 3.11, recorded by `sqlite_prototype.py`):
 
-All of the following happen in one `BEGIN IMMEDIATE … COMMIT`:
-- replace `manifest`, `excluded`, `file_artifacts`, `provides`, `consumes` and `global_state` for the new generation;
-- set the new generation's `state='published'` and the previous one's `'superseded'`;
-- write `meta.current_generation`, the fingerprints and `published_at`;
-- `PRAGMA synchronous=FULL` for this transaction.
+| Setting | Scope | Inside a transaction | Notes |
+| :--- | :--- | :--- | :--- |
+| `journal_mode=WAL` | Persistent in the file | Leaving WAL is an error | Returns the resulting mode, which must be checked |
+| `synchronous` | Per connection, reset on every open | **Error** | |
+| `foreign_keys` | Per connection | **Silently ignored** (reads back 0) | |
+| `auto_vacuum=INCREMENTAL` | Persistent | — | **Silently not applied** once a table exists (reads back 0); only effective on an empty file |
+| `busy_timeout`, `query_only` | Per connection | — | |
+| `application_id`, `user_version` | Database header | Allowed, and transactional | |
 
-**A reader accepts an index only if all of these hold:**
-- `meta.current_generation` names a `generations` row with `state='published'`;
-- that row's fingerprints equal `meta`'s;
-- every `global_state.checksum` verifies;
-- `manifest` and `file_artifacts` reference existing artifacts. This is checked by count in `"stat"` mode and fully under `validation="content"` with `verify=True`.
+Python's `sqlite3` adds a trap of its own. With the default `isolation_level`, it opens a transaction implicitly before `INSERT`/`UPDATE`/`DELETE`, so a later `PRAGMA synchronous` fails even though the code never began a transaction. The prototype reproduces this.
 
-**Crash outcomes.**
-- *Before COMMIT:* SQLite rolls back, and the previous published generation remains intact and valid.
-- *After COMMIT:* the new generation is durable.
-- *Either way:* there is no state in which a partially updated index is visible as published.
+**Writer connection.** At most one per process, used by the thread that builds or refreshes:
+1. `sqlite3.connect(path, isolation_level=None, timeout=busy_timeout_s)`. `isolation_level=None` turns off implicit transactions in Python 3.10–3.12, so a transaction exists only where the code issues `BEGIN`.
+2. **Before any transaction, in this order:**
+   - `PRAGMA auto_vacuum=INCREMENTAL`, only if the file is new (`page_count` is 0);
+   - `PRAGMA journal_mode=WAL`;
+   - `PRAGMA synchronous=FULL`;
+   - `PRAGMA foreign_keys=ON`;
+   - `PRAGMA busy_timeout=<ms>`;
+   - on macOS also `PRAGMA fullfsync=ON` and `PRAGMA checkpoint_fullfsync=ON`, because a plain `fsync` there does not flush the drive cache.
+3. **Verify the effective settings** by reading each one back: `journal_mode` must be `wal`, `synchronous` 2 (FULL), `foreign_keys` 1, `busy_timeout` as set, and `fullfsync` 1 where it applies. Also check `sqlite3.sqlite_version_info` against the minimum version that Stage 1 records from its CI matrix. On any mismatch, persistence is disabled for this run with the diagnostic `sqlite_settings_mismatch`. The engine still builds in memory, exactly as without a cache.
+4. If the file is new, run the creation transaction (`BEGIN IMMEDIATE`; `application_id`; `user_version`; the schema of §6; `COMMIT`), then check that `PRAGMA auto_vacuum` reads back 2.
+5. The settings are never changed for the lifetime of the connection. **Every transaction on the writer connection therefore runs with `synchronous=FULL`, including artifact batches and the publish.** The prototype wrote a complete cold build of the snapshot this way in 0.3 s (encoding B, a single indicative run), so there is no reason to switch levels between transactions.
 
-### 10.3 Incremental update
+**Reader connection** (startup load and `refresh()` reloads): `sqlite3.connect(..., isolation_level=None)`, then `PRAGMA query_only=ON` and `busy_timeout`, read back and verified. With `read_only=True` the file is opened as a `mode=ro` URI. If that open fails (a WAL database needs its `-shm` file), persistence is disabled for the run with a diagnostic. A reader loads one generation inside **one** read transaction (`BEGIN` … `COMMIT`). WAL gives that transaction a single snapshot, so a load can never mix rows from two generations.
 
-This is the same protocol with `kind='incremental'`. Only changed files' artifacts are written. The publish transaction replaces only the changed manifest/key rows plus the global state rows that changed. Work counters are recorded on the generation.
+### 10.2 Writer protocol: cold build and publish
+
+All steps run on the writer connection of §10.1.
+
+1. **Intent marker.** `BEGIN IMMEDIATE`; insert `generations(state='building', kind='cold')`; set `meta.clean_shutdown='0'`; `COMMIT`. This marks intent only; the row is never trusted.
+2. **Artifacts.** Write them in batches of about 500 files per `BEGIN IMMEDIATE … COMMIT`, using `INSERT OR IGNORE` because they are immutable and content-addressed. Checksums are computed from the in-memory bytes before insertion (§6.1). A crash here leaves only unreferenced artifacts.
+3. **Assemble** global state in memory, holding no lock.
+4. **Publish**, one `BEGIN IMMEDIATE … COMMIT`. This is the only way an index becomes valid:
+   - re-read `meta.current_generation`; if it is not the generation this change set was computed against, roll back and recompute (§10.5);
+   - replace `manifest`, `excluded`, `file_artifacts`, `provides`, `consumes` and `global_state` for the new generation;
+   - compute and store `generations.manifest_sha256` from the rows inserted;
+   - set the new generation's `state='published'` and the previous one's `'superseded'`;
+   - write `meta.current_generation`, the fingerprints and `published_at`;
+   - `COMMIT`. With `synchronous=FULL`, the WAL is synced before `COMMIT` returns.
+5. **Use.** Only after `COMMIT` returns does the engine report the new generation in its diagnostics.
+6. **Maintenance**, each step in its own short transaction or as an autocommit statement, never inside the publish: garbage collection (§12.2), bounded `PRAGMA incremental_vacuum(<pages>)`, and after a cold build `PRAGMA wal_checkpoint(TRUNCATE)`. On close, set `meta.clean_shutdown='1'`.
+
+**A reader accepts an index only if all of these hold**, checked inside its single read transaction:
+- `application_id`, `user_version`, `repo_root` and the fingerprints match;
+- `meta.current_generation` names a `generations` row with `state='published'`, whose fingerprints equal `meta`'s;
+- `manifest_sha256` verifies against the rows read;
+- every `global_state` checksum verifies;
+- every artifact it uses exists and its checksum verifies, before decoding (§6.1).
+
+No PRAGMA is issued inside steps 1–4, except `application_id` and `user_version` in the creation transaction.
+
+**Incremental update.** The same protocol with `kind='incremental'`. Only changed files' artifacts are written. The publish transaction replaces only the changed manifest and key rows, plus the global state rows that changed, and recomputes `manifest_sha256` over the complete published row set. Work counters are recorded on the generation.
+
+### 10.3 Crash recovery in WAL mode
+
+**Correctness relies on how SQLite commits in WAL mode,** not on the synchronous level:
+- **Commit point.** A transaction's pages are appended to the `-wal` file as frames. It is committed when its *commit frame* is written. Readers see only transactions whose commit frame was present when their read transaction began.
+- **Recovery.** After an unclean shutdown, the first connection rebuilds the WAL index (`-shm`) by scanning the WAL. Each frame carries a checksum chained over the previous frames, plus the WAL header's salt. Recovery keeps frames up to the last valid commit frame and ignores everything after it, including a half-written publish.
+- **The outcome is always a complete generation.** The database reopens at the last committed transaction. Because the publish is one transaction, that is either the previous published generation or the new one, never a mixture. A crash during artifact batches or GC leaves extra unreferenced rows, which are harmless and collected later.
+
+**What `synchronous=FULL` adds is durability, not atomicity.**
+- With `FULL`, the WAL is synced at every commit, so a publish whose `COMMIT` returned survives an operating-system crash or power loss.
+- With `NORMAL`, a process crash still loses nothing committed, but a power loss can roll back the most recent commits. The database stays consistent, and the cache reopens at an earlier valid generation.
+- `FULL` is required for published generations because the engine has already reported that generation (§10.2, step 5). Losing it after a power cut would contradict its diagnostics.
+- None of this holds if the storage acknowledges `fsync` without persisting data.
+
+**Checkpoints are crash-safe.** A checkpoint copies committed frames into the main file and syncs it before the WAL is reset. A crash during a checkpoint leaves the frames in the WAL, and the next checkpoint repeats the copy.
+
+**The `-wal` file is part of the database.** Deleting it, or copying or syncing the main file without it, loses committed transactions that have not been checkpointed. After a partial checkpoint, it can leave a main file whose pages come from different transactions. `cache clear` removes all three files together. A database whose generation, manifest digest or checksums do not verify is treated as corrupt (§10.4), never repaired.
 
 ### 10.4 Corruption and incompatibility
 
@@ -482,11 +650,11 @@ On open, the database is treated as **unusable** (moved aside to `<name>.corrupt
 - `user_version` newer than supported, or older with no migration;
 - a `repo_root` mismatch;
 - no published generation;
-- a checksum failure;
-- a payload decode failure;
+- a `manifest_sha256`, global-state or artifact checksum failure, **including payloads that are structurally valid and decode without error** (§6.1);
+- a payload decode, length or range failure;
 - after an unclean shutdown (`meta.clean_shutdown='0'`), `PRAGMA quick_check` failing.
 
-A full `PRAGMA integrity_check` is available on request.
+A full `PRAGMA integrity_check` and a check of every artifact checksum are available on request (`verify=True`, `reponeedle cache verify`).
 
 **Never:** salvaging part of a database, or serving results from a generation that failed validation.
 
@@ -501,7 +669,8 @@ A full `PRAGMA integrity_check` is available on request.
 | **Long cold builds** | Hold the write lock only for artifact batches and the publish transaction, never during extraction. |
 | **In-memory engines** | Keep the generation they loaded. `engine.refresh()` (§13) loads a newer one explicitly. Nothing changes under a running engine. |
 | **Network filesystems** | SQLite locking is unreliable on NFS/SMB. If the cache directory is detected as remote, persistence is disabled with a diagnostic; this can be overridden at the user's risk. |
-| **Checkpoints** | `wal_autocheckpoint` default, plus `PRAGMA wal_checkpoint(TRUNCATE)` after cold builds. |
+| **Checkpoints** | `wal_autocheckpoint` default, plus `PRAGMA wal_checkpoint(TRUNCATE)` after cold builds, outside any transaction. A large transaction cannot be checkpointed until it commits, so the WAL grows to at least the size of the largest transaction (peak 8.75 MB during a cold build of this repository with encoding B; report §3.3). `PRAGMA journal_size_limit` caps the size the WAL file keeps after a checkpoint. |
+| **Read transactions** | A load runs in one read transaction (§10.1). A checkpoint cannot reset the WAL past a frame an open reader still needs, so long-lived read transactions are not kept open after loading. |
 
 ### 10.6 Schema migrations
 
@@ -541,28 +710,87 @@ Before reading a file for packing or validation, its absolute path is re-derived
 
 ### 11.4 Sensitive data
 
-**Derived artifacts are not anonymous.** Term counts, symbol names, imports and character n-grams reproduce much of a file's vocabulary. Measured here, encoded artifacts are about **1.3× the size of the source**. Secrets present in source (API keys in code or config) **will appear** as tokens in the cache.
+**Derived artifacts are not anonymous.** Term counts, symbol names, imports and character n-grams reproduce much of a file's vocabulary. The prototype database for the pinned snapshot is **about 2.2× the size of the indexed source** (report §3.3). Secrets present in indexed files (API keys in code or configuration) **will appear** as tokens in the cache.
 
 **The cache must therefore be treated as being as sensitive as the repository.** The protections are:
 - persistence is opt-in;
 - the cache is local, per user and outside the repository by default;
-- files the user excluded (ignore rules, size limits, links outside the root) are never read and therefore never cached;
+- files excluded from indexing (ignore rules, the extension allow-list, size limits, links outside the root) are never read and therefore never cached. Today's allow-list already excludes `.env`, `.pem` and `.key` files, because they have no indexed extension;
+- an optional persistent-cache exclusion policy (§11.5);
 - a documented `cache clear` operation (§13);
 - no contents in diagnostics or logs, as today.
 
-Optional, configurable exclusion of secret-prone files (`.env`, key files) from indexing would be a discovery change affecting fresh builds too, so it is out of scope (§16).
+### 11.5 Persistent-cache exclusion policy (`persist_exclude`)
+
+Decision §16.5: secret-looking files are **not** silently removed from retrieval. Instead, a file can be indexed in memory, exactly as today, while nothing derived from it is written to disk.
+
+**Configuration.** `IndexCacheConfig.persist_exclude: List[str] = []` holds `gitwildmatch` patterns relative to the repository root. It is **empty by default**. The documentation offers an example list that users can adopt, such as `**/*secret*`, `**/*credential*`, `**/*password*` and `**/.env.*`.
+
+**Behaviour for a matched file:**
+- **Retrieval is unchanged.** The file is discovered, read and indexed in memory exactly as today, so the §1 equivalence with a fresh build still holds.
+- **Nothing about it is persisted:** no manifest row (not even its path or digest, since a digest of a short secret file allows offline guessing), no artifacts, no `provides`/`consumes` rows, and no `excluded` row.
+- **Global state is persisted only when it contains no contribution from a matched file.** Structures that cannot be split per file are recomputed in memory on every start while any file matches, and reported as global work. These are the semantic vocabulary and IDF, edge lists that touch the file, and PageRank. Stage 1 recomputes global state on every start anyway, so this matters from Stage 2 onwards.
+- **On every start** the file is re-read and re-extracted, and treated as an added file for dependency purposes: consumers of the keys it provides are re-resolved.
+
+**Trade-offs:**
+
+| | Effect |
+| :--- | :--- |
+| Privacy gained | The file's terms, n-grams, symbols, path and digest never reach the cache |
+| Privacy *not* gained | Secrets inside ordinary source files that match no pattern are cached as usual. Name patterns are a heuristic, not a secret scanner, which is why the policy is opt-in rather than presented as a default protection. |
+| Performance | Each matched file costs a read and an extraction on every start, plus re-resolution of its consumers. While any file matches, the order-sensitive global structures above cannot be maintained incrementally. Diagnostics report the number of matched files, never their contents. |
+| Correctness | Unchanged: the in-memory index includes the file |
 
 ## 12. Cache size management
 
-**Per database:**
-- After each publish, artifacts whose `last_used_gen` is older than the current generation, and that are not referenced by `file_artifacts`, are deleted.
-- `PRAGMA incremental_vacuum` reclaims pages, batched so that the time it takes stays bounded.
+### 12.1 Measured size and provisional limits
 
-**Limits:**
-- `IndexCacheConfig.max_db_bytes` (default **2 GiB**) applies per repository. If a publish would exceed it, the build still completes in memory, and persistence for that repository is skipped with a diagnostic. It is never truncated: a partial cache is worse than none.
-- `IndexCacheConfig.max_total_bytes` (default **10 GiB**) applies across the cache directory. Least-recently-*opened* repository databases are deleted first, never one that is open (detected via the lock).
+**Measured with the isolated prototype** (`sqlite_prototype.py`, report §3.3), encoding B (self-contained payloads), on the pinned snapshot. The source is 890 files and 8.17 MB of indexed text.
 
-**Commands:** `reponeedle cache info`, `reponeedle cache clear [--repo PATH | --all]`, `reponeedle cache verify`. These are a later stage (§15).
+| # | Component | Bytes | Status |
+| ---: | :--- | ---: | :--- |
+| 1 | Encoded per-file payloads (lexical, semantic, abstainer, function graph, symbols) | 11,922,510 (1.46× source) | Measured |
+| 2 | Shared string table | 0 (none in encoding B). Encoding A: 10,981,376 in SQLite for 1,028,877 bytes of text. | Measured |
+| 3 | **SQLite database file** after `wal_checkpoint(TRUNCATE)` | **18,296,832 (2.24× source)** | Measured |
+| 4 | Secondary indexes / remaining page, key, checksum, manifest and implicit-index overhead | 671,744 / 4,620,926 | Measured. Manifest and `file_artifacts` add 995,328 bytes; the `provides`/`consumes` rows (1,593,344 bytes) are an **approximation** from symbols and imports. |
+| 5 | WAL during the cold build (peak) / after checkpoint | 8,750,912 / 0 | Measured. Temporary files are **not measured**. |
+| 6 | Optional Tree-sitter and SCIP artifacts | — | **Not measured.** The extras were not installed in the measurement environment, and the default build has none. |
+| 7 | Global state (df tables, vocabulary, IDF, edges, PageRank, refcounts) | 1,081,652 payload, 1,089,536 in SQLite | Measured |
+
+On the synthetic 3,000-file repository (2.69 MB) the database is 13.1 MB (4.9× source), because small files carry fixed per-row costs.
+
+**The 1.27× figure in revision 1 was payload only.** It counted encoded payloads plus string text (component 1 plus the text part of 2) and excluded SQLite entirely. It is not a database-size estimate.
+
+**Limits (provisional).**
+- `max_db_bytes`, default **2 GiB**, applies per repository. If a publish would exceed it, the build still completes in memory, and persistence for that repository is skipped with a diagnostic. It is never truncated: a partial cache is worse than none.
+- `max_total_bytes`, default **10 GiB**, applies across the cache directory. Least-recently-*opened* databases are deleted first, never one that is open (detected via the lock).
+- **Both defaults are provisional.** A *linear projection* (an estimate, not a measurement) of this repository's measured database size to 100,000 files gives about 2.06 GB, just under 2 GiB. The synthetic profile projects to about 0.44 GB.
+- Stage 1 sets the final defaults from **actual databases** built at 10k, 30k and 100k files (§14.5). Until then no limit should be quoted as validated.
+
+### 12.2 Artifact garbage collection
+
+- After each publish, artifacts that `file_artifacts` does not reference and whose `last_used_gen` is older than the current generation are deleted, in short transactions.
+- Artifacts written by a generation still in state `building` are never collected. A `building` generation left by a crashed writer is marked `abandoned` by the next writer that holds the lock, and its artifacts become collectable.
+- `PRAGMA incremental_vacuum(<pages>)` then reclaims free pages in bounded steps, outside any other transaction.
+
+### 12.3 String-table garbage collection
+
+**Problem (revision 1).** A shared, append-only `strings` table outlives the artifacts that reference it. Strings that no live artifact references accumulate indefinitely as files change.
+
+**Decision: no shared string table.** Payloads are self-contained (§4). A string is stored inside the artifact that uses it and disappears when that artifact is collected (§12.2). No separate string garbage collection exists, and no artifact can refer to a missing or reassigned string. The measurements in §4 also favour this: a smaller database, faster writes and faster loads.
+
+**Options evaluated** (for the record, and as the protocol if a shared table is ever reintroduced):
+
+| Option | How | Integrity and crash safety | Cost | Verdict |
+| :--- | :--- | :--- | :--- | :--- |
+| Reference counting | Keep `refcount` per string, incremented on artifact insert and decremented on delete, in the same transaction | Safe only if every insert and delete path updates the counts in the same transaction. A missed path silently leaks or, worse, frees a live string. | Write amplification: one update per distinct string per artifact (about 3,000 per file for semantic artifacts here) | Rejected |
+| Periodic compaction (mark and sweep, no renumbering) | Under the write lock, in one transaction: collect the ids referenced by all artifacts and global state, including those of `building` generations; delete the rest; increment `meta.strings_gc_seq` | Safe if ids are **never reused** (taken from a monotonic `meta.next_sid`), so a stale reference fails decoding instead of resolving to a different string. Writers drop their in-memory string-to-id cache whenever `strings_gc_seq` has changed since their last transaction. | Decodes every live payload: 1.4 s for this repository in the prototype | Acceptable fallback |
+| Rebuild from live artifacts (renumbering) | Write a new string *epoch* and re-encode every live artifact against it in batches, then switch `file_artifacts` and `meta.string_epoch` in one publish transaction, and collect the old epoch afterwards | Atomic through the ordinary publish protocol (§10.2). A crash before publish leaves only unreferenced new rows. | Rewrites the entire cache; about as expensive as a cold build | Only as part of an explicit `cache compact`. A cold rebuild into a new file is simpler. |
+| **No shared table (chosen)** | Strings inline in each payload | Nothing to keep consistent between rows | Larger payloads (11.9 MB vs 8.7 MB here), but a smaller database (18.3 MB vs 25.3 MB) | **Adopted** |
+
+### 12.4 Commands
+
+`reponeedle cache info`, `reponeedle cache clear [--repo PATH | --all]` and `reponeedle cache verify` are a later stage (§15).
 
 ## 13. API
 
@@ -572,19 +800,23 @@ Optional, configurable exclusion of secret-prone files (`.env`, key files) from 
 class IndexCacheConfig(BaseModel):
     cache_dir: Optional[str] = None                      # default per-user location (§5)
     enabled: bool = True                                 # False: behave exactly as without the config
-    validation: Literal["content", "stat"] = "content"   # §8.2
+    validation: Literal["content", "stat"] = "content"   # §8.2; "stat" is a weaker, opt-in optimisation
     rebuild_policy: Literal["auto", "never", "always"] = "auto"
     #   auto:   rebuild on missing/incompatible/corrupt cache (default)
     #   never:  raise IndexCacheError instead of rebuilding (CI / reproducibility checks)
     #   always: ignore any existing cache, cold-build and publish (benchmarks, recovery)
-    read_only: bool = False                              # use a valid cache, never write (shared/CI caches)
-    verify: bool = False                                 # full artifact/payload verification on open
-    max_db_bytes: int = 2 * 1024**3
-    max_total_bytes: int = 10 * 1024**3
+    read_only: bool = False                              # use a valid cache, never write (e.g. a second process
+                                                         # on the same machine; not a cross-machine cache, §16.8)
+    verify: bool = False                                 # every artifact checksum + integrity_check on open
+    persist_exclude: List[str] = []                      # §11.5: indexed in memory, never persisted
+    max_db_bytes: int = 2 * 1024**3                      # provisional (§12.1)
+    max_total_bytes: int = 10 * 1024**3                  # provisional (§12.1)
     busy_timeout_s: float = 30.0
 
 RepoNeedleEngine.from_directory(repo_dir, ..., index_cache: Optional[IndexCacheConfig] = None)
-engine.refresh() -> IndexUpdateReport          # rescan + incremental update + publish; only with index_cache
+engine.refresh(validation: Optional[str] = None) -> IndexUpdateReport
+                                               # rescan + update + publish; the only disk-backed update path;
+                                               # only with index_cache; validation overrides the config once
 engine.index_cache_diagnostics -> Optional[dict]   # state, generation, reason for any rebuild, change counts,
                                                    # work counters, timings, database bytes
 ```
@@ -592,7 +824,7 @@ engine.index_cache_diagnostics -> Optional[dict]   # state, generation, reason f
 **Behaviour without the config.**
 - `index_cache=None`, the default, means no database is opened or created and behaviour is byte-identical to today.
 - `from_documents()` and `RepoNeedleEngine(docs=...)` do not support persistence: they have no repository root and no discovery to validate against.
-- `update_documents()` keeps its current meaning, an in-memory refit. With a persistent engine it does **not** write the cache, because the documents may not match the files on disk. `refresh()` is the persistent path.
+- `update_documents()` keeps its current meaning: an in-memory refit, **never written to disk** (§16.7). Its documents need not match the files on disk, so persisting them could publish an index that no fresh build would produce. After `update_documents()`, the engine's in-memory state no longer corresponds to its loaded generation, and diagnostics say so. `refresh()` is the only persistent, disk-backed update.
 
 **Other interfaces.**
 - *CLI and MCP (later stage):* `--index-cache [DIR]` and `--index-cache-validation`; MCP `reponeedle_inspect` reports `index_cache_diagnostics`.
@@ -627,7 +859,11 @@ For every test state, build `fresh = RepoNeedleEngine.from_directory(repo, <same
 
 - **Mutation sequences:** seeded random sequences over fixture repositories and a synthetic generator. Steps include adding, modifying, deleting and renaming files; adding a second definition of a function name; removing one of two; editing `.gitignore`; changing `max_files`; toggling `structural_parser`; replacing the SCIP index. After **every step**, the persistent engine (restart and `refresh()`) must satisfy §14.2 against a fresh build.
 - **Crash injection:** run cold builds and updates in a subprocess and kill it with `os._exit` at fault points (every batch commit, inside the publish transaction, during vacuum). On reopen, the database must be the previous published generation (exact equivalence) or be rebuilt. It must never be partially new.
-- **Corruption:** truncate the file, flip bytes in pages and payloads, delete `-wal`/`-shm` mid-write, change `user_version`, `application_id` or `repo_root`, and insert `..`/absolute/NUL paths. Each must lead to the §10.4 outcome, without crashes or reads outside the root.
+- **Corruption:** truncate the file, flip bytes in pages and payloads, delete `-wal`/`-shm` mid-write and after a partial checkpoint, change `user_version`, `application_id` or `repo_root`, and insert `..`/absolute/NUL paths. Each must lead to the §10.4 outcome, without crashes or reads outside the root.
+- **Structurally valid corruption** (§6.1): rewrite a payload with a re-encoded, decodable payload that has one changed count; swap two artifacts' payloads; copy a global-state payload from another generation; edit a manifest `content_sha256` or delete a `file_artifacts` row without updating `manifest_sha256`. Each must be rejected by a checksum, never decoded into the index.
+- **Connection settings** (§10.1): a test opens the writer and asserts the effective `journal_mode`, `synchronous`, `foreign_keys` and `busy_timeout`. Simulated mismatches must disable persistence, not fail the build. A static check rejects any `PRAGMA` issued between `BEGIN` and `COMMIT` other than `application_id` and `user_version`.
+- **Validation modes** (§8.2): under `"content"`, a same-size edit with a restored mtime is detected. Under `"stat"`, the same edit is documented as undetected and the diagnostics report `"stat"`.
+- **`persist_exclude`** (§11.5): after a build, the database file (main, WAL and `-shm`) contains no byte sequence unique to a matched file (its path, a planted token, its digest), and retrieval equals a fresh build.
 - **Concurrency:** two processes refreshing simultaneously and readers during publish, with no torn reads and no lost publishes.
 
 ### 14.4 "Incremental" must be demonstrated
@@ -638,7 +874,7 @@ Every update records work counters:
 - edges re-resolved and postings touched;
 - whether each global stage ran in full.
 
-**An update counts as incremental only for stages whose counters scale with the change set.** Stages recomputed in full (PageRank, semantic vocabulary in Stage 1) are reported as "global, full" in diagnostics, benchmarks and documentation.
+**An update counts as incremental only for stages whose counters scale with the change set.** Stages recomputed in full (PageRank, semantic vocabulary in Stage 1) are reported as "global, full" in diagnostics, benchmarks and documentation. A stage with both kinds of work is reported as "partially incremental", with its global O(N) parts named. BM25 is such a stage (§9.5).
 
 ### 14.5 Performance benchmarks (reported separately from correctness)
 
@@ -646,8 +882,8 @@ The performance methodology is in report §7. Every benchmark first passes §14.
 
 | # | Scenario | Measures |
 | :--- | :--- | :--- |
-| 1 | Cold index creation | Time, peak RSS, database bytes, overhead against the non-persistent build |
-| 2 | Restart, unchanged repository | Time to a ready engine (stat vs content validation) |
+| 1 | Cold index creation | Time, peak RSS, **actual database bytes** (main file after checkpoint, peak WAL, per-table growth), overhead against the non-persistent build |
+| 2 | Restart, unchanged repository | Time to a ready engine, reported **separately** for `"content"` and `"stat"` validation (they give different guarantees, §8.2) |
 | 3 | One modified file (body-only edit; symbol-changing edit; new duplicate function name) | `refresh()` time, work counters |
 | 4 | Multiple modified files (1%, 10%) | Same |
 | 5 | Added and deleted files | Same, plus GC time |
@@ -656,7 +892,7 @@ The performance methodology is in report §7. Every benchmark first passes §14.
 
 **Targets** (to be confirmed in Stage 1, not promises):
 - persistence overhead on a cold build ≤ 25%;
-- restart with an unchanged repository ≥ 2× faster than cold. The measured global-work floor (§3) bounds Stage 1 at about 2.3×, because Stage 1 still reads every file for packing (§8.4); about 2.7× only once content is loaded lazily;
+- restart with an unchanged repository ≥ 2× faster than cold. This target is **at risk**: the measured global-work floor (§3) bounds Stage 1 at about 2.0–2.3× before artifact loading and verification (about 1.6 s here), because Stage 1 still reads every file for packing (§8.4, §16.2). Stage 1 reports the measured figure whether or not it meets 2×;
 - in later stages, an update costs ≤ 25% of a cold build for a single body-only edit.
 
 ## 15. Staged implementation plan
@@ -666,20 +902,59 @@ Each stage is its own PR. A stage ships only with the §14 equivalence harness g
 | Stage | Scope | Exit criteria |
 | :--- | :--- | :--- |
 | **0. Prerequisites** (no persistence) | Clear `module_to_path`/`package_to_files` on every function-graph build; add a document-removal path (`remove_documents()`), refit-based like today; replace process-randomised `hash()` signatures in per-document caches with SHA-256 digests; build the **equivalence harness** (§14.2) and query set, and run it against today's `update_documents()` (expected to expose the ordering differences in report §4) | Harness exists and is in CI; defaults byte-identical to `main` (golden snapshots) |
-| **1. Persistent artifacts, global reassembly** | `IndexCacheConfig`; SQLite schema; per-file artifacts for every index; manifest, fingerprints, publish protocol, validation modes, corruption handling, GC. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental" |
-| **2. Incremental lexical and abstainer; dependency-scoped graphs** | BM25 df/postings by delta with identical recomputation of N, IDF and `avg_doc_len`; abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters proportional to the change for these stages |
+| **1. Persistent artifacts, global reassembly** | `IndexCacheConfig`; SQLite schema with self-contained, checksummed payloads (§4, §6.1); the writer and reader connection protocol with settings verification (§10.1); per-file artifacts for every index; manifest with `doc_meta_sha256`; all four fingerprint levels (§7); publish protocol; validation modes; corruption handling; artifact GC; `persist_exclude`. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order. Eager `FileDoc.content` as today (§16.2). | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental"; **size defaults set from actual databases at 10k, 30k and 100k files** (§12.1) |
+| **2. Incremental bookkeeping; dependency-scoped graphs** | BM25 df by delta and IDF of changed-df terms, with `avg_doc_len`, `doc_len_norms` and positional postings recomputed as global O(N) work (§9.5); abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters that separate proportional from global work. BM25 is reported as "partially incremental", or stays globally reassembled if bookkeeping does not pay. |
 | **3. Semantic** | df by delta; exact vocabulary maintenance with canonical first-seen order; vectorised IDF/norm recomputation, **only if bit-identical**; otherwise documented as global | Equivalence; or an explicit decision to keep the semantic index globally recomputed |
-| **4. Optional components and surfaces** | Tree-sitter artifacts and availability changes; SCIP resolution caching; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories; lazy content (§8.4) if approved | Equivalence including optional extras; documentation |
+| **4. Optional components and surfaces** | Tree-sitter artifacts and availability changes, with their sizes measured; SCIP: full re-resolution on change (§16.4), per-document reuse only if measured to be worth it; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories | Equivalence including optional extras; documentation |
 
-## 16. Open questions
+## 16. Design decisions
 
-These are listed for maintainers' decision and are not settled by this design.
+Revision 1 left these eight questions open. Revision 2 decides them.
 
-1. **Deterministic discovery order.** Today's order is the filesystem's (`os.walk`), so the same repository can rank ties differently on different machines. Sorting traversal would make equivalence portable and simplify canonical order, but it changes default results and `max_files` truncation. Should persistent mode, or all modes, sort? (This needs its own evaluation.)
-2. **Lazy content** (§8.4). Changing `FileDoc.content` loading is an API change, so the question is whether it is worth it.
-3. **Semantic artifact form.** Store n-gram counts (fast, about 1.3× source size) or word counts that regenerate them (smaller, slower)? Stage 1 measures both.
-4. **SCIP per-document reuse.** Is a full re-resolution on any covered-file change acceptable at the sizes users run?
-5. **Secret-prone files.** Should discovery gain an opt-in secret-file exclusion list? This affects fresh builds too.
-6. **Nested `.gitignore` files** are not honoured today. Fixing that is a discovery change independent of persistence.
-7. **`update_documents()` with persistence.** Keep it in-memory only (proposed), or allow writing when documents match disk?
-8. **Shared or CI caches** (`read_only=True`): are artifacts portable across machines? Paths are relative, but Python minor versions and discovery order may differ.
+### 16.1 Discovery order: preserve the current filesystem order
+
+**Decision.** Keep today's `os.walk` order. Do not sort files, and do not change `max_files` truncation, in persistent mode or any other mode. Equivalence is defined against a fresh build in the **current scan's** order (§1, §9.4).
+
+**Rationale.** Sorting would change default rankings (ties, semantic vocabulary tie order, graph insertion order) and which files `max_files` keeps, on every machine, including for users who never enable a cache. The persistent design already handles order through the manifest ordinal and ordered replay, so it does not need a sorted order. Any global sorting change needs its own evaluation, with retrieval benchmarks, as a separate proposal.
+
+### 16.2 Lazy content: deferred
+
+**Decision.** Stage 1 keeps the current eager `FileDoc.content`: all indexed files are read at startup, which `validation="content"` requires anyway.
+
+**Rationale.** Lazy loading changes `FileDoc` behaviour, which is a public API change. It adds a failure mode (a file changed between indexing and packing), and it only raises the restart bound modestly (report §3.1). It can be revisited after Stage 1 with measurements.
+
+### 16.3 Semantic artifact format: ordered n-gram feature counts first
+
+**Decision.** Stage 1 stores each file's semantic features as **ordered n-gram feature counts**, in first-occurrence order, exactly as `_doc_feature_cache` holds them. Reconstruction is then a straight decode with no recomputation, so exactness does not depend on re-running the n-gram generator.
+
+**Rationale.** Semantic payloads are the largest artifacts: about 9.2 MB of the 11.9 MB of payloads here (report §3.3). Regenerating n-grams from ordered word counts would be smaller but costs CPU on every load and must reproduce the insertion order exactly. It is **benchmarked separately** (size, load time, and an exactness check against the stored form), and replaces the n-gram form only if it is exact and the measurements justify it.
+
+### 16.4 SCIP: full re-resolution in the initial implementation
+
+**Decision.** When the SCIP index or any document it covers changes, re-run the SCIP resolution in full.
+
+**Rationale.** Resolution validates contents and ranges across documents, and SCIP is opt-in and affects only the `arm101` ranker. Per-document reuse is added only if measurements on real SCIP indexes show that the full re-resolution matters. Until then, diagnostics report SCIP as "global, full".
+
+### 16.5 Secret-looking files: never silently removed; optional persistent-cache exclusion
+
+**Decision.** Discovery and retrieval are unchanged. Files that look like secrets are not dropped from the index, because that would change results and fresh builds. Instead, the opt-in `persist_exclude` policy (§11.5) keeps matching files in the in-memory index while writing nothing derived from them to disk.
+
+**Rationale.** Privacy is gained for the matched files: their terms, paths and digests never reach the cache. Performance is lost: they are re-read and re-extracted on every start, and they block incremental maintenance of order-sensitive global state. Name patterns cannot find secrets inside ordinary source files, so the policy is offered as an option. It is not a default that would suggest more protection than it gives. The primary protection remains treating the whole cache as sensitive (§11.4).
+
+### 16.6 Nested `.gitignore`: deferred
+
+**Decision.** Preserve today's behaviour, which honours the root `.gitignore` only. The discovery fingerprint covers the root file only (§7.3).
+
+**Rationale.** Honouring nested files changes the indexed file set for everyone. It is a discovery change, independent of persistence, and belongs in its own proposal. When it lands, it bumps `IGNORE_MATCH_VERSION` and adds the nested files' digests to the discovery fingerprint.
+
+### 16.7 `update_documents()`: in-memory only
+
+**Decision.** `update_documents()` never writes the cache. `refresh()` is the only explicit, disk-backed persistent operation (§13).
+
+**Rationale.** `update_documents()` accepts arbitrary `FileDoc` objects, which need not match the files on disk. Persisting them could publish a generation that no fresh build of the repository would produce, which breaks the §1 invariant. `refresh()` rescans the disk and so always has a fresh-build reference.
+
+### 16.8 Shared caches: cross-machine portability deferred
+
+**Decision.** A cache is local: one repository root, one user, one machine and a compatible runtime. That means the same Python minor version, Unicode database, SQLite features and optional-component versions, all of which are recorded in the fingerprints (§7). No promise of cross-machine compatibility is made. `read_only=True` exists for a second process on the same machine, not for shipping caches between machines or to CI.
+
+**Rationale.** Portability depends on discovery order (§16.1), the absolute root inside `repo_id` (§5), platform path rules and runtime versions. A fingerprint mismatch on another machine would simply rebuild, so a shared cache would add risk without a dependable benefit. Portability can be revisited once the ordering and fingerprint behaviour has been measured across platforms.
