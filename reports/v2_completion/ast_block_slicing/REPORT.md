@@ -292,6 +292,19 @@ A test enforces a 0.5–2× band.
 
 It is added to the strict Linux job and to the six Tree-sitter CI legs.
 
+**Results.**
+
+| Where | Result |
+| :--- | :--- |
+| Local, Python 3.12 + `treesitter` + `scip` | 976 passed, 8 skipped (Windows symlink permission only) |
+| Local, Python 3.11, no extras | 726 passed, 14 skipped |
+| Local, optional-extra suites on protobuf 5.29.0 | 444 passed, 1 skipped |
+
+**PR #20 CI** ([run 44100939524](https://github.com/krishika08/RepoNeedle/actions/runs/44100939524)) passes all 19 checks:
+- every Tree-sitter leg: 323 passed, 0 skipped;
+- the strict job: 349 passed, 0 skipped;
+- Production CI 3.12: 667 passed, 34 skipped.
+
 ### 9.5 Benchmark (`bench_cache.py`, raw data in `cache_results.json`)
 
 **Environment:** Windows 11, Python 3.12.10. This PR is compared with the baseline caches of `90efcd2`, loaded from git.
