@@ -1,0 +1,167 @@
+{
+  "environment": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "repeats": 9
+  },
+  "timings": [
+    {
+      "input": "python, 2,000 functions",
+      "lines": 18804,
+      "bytes": 477327,
+      "baseline_90efcd2": {
+        "cold_ms": 237.932,
+        "warm_repeat_ms": 0.168,
+        "new_query_parsed_file_ms": 16.984
+      },
+      "this_pr": {
+        "cold_ms": 200.156,
+        "warm_repeat_ms": 0.443,
+        "new_query_parsed_file_ms": 15.656
+      },
+      "this_pr_overheads": {
+        "sha256_digest_ms": 0.221,
+        "structure_size_estimate_ms": 3.147
+      }
+    },
+    {
+      "input": "typescript, 2,000 functions",
+      "lines": 20603,
+      "bytes": 455846,
+      "baseline_90efcd2": {
+        "cold_ms": 243.638,
+        "warm_repeat_ms": 0.078,
+        "new_query_parsed_file_ms": 27.426
+      },
+      "this_pr": {
+        "cold_ms": 261.584,
+        "warm_repeat_ms": 0.46,
+        "new_query_parsed_file_ms": 21.023
+      },
+      "this_pr_overheads": {
+        "sha256_digest_ms": 0.378,
+        "structure_size_estimate_ms": 2.726
+      }
+    },
+    {
+      "input": "go, 2,000 functions",
+      "lines": 22007,
+      "bytes": 508714,
+      "baseline_90efcd2": {
+        "cold_ms": 327.55,
+        "warm_repeat_ms": 0.087,
+        "new_query_parsed_file_ms": 27.217
+      },
+      "this_pr": {
+        "cold_ms": 293.718,
+        "warm_repeat_ms": 0.477,
+        "new_query_parsed_file_ms": 19.776
+      },
+      "this_pr_overheads": {
+        "sha256_digest_ms": 0.233,
+        "structure_size_estimate_ms": 1.394
+      }
+    }
+  ],
+  "churn_workload": {
+    "files": 300,
+    "lines_per_file": "about 3,000-6,000",
+    "total_content_bytes": 32012090,
+    "queries_per_file": 2
+  },
+  "churn": [
+    {
+      "implementation": "baseline_90efcd2",
+      "files": 300,
+      "queries_per_file": 2,
+      "total_s": 133.88,
+      "ms_per_file": 446.3,
+      "structure_entries": 300,
+      "span_entries": 600,
+      "measured_retained_bytes": 120433366,
+      "traced_peak_bytes": 133723737,
+      "rss_before_bytes": 73682944,
+      "rss_after_bytes": 211697664,
+      "rss_after_release_bytes": 161230848
+    },
+    {
+      "implementation": "this_pr",
+      "files": 300,
+      "queries_per_file": 2,
+      "total_s": 142.89,
+      "ms_per_file": 476.3,
+      "structure_entries": 134,
+      "span_entries": 600,
+      "measured_retained_bytes": 34411720,
+      "traced_peak_bytes": 53800582,
+      "rss_before_bytes": 70803456,
+      "rss_after_bytes": 124637184,
+      "estimated_retained_bytes": 34757269,
+      "cache_stats": {
+        "structure": {
+          "entries": 134,
+          "max_entries": 512,
+          "estimated_bytes": 33329573,
+          "max_bytes": 33554432,
+          "max_entry_bytes": 4194304,
+          "hits": 300,
+          "misses": 300,
+          "evictions": 166,
+          "rejected_oversized": 0
+        },
+        "span": {
+          "entries": 600,
+          "max_entries": 4096,
+          "estimated_bytes": 1427696,
+          "max_bytes": 16777216,
+          "max_entry_bytes": 2097152,
+          "hits": 0,
+          "misses": 600,
+          "evictions": 0,
+          "rejected_oversized": 0
+        }
+      },
+      "rss_after_release_bytes": 114122752
+    },
+    {
+      "implementation": "this_pr, 2 MiB structure / 1 MiB span budget",
+      "files": 300,
+      "queries_per_file": 2,
+      "total_s": 176.45,
+      "ms_per_file": 588.2,
+      "structure_entries": 10,
+      "span_entries": 440,
+      "measured_retained_bytes": 3304627,
+      "traced_peak_bytes": 22840955,
+      "rss_before_bytes": 70590464,
+      "rss_after_bytes": 89866240,
+      "estimated_retained_bytes": 3038721,
+      "cache_stats": {
+        "structure": {
+          "entries": 10,
+          "max_entries": 512,
+          "estimated_bytes": 1991127,
+          "max_bytes": 2097152,
+          "max_entry_bytes": 262144,
+          "hits": 201,
+          "misses": 399,
+          "evictions": 191,
+          "rejected_oversized": 198
+        },
+        "span": {
+          "entries": 440,
+          "max_entries": 4096,
+          "estimated_bytes": 1047594,
+          "max_bytes": 1048576,
+          "max_entry_bytes": 131072,
+          "hits": 0,
+          "misses": 600,
+          "evictions": 160,
+          "rejected_oversized": 0
+        }
+      },
+      "rss_after_release_bytes": 89784320
+    }
+  ]
+}

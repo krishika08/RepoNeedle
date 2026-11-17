@@ -22,6 +22,7 @@ from __future__ import annotations
 import ast
 import bisect
 import re
+import sys
 from dataclasses import dataclass
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
 
@@ -60,7 +61,7 @@ def detect_language(path: str) -> Optional[str]:
 # Records
 # ---------------------------------------------------------------------------
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class CodeBlock:
     """A selectable unit. Lines are 1-based and inclusive."""
     kind: str                       # "callable" | "declaration"
@@ -76,7 +77,7 @@ class CodeBlock:
         return self.end_line - self.start_line + 1
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class ScopeHeader:
     """An enclosing class / impl / namespace / function, rendered as its header (and closing line)."""
     kind: str
@@ -86,7 +87,7 @@ class ScopeHeader:
     close_line: Optional[int]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class ImportUnit:
     start_line: int
     end_line: int
@@ -97,7 +98,7 @@ class ImportUnit:
     parts: Tuple[Tuple[int, int, FrozenSet[str]], ...] = ()
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class FileStructure:
     language: str
     parser: str
@@ -723,7 +724,17 @@ def slice_blocks(
     max_blocks: int = DEFAULT_MAX_BLOCKS,
     structure: Optional[StructureResult] = None,
 ) -> BlockSlice:
-    """Selects and renders the blocks relevant to ``query_terms`` (see the module docstring)."""
+    """
+    Selects and renders the blocks relevant to ``query_terms`` (see the module docstring).
+
+    Limits never cut a block:
+
+    * ``max_block_lines`` (hard): a longer block is never selected. It is shown as its signature only, or the file
+      falls back (``oversized_block``) when nothing else matches.
+    * ``max_total_lines`` (soft): the highest-ranked eligible block is always selected whole, even if it alone
+      exceeds this budget; further blocks are added only while the total stays within it.
+    * ``max_blocks`` (hard): at most this many blocks.
+    """
     result = structure if structure is not None else analyze_structure(content, path)
     fs = result.structure
     if fs is None:
@@ -768,7 +779,9 @@ def slice_blocks(
             if len(oversized) < max_blocks:
                 oversized.append(b)
             continue
-        if len(selected) >= max_blocks or total + b.line_count > max_total_lines:
+        # max_total_lines is a soft budget: the first (highest-ranked) block is always taken whole; later blocks
+        # only while the total stays within it. Blocks are never truncated to meet it.
+        if len(selected) >= max_blocks or (selected and total + b.line_count > max_total_lines):
             continue
         selected.append(b)
         total += b.line_count
@@ -854,3 +867,57 @@ def _render(lines: List[str], intervals: List[Tuple[int, int]], comment: str) ->
     if prev_end < n:
         out.extend(gap(prev_end + 1, n))
     return "\n".join(out)
+
+
+# ---------------------------------------------------------------------------
+# Retained-size estimates (used by the bounded caches in CodeSpanExtractor)
+# ---------------------------------------------------------------------------
+#
+# Each estimate sums ``sys.getsizeof`` over the objects a cache entry keeps alive: the record instances (slotted,
+# so ``getsizeof`` covers all their fields), their tuples, frozensets, name strings and rendered text, plus the
+# integer objects of the per-line owner map. Objects shared with the rest of the program (string literals such as
+# block kinds, interned short strings, small ints) are not counted. Allocator overhead is not included. It is an
+# estimate of retained Python object bytes, not a measurement of process memory.
+
+def _obj_bytes(obj) -> int:
+    size = sys.getsizeof(obj)
+    if hasattr(obj, "__dict__"):                  # non-slotted dataclass: count its instance dict once
+        size += _INSTANCE_DICT_BYTES
+    return size
+
+
+def _opt_str(value: Optional[str]) -> int:
+    return sys.getsizeof(value) if value else 0
+
+
+def estimate_structure_bytes(result: StructureResult) -> int:
+    """Approximate bytes retained by one cached :class:`StructureResult` (see the note above)."""
+    total = _obj_bytes(result)
+    fs = result.structure
+    if fs is None:
+        return total
+    total += sys.getsizeof(fs) + sys.getsizeof(fs.blocks) + sys.getsizeof(fs.scopes) + sys.getsizeof(fs.imports)
+    total += sys.getsizeof(fs.preamble) + sum(sys.getsizeof(p) for p in fs.preamble) + sys.getsizeof(fs.owner)
+    total += _INT_BYTES * max(0, len(fs.blocks) - 256)      # owner-map indices above the small-int cache
+    for b in fs.blocks:
+        total += sys.getsizeof(b) + sys.getsizeof(b.scope_chain) + _opt_str(b.name)
+    for sc in fs.scopes:
+        total += sys.getsizeof(sc) + _opt_str(sc.name)
+    for imp in fs.imports:
+        total += sys.getsizeof(imp) + sys.getsizeof(imp.names) + sum(sys.getsizeof(n) for n in imp.names)
+        total += sys.getsizeof(imp.parts) + sum(sys.getsizeof(p) + sys.getsizeof(p[2]) for p in imp.parts)
+    return total
+
+
+def estimate_slice_bytes(sliced: BlockSlice, rendered: Optional[str] = None) -> int:
+    """Approximate bytes retained by one cached :class:`BlockSlice` and its rendered span (if different)."""
+    total = _obj_bytes(sliced) + _opt_str(sliced.text)
+    for group in (sliced.selected, sliced.header_only):
+        total += sys.getsizeof(group) + sum(sys.getsizeof(s) + _opt_str(s[1]) for s in group)
+    if rendered is not None and rendered is not sliced.text:
+        total += sys.getsizeof(rendered)
+    return total
+
+
+_INT_BYTES = sys.getsizeof(10 ** 6)
+_INSTANCE_DICT_BYTES = sys.getsizeof(BlockSlice(None, None, None).__dict__)   # materialised on a sample only
