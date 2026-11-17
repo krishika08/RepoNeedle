@@ -42,9 +42,9 @@ The proposed interface was written to `docs/AST_BLOCK_SLICING.md` §2 before any
 ```
 CUDPackOptimizer.pack_context(...)
   └─ config.focus_span_strategy == "ast_blocks"
-       └─ CodeSpanExtractor.extract_block_span(content, path, terms)       (LRU result cache, 4,096)
+       └─ CodeSpanExtractor.extract_block_span(content, path, terms)       (result cache: 4,096 / 16 MiB est., §9)
             ├─ empty / <=45 lines ─────────────────► same as legacy
-            ├─ analyze_structure(content, path)                            (LRU structure cache, 512)
+            ├─ analyze_structure(content, path)                            (structure cache: 512 / 32 MiB est., §9)
             │    ├─ .py ── ast ──► _PythonAnalyzer
             │    ├─ .ts/.tsx/.go/.rs/.java/.cpp/... ── tse.parse_source() ──► _TreeSitterAnalyzer
             │    └─ otherwise / no parser / syntax error ──► fallback_reason
@@ -202,4 +202,136 @@ pytest tests/test_block_slicing.py tests/test_block_slicing_tree_sitter.py tests
 python reports/v2_completion/ast_block_slicing/bench_block_slicing.py --out benchmark_results.json
 python reports/v2_completion/ast_block_slicing/eval_packing_suites.py          # needs external/agent-retrieval-bench
 python reports/v2_completion/ast_block_slicing/make_legacy_golden.py           # regenerates the legacy golden from 0c0effe
+python reports/v2_completion/ast_block_slicing/bench_cache.py --out cache_results.json   # §9 cache benchmark
 ```
+
+## 9. Post-milestone maintenance: bounded cache memory and `cap_lines` (PR #20)
+
+Branch `fix/ast-block-slicing-cache-api`, from `main` at `90efcd2`. Retrieval, ranking, routing, tier selection, AST parsing, language support and the legacy extractor are unchanged; `ast_blocks` stays opt-in.
+
+### 9.1 Problem
+
+- The structure cache (512 entries) and result cache (4,096) were bounded only by **entry count**.
+- Both kept the **full file content in their keys**, so every cached file version stayed alive, including versions the caller had already dropped (changed or re-read files).
+- `extract_block_span(..., cap_lines=65)` used `cap_lines` only on the legacy fallback, and the result cache ignored it.
+
+### 9.2 Cache design
+
+**Keys.**
+- The structure cache is keyed by `(path, SHA-256(content))`; the result cache by `(path, SHA-256(content), frozenset(query terms), cap_lines)`.
+- The digest is 32 bytes and no source text is retained.
+- A changed file always produces a new key.
+
+**Budgets.** `reponeedle/core/bounded_cache.ByteBudgetLRU` is a deterministic LRU bounded by **entry count and an estimated-byte budget**.
+
+| Cache | Entry limit | Estimated-byte budget |
+| :--- | ---: | ---: |
+| Structure | 512 | 32 MiB |
+| Result | 4,096 | 16 MiB |
+
+Both budgets are configurable per extractor (`structure_cache_bytes`, `span_cache_bytes`) or through class attributes.
+
+**Eviction.**
+- After each insert, the oldest entries are evicted until both limits hold.
+- Evicted values are dropped, and a test checks with `weakref` that they are released.
+
+**Oversized entries.** An entry estimated at more than **1/8 of its budget** is returned but not cached (counted as `rejected_oversized`).
+
+**Accounting (estimate).** For each entry, `sys.getsizeof` is summed over what it keeps alive, plus a fixed 160-byte per-entry allowance for the LRU slot, link and `(value, size)` pair. The objects counted are:
+- the block, scope and import records, now `slots=True` dataclasses so `getsizeof` covers their fields;
+- tuples, frozensets and name strings;
+- the per-line owner map, and the integers above the small-int cache;
+- the rendered text;
+- the key's path, digest and terms.
+
+Literals and allocator overhead are excluded. The estimate stands for retained Python objects; it is **not** RSS. `block_cache_stats()` exposes it.
+
+**Calibration.** Against tracemalloc's measured retained allocations (after `gc.collect()`), estimates were:
+
+| Measured scope | Estimate ÷ measured |
+| :--- | ---: |
+| Single structures (878- to 22,000-line files) | 0.92–1.34 |
+| A populated cache of 160 entries | 1.23 |
+| The churn workloads below | 0.92 and 1.01 |
+
+A test enforces a 0.5–2× band.
+
+### 9.3 `cap_lines` decision
+
+`cap_lines` is kept and defined as a **soft selection budget** (`Optional[int] = None`).
+
+**At the slicer level** (`slice_blocks(max_total_lines=...)`), the highest-ranked eligible block is always selected **whole**, even if it alone is longer. Further blocks are added only while the total stays within the budget, and no limit ever truncates a block.
+
+**Other behaviour:**
+- `max_block_lines` (120) remains a hard eligibility limit, with header-only rendering or the `oversized_block` fallback.
+- With `None`, the defaults apply: 160 lines for slicing, and the legacy 65 for the fallback.
+- An integer is also passed to the legacy fallback with its legacy meaning.
+- Non-positive and non-integer values raise `ValueError`.
+- `cap_lines` is part of the result-cache key.
+
+**Why keep it.** It keeps `extract_block_span` a drop-in counterpart of `extract_focus_span`.
+
+**Compatibility.**
+- The argument was never in a release: `v1.2.0` has no `extract_block_span`.
+- No call site passes it.
+- At the default, the only behaviour change is the soft-first-block rule, which matters only when `max_total_lines < max_block_lines` (160 > 120 by default).
+- All 282 AST spans (with their selections and notes) and 36 `ast_blocks` packs over the fixture corpus are byte-identical before and after this change.
+- The legacy golden (282 spans, 282 skeletons, 36 packs from the baseline packer) is unchanged.
+
+### 9.4 Tests
+
+`tests/test_block_slicing_cache.py` has 31 tests and needs no extras. They cover:
+- **LRU:** order, refresh on `get`, byte budget, oversized rejection, size update on replace, invalid limits.
+- **Keys:** keys hold the SHA-256 digest and never the content; different paths are cached separately.
+- **Correctness:** changed content is never served stale; query-term separation with a shared structure; repeated-query reuse (same object returned).
+- **Budgets:** under churn the byte budgets are never exceeded and eviction happens; entry-count limits still apply.
+- **Oversized entries:** computed but not retained, and re-parsed on the next call while the small file stays cached.
+- **Eviction:** evicted objects are released (`weakref`).
+- **Estimates:** the size estimate stays within 0.5–2× of tracemalloc.
+- **`cap_lines`:** defaults equal the slicer defaults; caps of 1, 21, 43, 44, 66 and 500 give 1, 1, 1, 2, 3 and 5 complete 22-line blocks; a block longer than the cap is returned whole; the oversized rule is independent of the cap; the cap is part of the key; it reaches the legacy fallback unchanged; invalid values are rejected.
+
+It is added to the strict Linux job and to the six Tree-sitter CI legs.
+
+### 9.5 Benchmark (`bench_cache.py`, raw data in `cache_results.json`)
+
+**Environment:** Windows 11, Python 3.12.10. This PR is compared with the baseline caches of `90efcd2`, loaded from git.
+
+**Timing.**
+- Method: `time.perf_counter`, median of 9, with the implementations **interleaved within each repeat** to cancel machine drift.
+- Machine noise was still about ±30% on cold runs.
+
+| Input (2,000 functions) | Cold: baseline / PR | Warm repeat: baseline / PR | New query on parsed file: baseline / PR | Digest | Size estimate (on insert) |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Python (18,804 lines, 477 KB) | 238 / 200 ms | 0.17 / 0.44 ms | 17.0 / 15.7 ms | 0.22 ms | 3.1 ms |
+| TypeScript (20,603 lines, 456 KB) | 244 / 262 ms | 0.08 / 0.46 ms | 27.4 / 21.0 ms | 0.38 ms | 2.7 ms |
+| Go (22,007 lines, 509 KB) | 328 / 294 ms | 0.09 / 0.48 ms | 27.2 / 19.8 ms | 0.23 ms | 1.4 ms |
+
+**What this shows.**
+- Cold and new-query times show no consistent change: the differences are within noise and point both ways.
+- A warm cache hit now costs one SHA-256 of the content, about 0.3–0.4 ms more per call for a 500 KB file.
+- Inserting a new structure costs one size estimate, 1.4–3.1 ms, against 200–300 ms of parsing.
+
+**Churn: repeated indexing of many different large files.**
+- Workload: 300 generated Python, TypeScript and Go files (about 3,000–6,000 lines each, 32 MB of source in total), two queries per file, through one extractor.
+- Isolation: each variant runs in a **fresh process**.
+- Content lifetime: each file's content is created inside the traced region and dropped by the caller after use, so anything left allocated is held by the cache.
+
+| Variant | Entries kept (structure / result) | Evictions (structure / result) | Rejected oversized | **Measured** retained (tracemalloc) | **Estimated** retained | Traced peak | RSS before → after | ms per file |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline `90efcd2` | 300 / 600 | 0 / 0 | n/a | **120.4 MB** | n/a | 133.7 MB | 73.7 → 211.7 MB | 446 |
+| This PR, defaults | 134 / 600 | 166 / 0 | 0 | **34.4 MB** | 34.8 MB | 53.8 MB | 70.8 → 124.6 MB | 476 |
+| This PR, 2 MiB + 1 MiB budgets | 10 / 440 | 191 / 160 | 198 | **3.3 MB** | 3.04 MB | 22.8 MB | 70.6 → 89.9 MB | 588 |
+
+**Findings.**
+- The baseline kept all 300 structures, and every dropped file's content, alive through its keys.
+- With the defaults, the structure cache filled its 32 MiB estimate (33.3 MB estimated) and evicted the oldest 166 structures. Measured retained memory fell by **71%**.
+- With the small budgets, the estimate stayed within its 3 MiB, but the **measured** retained figure (3.30 MB) exceeded the budget by about 5%. The budget bounds the estimate, not measured memory.
+- Under the small budgets, 198 structures were above 1/8 of the 2 MiB budget, so they were not cached and the second query re-parsed them. That is why this variant was slower per file.
+- RSS is shown for context only. It includes the interpreter and parsers, the allocator does not necessarily return freed memory to the OS, and the difference from the baseline (+54 MB against +138 MB growth) is indicative only.
+
+### 9.6 Limitations
+
+- Sizes are estimates. They track tracemalloc within about ±35% here, and measured retained memory can exceed a configured budget slightly.
+- The legacy extractor's caches (`_span_cache`, `_skel_cache`) and the tokenizer cache are unchanged and remain unbounded by bytes. AST-mode fallbacks still populate the legacy span cache.
+- Warm hits now hash the content (about 0.5–0.8 ms per MB measured).
+- No persistent or on-disk cache was added; that is out of scope.

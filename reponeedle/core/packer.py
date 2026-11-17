@@ -7,16 +7,19 @@ Supports dual operational modes:
 """
 
 import ast
+import hashlib
 import math
 import os
 import re
-from collections import OrderedDict, defaultdict
+import sys
+from collections import defaultdict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from reponeedle.core import block_slicing
+from reponeedle.core.bounded_cache import ByteBudgetLRU
 from reponeedle.models import BudgetConfig, ContextTier, FileDoc, ScoredFile
 
 # Official Benchmark Code Tokenizer Regex Pattern: regex_code_tokenizer_v1
@@ -95,40 +98,79 @@ class CodeSpanExtractor:
     Extracts syntactically bounded focal spans and structural skeletons across polyglot languages.
     """
 
-    # Bounds for the AST block-slicing caches (the legacy caches above are unchanged).
+    # --- AST block-slicing caches (the legacy caches above are unchanged) -------------------------------------
+    #
+    # Keys hold a SHA-256 digest of the content, never the content itself: (path, digest) for parsed structures and
+    # (path, digest, query terms, cap_lines) for results. Values are the derived structure / slice only. Both caches
+    # are deterministic LRUs bounded by entry count *and* by an estimate of retained bytes (see
+    # block_slicing.estimate_structure_bytes / estimate_slice_bytes and _cache_key_bytes below). One entry may use at
+    # most BLOCK_CACHE_MAX_ENTRY_FRACTION of its cache's byte budget; larger entries are computed but not cached.
+    # The byte figures are estimates of retained Python objects, not measurements of process memory.
     BLOCK_STRUCTURE_CACHE_SIZE = 512
     BLOCK_SPAN_CACHE_SIZE = 4096
+    BLOCK_STRUCTURE_CACHE_BYTES = 32 * 1024 * 1024
+    BLOCK_SPAN_CACHE_BYTES = 16 * 1024 * 1024
+    BLOCK_CACHE_MAX_ENTRY_FRACTION = 0.125
+    # Per-entry bookkeeping not visible to sys.getsizeof of the key/value: the OrderedDict slot and LRU link plus
+    # the (value, size) pair the cache stores.
+    CACHE_ENTRY_OVERHEAD_BYTES = 160
 
-    def __init__(self, tokenizer: Optional[ExactTokenizer] = None):
+    def __init__(
+        self,
+        tokenizer: Optional[ExactTokenizer] = None,
+        *,
+        structure_cache_bytes: Optional[int] = None,
+        span_cache_bytes: Optional[int] = None,
+    ):
         self.tokenizer = tokenizer or ExactTokenizer()
         self._span_cache: Dict[Tuple[str, int], Tuple[str, int]] = {}
         self._skel_cache: Dict[Tuple[str, int], Tuple[str, int]] = {}
-        # Keyed by the full content (not its hash) so a collision can never return another file's span.
-        self._structure_cache: "OrderedDict[Tuple[str, str], Any]" = OrderedDict()
-        self._block_cache: "OrderedDict[Tuple[str, str, frozenset], Tuple[Tuple[str, int], Any]]" = OrderedDict()
+        self._structure_cache = ByteBudgetLRU(
+            self.BLOCK_STRUCTURE_CACHE_SIZE,
+            structure_cache_bytes if structure_cache_bytes is not None else self.BLOCK_STRUCTURE_CACHE_BYTES,
+            self.BLOCK_CACHE_MAX_ENTRY_FRACTION)
+        self._block_cache = ByteBudgetLRU(
+            self.BLOCK_SPAN_CACHE_SIZE,
+            span_cache_bytes if span_cache_bytes is not None else self.BLOCK_SPAN_CACHE_BYTES,
+            self.BLOCK_CACHE_MAX_ENTRY_FRACTION)
 
-    def _block_structure(self, clean_path: str, content: str):
-        key = (clean_path, content)
+    @staticmethod
+    def _content_digest(content: str) -> bytes:
+        return hashlib.sha256(content.encode("utf-8", "surrogatepass")).digest()
+
+    def _cache_key_bytes(self, key: Tuple) -> int:
+        size = sys.getsizeof(key) + self.CACHE_ENTRY_OVERHEAD_BYTES
+        for part in key:
+            if isinstance(part, frozenset):
+                size += sys.getsizeof(part) + sum(sys.getsizeof(t) for t in part)
+            elif part is not None:
+                size += sys.getsizeof(part)
+        return size
+
+    def block_cache_stats(self) -> Dict[str, Dict[str, int]]:
+        """Entry counts, estimated retained bytes, limits, hits, misses, evictions and rejected entries."""
+        return {"structure": self._structure_cache.stats(), "span": self._block_cache.stats()}
+
+    def _block_structure(self, clean_path: str, content: str, digest: bytes):
+        key = (clean_path, digest)
         cached = self._structure_cache.get(key)
-        if cached is not None:
-            self._structure_cache.move_to_end(key)
+        if cached is not ByteBudgetLRU.MISSING:
             return cached
         result = block_slicing.analyze_structure(content, clean_path)
-        self._structure_cache[key] = result
-        if len(self._structure_cache) > self.BLOCK_STRUCTURE_CACHE_SIZE:
-            self._structure_cache.popitem(last=False)
+        self._structure_cache.put(key, result,
+                                  block_slicing.estimate_structure_bytes(result) + self._cache_key_bytes(key))
         return result
 
-    def slice_blocks(self, content: str, path: str, query_terms: Set[str]):
+    def slice_blocks(self, content: str, path: str, query_terms: Set[str], cap_lines: Optional[int] = None):
         """The :class:`~reponeedle.core.block_slicing.BlockSlice` behind ``extract_block_span`` (cached)."""
-        return self._block_span(content, path, query_terms)[1]
+        return self._block_span(content, path, query_terms, cap_lines)[1]
 
     def extract_block_span(
         self,
         content: str,
         path: str,
         query_terms: Set[str],
-        cap_lines: int = 65,
+        cap_lines: Optional[int] = None,
     ) -> Tuple[str, int]:
         """
         AST block-slicing focus span (``BudgetConfig.focus_span_strategy="ast_blocks"``): the smallest complete
@@ -136,33 +178,43 @@ class CodeSpanExtractor:
         headers. Empty and short files behave exactly like ``extract_focus_span``; any file that cannot be
         sliced (unsupported language, missing parser, syntax error, no block match, oversized block) falls back
         to ``extract_focus_span``. Returns ``(rendered, tokens)``.
+
+        ``cap_lines`` is a *soft* selection budget for the selected blocks (``slice_blocks(max_total_lines=...)``):
+        the highest-ranked block is always rendered whole, even if it alone is longer, and further blocks are added
+        only while the total stays within the budget. Blocks are never truncated. ``None`` (the default) uses
+        ``block_slicing.DEFAULT_MAX_TOTAL_LINES`` for slicing and the legacy default (65) for the fallback; an
+        integer is also passed to the legacy fallback, where it keeps its legacy meaning.
         """
         return self._block_span(content, path, query_terms, cap_lines)[0]
 
-    def _block_span(self, content: str, path: str, query_terms: Set[str], cap_lines: int = 65):
+    def _block_span(self, content: str, path: str, query_terms: Set[str], cap_lines: Optional[int] = None):
+        if cap_lines is not None and (isinstance(cap_lines, bool) or not isinstance(cap_lines, int) or cap_lines < 1):
+            raise ValueError("cap_lines must be a positive integer or None")
         if not content or not content.strip():
             return ("", 0), block_slicing.BlockSlice(None, None, None, fallback_reason="empty_file")
         clean_path = path.replace("\\", "/")
         q_key = frozenset(query_terms) if query_terms else frozenset()
-        key = (clean_path, content, q_key)
+        digest = self._content_digest(content)
+        key = (clean_path, digest, q_key, cap_lines)
         cached = self._block_cache.get(key)
-        if cached is not None:
-            self._block_cache.move_to_end(key)
+        if cached is not ByteBudgetLRU.MISSING:
             return cached
         if len(content.splitlines()) <= 45:            # same short-file rule as extract_focus_span
             sliced = block_slicing.BlockSlice(None, block_slicing.detect_language(clean_path), None,
                                               fallback_reason="short_file")
         else:
+            limits = {} if cap_lines is None else {"max_total_lines": cap_lines}
             sliced = block_slicing.slice_blocks(content, clean_path, q_key,
-                                                structure=self._block_structure(clean_path, content))
+                                                structure=self._block_structure(clean_path, content, digest),
+                                                **limits)
         if sliced.text is None:
-            res = self.extract_focus_span(content, path, query_terms, cap_lines)
+            res = self.extract_focus_span(content, path, query_terms, 65 if cap_lines is None else cap_lines)
         else:
             res = (sliced.text, self.tokenizer.count_tokens(sliced.text, clean_path))
-        self._block_cache[key] = (res, sliced)
-        if len(self._block_cache) > self.BLOCK_SPAN_CACHE_SIZE:
-            self._block_cache.popitem(last=False)
-        return res, sliced
+        value = (res, sliced)
+        self._block_cache.put(key, value, block_slicing.estimate_slice_bytes(sliced, res[0])
+                              + sys.getsizeof(value) + sys.getsizeof(res) + self._cache_key_bytes(key))
+        return value
 
     def extract_focus_span(
         self,

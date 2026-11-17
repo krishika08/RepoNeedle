@@ -64,7 +64,14 @@ slice_blocks(content, path, query_terms, *, max_block_lines=120,
     # .language, .parser, .blocks_considered
 ```
 
-`CodeSpanExtractor.extract_block_span(content, path, query_terms)` wraps `slice_blocks`. It returns `(text, tokens)` like `extract_focus_span`, falls back to `extract_focus_span` when slicing does not apply, and caches both the parsed structure (per path and content) and the result (per path, content and query terms).
+`CodeSpanExtractor.extract_block_span(content, path, query_terms, cap_lines=None)` wraps `slice_blocks`. It returns `(text, tokens)` like `extract_focus_span`, and falls back to `extract_focus_span` when slicing does not apply.
+
+**`cap_lines`** is a soft selection budget, passed as `slice_blocks(max_total_lines=cap_lines)`. The best block is always rendered whole, and more blocks are added only while the total stays within the budget. The argument has these properties:
+- `None` keeps the defaults: 160 lines for slicing, and the legacy 65 for the fallback.
+- An integer is also passed to the legacy fallback unchanged.
+- Values that are not positive integers raise `ValueError`.
+
+Both the parsed structure and the result are cached; see §4.
 
 ## 3. Behaviour
 
@@ -84,8 +91,9 @@ slice_blocks(content, path, query_terms, *, max_block_lines=120,
 **Selection.**
 1. Lines matching a query term (the same case-insensitive substring test as the legacy extractor) are attributed to the **innermost** block containing them.
 2. Blocks are ranked by distinct query terms matched, then whether the block's name contains a term, then the number of matching lines, then source order. The ordering is fully deterministic.
-3. Blocks are taken greedily up to `max_blocks` (5) and `max_total_lines` (160).
-4. A block longer than `max_block_lines` (120) is never cut. Only its header (signature) is shown, with a `[… body elided: block too large …]` marker. If nothing selectable remains, the legacy extractor is used.
+3. Blocks are taken greedily up to `max_blocks` (5).
+4. `max_total_lines` (160, or `cap_lines` when given) is a **soft** budget. The highest-ranked block is always taken whole, even if it alone is longer; further blocks are added only while the total stays within the budget. No limit ever truncates a block.
+5. A block longer than `max_block_lines` (120) is never selected. Only its header (signature) is shown, followed by an ordinary `[lines a-b elided]` marker. If nothing selectable remains, the legacy extractor is used.
 
 **Rendering.** The output contains:
 - package declarations;
@@ -113,6 +121,40 @@ Files of 45 lines or fewer are returned whole, exactly as in the legacy extracto
 
 A larger block span is simply a larger `FOCUS_SPAN` candidate, so it is chosen only when it fits, otherwise the existing skeleton or next tier is used. The `ScoredFile.explanation` of an AST block span names the language and the number of blocks.
 
+### Caching and memory
+
+Each `CodeSpanExtractor` keeps two deterministic LRU caches (`reponeedle/core/bounded_cache.py`). Neither cache retains source text.
+
+| Cache | Key | Value | Entry limit | Estimated-byte budget |
+| :--- | :--- | :--- | ---: | ---: |
+| Parsed structure | `(path, SHA-256(content))` | the `StructureResult` (blocks, scopes, imports, line owner map) | 512 | 32 MiB |
+| Result | `(path, SHA-256(content), query terms, cap_lines)` | the rendered span, its token count and the `BlockSlice` | 4,096 | 16 MiB |
+
+**Keys.**
+- Keys hold a 32-byte digest, never the content, so a changed file can never hit an old entry and the cache never keeps old file versions alive.
+- Paths, contents, query-term sets and `cap_lines` values are all kept apart.
+
+**Eviction.**
+- After each insert, least-recently-used entries are evicted until both the entry limit and the byte budget hold.
+- Evicted values are dropped, so the cache no longer references them.
+
+**Oversized entries.** An entry estimated at more than one eighth of its cache's budget (`BLOCK_CACHE_MAX_ENTRY_FRACTION`) is computed and returned but not cached, so one huge file cannot flush the cache.
+
+**Accounting.** Each entry's size is an **estimate**: `sys.getsizeof` summed over the objects the entry keeps alive, plus a fixed per-entry allowance for the LRU bookkeeping. The objects counted are:
+- the slotted block, scope and import records;
+- their tuples, frozensets and name strings;
+- the owner map;
+- the rendered text;
+- the key's path, digest and terms.
+
+Interned literals, small integers and allocator overhead are not counted. This estimates retained Python objects; it is **not** process memory (RSS). Measured against tracemalloc, estimates were within 0.9–1.4× of the bytes actually retained (see the report).
+
+**Configuration.**
+- Budgets: `CodeSpanExtractor(structure_cache_bytes=..., span_cache_bytes=...)`, or the class attributes `BLOCK_STRUCTURE_CACHE_BYTES`, `BLOCK_SPAN_CACHE_BYTES`, `BLOCK_STRUCTURE_CACHE_SIZE`, `BLOCK_SPAN_CACHE_SIZE` and `BLOCK_CACHE_MAX_ENTRY_FRACTION`.
+- Statistics: `CodeSpanExtractor.block_cache_stats()` reports entries, estimated bytes, limits, hits, misses, evictions and rejected entries.
+
+The legacy extractor's own caches (`_span_cache`, `_skel_cache`) and the tokenizer cache are unchanged.
+
 ## 5. Limitations
 
 **Scope.**
@@ -133,4 +175,4 @@ A larger block span is simply a larger `FOCUS_SPAN` candidate, so it is chosen o
 **Performance.**
 - Python slicing is faster than the legacy extractor on large files.
 - Tree-sitter languages cost roughly 6–15 ms per 1,000 lines on the first (cold) call, against about 1 ms per 1,000 lines for the legacy regex scan.
-- Results and parsed structures are cached per extractor; a new query on an already parsed file costs about 0.5–2 ms per 1,000 lines.
+- Results and parsed structures are cached per extractor (§4). A new query on an already parsed file costs about 0.5–2 ms per 1,000 lines. A repeated query costs one SHA-256 digest of the content, about 0.25–0.5 ms for a 600 KB file.
