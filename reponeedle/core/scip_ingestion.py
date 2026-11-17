@@ -246,7 +246,9 @@ class SourceRange(NamedTuple):
     end_character: int
 
     def contains(self, line: int, character: int) -> bool:
-        return (self.start_line, self.start_character) <= (line, character) <= (self.end_line, self.end_character)
+        """True if (line, character) is in [start, end): the end position is exclusive, so an empty range
+        contains nothing and a position at one range's end belongs to an adjacent range starting there."""
+        return (self.start_line, self.start_character) <= (line, character) < (self.end_line, self.end_character)
 
     @property
     def span(self) -> Tuple[int, int]:

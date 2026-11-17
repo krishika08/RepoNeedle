@@ -183,7 +183,7 @@ Linux legs fail on any skip (`REPONEEDLE_FAIL_ON_SKIP`); Windows allows the syml
 
 The strict Linux security job also runs `test_scip_core.py`. The workflow passes `actionlint`.
 
-**PR #17 CI** ([run 44059367633](https://github.com/krishika08/RepoNeedle/actions/runs/44059367633)): all 19 checks pass.
+**PR #17 CI** ([run 44059879067](https://github.com/krishika08/RepoNeedle/actions/runs/44059879067), head `9be4492`, the last run before the half-open range hotfix): all 19 checks pass.
 - **SCIP legs:** each Linux leg (3.10, 3.11, 3.12, the 5.29.0 minimum, the pure-Python backend) and the Windows 3.12 leg ran 137 passed, 0 skipped. Linux 3.12 with both extras ran 180 passed, 0 skipped.
 - **Other jobs:** the wheel smokes pass (absent, `[scip]`, `[scip,treesitter]`); the strict security job ran 253 passed, 0 skipped; Production CI, Tree-sitter and benchmark parity are unchanged and pass.
 - **First run:** it failed on Windows because the checkout converted `scip.proto` to CRLF, which broke the pinned hash. `.gitattributes` now disables end-of-line conversion for the vendored schema and the real fixture.
