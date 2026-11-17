@@ -45,12 +45,16 @@ def read(rel: str) -> str:
 
 
 def fixture_corpus() -> Dict[str, str]:
-    """Every block-slicing and Tree-sitter fixture file (paths relative to tests/fixtures)."""
+    """
+    Every block-slicing and Tree-sitter fixture file (paths relative to tests/fixtures), ordered by the POSIX path
+    string. Sorting Path objects is case-insensitive on Windows and case-sensitive elsewhere, which would change the
+    candidate order (and therefore the golden packs) between platforms.
+    """
     files = {}
     for root in (BLOCK_FIXTURES, FIXTURES / "tree_sitter"):
-        for p in sorted(root.rglob("*")):
-            if p.is_file() and p.suffix not in (".json", ".md"):
-                files[p.relative_to(FIXTURES).as_posix()] = p.read_text(encoding="utf-8")
+        found = [p for p in root.rglob("*") if p.is_file() and p.suffix not in (".json", ".md")]
+        for p in sorted(found, key=lambda q: q.relative_to(FIXTURES).as_posix()):
+            files[p.relative_to(FIXTURES).as_posix()] = p.read_text(encoding="utf-8")
     return files
 
 

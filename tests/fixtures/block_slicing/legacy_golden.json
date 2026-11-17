@@ -254,42 +254,6 @@
    "4bc2a686e36090b1"
   ],
   [
-   "block_slicing/typescript/inventory.ts",
-   "reserve",
-   175,
-   "492d4b96cd65500a"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "restock threshold",
-   197,
-   "37e7d3601022f701"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "discounted value",
-   129,
-   "0585c259b075ce03"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "nothing_matches_this_term",
-   226,
-   "d2af844a476dc67a"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "residual backfill skeleton",
-   226,
-   "d2af844a476dc67a"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "resolve import graph",
-   126,
-   "d778ef1d275fbeaa"
-  ],
-  [
    "block_slicing/typescript/InventoryTable.tsx",
    "reserve",
    217,
@@ -326,6 +290,42 @@
    "89a5f7f209e7e17b"
   ],
   [
+   "block_slicing/typescript/inventory.ts",
+   "reserve",
+   175,
+   "492d4b96cd65500a"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "restock threshold",
+   197,
+   "37e7d3601022f701"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "discounted value",
+   129,
+   "0585c259b075ce03"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "nothing_matches_this_term",
+   226,
+   "d2af844a476dc67a"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "residual backfill skeleton",
+   226,
+   "d2af844a476dc67a"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "resolve import graph",
+   126,
+   "d778ef1d275fbeaa"
+  ],
+  [
    "tree_sitter/cpp/include/shop/pricing.h",
    "reserve",
    102,
@@ -864,6 +864,42 @@
    "resolve import graph",
    41,
    "8146061bf23a7387"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/Empty.java",
+   "reserve",
+   0,
+   "e3b0c44298fc1c14"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/Empty.java",
+   "restock threshold",
+   0,
+   "e3b0c44298fc1c14"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/Empty.java",
+   "discounted value",
+   0,
+   "e3b0c44298fc1c14"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/Empty.java",
+   "nothing_matches_this_term",
+   0,
+   "e3b0c44298fc1c14"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/Empty.java",
+   "residual backfill skeleton",
+   0,
+   "e3b0c44298fc1c14"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/Empty.java",
+   "resolve import graph",
+   0,
+   "e3b0c44298fc1c14"
   ],
   [
    "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
@@ -900,42 +936,6 @@
    "resolve import graph",
    133,
    "64a7d95c085a74e7"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/Empty.java",
-   "reserve",
-   0,
-   "e3b0c44298fc1c14"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/Empty.java",
-   "restock threshold",
-   0,
-   "e3b0c44298fc1c14"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/Empty.java",
-   "discounted value",
-   0,
-   "e3b0c44298fc1c14"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/Empty.java",
-   "nothing_matches_this_term",
-   0,
-   "e3b0c44298fc1c14"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/Empty.java",
-   "residual backfill skeleton",
-   0,
-   "e3b0c44298fc1c14"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/Empty.java",
-   "resolve import graph",
-   0,
-   "e3b0c44298fc1c14"
   ],
   [
    "tree_sitter/java/src/main/java/com/shop/pricing/PriceCalculator.java",
@@ -1948,42 +1948,6 @@
    "4bc2a686e36090b1"
   ],
   [
-   "block_slicing/typescript/inventory.ts",
-   "reserve",
-   263,
-   "a1edeeb95401126b"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "restock threshold",
-   250,
-   "c81f5e2bb28d78c9"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "discounted value",
-   226,
-   "d2af844a476dc67a"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "nothing_matches_this_term",
-   226,
-   "d2af844a476dc67a"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "residual backfill skeleton",
-   226,
-   "d2af844a476dc67a"
-  ],
-  [
-   "block_slicing/typescript/inventory.ts",
-   "resolve import graph",
-   226,
-   "d2af844a476dc67a"
-  ],
-  [
    "block_slicing/typescript/InventoryTable.tsx",
    "reserve",
    154,
@@ -2018,6 +1982,42 @@
    "resolve import graph",
    94,
    "699fe5ca4bdfe2ef"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "reserve",
+   263,
+   "a1edeeb95401126b"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "restock threshold",
+   250,
+   "c81f5e2bb28d78c9"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "discounted value",
+   226,
+   "d2af844a476dc67a"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "nothing_matches_this_term",
+   226,
+   "d2af844a476dc67a"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "residual backfill skeleton",
+   226,
+   "d2af844a476dc67a"
+  ],
+  [
+   "block_slicing/typescript/inventory.ts",
+   "resolve import graph",
+   226,
+   "d2af844a476dc67a"
   ],
   [
    "tree_sitter/cpp/include/shop/pricing.h",
@@ -2560,42 +2560,6 @@
    "900488dd0c751066"
   ],
   [
-   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
-   "reserve",
-   177,
-   "eef4ee45c193d1cf"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
-   "restock threshold",
-   177,
-   "eef4ee45c193d1cf"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
-   "discounted value",
-   177,
-   "eef4ee45c193d1cf"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
-   "nothing_matches_this_term",
-   177,
-   "eef4ee45c193d1cf"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
-   "residual backfill skeleton",
-   177,
-   "eef4ee45c193d1cf"
-  ],
-  [
-   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
-   "resolve import graph",
-   177,
-   "eef4ee45c193d1cf"
-  ],
-  [
    "tree_sitter/java/src/main/java/com/shop/Empty.java",
    "reserve",
    0,
@@ -2630,6 +2594,42 @@
    "resolve import graph",
    0,
    "e3b0c44298fc1c14"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
+   "reserve",
+   177,
+   "eef4ee45c193d1cf"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
+   "restock threshold",
+   177,
+   "eef4ee45c193d1cf"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
+   "discounted value",
+   177,
+   "eef4ee45c193d1cf"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
+   "nothing_matches_this_term",
+   177,
+   "eef4ee45c193d1cf"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
+   "residual backfill skeleton",
+   177,
+   "eef4ee45c193d1cf"
+  ],
+  [
+   "tree_sitter/java/src/main/java/com/shop/cart/Cart.java",
+   "resolve import graph",
+   177,
+   "eef4ee45c193d1cf"
   ],
   [
    "tree_sitter/java/src/main/java/com/shop/pricing/PriceCalculator.java",
@@ -3686,22 +3686,10 @@
      "9202fcf5766e5281"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
+     "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
-     192,
-     "492d4b96cd65500a"
-    ],
-    [
-     "tree_sitter/cpp/include/shop/pricing.h",
-     "skeleton",
-     32,
-     "a5b6f591e6ad0911"
-    ],
-    [
-     "tree_sitter/cpp/src/broken.cpp",
-     "skeleton",
-     19,
-     "e3b0c44298fc1c14"
+     234,
+     "3bb5a07207559c0e"
     ]
    ]
   ],
@@ -3814,16 +3802,16 @@
      "b4e10a7953ca5d05"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     146,
-     "0585c259b075ce03"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      111,
      "699fe5ca4bdfe2ef"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     146,
+     "0585c259b075ce03"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -3905,16 +3893,16 @@
      "9202fcf5766e5281"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     192,
-     "492d4b96cd65500a"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      234,
      "3bb5a07207559c0e"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     192,
+     "492d4b96cd65500a"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -4092,16 +4080,16 @@
      "ebd756753b68fc2e"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     214,
-     "37e7d3601022f701"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      111,
      "699fe5ca4bdfe2ef"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     214,
+     "37e7d3601022f701"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -4267,16 +4255,16 @@
      "b4e10a7953ca5d05"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     146,
-     "0585c259b075ce03"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      111,
      "699fe5ca4bdfe2ef"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     146,
+     "0585c259b075ce03"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -4484,16 +4472,16 @@
      "9202fcf5766e5281"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     192,
-     "492d4b96cd65500a"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      234,
      "3bb5a07207559c0e"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     192,
+     "492d4b96cd65500a"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -4743,16 +4731,16 @@
      "ebd756753b68fc2e"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     214,
-     "37e7d3601022f701"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      111,
      "699fe5ca4bdfe2ef"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     214,
+     "37e7d3601022f701"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -5002,16 +4990,16 @@
      "b4e10a7953ca5d05"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "focus_span",
-     146,
-     "0585c259b075ce03"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "focus_span",
      111,
      "699fe5ca4bdfe2ef"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "focus_span",
+     146,
+     "0585c259b075ce03"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -5585,22 +5573,22 @@
      "927a893b344392c1"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
+     "block_slicing/typescript/InventoryTable.tsx",
      "full",
-     657,
-     "bf37676af485fea8"
+     417,
+     "612d0eb3f4da3a87"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "skeleton",
+     280,
+     "a1edeeb95401126b"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
      "skeleton",
      32,
      "a5b6f591e6ad0911"
-    ],
-    [
-     "tree_sitter/cpp/src/broken.cpp",
-     "full",
-     50,
-     "52d4556a0412298f"
     ]
    ]
   ],
@@ -5652,22 +5640,22 @@
      "927a893b344392c1"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
+     "block_slicing/typescript/InventoryTable.tsx",
      "full",
-     657,
-     "bf37676af485fea8"
+     417,
+     "612d0eb3f4da3a87"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "skeleton",
+     267,
+     "c81f5e2bb28d78c9"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
      "skeleton",
      32,
      "a5b6f591e6ad0911"
-    ],
-    [
-     "tree_sitter/cpp/src/broken.cpp",
-     "full",
-     50,
-     "52d4556a0412298f"
     ]
    ]
   ],
@@ -5719,10 +5707,16 @@
      "927a893b344392c1"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
+     "block_slicing/typescript/InventoryTable.tsx",
      "full",
-     657,
-     "bf37676af485fea8"
+     417,
+     "612d0eb3f4da3a87"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "skeleton",
+     243,
+     "d2af844a476dc67a"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -5786,16 +5780,16 @@
      "927a893b344392c1"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "full",
-     657,
-     "bf37676af485fea8"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "full",
      417,
      "612d0eb3f4da3a87"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "full",
+     657,
+     "bf37676af485fea8"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -6045,16 +6039,16 @@
      "927a893b344392c1"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "full",
-     657,
-     "bf37676af485fea8"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "full",
      417,
      "612d0eb3f4da3a87"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "full",
+     657,
+     "bf37676af485fea8"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
@@ -6304,16 +6298,16 @@
      "927a893b344392c1"
     ],
     [
-     "block_slicing/typescript/inventory.ts",
-     "full",
-     657,
-     "bf37676af485fea8"
-    ],
-    [
      "block_slicing/typescript/InventoryTable.tsx",
      "full",
      417,
      "612d0eb3f4da3a87"
+    ],
+    [
+     "block_slicing/typescript/inventory.ts",
+     "full",
+     657,
+     "bf37676af485fea8"
     ],
     [
      "tree_sitter/cpp/include/shop/pricing.h",
