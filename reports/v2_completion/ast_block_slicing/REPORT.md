@@ -104,11 +104,25 @@ Non-callable statements directly in a module or class body (constants, fields, s
 
 `assert_exact` (in `tests/block_slicing_support.py`) checks every rendered slice line by line. Each output line must be the next source line verbatim, or a single marker whose range is exactly the skipped, non-blank lines. The whole file must be accounted for.
 
-**Local results** (Windows 11, Python 3.12.10, tree-sitter 0.26.1, protobuf 7.36.2; and Python 3.11.9 without extras): see the PR description for the final full-suite numbers.
+**Local results** (Windows 11):
+
+| Environment | Result |
+| :--- | :--- |
+| Full suite, Python 3.12.10 with `treesitter` and `scip` | 945 passed, 8 skipped (Windows symlink permission only) |
+| Full suite, Python 3.11.9, no extras | 695 passed, 14 skipped (symlink permission and optional extras, including the Tree-sitter block-slicing module) |
 
 **CI.**
 - The strict Linux job ("skips fail") now also runs `test_block_slicing.py` and `test_block_slicing_packing.py` without extras.
 - The Tree-sitter job runs all three files on six legs: Linux 3.10, 3.11, 3.12 and minimum versions, macOS 3.12, and Windows 3.12.
+
+**PR #19** ([run 44090274632](https://github.com/krishika08/RepoNeedle/actions/runs/44090274632)) passes all 19 checks:
+- every Tree-sitter leg: 292 passed, 0 skipped;
+- the strict job: 318 passed, 0 skipped;
+- Production CI 3.12: 636 passed, 34 skipped (optional extras and external data not installed).
+
+**The first run failed, for two reasons:**
+- Sorting fixture `Path`s is case-insensitive on Windows but case-sensitive on Linux, so the golden's candidate order differed between platforms. The order now uses the POSIX path string, and the golden was regenerated from the baseline.
+- A `\` line continuation is not valid in the Windows leg's PowerShell.
 
 ## 5. Performance
 
