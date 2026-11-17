@@ -33,7 +33,7 @@ Test coverage is measured, not assumed: on the pre-release 1.2.0 development bra
 | Persistent / on-disk index cache | Not implemented (the index is rebuilt in memory on every start) |
 | Automatic live filesystem updates / file watching | Not implemented (restart the MCP server to refresh) |
 | HTTP / SSE MCP transport | Not implemented (STDIO only) |
-| AST block slicing (sub-function spans of large files) | Not implemented |
+| AST block slicing (sub-function spans of large files) | Opt-in on `main`, not released ([AST_BLOCK_SLICING.md](AST_BLOCK_SLICING.md)) |
 | Calibrated selective retrieval / reliable abstention | Not implemented (open research problem, below) |
 
 ---
@@ -54,4 +54,4 @@ The current heuristic (repository vocabulary overlap + $Z$-score peakiness + top
 ## Phase 3: Agent Scaffolding & Scale
 - [ ] **Aider Adapter**: drop-in alternative to Aider's RepoMap for workflow routing and test discovery.
 - [ ] **Persistent, incremental indexing** (on-disk cache; embedded SQLite/DuckDB backing for monorepos > 100,000 files).
-- [ ] **AST block slicing** for monolithic files.
+- [x] **AST block slicing** for monolithic files (opt-in `BudgetConfig(focus_span_strategy="ast_blocks")`; on `main`, not in a published release yet): CUD-Pack focus spans become the smallest complete functions, methods or declarations containing query matches, with relevant imports and enclosing class headers. Python uses `ast`; TypeScript/TSX, Go, Rust, Java and C++ use the optional Tree-sitter extra. Every other case falls back to the unchanged legacy extractor. The default packing is unchanged. In a packing-level comparison on frozen candidate lists, complete blocks cost more tokens per file, so compact mode packed fewer files. No retrieval improvement is claimed. See [AST_BLOCK_SLICING.md](AST_BLOCK_SLICING.md).

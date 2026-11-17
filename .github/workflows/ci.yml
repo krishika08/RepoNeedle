@@ -97,7 +97,10 @@ jobs:
             tests/test_abstention_opt_in.py \
             tests/test_indexing_diagnostics.py \
             tests/test_documentation_consistency.py \
-            tests/test_tree_sitter_fallback.py             tests/test_scip_core.py
+            tests/test_tree_sitter_fallback.py \
+            tests/test_scip_core.py \
+            tests/test_block_slicing.py \
+            tests/test_block_slicing_packing.py
 
       - name: MCP STDIO smoke test (initialize; reports RepoNeedle version)
         run: |
@@ -149,11 +152,11 @@ jobs:
         run: |
           python -c "import json; from reponeedle.core.tree_sitter_extraction import tree_sitter_status as s; st = s(); print(json.dumps(st, indent=1)); assert st['runtime']['available'] and all(v['available'] for v in st['languages'].values())"
 
-      - name: Run Tree-sitter and function-graph suites (any skip fails the job)
+      - name: Run Tree-sitter, function-graph and AST block-slicing suites (any skip fails the job)
         env:
           REPONEEDLE_FAIL_ON_SKIP: "1"
         run: |
-          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py
+          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py tests/test_block_slicing.py tests/test_block_slicing_tree_sitter.py tests/test_block_slicing_packing.py
 
   package-install:
     name: Wheel install with and without the optional extras (Linux, Python 3.12)

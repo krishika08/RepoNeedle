@@ -723,10 +723,11 @@ class _Walker:
         return self.text(target), self._container_class(node, cls, {"field_declaration_list"})
 
 
-def extract(content: str, filepath: str, language: str, is_test: bool) -> Optional[TreeSitterExtraction]:
+def parse_source(content: str, language: str) -> Optional[Tuple[Any, bytes]]:
     """
-    Parses ``content`` and returns the extraction, or None if no parser is available for ``language``.
-    Syntax errors do not raise: Tree-sitter returns a partial tree, which is extracted and flagged.
+    Parses ``content`` with the cached parser for ``language``. Returns ``(tree, utf-8 source bytes)``,
+    or None if no parser is available (the reason is in ``load_errors()``). Node byte offsets refer to
+    the returned bytes. Syntax errors do not raise; check ``tree.root_node.has_error``.
     """
     lang = load_language(language)
     if lang is None:
@@ -735,7 +736,18 @@ def extract(content: str, filepath: str, language: str, is_test: bool) -> Option
     if parser is None:
         parser = _PARSERS[language] = _runtime().Parser(lang)
     src = content.encode("utf-8", "surrogatepass")
-    tree = parser.parse(src)
+    return parser.parse(src), src
+
+
+def extract(content: str, filepath: str, language: str, is_test: bool) -> Optional[TreeSitterExtraction]:
+    """
+    Parses ``content`` and returns the extraction, or None if no parser is available for ``language``.
+    Syntax errors do not raise: Tree-sitter returns a partial tree, which is extracted and flagged.
+    """
+    parsed = parse_source(content, language)
+    if parsed is None:
+        return None
+    tree, src = parsed
     out = _Walker(language, src, filepath, is_test).run(tree.root_node)
     out.has_error = bool(tree.root_node.has_error)
     return out

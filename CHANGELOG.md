@@ -17,10 +17,15 @@ All notable changes to RepoNeedle are documented here. Versions follow [Semantic
   - `engine.scip_diagnostics` reports the producer, root match, document and reference outcomes, and timings.
   - It is a SCIP consumer, not an indexer. Only scip-typescript 0.6.2 was validated with a real index. It affects only the opt-in `arm101` ranker (which now also propagates over `scip_reference` edges), and **no retrieval-quality improvement is claimed or measured**. See [docs/SCIP.md](docs/SCIP.md) and `reports/v2_completion/scip_ingestion/REPORT.md`.
 - `FunctionGraphEdge.source_symbol`, `target_symbol` and `provenance` (optional, default `None`): set on SCIP-derived edges only.
+- **Optional AST block slicing** for CUD-Pack focus spans (opt-in with `BudgetConfig(focus_span_strategy="ast_blocks")`; the default `"legacy"` is unchanged).
+  - It renders the smallest complete function, method, nested function or declaration containing each query match, instead of line windows. Decorators, attributes, annotations and attached doc comments are included, along with relevant imports, package declarations and the headers of enclosing classes and functions. Elided line ranges are marked explicitly.
+  - Python uses `ast` (no extra). TypeScript/TSX, Go, Rust, Java and C++ use the optional `treesitter` extra, sharing the existing parser cache through the new `tree_sitter_extraction.parse_source()`.
+  - Blocks are never cut: an oversized block is shown as its signature, or the file falls back. Unsupported languages (including JavaScript and C), missing parsers, any syntax error and unmatched queries fall back per file to the legacy extractor. The CUD-Pack tiers, exact token accounting and the budget invariant are unchanged.
+  - New: `reponeedle.core.block_slicing`, `CodeSpanExtractor.extract_block_span()` and `CodeSpanExtractor.slice_blocks()`. **No retrieval-quality improvement is claimed or measured.** In a packing-level comparison, complete blocks used more tokens per file, so compact packs held fewer files. See [docs/AST_BLOCK_SLICING.md](docs/AST_BLOCK_SLICING.md) and `reports/v2_completion/ast_block_slicing/REPORT.md`.
 
 ### Not changed
 
-- The default extraction (`structural_parser="regex"`) reproduces 1.2.0 exactly; this is checked against a golden snapshot of the 1.2.0 implementation. Without `scip_config` no SCIP code or Protobuf import runs. Ranking weights, routing, packing, abstention defaults, the MCP tools and the core dependencies are unchanged.
+- The default extraction (`structural_parser="regex"`) reproduces 1.2.0 exactly; this is checked against a golden snapshot of the 1.2.0 implementation. Without `scip_config` no SCIP code or Protobuf import runs. With the default `focus_span_strategy="legacy"`, focus spans, skeletons and packs are identical to the baseline packer (checked against a golden snapshot). Ranking weights, routing, packing, abstention defaults, the MCP tools and the core dependencies are unchanged.
 
 ## [1.2.0] — 2026-11-12
 
