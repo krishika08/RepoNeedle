@@ -1,0 +1,361 @@
+{
+  "environment": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "tree_sitter": "0.26.1",
+    "repeats": 5
+  },
+  "results": [
+    {
+      "input": "synthetic python 200 functions",
+      "language": "python",
+      "lines": 1884,
+      "bytes": 46827,
+      "blocks_in_file": 420,
+      "blocks_considered": 420,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 9.973,
+        "warm_cached_ms": 0.002,
+        "warm_structure_new_query_ms": 0.866,
+        "peak_alloc_kib": 6183.7,
+        "output_lines": 13,
+        "output_tokens": 97
+      },
+      "legacy_focus_span": {
+        "cold_ms": 12.418,
+        "peak_alloc_kib": 6183.4,
+        "output_lines": 12,
+        "output_tokens": 71
+      }
+    },
+    {
+      "input": "synthetic python 2000 functions",
+      "language": "python",
+      "lines": 18804,
+      "bytes": 477327,
+      "blocks_in_file": 4200,
+      "blocks_considered": 4200,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 178.21,
+        "warm_cached_ms": 0.009,
+        "warm_structure_new_query_ms": 8.632,
+        "peak_alloc_kib": 62332.5,
+        "output_lines": 13,
+        "output_tokens": 97
+      },
+      "legacy_focus_span": {
+        "cold_ms": 438.736,
+        "peak_alloc_kib": 62332.3,
+        "output_lines": 12,
+        "output_tokens": 71
+      }
+    },
+    {
+      "input": "synthetic typescript 200 functions",
+      "language": "typescript",
+      "lines": 2063,
+      "bytes": 44706,
+      "blocks_in_file": 200,
+      "blocks_considered": 200,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 28.752,
+        "warm_cached_ms": 0.006,
+        "warm_structure_new_query_ms": 3.573,
+        "peak_alloc_kib": 2230.6,
+        "output_lines": 15,
+        "output_tokens": 127
+      },
+      "legacy_focus_span": {
+        "cold_ms": 1.939,
+        "peak_alloc_kib": 139.5,
+        "output_lines": 12,
+        "output_tokens": 151
+      }
+    },
+    {
+      "input": "synthetic typescript 2000 functions",
+      "language": "typescript",
+      "lines": 20603,
+      "bytes": 455846,
+      "blocks_in_file": 2000,
+      "blocks_considered": 2000,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 243.745,
+        "warm_cached_ms": 0.029,
+        "warm_structure_new_query_ms": 40.604,
+        "peak_alloc_kib": 22324.2,
+        "output_lines": 15,
+        "output_tokens": 127
+      },
+      "legacy_focus_span": {
+        "cold_ms": 16.257,
+        "peak_alloc_kib": 1329.8,
+        "output_lines": 12,
+        "output_tokens": 151
+      }
+    },
+    {
+      "input": "synthetic go 200 functions",
+      "language": "go",
+      "lines": 2207,
+      "bytes": 50314,
+      "blocks_in_file": 200,
+      "blocks_considered": 200,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 28.24,
+        "warm_cached_ms": 0.003,
+        "warm_structure_new_query_ms": 2.659,
+        "peak_alloc_kib": 2535.0,
+        "output_lines": 18,
+        "output_tokens": 124
+      },
+      "legacy_focus_span": {
+        "cold_ms": 1.228,
+        "peak_alloc_kib": 142.6,
+        "output_lines": 10,
+        "output_tokens": 86
+      }
+    },
+    {
+      "input": "synthetic go 2000 functions",
+      "language": "go",
+      "lines": 22007,
+      "bytes": 508714,
+      "blocks_in_file": 2000,
+      "blocks_considered": 2000,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 313.595,
+        "warm_cached_ms": 0.043,
+        "warm_structure_new_query_ms": 27.397,
+        "peak_alloc_kib": 25515.5,
+        "output_lines": 18,
+        "output_tokens": 124
+      },
+      "legacy_focus_span": {
+        "cold_ms": 20.777,
+        "peak_alloc_kib": 1390.1,
+        "output_lines": 10,
+        "output_tokens": 86
+      }
+    },
+    {
+      "input": "synthetic rust 200 functions",
+      "language": "rust",
+      "lines": 2207,
+      "bytes": 52381,
+      "blocks_in_file": 401,
+      "blocks_considered": 401,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 16.119,
+        "warm_cached_ms": 0.003,
+        "warm_structure_new_query_ms": 2.576,
+        "peak_alloc_kib": 1894.0,
+        "output_lines": 15,
+        "output_tokens": 115
+      },
+      "legacy_focus_span": {
+        "cold_ms": 1.887,
+        "peak_alloc_kib": 152.7,
+        "output_lines": 8,
+        "output_tokens": 79
+      }
+    },
+    {
+      "input": "synthetic rust 2000 functions",
+      "language": "rust",
+      "lines": 22007,
+      "bytes": 534448,
+      "blocks_in_file": 4001,
+      "blocks_considered": 4001,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 252.108,
+        "warm_cached_ms": 0.034,
+        "warm_structure_new_query_ms": 40.538,
+        "peak_alloc_kib": 19079.6,
+        "output_lines": 15,
+        "output_tokens": 115
+      },
+      "legacy_focus_span": {
+        "cold_ms": 11.548,
+        "peak_alloc_kib": 1497.2,
+        "output_lines": 8,
+        "output_tokens": 79
+      }
+    },
+    {
+      "input": "synthetic java 200 functions",
+      "language": "java",
+      "lines": 2008,
+      "bytes": 43432,
+      "blocks_in_file": 200,
+      "blocks_considered": 200,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 12.121,
+        "warm_cached_ms": 0.003,
+        "warm_structure_new_query_ms": 1.93,
+        "peak_alloc_kib": 1537.8,
+        "output_lines": 15,
+        "output_tokens": 109
+      },
+      "legacy_focus_span": {
+        "cold_ms": 0.999,
+        "peak_alloc_kib": 134.3,
+        "output_lines": 10,
+        "output_tokens": 80
+      }
+    },
+    {
+      "input": "synthetic java 2000 functions",
+      "language": "java",
+      "lines": 20008,
+      "bytes": 440699,
+      "blocks_in_file": 2000,
+      "blocks_considered": 2000,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 131.987,
+        "warm_cached_ms": 0.016,
+        "warm_structure_new_query_ms": 23.657,
+        "peak_alloc_kib": 15401.5,
+        "output_lines": 15,
+        "output_tokens": 109
+      },
+      "legacy_focus_span": {
+        "cold_ms": 13.157,
+        "peak_alloc_kib": 1306.5,
+        "output_lines": 10,
+        "output_tokens": 80
+      }
+    },
+    {
+      "input": "synthetic cpp 200 functions",
+      "language": "cpp",
+      "lines": 1807,
+      "bytes": 41355,
+      "blocks_in_file": 200,
+      "blocks_considered": 200,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 17.831,
+        "warm_cached_ms": 0.004,
+        "warm_structure_new_query_ms": 1.539,
+        "peak_alloc_kib": 1634.0,
+        "output_lines": 15,
+        "output_tokens": 114
+      },
+      "legacy_focus_span": {
+        "cold_ms": 1.28,
+        "peak_alloc_kib": 115.6,
+        "output_lines": 7,
+        "output_tokens": 71
+      }
+    },
+    {
+      "input": "synthetic cpp 2000 functions",
+      "language": "cpp",
+      "lines": 18007,
+      "bytes": 418755,
+      "blocks_in_file": 2000,
+      "blocks_considered": 2000,
+      "blocks_matched": 1,
+      "blocks_selected": 1,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 238.408,
+        "warm_cached_ms": 0.03,
+        "warm_structure_new_query_ms": 24.333,
+        "peak_alloc_kib": 16377.8,
+        "output_lines": 15,
+        "output_tokens": 114
+      },
+      "legacy_focus_span": {
+        "cold_ms": 17.37,
+        "peak_alloc_kib": 1105.5,
+        "output_lines": 7,
+        "output_tokens": 71
+      }
+    },
+    {
+      "input": "real python packer_snapshot.py",
+      "language": "python",
+      "lines": 509,
+      "bytes": 22491,
+      "blocks_in_file": 22,
+      "blocks_considered": 22,
+      "blocks_matched": 5,
+      "blocks_selected": 3,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 9.35,
+        "warm_cached_ms": 0.006,
+        "warm_structure_new_query_ms": 0.847,
+        "peak_alloc_kib": 2065.9,
+        "output_lines": 110,
+        "output_tokens": 1034
+      },
+      "legacy_focus_span": {
+        "cold_ms": 12.366,
+        "peak_alloc_kib": 2066.1,
+        "output_lines": 76,
+        "output_tokens": 718
+      }
+    },
+    {
+      "input": "real python function_graph_snapshot.py",
+      "language": "python",
+      "lines": 878,
+      "bytes": 41283,
+      "blocks_in_file": 51,
+      "blocks_considered": 51,
+      "blocks_matched": 10,
+      "blocks_selected": 5,
+      "fallback_reason": null,
+      "ast_blocks": {
+        "cold_ms": 16.333,
+        "warm_cached_ms": 0.005,
+        "warm_structure_new_query_ms": 1.87,
+        "peak_alloc_kib": 3626.8,
+        "output_lines": 172,
+        "output_tokens": 2097
+      },
+      "legacy_focus_span": {
+        "cold_ms": 21.315,
+        "peak_alloc_kib": 3626.9,
+        "output_lines": 61,
+        "output_tokens": 606
+      }
+    }
+  ]
+}

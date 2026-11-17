@@ -163,6 +163,11 @@ class BudgetConfig(BaseModel):
     capacity_elasticity: Optional[float] = None
     candidate_pool_cutoff: int = 85
     exact_tokenizer: bool = True
+    # Focus-span extractor used by CUD-Pack. "legacy" (default) is the original line-window/AST-name
+    # extractor, unchanged. "ast_blocks" (opt-in) renders the smallest complete function/method/declaration
+    # blocks containing query matches (Python via `ast`; TypeScript/TSX, Go, Rust, Java, C++ via the optional
+    # Tree-sitter extra) and falls back to "legacy" per file. See docs/AST_BLOCK_SLICING.md.
+    focus_span_strategy: Literal["legacy", "ast_blocks"] = "legacy"
 
 
 class AblationConfig(BaseModel):

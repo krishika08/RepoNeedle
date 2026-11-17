@@ -10,12 +10,13 @@ import ast
 import math
 import os
 import re
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
+from reponeedle.core import block_slicing
 from reponeedle.models import BudgetConfig, ContextTier, FileDoc, ScoredFile
 
 # Official Benchmark Code Tokenizer Regex Pattern: regex_code_tokenizer_v1
@@ -94,10 +95,74 @@ class CodeSpanExtractor:
     Extracts syntactically bounded focal spans and structural skeletons across polyglot languages.
     """
 
+    # Bounds for the AST block-slicing caches (the legacy caches above are unchanged).
+    BLOCK_STRUCTURE_CACHE_SIZE = 512
+    BLOCK_SPAN_CACHE_SIZE = 4096
+
     def __init__(self, tokenizer: Optional[ExactTokenizer] = None):
         self.tokenizer = tokenizer or ExactTokenizer()
         self._span_cache: Dict[Tuple[str, int], Tuple[str, int]] = {}
         self._skel_cache: Dict[Tuple[str, int], Tuple[str, int]] = {}
+        # Keyed by the full content (not its hash) so a collision can never return another file's span.
+        self._structure_cache: "OrderedDict[Tuple[str, str], Any]" = OrderedDict()
+        self._block_cache: "OrderedDict[Tuple[str, str, frozenset], Tuple[Tuple[str, int], Any]]" = OrderedDict()
+
+    def _block_structure(self, clean_path: str, content: str):
+        key = (clean_path, content)
+        cached = self._structure_cache.get(key)
+        if cached is not None:
+            self._structure_cache.move_to_end(key)
+            return cached
+        result = block_slicing.analyze_structure(content, clean_path)
+        self._structure_cache[key] = result
+        if len(self._structure_cache) > self.BLOCK_STRUCTURE_CACHE_SIZE:
+            self._structure_cache.popitem(last=False)
+        return result
+
+    def slice_blocks(self, content: str, path: str, query_terms: Set[str]):
+        """The :class:`~reponeedle.core.block_slicing.BlockSlice` behind ``extract_block_span`` (cached)."""
+        return self._block_span(content, path, query_terms)[1]
+
+    def extract_block_span(
+        self,
+        content: str,
+        path: str,
+        query_terms: Set[str],
+        cap_lines: int = 65,
+    ) -> Tuple[str, int]:
+        """
+        AST block-slicing focus span (``BudgetConfig.focus_span_strategy="ast_blocks"``): the smallest complete
+        function/method/declaration blocks containing query matches, with relevant imports and enclosing class
+        headers. Empty and short files behave exactly like ``extract_focus_span``; any file that cannot be
+        sliced (unsupported language, missing parser, syntax error, no block match, oversized block) falls back
+        to ``extract_focus_span``. Returns ``(rendered, tokens)``.
+        """
+        return self._block_span(content, path, query_terms, cap_lines)[0]
+
+    def _block_span(self, content: str, path: str, query_terms: Set[str], cap_lines: int = 65):
+        if not content or not content.strip():
+            return ("", 0), block_slicing.BlockSlice(None, None, None, fallback_reason="empty_file")
+        clean_path = path.replace("\\", "/")
+        q_key = frozenset(query_terms) if query_terms else frozenset()
+        key = (clean_path, content, q_key)
+        cached = self._block_cache.get(key)
+        if cached is not None:
+            self._block_cache.move_to_end(key)
+            return cached
+        if len(content.splitlines()) <= 45:            # same short-file rule as extract_focus_span
+            sliced = block_slicing.BlockSlice(None, block_slicing.detect_language(clean_path), None,
+                                              fallback_reason="short_file")
+        else:
+            sliced = block_slicing.slice_blocks(content, clean_path, q_key,
+                                                structure=self._block_structure(clean_path, content))
+        if sliced.text is None:
+            res = self.extract_focus_span(content, path, query_terms, cap_lines)
+        else:
+            res = (sliced.text, self.tokenizer.count_tokens(sliced.text, clean_path))
+        self._block_cache[key] = (res, sliced)
+        if len(self._block_cache) > self.BLOCK_SPAN_CACHE_SIZE:
+            self._block_cache.popitem(last=False)
+        return res, sliced
 
     def extract_focus_span(
         self,
@@ -401,13 +466,18 @@ class CUDPackOptimizer:
             full_w, full_tok = self.tokenizer.package_file(p, content)
 
             chosen = None
+            span_note = None
 
             # If skeletons are disallowed (full files only)
             if not allow_skel:
                 if full_tok <= rem_budget:
                     chosen = (ContextTier.FULL, full_tok, content, "Full file preservation (skeletons disallowed)")
             else:
-                span_c, _ = self.extractor.extract_focus_span(content, p, q_terms)
+                if getattr(self.config, "focus_span_strategy", "legacy") == "ast_blocks":
+                    (span_c, _), sliced = self.extractor._block_span(content, p, q_terms)
+                    span_note = sliced.note()
+                else:
+                    span_c, _ = self.extractor.extract_focus_span(content, p, q_terms)
                 span_w, span_tok = self.tokenizer.package_file(p, span_c)
                 skel_c, _ = self.extractor.extract_skeleton(content, p, q_terms)
                 skel_w, skel_tok = self.tokenizer.package_file(p, skel_c)
@@ -449,6 +519,8 @@ class CUDPackOptimizer:
 
             if chosen:
                 tier, pkg_tok, rendered, reason = chosen
+                if tier == ContextTier.FOCUS_SPAN and span_note:
+                    reason = f"{reason} [{span_note}]"
                 overhead = self.tokenizer.packaging_overhead(p)
                 selected.append(
                     ScoredFile(

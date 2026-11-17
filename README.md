@@ -42,7 +42,7 @@ RepoNeedle is a research-oriented project: its benchmark results, including wher
 | Persistent index cache | Not implemented | Not implemented |
 | Automatic live filesystem updates | Not implemented | Not implemented |
 | HTTP / SSE MCP transport | Not implemented | Not implemented |
-| AST block slicing of large files | Not implemented | Not implemented |
+| AST block slicing of large files | Not implemented | Not implemented (opt-in on `main`, unreleased: [docs/AST_BLOCK_SLICING.md](docs/AST_BLOCK_SLICING.md)) |
 
 Both versions are published on [PyPI](https://pypi.org/project/reponeedle/), and `pip install reponeedle` installs the latest. Behaviour changes from 1.1.0 and migration steps are listed in [CHANGELOG.md](CHANGELOG.md#migrating-from-11x).
 
@@ -133,6 +133,7 @@ RepoNeedle is self-contained and requires standard Python dependencies (`numpy`,
 | Test and development tools | `pip install -e ".[dev]"` |
 | Optional Tree-sitter extraction for TypeScript/TSX, Go, Rust, Java and C++ (opt-in; on `main`, not in a published release yet; see [docs/TREE_SITTER.md](docs/TREE_SITTER.md)) | `pip install -e ".[treesitter]"` |
 | Optional ingestion of an externally generated SCIP index (`index.scip`) into the function graph (opt-in; on `main`, not in a published release yet; see [docs/SCIP.md](docs/SCIP.md)) | `pip install -e ".[scip]"` |
+| Optional AST block slicing in CUD-Pack: complete functions/methods instead of line windows (opt-in `BudgetConfig(focus_span_strategy="ast_blocks")`; Python needs no extra, TypeScript/TSX, Go, Rust, Java and C++ need `treesitter`; on `main`, not in a published release yet; see [docs/AST_BLOCK_SLICING.md](docs/AST_BLOCK_SLICING.md)) | `pip install -e ".[treesitter]"` |
 
 > [!NOTE]
 > The `>=1.2.0` pin also upgrades an existing 1.1.0 installation. 1.1.0 has no MCP server, `--json` or `--anchors`.
