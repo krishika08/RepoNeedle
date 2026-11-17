@@ -1,0 +1,58 @@
+{
+  "A_modify": {
+    "differences_vs_fresh": [],
+    "old_symbols": [
+      "helper",
+      "other"
+    ]
+  },
+  "B_add": {
+    "differences_vs_fresh": [
+      "doc_order",
+      "semantic.vocabulary_order"
+    ],
+    "doc_order_update_documents": [
+      "app/alpha.py",
+      "app/omega.py",
+      "app/zeta.py",
+      "tests/test_zeta.py",
+      "app/middle.py"
+    ],
+    "doc_order_fresh": [
+      "app/alpha.py",
+      "app/middle.py",
+      "app/omega.py",
+      "app/zeta.py",
+      "tests/test_zeta.py"
+    ],
+    "rankings_equal": true,
+    "same_vocabulary_set": true,
+    "semantic_idf_equal_as_sets": true
+  },
+  "C_remove": {
+    "engine_has_removal_api": false
+  },
+  "D_function_graph_rebuild": {
+    "stale_module_keys_after_rebuild": [
+      "app.zeta",
+      "zeta"
+    ],
+    "stale_package_entries": [
+      "app/zeta.py"
+    ],
+    "edges_to_files_not_in_the_build": [
+      [
+        "app/alpha.py",
+        "app/zeta.py"
+      ],
+      [
+        "tests/test_zeta.py",
+        "app/zeta.py"
+      ]
+    ],
+    "edges_equal_to_fresh_instance": false
+  },
+  "E_hash_randomisation": {
+    "distinct_values_over_3_processes": 3
+  }
+}

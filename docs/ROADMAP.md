@@ -30,7 +30,7 @@ Test coverage is measured, not assumed: on the pre-release 1.2.0 development bra
 ## Not implemented
 | Capability | Status |
 | :--- | :--- |
-| Persistent / on-disk index cache | Not implemented (the index is rebuilt in memory on every start) |
+| Persistent / on-disk index cache | Not implemented (the index is rebuilt in memory on every start; `update_documents()` refits every index). Design complete, implementation not started: [PERSISTENT_INDEXING_DESIGN.md](PERSISTENT_INDEXING_DESIGN.md) |
 | Automatic live filesystem updates / file watching | Not implemented (restart the MCP server to refresh) |
 | HTTP / SSE MCP transport | Not implemented (STDIO only) |
 | AST block slicing (sub-function spans of large files) | Opt-in on `main`, not released ([AST_BLOCK_SLICING.md](AST_BLOCK_SLICING.md)) |
@@ -53,5 +53,9 @@ The current heuristic (repository vocabulary overlap + $Z$-score peakiness + top
 
 ## Phase 3: Agent Scaffolding & Scale
 - [ ] **Aider Adapter**: drop-in alternative to Aider's RepoMap for workflow routing and test discovery.
-- [ ] **Persistent, incremental indexing** (on-disk cache; embedded SQLite/DuckDB backing for monorepos > 100,000 files).
+- **Persistent, incremental indexing** (opt-in on-disk cache for large repositories):
+  - [x] **Design** (Milestone 4A, design only): SQLite (standard library) storage of per-file derived artifacts with no raw source, fingerprints, a single-transaction publish protocol, dependency-scoped invalidation, a security and privacy model, an exact-equivalence acceptance harness and a staged plan. See [PERSISTENT_INDEXING_DESIGN.md](PERSISTENT_INDEXING_DESIGN.md) and the [architecture report](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md).
+  - [ ] Stage 0: prerequisites (function-graph state reset, document removal, stable digests, equivalence harness).
+  - [ ] Stage 1: persistent per-file artifacts with global structures recomputed in full ("persistent", not incremental).
+  - [ ] Stages 2–4: incremental global maintenance (BM25, graphs, then semantic), optional components, CLI/MCP surfaces.
 - [x] **AST block slicing** for monolithic files (opt-in `BudgetConfig(focus_span_strategy="ast_blocks")`; on `main`, not in a published release yet): CUD-Pack focus spans become the smallest complete functions, methods or declarations containing query matches, with relevant imports and enclosing class headers. Python uses `ast`; TypeScript/TSX, Go, Rust, Java and C++ use the optional Tree-sitter extra. Every other case falls back to the unchanged legacy extractor. The default packing is unchanged. In a packing-level comparison on frozen candidate lists, complete blocks cost more tokens per file, so compact mode packed fewer files. No retrieval improvement is claimed. See [AST_BLOCK_SLICING.md](AST_BLOCK_SLICING.md).

@@ -1,0 +1,82 @@
+{
+  "this repository": {
+    "files": 885,
+    "source_bytes": 8087409,
+    "mean_per_file_counts": {
+      "lexical_terms": 339.5,
+      "semantic_features": 3043.7,
+      "abstainer_vocab": 182.8,
+      "functions": 2.6,
+      "call_sites": 27.1
+    },
+    "unique_strings": 167399,
+    "string_table_bytes": 1694119,
+    "mean_encoded_bytes_per_file": {
+      "lexical": {
+        "json_zlib": 1771.8,
+        "dict_coded": 962.4
+      },
+      "semantic": {
+        "json_zlib": 9378.3,
+        "dict_coded": 7934.0
+      },
+      "abstainer": {
+        "json_zlib": 754.4,
+        "dict_coded": 417.8
+      },
+      "function_graph": {
+        "json_zlib": 388.6,
+        "dict_coded": 388.6
+      }
+    },
+    "total_encoded_bytes": {
+      "json_zlib": 10879510,
+      "dict_coded": 8587013,
+      "dict_coded_plus_string_table": 10281132
+    },
+    "projection_100k_files_bytes (linear, estimate)": {
+      "json_zlib": 1229323163,
+      "dict_coded": 970283954
+    }
+  },
+  "synthetic 3000 files": {
+    "files": 3000,
+    "source_bytes": 2694198,
+    "mean_per_file_counts": {
+      "lexical_terms": 40.3,
+      "semantic_features": 266.4,
+      "abstainer_vocab": 28.2,
+      "functions": 12.3,
+      "call_sites": 12.3
+    },
+    "unique_strings": 130622,
+    "string_table_bytes": 1418361,
+    "mean_encoded_bytes_per_file": {
+      "lexical": {
+        "json_zlib": 186.0,
+        "dict_coded": 114.7
+      },
+      "semantic": {
+        "json_zlib": 765.6,
+        "dict_coded": 659.9
+      },
+      "abstainer": {
+        "json_zlib": 129.5,
+        "dict_coded": 73.9
+      },
+      "function_graph": {
+        "json_zlib": 226.4,
+        "dict_coded": 226.4
+      }
+    },
+    "total_encoded_bytes": {
+      "json_zlib": 3922582,
+      "dict_coded": 3224962,
+      "dict_coded_plus_string_table": 4643323
+    },
+    "projection_100k_files_bytes (linear, estimate)": {
+      "json_zlib": 130752733,
+      "dict_coded": 107498733
+    }
+  }
+}
