@@ -1,0 +1,336 @@
+{
+  "environment": {
+    "python": "3.11.9",
+    "sqlite": "3.45.1",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "sqlite_behaviour": {
+    "auto_vacuum_after_first_table (2 = incremental)": 0,
+    "journal_mode_returned": "wal",
+    "synchronous_inside_transaction": "error: Safety level may not be changed inside a transaction",
+    "foreign_keys_set_inside_transaction (read back)": 0,
+    "journal_mode_change_inside_transaction": "error: cannot change out of wal mode from within a transaction",
+    "journal_mode_after_reopen (persistent)": "wal",
+    "synchronous_after_reopen (per connection; 2 = FULL)": 2,
+    "python_default_isolation_pragma_after_insert": "error: Safety level may not be changed inside a transaction"
+  },
+  "this repository (pinned snapshot)": {
+    "snapshot": {
+      "commit": "bac30c82fd17b2b21c4726cbd4d49b1fb729b347",
+      "tree": "8ab01f7a6e3850c8e51e3bb88541563ea521cebe",
+      "files": 890,
+      "source_bytes": 8173201,
+      "file_set_sha256": "b6061cba4f4018608eec2c3e5687073d0784b274cbaefd79e4cc78f8813a4274",
+      "file_set_sorted_sha256": "49a6f02a7e0c84a9584c40bec060b073c7c84ddcf5089481100ad54be8ab485b",
+      "package_code_matches_commit": true
+    },
+    "files": 890,
+    "source_bytes": 8173201,
+    "from_directory_s": 48.302,
+    "semantic_csr_matrix_if_persisted_bytes (not proposed for Stage 1)": 7736930,
+    "6_optional_tree_sitter_scip": {
+      "status": {
+        "tree_sitter": "not installed",
+        "google.protobuf": "not installed"
+      },
+      "bytes": "not measured: the extras are not installed in the measurement environment, and the default build produces no Tree-sitter or SCIP artifacts"
+    },
+    "A_shared_string_table": {
+      "1_encoded_per_file_payload_bytes": {
+        "total": 8733804,
+        "by_kind": {
+          "lexical": 861640,
+          "semantic": 7064759,
+          "abstainer": 371421,
+          "function_graph": 337589,
+          "symbols": 98395
+        }
+      },
+      "2_string_table": {
+        "unique_strings": 168006,
+        "utf8_text_bytes": 1028877,
+        "checksum_bytes": 5376192,
+        "sqlite_bytes_incl_unique_index": 10981376
+      },
+      "3_database_file_bytes_after_checkpoint": 25264128,
+      "3_database_bytes_after_vacuum_into": 24801280,
+      "4_overhead": {
+        "secondary_indexes_bytes": 671744,
+        "everything_else_bytes": 14292929,
+        "note": "file size minus secondary indexes, artifact payloads, string text and global payloads: checksums, keys, manifest and dependency rows, implicit PRIMARY KEY/UNIQUE indexes, page headers and free space"
+      },
+      "5_wal": {
+        "peak_wal_bytes_observed_after_commits": 10345352,
+        "wal_bytes_before_truncate_checkpoint": 10345352,
+        "wal_bytes_after_truncate_checkpoint": 0,
+        "temporary_files": "not measured"
+      },
+      "7_global_state": {
+        "payload_bytes": {
+          "bm25.df": 77896,
+          "bm25.lengths": 2239,
+          "semantic.df": 311534,
+          "semantic.vocabulary": 60743,
+          "semantic.idf": 2815,
+          "repo_graph.edges": 6073,
+          "repo_graph.pagerank": 427,
+          "function_graph.edges": 24789,
+          "abstainer.refcounts": 50258
+        },
+        "payload_total": 536774,
+        "sqlite_bytes": 544768
+      },
+      "sqlite_growth_by_step_bytes": {
+        "empty_schema": 102400,
+        "strings_table": 10981376,
+        "artifacts_table": 11046912,
+        "manifest_and_file_artifacts": 995328,
+        "provides_consumes (approximation)": 1593344,
+        "global_state_table": 544768
+      },
+      "timings_s (indicative, single run)": {
+        "write_all_with_synchronous_full": 3.179,
+        "verify_string_checksums": 1.015,
+        "verify_checksums_and_decode_all_artifacts": 1.205,
+        "string_sweep_collect_live_sids": 1.406
+      },
+      "artifacts_verified": 4450,
+      "ratios_to_source": {
+        "per_file_payload": 1.069,
+        "per_file_payload_plus_string_text": 1.194,
+        "database_file": 3.091
+      },
+      "projection_100k_files_database_bytes (linear, estimate)": 2838666067,
+      "corruption_checks": {
+        "altered_payload_still_decodes": true,
+        "altered_payload_rejected": true,
+        "swapped_payloads_rejected": true,
+        "altered_string_rejected": true,
+        "string_moved_to_another_sid_rejected": true,
+        "altered_global_state_rejected": true
+      }
+    },
+    "B_self_contained": {
+      "1_encoded_per_file_payload_bytes": {
+        "total": 11922510,
+        "by_kind": {
+          "lexical": 1575109,
+          "semantic": 9179083,
+          "abstainer": 732334,
+          "function_graph": 337589,
+          "symbols": 98395
+        }
+      },
+      "2_string_table": {
+        "unique_strings": 0,
+        "utf8_text_bytes": 0,
+        "checksum_bytes": 0,
+        "sqlite_bytes_incl_unique_index": 0
+      },
+      "3_database_file_bytes_after_checkpoint": 18296832,
+      "3_database_bytes_after_vacuum_into": 18120704,
+      "4_overhead": {
+        "secondary_indexes_bytes": 671744,
+        "everything_else_bytes": 4620926,
+        "note": "file size minus secondary indexes, artifact payloads, string text and global payloads: checksums, keys, manifest and dependency rows, implicit PRIMARY KEY/UNIQUE indexes, page headers and free space"
+      },
+      "5_wal": {
+        "peak_wal_bytes_observed_after_commits": 8750912,
+        "wal_bytes_before_truncate_checkpoint": 8750912,
+        "wal_bytes_after_truncate_checkpoint": 0,
+        "temporary_files": "not measured"
+      },
+      "7_global_state": {
+        "payload_bytes": {
+          "bm25.df": 217651,
+          "bm25.lengths": 2239,
+          "semantic.df": 622987,
+          "semantic.vocabulary": 78565,
+          "semantic.idf": 2815,
+          "repo_graph.edges": 6073,
+          "repo_graph.pagerank": 427,
+          "function_graph.edges": 24789,
+          "abstainer.refcounts": 126106
+        },
+        "payload_total": 1081652,
+        "sqlite_bytes": 1089536
+      },
+      "sqlite_growth_by_step_bytes": {
+        "empty_schema": 102400,
+        "strings_table": 0,
+        "artifacts_table": 14516224,
+        "manifest_and_file_artifacts": 995328,
+        "provides_consumes (approximation)": 1593344,
+        "global_state_table": 1089536
+      },
+      "timings_s (indicative, single run)": {
+        "write_all_with_synchronous_full": 0.306,
+        "verify_string_checksums": 0.0,
+        "verify_checksums_and_decode_all_artifacts": 1.612,
+        "string_sweep_collect_live_sids": null
+      },
+      "artifacts_verified": 4450,
+      "ratios_to_source": {
+        "per_file_payload": 1.459,
+        "per_file_payload_plus_string_text": 1.459,
+        "database_file": 2.239
+      },
+      "projection_100k_files_database_bytes (linear, estimate)": 2055823820
+    }
+  },
+  "synthetic 3000 files": {
+    "files": 3000,
+    "source_bytes": 2694198,
+    "from_directory_s": 19.585,
+    "semantic_csr_matrix_if_persisted_bytes (not proposed for Stage 1)": 1233382,
+    "6_optional_tree_sitter_scip": {
+      "status": {
+        "tree_sitter": "not installed",
+        "google.protobuf": "not installed"
+      },
+      "bytes": "not measured: the extras are not installed in the measurement environment, and the default build produces no Tree-sitter or SCIP artifacts"
+    },
+    "A_shared_string_table": {
+      "1_encoded_per_file_payload_bytes": {
+        "total": 3385275,
+        "by_kind": {
+          "lexical": 344049,
+          "semantic": 1979066,
+          "abstainer": 221361,
+          "function_graph": 655911,
+          "symbols": 184888
+        }
+      },
+      "2_string_table": {
+        "unique_strings": 130622,
+        "utf8_text_bytes": 895873,
+        "checksum_bytes": 4179904,
+        "sqlite_bytes_incl_unique_index": 8732672
+      },
+      "3_database_file_bytes_after_checkpoint": 20631552,
+      "3_database_bytes_after_vacuum_into": 20037632,
+      "4_overhead": {
+        "secondary_indexes_bytes": 929792,
+        "everything_else_bytes": 14983306,
+        "note": "file size minus secondary indexes, artifact payloads, string text and global payloads: checksums, keys, manifest and dependency rows, implicit PRIMARY KEY/UNIQUE indexes, page headers and free space"
+      },
+      "5_wal": {
+        "peak_wal_bytes_observed_after_commits": 8330672,
+        "wal_bytes_before_truncate_checkpoint": 8330672,
+        "wal_bytes_after_truncate_checkpoint": 0,
+        "temporary_files": "not measured"
+      },
+      "7_global_state": {
+        "payload_bytes": {
+          "bm25.df": 81114,
+          "bm25.lengths": 219,
+          "semantic.df": 203370,
+          "semantic.vocabulary": 62825,
+          "semantic.idf": 1136,
+          "repo_graph.edges": 5570,
+          "repo_graph.pagerank": 216,
+          "function_graph.edges": 10,
+          "abstainer.refcounts": 82846
+        },
+        "payload_total": 437306,
+        "sqlite_bytes": 442368
+      },
+      "sqlite_growth_by_step_bytes": {
+        "empty_schema": 102400,
+        "strings_table": 8732672,
+        "artifacts_table": 7053312,
+        "manifest_and_file_artifacts": 2232320,
+        "provides_consumes (approximation)": 2068480,
+        "global_state_table": 442368
+      },
+      "timings_s (indicative, single run)": {
+        "write_all_with_synchronous_full": 2.725,
+        "verify_string_checksums": 0.839,
+        "verify_checksums_and_decode_all_artifacts": 1.266,
+        "string_sweep_collect_live_sids": 1.394
+      },
+      "artifacts_verified": 15000,
+      "ratios_to_source": {
+        "per_file_payload": 1.257,
+        "per_file_payload_plus_string_text": 1.589,
+        "database_file": 7.658
+      },
+      "projection_100k_files_database_bytes (linear, estimate)": 687718400,
+      "corruption_checks": {
+        "altered_payload_still_decodes": true,
+        "altered_payload_rejected": true,
+        "swapped_payloads_rejected": true,
+        "altered_string_rejected": true,
+        "string_moved_to_another_sid_rejected": true,
+        "altered_global_state_rejected": true
+      }
+    },
+    "B_self_contained": {
+      "1_encoded_per_file_payload_bytes": {
+        "total": 4156355,
+        "by_kind": {
+          "lexical": 504551,
+          "semantic": 2430304,
+          "abstainer": 380701,
+          "function_graph": 655911,
+          "symbols": 184888
+        }
+      },
+      "2_string_table": {
+        "unique_strings": 0,
+        "utf8_text_bytes": 0,
+        "checksum_bytes": 0,
+        "sqlite_bytes_incl_unique_index": 0
+      },
+      "3_database_file_bytes_after_checkpoint": 13131776,
+      "3_database_bytes_after_vacuum_into": 12779520,
+      "4_overhead": {
+        "secondary_indexes_bytes": 929792,
+        "everything_else_bytes": 7331660,
+        "note": "file size minus secondary indexes, artifact payloads, string text and global payloads: checksums, keys, manifest and dependency rows, implicit PRIMARY KEY/UNIQUE indexes, page headers and free space"
+      },
+      "5_wal": {
+        "peak_wal_bytes_observed_after_commits": 5516712,
+        "wal_bytes_before_truncate_checkpoint": 5516712,
+        "wal_bytes_after_truncate_checkpoint": 0,
+        "temporary_files": "not measured"
+      },
+      "7_global_state": {
+        "payload_bytes": {
+          "bm25.df": 146294,
+          "bm25.lengths": 219,
+          "semantic.df": 346683,
+          "semantic.vocabulary": 63273,
+          "semantic.idf": 1136,
+          "repo_graph.edges": 5570,
+          "repo_graph.pagerank": 216,
+          "function_graph.edges": 10,
+          "abstainer.refcounts": 150568
+        },
+        "payload_total": 713969,
+        "sqlite_bytes": 720896
+      },
+      "sqlite_growth_by_step_bytes": {
+        "empty_schema": 102400,
+        "strings_table": 0,
+        "artifacts_table": 8011776,
+        "manifest_and_file_artifacts": 2232320,
+        "provides_consumes (approximation)": 2064384,
+        "global_state_table": 720896
+      },
+      "timings_s (indicative, single run)": {
+        "write_all_with_synchronous_full": 1.017,
+        "verify_string_checksums": 0.001,
+        "verify_checksums_and_decode_all_artifacts": 1.644,
+        "string_sweep_collect_live_sids": null
+      },
+      "artifacts_verified": 15000,
+      "ratios_to_source": {
+        "per_file_payload": 1.543,
+        "per_file_payload_plus_string_text": 1.543,
+        "database_file": 4.874
+      },
+      "projection_100k_files_database_bytes (linear, estimate)": 437725866
+    }
+  }
+}

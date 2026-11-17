@@ -11,8 +11,12 @@ encodes them the way the design proposes:
 * "dict-coded": strings replaced by integer ids from a shared per-index string table (counted once), with the
   per-file payload as varint-packed (id, count) pairs, zlib level 6.
 
-Figures are bytes of encoded payload (no SQLite page overhead); the 100,000-file projection scales the per-file mean
-linearly and is an estimate, not a measurement.
+The repository workload is a pinned snapshot (``--snapshot``, default HEAD) exported by snapshot.py to a temporary
+directory, so the scripts' own files and outputs are never measured.
+
+Figures are bytes of encoded payload ONLY: no SQLite pages, B-tree indexes, WAL or global state. Those are measured
+by sqlite_prototype.py. The 100,000-file projection scales the per-file mean linearly and is an estimate, not a
+measurement.
 """
 
 import argparse
@@ -28,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from profile_current import write_synthetic_repo  # noqa: E402
 from reponeedle.engine import RepoNeedleEngine  # noqa: E402
+from snapshot import Snapshot, check_out_path, package_matches_commit  # noqa: E402
 
 
 def varint(n: int) -> bytes:
@@ -40,7 +45,7 @@ def varint(n: int) -> bytes:
             return bytes(out)
 
 
-def measure(repo: str):
+def measure(repo: str, snap=None):
     engine = RepoNeedleEngine.from_directory(repo, max_files=10 ** 7)
     lex = engine.lexical_index._doc_term_cache
     sem = engine.semantic_index._doc_feature_cache
@@ -86,12 +91,18 @@ def measure(repo: str):
     n = len(engine.docs)
     per_file = {k: {enc: round(statistics.mean(v), 1) for enc, v in d.items()} for k, d in sizes.items()}
     totals = {enc: sum(sum(d[enc]) for d in sizes.values()) for enc in ("json_zlib", "dict_coded")}
+    out = {"snapshot": {**snap.describe(engine.docs), "package_code_matches_commit":
+                        package_matches_commit(snap.commit)}} if snap else {}
     return {
+        **out,
         "files": n, "source_bytes": sum(len(d.content.encode()) for d in engine.docs),
         "mean_per_file_counts": {k: round(statistics.mean(v), 1) for k, v in rows.items()},
         "unique_strings": len(strings), "string_table_bytes": string_table,
         "mean_encoded_bytes_per_file": per_file,
         "total_encoded_bytes": {**totals, "dict_coded_plus_string_table": totals["dict_coded"] + string_table},
+        "payload_to_source_ratio": {
+            "dict_coded_plus_string_table": round((totals["dict_coded"] + string_table)
+                                                  / sum(len(d.content.encode()) for d in engine.docs), 3)},
         "projection_100k_files_bytes (linear, estimate)": {
             enc: int(totals[enc] / n * 100_000) for enc in ("json_zlib", "dict_coded")},
     }
@@ -101,9 +112,12 @@ def main():
     import shutil
     import tempfile
     ap = argparse.ArgumentParser()
+    ap.add_argument("--snapshot", default="HEAD", help="commit of this repository to measure")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
-    result = {"this repository": measure(str(ROOT))}
+    with Snapshot(args.snapshot) as snap:
+        check_out_path(args.out, snap.path)
+        result = {"this repository (pinned snapshot)": measure(str(snap.path), snap)}
     tmp = Path(tempfile.mkdtemp(prefix="rn_sizes_"))
     try:
         write_synthetic_repo(tmp, 3000)

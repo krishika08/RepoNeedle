@@ -6,61 +6,70 @@
     "repeats": 3
   },
   "workloads": {
-    "this repository": {
-      "files": 884,
-      "bytes": 8080900,
+    "this repository (pinned snapshot)": {
+      "files": 890,
+      "bytes": 8173201,
       "seconds": {
-        "lexical.fit (BM25)": 2.529,
-        "lexical.fit (BM25) [warm refit: global work only]": 0.411,
-        "semantic.fit (subword TF-IDF)": 12.613,
-        "semantic.fit (subword TF-IDF) [warm refit: global work only]": 4.346,
-        "repo_graph.fit (imports, tests, PageRank)": 2.443,
-        "repo_graph.fit (imports, tests, PageRank) [warm refit: global work only]": 2.353,
-        "function_graph.build_graph": 4.401,
-        "function_graph.build_graph [warm refit: global work only]": 0.779,
-        "abstainer.fit": 1.353,
-        "abstainer.fit [warm refit: global work only]": 0.009,
-        "scan + read + per-file symbol extraction (from_directory, before fit)": 1.46,
-        "update_documents (one modified file, warm per-document caches)": 8.205,
-        "from_directory total (cold)": 21.567
+        "lexical.fit (BM25)": 4.407,
+        "lexical.fit (BM25) [warm refit: global work only]": 0.575,
+        "semantic.fit (subword TF-IDF)": 19.182,
+        "semantic.fit (subword TF-IDF) [warm refit: global work only]": 6.286,
+        "repo_graph.fit (imports, tests, PageRank)": 4.451,
+        "repo_graph.fit (imports, tests, PageRank) [warm refit: global work only]": 3.694,
+        "function_graph.build_graph": 5.352,
+        "function_graph.build_graph [warm refit: global work only]": 1.12,
+        "abstainer.fit": 2.216,
+        "abstainer.fit [warm refit: global work only]": 0.018,
+        "scan + read + per-file symbol extraction (from_directory, before fit)": 3.896,
+        "update_documents (one modified file, warm per-document caches)": 11.173,
+        "from_directory total (cold)": 31.627
+      },
+      "snapshot": {
+        "commit": "bac30c82fd17b2b21c4726cbd4d49b1fb729b347",
+        "tree": "8ab01f7a6e3850c8e51e3bb88541563ea521cebe",
+        "files": 890,
+        "source_bytes": 8173201,
+        "file_set_sha256": "b6061cba4f4018608eec2c3e5687073d0784b274cbaefd79e4cc78f8813a4274",
+        "file_set_sorted_sha256": "49a6f02a7e0c84a9584c40bec060b073c7c84ddcf5089481100ad54be8ab485b",
+        "package_code_matches_commit": true
       }
     },
     "synthetic 1000 files": {
       "files": 1000,
       "bytes": 887119,
       "seconds": {
-        "lexical.fit (BM25)": 0.627,
-        "lexical.fit (BM25) [warm refit: global work only]": 0.051,
-        "semantic.fit (subword TF-IDF)": 2.08,
-        "semantic.fit (subword TF-IDF) [warm refit: global work only]": 0.521,
-        "repo_graph.fit (imports, tests, PageRank)": 0.199,
-        "repo_graph.fit (imports, tests, PageRank) [warm refit: global work only]": 0.205,
-        "function_graph.build_graph": 0.668,
-        "function_graph.build_graph [warm refit: global work only]": 0.216,
-        "abstainer.fit": 0.743,
-        "abstainer.fit [warm refit: global work only]": 0.006,
-        "scan + read + per-file symbol extraction (from_directory, before fit)": 0.718,
-        "update_documents (one modified file, warm per-document caches)": 0.959,
-        "from_directory total (cold)": 4.795
+        "lexical.fit (BM25)": 0.906,
+        "lexical.fit (BM25) [warm refit: global work only]": 0.081,
+        "semantic.fit (subword TF-IDF)": 3.107,
+        "semantic.fit (subword TF-IDF) [warm refit: global work only]": 0.597,
+        "repo_graph.fit (imports, tests, PageRank)": 0.168,
+        "repo_graph.fit (imports, tests, PageRank) [warm refit: global work only]": 0.221,
+        "function_graph.build_graph": 0.397,
+        "function_graph.build_graph [warm refit: global work only]": 0.167,
+        "abstainer.fit": 0.605,
+        "abstainer.fit [warm refit: global work only]": 0.005,
+        "scan + read + per-file symbol extraction (from_directory, before fit)": 1.176,
+        "update_documents (one modified file, warm per-document caches)": 0.842,
+        "from_directory total (cold)": 5.117
       }
     },
     "synthetic 3000 files": {
       "files": 3000,
       "bytes": 2694198,
       "seconds": {
-        "lexical.fit (BM25)": 1.997,
-        "lexical.fit (BM25) [warm refit: global work only]": 0.182,
-        "semantic.fit (subword TF-IDF)": 6.654,
-        "semantic.fit (subword TF-IDF) [warm refit: global work only]": 1.318,
-        "repo_graph.fit (imports, tests, PageRank)": 0.483,
-        "repo_graph.fit (imports, tests, PageRank) [warm refit: global work only]": 0.543,
-        "function_graph.build_graph": 3.345,
-        "function_graph.build_graph [warm refit: global work only]": 1.778,
-        "abstainer.fit": 2.299,
-        "abstainer.fit [warm refit: global work only]": 0.02,
-        "scan + read + per-file symbol extraction (from_directory, before fit)": 2.328,
-        "update_documents (one modified file, warm per-document caches)": 3.983,
-        "from_directory total (cold)": 17.024
+        "lexical.fit (BM25)": 2.537,
+        "lexical.fit (BM25) [warm refit: global work only]": 0.301,
+        "semantic.fit (subword TF-IDF)": 6.55,
+        "semantic.fit (subword TF-IDF) [warm refit: global work only]": 2.071,
+        "repo_graph.fit (imports, tests, PageRank)": 0.75,
+        "repo_graph.fit (imports, tests, PageRank) [warm refit: global work only]": 0.338,
+        "function_graph.build_graph": 2.113,
+        "function_graph.build_graph [warm refit: global work only]": 1.181,
+        "abstainer.fit": 1.273,
+        "abstainer.fit [warm refit: global work only]": 0.012,
+        "scan + read + per-file symbol extraction (from_directory, before fit)": 1.607,
+        "update_documents (one modified file, warm per-document caches)": 2.228,
+        "from_directory total (cold)": 13.992
       }
     }
   }
