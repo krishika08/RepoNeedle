@@ -1,0 +1,97 @@
+{
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "rounds": 3,
+    "baseline_commit": "06d4fe6"
+  },
+  "workloads": {
+    "this repository (pinned snapshot)": {
+      "snapshot": "06d4fe6ac4b786ec800ff90b9a60f0ee2a353bb0",
+      "best_seconds": {
+        "baseline": {
+          "files": 894,
+          "lexical.cold_fit": 4.3522,
+          "lexical.warm_refit": 0.487,
+          "semantic.cold_fit": 12.5873,
+          "semantic.warm_refit": 5.0696,
+          "abstainer.cold_fit": 1.1567,
+          "abstainer.warm_refit": 0.0136,
+          "function_graph.cold_build": 2.745,
+          "function_graph.3_warm_rebuilds": 1.7908,
+          "engine.update_documents_one_file": 9.3339
+        },
+        "stage0": {
+          "files": 894,
+          "lexical.cold_fit": 3.3921,
+          "lexical.warm_refit": 0.3825,
+          "semantic.cold_fit": 15.0603,
+          "semantic.warm_refit": 5.1741,
+          "abstainer.cold_fit": 1.772,
+          "abstainer.warm_refit": 0.0472,
+          "function_graph.cold_build": 4.6865,
+          "function_graph.3_warm_rebuilds": 2.7311,
+          "engine.update_documents_one_file": 5.777,
+          "signatures.bm25_all_docs": 0.0153,
+          "signatures.old_style_hash_all_docs": 0.004,
+          "engine.remove_documents_one_file": 5.4343,
+          "engine.remove_documents_10_percent": 3.5205
+        }
+      },
+      "stage0_over_baseline": {
+        "lexical.cold_fit": 0.779,
+        "lexical.warm_refit": 0.785,
+        "semantic.cold_fit": 1.196,
+        "semantic.warm_refit": 1.021,
+        "abstainer.cold_fit": 1.532,
+        "abstainer.warm_refit": 3.465,
+        "function_graph.cold_build": 1.707,
+        "function_graph.3_warm_rebuilds": 1.525,
+        "engine.update_documents_one_file": 0.619
+      }
+    },
+    "synthetic 3000 files": {
+      "best_seconds": {
+        "baseline": {
+          "files": 3000,
+          "lexical.cold_fit": 2.1003,
+          "lexical.warm_refit": 0.1982,
+          "semantic.cold_fit": 6.8596,
+          "semantic.warm_refit": 1.4385,
+          "abstainer.cold_fit": 2.3775,
+          "abstainer.warm_refit": 0.0187,
+          "function_graph.cold_build": 3.5546,
+          "function_graph.3_warm_rebuilds": 6.2807,
+          "engine.update_documents_one_file": 4.2801
+        },
+        "stage0": {
+          "files": 3000,
+          "lexical.cold_fit": 2.1523,
+          "lexical.warm_refit": 0.2531,
+          "semantic.cold_fit": 6.7615,
+          "semantic.warm_refit": 1.4878,
+          "abstainer.cold_fit": 2.4583,
+          "abstainer.warm_refit": 0.0623,
+          "function_graph.cold_build": 3.5609,
+          "function_graph.3_warm_rebuilds": 6.2246,
+          "engine.update_documents_one_file": 4.4776,
+          "signatures.bm25_all_docs": 0.0595,
+          "signatures.old_style_hash_all_docs": 0.0053,
+          "engine.remove_documents_one_file": 4.5047,
+          "engine.remove_documents_10_percent": 4.0394
+        }
+      },
+      "stage0_over_baseline": {
+        "lexical.cold_fit": 1.025,
+        "lexical.warm_refit": 1.277,
+        "semantic.cold_fit": 0.986,
+        "semantic.warm_refit": 1.034,
+        "abstainer.cold_fit": 1.034,
+        "abstainer.warm_refit": 3.337,
+        "function_graph.cold_build": 1.002,
+        "function_graph.3_warm_rebuilds": 0.991,
+        "engine.update_documents_one_file": 1.046
+      }
+    }
+  }
+}
