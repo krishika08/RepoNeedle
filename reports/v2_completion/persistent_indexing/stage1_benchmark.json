@@ -1,0 +1,892 @@
+{
+  "environment": {
+    "python": "3.11.9",
+    "sqlite": "3.45.1",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "cpus": 18,
+    "memory_limit_gb": 12.0
+  },
+  "profile": "realistic",
+  "runs": {
+    "realistic 1000 files": {
+      "workload": {
+        "files": 1000,
+        "source_bytes": 9236938,
+        "mean": 9236,
+        "p10": 2471,
+        "p50": 6612,
+        "p90": 18778,
+        "p99": 50753,
+        "max": 73746,
+        "generation_seconds": 3.4
+      },
+      "phases": {
+        "uncached": {
+          "seconds_to_ready_engine": 34.459,
+          "files": 1000,
+          "peak_wal_bytes": 0,
+          "peak_rss_bytes": 877768704
+        },
+        "cold_cached": {
+          "seconds_to_ready_engine": 40.716,
+          "files": 1000,
+          "peak_wal_bytes": 12257032,
+          "peak_rss_bytes": 879214592,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 1,
+            "files_reused": 0,
+            "files_extracted": 1000,
+            "artifacts_written": 5000,
+            "artifacts_reused": 0,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 3.872,
+              "scan_ms": 2660.246,
+              "of_which_hashing_ms": 18.438,
+              "seed_ms": 0.031,
+              "fit_ms": 34453.308,
+              "persist_ms": 3567.497,
+              "write_artifacts_ms": 366.893,
+              "publish_ms": 72.823,
+              "gc_ms": 21.357,
+              "maintenance_ms": 12.938,
+              "total_ms": 40684.954
+            }
+          }
+        },
+        "warm_restart": {
+          "seconds_to_ready_engine": 16.944,
+          "files": 1000,
+          "peak_wal_bytes": 1009432,
+          "peak_rss_bytes": 958107648,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 2,
+            "files_reused": 1000,
+            "files_extracted": 0,
+            "artifacts_written": 0,
+            "artifacts_reused": 5000,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 3016.978,
+              "scan_ms": 890.923,
+              "of_which_hashing_ms": 16.129,
+              "seed_ms": 239.02,
+              "fit_ms": 12603.218,
+              "persist_ms": 173.987,
+              "write_artifacts_ms": 0.038,
+              "publish_ms": 87.876,
+              "gc_ms": 21.059,
+              "maintenance_ms": 7.206,
+              "total_ms": 16924.126
+            }
+          }
+        },
+        "restart_after_1pct_modified": {
+          "seconds_to_ready_engine": 17.43,
+          "files": 1000,
+          "peak_wal_bytes": 1499712,
+          "peak_rss_bytes": 962179072,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 3,
+            "files_reused": 990,
+            "files_extracted": 10,
+            "artifacts_written": 50,
+            "artifacts_reused": 4950,
+            "artifacts_collected": 50,
+            "timings_ms": {
+              "load_ms": 2974.048,
+              "scan_ms": 964.869,
+              "of_which_hashing_ms": 15.489,
+              "seed_ms": 134.315,
+              "fit_ms": 13113.181,
+              "persist_ms": 225.058,
+              "write_artifacts_ms": 8.299,
+              "publish_ms": 92.172,
+              "gc_ms": 19.402,
+              "maintenance_ms": 12.307,
+              "total_ms": 17411.471
+            }
+          }
+        }
+      },
+      "database_after_cold": {
+        "database_file_bytes": 24719360,
+        "page_size": 4096,
+        "page_count": 6035,
+        "freelist_pages": 0,
+        "artifacts": {
+          "abstainer": {
+            "rows": 1000,
+            "payload_bytes": 1122948
+          },
+          "doc_meta": {
+            "rows": 1000,
+            "payload_bytes": 387095
+          },
+          "function_graph": {
+            "rows": 1000,
+            "payload_bytes": 1987607
+          },
+          "lexical": {
+            "rows": 1000,
+            "payload_bytes": 2481697
+          },
+          "semantic": {
+            "rows": 1000,
+            "payload_bytes": 13954945
+          }
+        },
+        "manifest_rows": 1000,
+        "file_artifacts_rows": 5000,
+        "artifact_metadata_bytes": 829915,
+        "wal_bytes_after": 0
+      },
+      "database_after_modification": {
+        "database_file_bytes": 24997888,
+        "page_size": 4096,
+        "page_count": 6103,
+        "freelist_pages": 65,
+        "artifacts": {
+          "abstainer": {
+            "rows": 1000,
+            "payload_bytes": 1122948
+          },
+          "doc_meta": {
+            "rows": 1000,
+            "payload_bytes": 387094
+          },
+          "function_graph": {
+            "rows": 1000,
+            "payload_bytes": 1987607
+          },
+          "lexical": {
+            "rows": 1000,
+            "payload_bytes": 2481730
+          },
+          "semantic": {
+            "rows": 1000,
+            "payload_bytes": 13955029
+          }
+        },
+        "manifest_rows": 1000,
+        "file_artifacts_rows": 5000,
+        "artifact_metadata_bytes": 829915,
+        "wal_bytes_after": 0
+      },
+      "warm_restart_speedup_vs_uncached": 2.034
+    },
+    "realistic 2500 files": {
+      "workload": {
+        "files": 2500,
+        "source_bytes": 22679167,
+        "mean": 9071,
+        "p10": 2424,
+        "p50": 6798,
+        "p90": 18053,
+        "p99": 42175,
+        "max": 87670,
+        "generation_seconds": 9.4
+      },
+      "phases": {
+        "uncached": {
+          "seconds_to_ready_engine": 140.588,
+          "files": 2500,
+          "peak_wal_bytes": 0,
+          "peak_rss_bytes": 2045943808
+        },
+        "cold_cached": {
+          "seconds_to_ready_engine": 155.167,
+          "files": 2500,
+          "peak_wal_bytes": 12545432,
+          "peak_rss_bytes": 2049556480,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 1,
+            "files_reused": 0,
+            "files_extracted": 2500,
+            "artifacts_written": 12500,
+            "artifacts_reused": 0,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 6.965,
+              "scan_ms": 5607.572,
+              "of_which_hashing_ms": 38.671,
+              "seed_ms": 0.031,
+              "fit_ms": 138536.265,
+              "persist_ms": 10994.604,
+              "write_artifacts_ms": 1076.051,
+              "publish_ms": 246.249,
+              "gc_ms": 60.871,
+              "maintenance_ms": 16.446,
+              "total_ms": 155145.437
+            }
+          }
+        },
+        "warm_restart": {
+          "seconds_to_ready_engine": 84.877,
+          "files": 2500,
+          "peak_wal_bytes": 2447312,
+          "peak_rss_bytes": 2227404800,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 2,
+            "files_reused": 2500,
+            "files_extracted": 0,
+            "artifacts_written": 0,
+            "artifacts_reused": 12500,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 7516.172,
+              "scan_ms": 3088.287,
+              "of_which_hashing_ms": 59.176,
+              "seed_ms": 488.894,
+              "fit_ms": 73146.486,
+              "persist_ms": 612.416,
+              "write_artifacts_ms": 0.064,
+              "publish_ms": 450.467,
+              "gc_ms": 59.839,
+              "maintenance_ms": 11.365,
+              "total_ms": 84852.255
+            }
+          }
+        },
+        "restart_after_1pct_modified": {
+          "seconds_to_ready_engine": 80.646,
+          "files": 2500,
+          "peak_wal_bytes": 4935792,
+          "peak_rss_bytes": 2241486848,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 3,
+            "files_reused": 2475,
+            "files_extracted": 25,
+            "artifacts_written": 125,
+            "artifacts_reused": 12375,
+            "artifacts_collected": 125,
+            "timings_ms": {
+              "load_ms": 7165.829,
+              "scan_ms": 2890.837,
+              "of_which_hashing_ms": 52.454,
+              "seed_ms": 458.531,
+              "fit_ms": 68984.952,
+              "persist_ms": 1127.781,
+              "write_artifacts_ms": 16.151,
+              "publish_ms": 382.394,
+              "gc_ms": 106.419,
+              "maintenance_ms": 3.61,
+              "total_ms": 80627.93
+            }
+          }
+        }
+      },
+      "database_after_cold": {
+        "database_file_bytes": 61906944,
+        "page_size": 4096,
+        "page_count": 15114,
+        "freelist_pages": 0,
+        "artifacts": {
+          "abstainer": {
+            "rows": 2500,
+            "payload_bytes": 2810832
+          },
+          "doc_meta": {
+            "rows": 2500,
+            "payload_bytes": 964663
+          },
+          "function_graph": {
+            "rows": 2500,
+            "payload_bytes": 4878639
+          },
+          "lexical": {
+            "rows": 2500,
+            "payload_bytes": 6155196
+          },
+          "semantic": {
+            "rows": 2500,
+            "payload_bytes": 35066553
+          }
+        },
+        "manifest_rows": 2500,
+        "file_artifacts_rows": 12500,
+        "artifact_metadata_bytes": 2085410,
+        "wal_bytes_after": 0
+      },
+      "database_after_modification": {
+        "database_file_bytes": 62537728,
+        "page_size": 4096,
+        "page_count": 15268,
+        "freelist_pages": 150,
+        "artifacts": {
+          "abstainer": {
+            "rows": 2500,
+            "payload_bytes": 2810838
+          },
+          "doc_meta": {
+            "rows": 2500,
+            "payload_bytes": 964662
+          },
+          "function_graph": {
+            "rows": 2500,
+            "payload_bytes": 4878639
+          },
+          "lexical": {
+            "rows": 2500,
+            "payload_bytes": 6155293
+          },
+          "semantic": {
+            "rows": 2500,
+            "payload_bytes": 35066795
+          }
+        },
+        "manifest_rows": 2500,
+        "file_artifacts_rows": 12500,
+        "artifact_metadata_bytes": 2085410,
+        "wal_bytes_after": 0
+      },
+      "warm_restart_speedup_vs_uncached": 1.656
+    },
+    "realistic 10000 files": {
+      "workload": {
+        "files": 10000,
+        "source_bytes": 89405607,
+        "mean": 8940,
+        "p10": 2466,
+        "p50": 6615,
+        "p90": 17844,
+        "p99": 41173,
+        "max": 141016,
+        "generation_seconds": 38.8
+      },
+      "phases": {
+        "uncached": {
+          "seconds_to_ready_engine": 2607.329,
+          "files": 10000,
+          "peak_wal_bytes": 0,
+          "peak_rss_bytes": 6312062976
+        },
+        "cold_cached": {
+          "seconds_to_ready_engine": 2405.212,
+          "files": 10000,
+          "peak_wal_bytes": 14255232,
+          "peak_rss_bytes": 6053736448,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 1,
+            "files_reused": 0,
+            "files_extracted": 10000,
+            "artifacts_written": 50000,
+            "artifacts_reused": 0,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 6.292,
+              "scan_ms": 21028.839,
+              "of_which_hashing_ms": 134.116,
+              "seed_ms": 0.022,
+              "fit_ms": 2320433.647,
+              "persist_ms": 63660.583,
+              "write_artifacts_ms": 8611.333,
+              "publish_ms": 3290.798,
+              "gc_ms": 785.787,
+              "maintenance_ms": 4.136,
+              "total_ms": 2405129.383
+            }
+          }
+        },
+        "warm_restart": {
+          "seconds_to_ready_engine": 2825.188,
+          "files": 10000,
+          "peak_wal_bytes": 9698512,
+          "peak_rss_bytes": 6118551552,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 2,
+            "files_reused": 10000,
+            "files_extracted": 0,
+            "artifacts_written": 0,
+            "artifacts_reused": 50000,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 43147.149,
+              "scan_ms": 14834.647,
+              "of_which_hashing_ms": 206.223,
+              "seed_ms": 1984.972,
+              "fit_ms": 2745763.942,
+              "persist_ms": 15421.105,
+              "write_artifacts_ms": 0.115,
+              "publish_ms": 4979.82,
+              "gc_ms": 9749.101,
+              "maintenance_ms": 5.513,
+              "total_ms": 2821151.815
+            }
+          }
+        },
+        "restart_after_1pct_modified": {
+          "seconds_to_ready_engine": 4098.723,
+          "files": 10000,
+          "peak_wal_bytes": 9714992,
+          "peak_rss_bytes": 6393004032,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 3,
+            "files_reused": 9900,
+            "files_extracted": 100,
+            "artifacts_written": 500,
+            "artifacts_reused": 49500,
+            "artifacts_collected": 500,
+            "timings_ms": {
+              "load_ms": 64372.833,
+              "scan_ms": 18023.4,
+              "of_which_hashing_ms": 263.524,
+              "seed_ms": 2665.111,
+              "fit_ms": 3991189.324,
+              "persist_ms": 16233.019,
+              "write_artifacts_ms": 455.611,
+              "publish_ms": 7092.478,
+              "gc_ms": 7365.225,
+              "maintenance_ms": 10.619,
+              "total_ms": 4092483.687
+            }
+          }
+        }
+      },
+      "database_after_cold": {
+        "database_file_bytes": 244887552,
+        "page_size": 4096,
+        "page_count": 59787,
+        "freelist_pages": 0,
+        "artifacts": {
+          "abstainer": {
+            "rows": 10000,
+            "payload_bytes": 11180188
+          },
+          "doc_meta": {
+            "rows": 10000,
+            "payload_bytes": 3832444
+          },
+          "function_graph": {
+            "rows": 10000,
+            "payload_bytes": 19159594
+          },
+          "lexical": {
+            "rows": 10000,
+            "payload_bytes": 24163133
+          },
+          "semantic": {
+            "rows": 10000,
+            "payload_bytes": 138905707
+          }
+        },
+        "manifest_rows": 10000,
+        "file_artifacts_rows": 50000,
+        "artifact_metadata_bytes": 8368580,
+        "wal_bytes_after": 0
+      },
+      "database_after_modification": {
+        "database_file_bytes": 247230464,
+        "page_size": 4096,
+        "page_count": 60359,
+        "freelist_pages": 537,
+        "artifacts": {
+          "abstainer": {
+            "rows": 10000,
+            "payload_bytes": 11180224
+          },
+          "doc_meta": {
+            "rows": 10000,
+            "payload_bytes": 3832447
+          },
+          "function_graph": {
+            "rows": 10000,
+            "payload_bytes": 19159594
+          },
+          "lexical": {
+            "rows": 10000,
+            "payload_bytes": 24163459
+          },
+          "semantic": {
+            "rows": 10000,
+            "payload_bytes": 138906832
+          }
+        },
+        "manifest_rows": 10000,
+        "file_artifacts_rows": 50000,
+        "artifact_metadata_bytes": 8368580,
+        "wal_bytes_after": 0
+      },
+      "warm_restart_speedup_vs_uncached": 0.923
+    },
+    "reduced 10000 files": {
+      "workload": {
+        "files": 10000,
+        "source_bytes": 15464202,
+        "mean": 1546,
+        "p10": 443,
+        "p50": 1140,
+        "p90": 2984,
+        "p99": 7340,
+        "max": 23922,
+        "generation_seconds": 15.4
+      },
+      "phases": {
+        "uncached": {
+          "seconds_to_ready_engine": 187.489,
+          "files": 10000,
+          "peak_wal_bytes": 0,
+          "peak_rss_bytes": 2946682880
+        },
+        "cold_cached": {
+          "seconds_to_ready_engine": 218.624,
+          "files": 10000,
+          "peak_wal_bytes": 9677912,
+          "peak_rss_bytes": 2954960896,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 1,
+            "files_reused": 0,
+            "files_extracted": 10000,
+            "artifacts_written": 50000,
+            "artifacts_reused": 0,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 2.592,
+              "scan_ms": 20935.989,
+              "of_which_hashing_ms": 151.938,
+              "seed_ms": 0.046,
+              "fit_ms": 162710.05,
+              "persist_ms": 34949.511,
+              "write_artifacts_ms": 4782.419,
+              "publish_ms": 2998.23,
+              "gc_ms": 587.035,
+              "maintenance_ms": 2.995,
+              "total_ms": 218598.188
+            }
+          }
+        },
+        "warm_restart": {
+          "seconds_to_ready_engine": 142.245,
+          "files": 10000,
+          "peak_wal_bytes": 9690272,
+          "peak_rss_bytes": 3203756032,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 2,
+            "files_reused": 10000,
+            "files_extracted": 0,
+            "artifacts_written": 0,
+            "artifacts_reused": 50000,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 21211.849,
+              "scan_ms": 26367.997,
+              "of_which_hashing_ms": 416.222,
+              "seed_ms": 2404.157,
+              "fit_ms": 82472.659,
+              "persist_ms": 9699.497,
+              "write_artifacts_ms": 0.157,
+              "publish_ms": 6231.222,
+              "gc_ms": 905.489,
+              "maintenance_ms": 7.214,
+              "total_ms": 142156.159
+            }
+          }
+        },
+        "restart_after_1pct_modified": {
+          "seconds_to_ready_engine": 117.789,
+          "files": 10000,
+          "peak_wal_bytes": 12508352,
+          "peak_rss_bytes": 3210473472,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 3,
+            "files_reused": 9900,
+            "files_extracted": 100,
+            "artifacts_written": 500,
+            "artifacts_reused": 49500,
+            "artifacts_collected": 500,
+            "timings_ms": {
+              "load_ms": 21028.806,
+              "scan_ms": 11332.432,
+              "of_which_hashing_ms": 155.327,
+              "seed_ms": 2442.462,
+              "fit_ms": 75755.042,
+              "persist_ms": 7132.453,
+              "write_artifacts_ms": 88.707,
+              "publish_ms": 4262.739,
+              "gc_ms": 703.841,
+              "maintenance_ms": 150.134,
+              "total_ms": 117691.195
+            }
+          }
+        }
+      },
+      "database_after_cold": {
+        "database_file_bytes": 103571456,
+        "page_size": 4096,
+        "page_count": 25286,
+        "freelist_pages": 0,
+        "artifacts": {
+          "abstainer": {
+            "rows": 10000,
+            "payload_bytes": 5255178
+          },
+          "doc_meta": {
+            "rows": 10000,
+            "payload_bytes": 1614244
+          },
+          "function_graph": {
+            "rows": 10000,
+            "payload_bytes": 4182671
+          },
+          "lexical": {
+            "rows": 10000,
+            "payload_bytes": 6759064
+          },
+          "semantic": {
+            "rows": 10000,
+            "payload_bytes": 50031924
+          }
+        },
+        "manifest_rows": 10000,
+        "file_artifacts_rows": 50000,
+        "artifact_metadata_bytes": 8369030,
+        "wal_bytes_after": 0
+      },
+      "database_after_modification": {
+        "database_file_bytes": 104472576,
+        "page_size": 4096,
+        "page_count": 25506,
+        "freelist_pages": 189,
+        "artifacts": {
+          "abstainer": {
+            "rows": 10000,
+            "payload_bytes": 5255411
+          },
+          "doc_meta": {
+            "rows": 10000,
+            "payload_bytes": 1614248
+          },
+          "function_graph": {
+            "rows": 10000,
+            "payload_bytes": 4182671
+          },
+          "lexical": {
+            "rows": 10000,
+            "payload_bytes": 6759390
+          },
+          "semantic": {
+            "rows": 10000,
+            "payload_bytes": 50034061
+          }
+        },
+        "manifest_rows": 10000,
+        "file_artifacts_rows": 50000,
+        "artifact_metadata_bytes": 8369030,
+        "wal_bytes_after": 0
+      },
+      "warm_restart_speedup_vs_uncached": 1.318
+    },
+    "reduced 30000 files": {
+      "workload": {
+        "files": 30000,
+        "source_bytes": 46158970,
+        "mean": 1538,
+        "p10": 445,
+        "p50": 1140,
+        "p90": 3002,
+        "p99": 7050,
+        "max": 33463,
+        "generation_seconds": 58.7
+      },
+      "phases": {
+        "uncached": {
+          "seconds_to_ready_engine": 1154.494,
+          "files": 30000,
+          "peak_wal_bytes": 0,
+          "peak_rss_bytes": 6679687168
+        },
+        "cold_cached": {
+          "seconds_to_ready_engine": 1581.069,
+          "files": 30000,
+          "peak_wal_bytes": 29276752,
+          "peak_rss_bytes": 6858002432,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 1,
+            "files_reused": 0,
+            "files_extracted": 30000,
+            "artifacts_written": 150000,
+            "artifacts_reused": 0,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 4.229,
+              "scan_ms": 66151.54,
+              "of_which_hashing_ms": 499.987,
+              "seed_ms": 0.052,
+              "fit_ms": 1156476.326,
+              "persist_ms": 358353.976,
+              "write_artifacts_ms": 21508.624,
+              "publish_ms": 17885.214,
+              "gc_ms": 2445.965,
+              "maintenance_ms": 11.205,
+              "total_ms": 1580986.123
+            }
+          }
+        },
+        "warm_restart": {
+          "seconds_to_ready_engine": 1325.387,
+          "files": 30000,
+          "peak_wal_bytes": 29289112,
+          "peak_rss_bytes": 6436401152,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 2,
+            "files_reused": 30000,
+            "files_extracted": 0,
+            "artifacts_written": 0,
+            "artifacts_reused": 150000,
+            "artifacts_collected": 0,
+            "timings_ms": {
+              "load_ms": 77885.083,
+              "scan_ms": 52258.224,
+              "of_which_hashing_ms": 532.08,
+              "seed_ms": 7321.141,
+              "fit_ms": 1147709.73,
+              "persist_ms": 39279.573,
+              "write_artifacts_ms": 0.107,
+              "publish_ms": 24891.439,
+              "gc_ms": 13059.594,
+              "maintenance_ms": 11.875,
+              "total_ms": 1324453.751
+            }
+          }
+        },
+        "restart_after_1pct_modified": {
+          "seconds_to_ready_engine": 820.221,
+          "files": 30000,
+          "peak_wal_bytes": 29280872,
+          "peak_rss_bytes": 6238924800,
+          "report": {
+            "state": "published",
+            "reason": "",
+            "generation": 3,
+            "files_reused": 29700,
+            "files_extracted": 300,
+            "artifacts_written": 1500,
+            "artifacts_reused": 148500,
+            "artifacts_collected": 1500,
+            "timings_ms": {
+              "load_ms": 84089.918,
+              "scan_ms": 48646.136,
+              "of_which_hashing_ms": 538.074,
+              "seed_ms": 6978.588,
+              "fit_ms": 645423.073,
+              "persist_ms": 34150.754,
+              "write_artifacts_ms": 857.472,
+              "publish_ms": 18048.647,
+              "gc_ms": 13655.241,
+              "maintenance_ms": 11.168,
+              "total_ms": 819288.469
+            }
+          }
+        }
+      },
+      "database_after_cold": {
+        "database_file_bytes": 310996992,
+        "page_size": 4096,
+        "page_count": 75927,
+        "freelist_pages": 0,
+        "artifacts": {
+          "abstainer": {
+            "rows": 30000,
+            "payload_bytes": 15745172
+          },
+          "doc_meta": {
+            "rows": 30000,
+            "payload_bytes": 4857451
+          },
+          "function_graph": {
+            "rows": 30000,
+            "payload_bytes": 12541838
+          },
+          "lexical": {
+            "rows": 30000,
+            "payload_bytes": 20217612
+          },
+          "semantic": {
+            "rows": 30000,
+            "payload_bytes": 149657157
+          }
+        },
+        "manifest_rows": 30000,
+        "file_artifacts_rows": 150000,
+        "artifact_metadata_bytes": 25226985,
+        "wal_bytes_after": 0
+      },
+      "database_after_modification": {
+        "database_file_bytes": 313798656,
+        "page_size": 4096,
+        "page_count": 76611,
+        "freelist_pages": 562,
+        "artifacts": {
+          "abstainer": {
+            "rows": 30000,
+            "payload_bytes": 15745859
+          },
+          "doc_meta": {
+            "rows": 30000,
+            "payload_bytes": 4857468
+          },
+          "function_graph": {
+            "rows": 30000,
+            "payload_bytes": 12541838
+          },
+          "lexical": {
+            "rows": 30000,
+            "payload_bytes": 20218582
+          },
+          "semantic": {
+            "rows": 30000,
+            "payload_bytes": 149663585
+          }
+        },
+        "manifest_rows": 30000,
+        "file_artifacts_rows": 150000,
+        "artifact_metadata_bytes": 25226985,
+        "wal_bytes_after": 0
+      },
+      "warm_restart_speedup_vs_uncached": 0.871
+    },
+    "reduced 100000 files": {
+      "workload": {
+        "files": 100000,
+        "note": "generated (same seeded generator); file statistics not recorded because the run was stopped"
+      },
+      "phases": {
+        "uncached": {
+          "aborted": "stopped manually after 18 minutes of the uncached build: 23.2 GB committed (private bytes) on a 15.5 GB machine, 4.3 GB resident, 0.9 GB physical memory free, i.e. continuous paging. The working-set watchdog could not trigger because the working set is capped by physical memory; the watchdog now also checks committed memory.",
+          "observed_committed_bytes": 24367857664,
+          "observed_working_set_bytes": 4513071104,
+          "observed_free_physical_bytes": 966367641
+        }
+      },
+      "blocker": "RepoNeedle's in-memory index (not the cache) needs more memory than this machine has for 100,000 files even in the reduced profile; the cached phases were therefore not run and no 100,000-file database was built."
+    }
+  }
+}

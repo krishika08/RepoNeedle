@@ -1,6 +1,6 @@
 # Persistent and Incremental Indexing: Design
 
-**Status:** **Stage 0 (correctness prerequisites) is implemented; persistence is not.** Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()`, and added the differential equivalence harness (§15; [Stage 0 report](../reports/v2_completion/persistent_indexing/STAGE0_REPORT.md)). RepoNeedle still rebuilds every index in memory on each start, `update_documents()` and `remove_documents()` still refit every index over every document, and there is no SQLite storage, index cache or `IndexCacheConfig`.
+**Status:** **Stages 0 and 1 are implemented.** Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 adds the opt-in persistent index cache: `from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()` and `engine.index_cache_diagnostics`, backed by SQLite (§17; [Stage 1 report](../reports/v2_completion/persistent_indexing/STAGE1_REPORT.md)). **Global structures are still recomputed in full on every start: this is persistence, not incremental indexing** (Stages 2–4 are not implemented). Without `index_cache` nothing changes.
 **Milestone:** V2 Milestone 4A (architecture and research). **Revision 2** applies the corrections from an independent architecture review; the report's §14 maps each review point to its resolution.
 **Evidence:** [reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md), with the measurements behind every number quoted here. All repository measurements use one pinned snapshot (commit `bac30c8`, 890 files, 8,173,201 bytes of indexed text).
 
@@ -22,6 +22,7 @@
 14. [Equivalence checking and acceptance criteria](#14-equivalence-checking-and-acceptance-criteria)
 15. [Staged implementation plan](#15-staged-implementation-plan)
 16. [Design decisions](#16-design-decisions)
+17. [Stage 1 as built](#17-stage-1-as-built)
 
 ---
 
@@ -911,7 +912,7 @@ Each stage is its own PR. A stage ships only with the §14 equivalence harness g
 | Stage | Scope | Exit criteria |
 | :--- | :--- | :--- |
 | **0. Prerequisites** (no persistence) — **implemented** | Reset every build-derived function-graph structure; `remove_documents()`, refit-based like today; SHA-256 per-document cache signatures; the **equivalence harness** (§14.2) with a frozen 225-query corpus, run against `remove_documents()`, `update_documents()` and mutation sequences. Today's `update_documents()` matches a fresh build for in-place replacement; an addition matches only a build with the new file appended, and the harness reports the divergence from a discovery-ordered build. | Done: harness and mutation suite in CI; existing tests unchanged; see the [Stage 0 report](../reports/v2_completion/persistent_indexing/STAGE0_REPORT.md) |
-| **1. Persistent artifacts, global reassembly** | `IndexCacheConfig`; SQLite schema with self-contained, checksummed payloads (§4, §6.1); the writer and reader connection protocol with settings verification (§10.1); per-file artifacts for every index; manifest with `doc_meta_sha256`; all four fingerprint levels (§7); publish protocol; validation modes; corruption handling; artifact GC; `persist_exclude`. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order. Eager `FileDoc.content` as today (§16.2). | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental"; **size defaults set from actual databases at 10k, 30k and 100k files** (§12.1) |
+| **1. Persistent artifacts, global reassembly** — **implemented** (§17) | `IndexCacheConfig`; SQLite schema with self-contained, checksummed payloads (§4, §6.1); the writer and reader connection protocol with settings verification (§10.1); per-file artifacts for every index; manifest with `doc_meta_sha256`; all four fingerprint levels (§7); publish protocol; validation modes; corruption handling; artifact GC; `persist_exclude`. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order. Eager `FileDoc.content` as today (§16.2). | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental"; **size defaults set from actual databases at 10k, 30k and 100k files** (§12.1) |
 | **2. Incremental bookkeeping; dependency-scoped graphs** | BM25 df by delta and IDF of changed-df terms, with `avg_doc_len`, `doc_len_norms` and positional postings recomputed as global O(N) work (§9.5); abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters that separate proportional from global work. BM25 is reported as "partially incremental", or stays globally reassembled if bookkeeping does not pay. |
 | **3. Semantic** | df by delta; exact vocabulary maintenance with canonical first-seen order; vectorised IDF/norm recomputation, **only if bit-identical**; otherwise documented as global | Equivalence; or an explicit decision to keep the semantic index globally recomputed |
 | **4. Optional components and surfaces** | Tree-sitter artifacts and availability changes, with their sizes measured; SCIP: full re-resolution on change (§16.4), per-document reuse only if measured to be worth it; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories | Equivalence including optional extras; documentation |
@@ -967,3 +968,43 @@ Revision 1 left these eight questions open. Revision 2 decides them.
 **Decision.** A cache is local: one repository root, one user, one machine and a compatible runtime. That means the same Python minor version, Unicode database, SQLite features and optional-component versions, all of which are recorded in the fingerprints (§7). No promise of cross-machine compatibility is made. `read_only=True` exists for a second process on the same machine, not for shipping caches between machines or to CI.
 
 **Rationale.** Portability depends on discovery order (§16.1), the absolute root inside `repo_id` (§5), platform path rules and runtime versions. A fingerprint mismatch on another machine would simply rebuild, so a shared cache would add risk without a dependable benefit. Portability can be revisited once the ordering and fingerprint behaviour has been measured across platforms.
+
+## 17. Stage 1 as built
+
+Stage 1 is implemented in `reponeedle/core/index_cache/` (paths, fingerprints, codecs, schema, connection, store,
+session) and integrated through `RepoNeedleEngine.from_directory(..., index_cache=...)` and `RepoNeedleEngine.refresh()`.
+Evidence, measurements and limitations: [STAGE1_REPORT.md](../reports/v2_completion/persistent_indexing/STAGE1_REPORT.md).
+
+**How a build reuses work.** Discovery runs unchanged. For each file the SHA-256 of the decoded text is compared with
+the verified manifest. When it matches, the file's document metadata (language, `is_test`, counts, symbols, imports)
+comes from its verified `doc_meta` artifact, and the per-document caches of BM25, the semantic index, the abstainer and
+the function graph are seeded with verified artifacts whose key, recomputed from the current inputs, matches. Then the
+existing `_fit()` runs: every global structure is recomputed by the existing code, so the result is identical to an
+uncached build by construction (and checked by the Stage 0 harness).
+
+**Deviations from sections 4–14, and why:**
+
+| Design | As built | Reason |
+| :--- | :--- | :--- |
+| `content_sha256` (raw bytes) and `text_sha256` in the manifest | `text_sha256` only (decoded text) | Every index reads the decoded text, so equal decoded text means equal artifacts; hashing raw bytes would require reading each file twice or changing discovery's read path. |
+| `size`, `mtime_ns`, `ctime_ns`, `inode` in the manifest; `validation="stat"` skips hashing | Not stored; `"stat"` runs as `"content"` and says so in the report | Stage 1 reads every file eagerly (§16.2), so stat validation would only save the SHA-256 time (5 ms for 300 files of 2.9 MB). Correctness is not traded for that. |
+| `provides`/`consumes` tables | Not created | They serve Stage 2's dependency-scoped re-resolution; Stage 1 never writes approximate rows. |
+| `global_state` with df tables, vocabulary, edges | One checksummed summary row per generation | Stage 1 recomputes every global structure; persisting them would be unused data that could go stale. The table, its checksum and its verification exist for Stage 2. |
+| Binary varint codecs (§4) | Canonical JSON column arrays + zlib level 1 | Measured: the pure-Python varint decoder took 1.75 s per 300 files; the C-accelerated `json` decoder 0.83 s. Python's float `repr` round-trips exactly, so weights stay bit-identical (tested). Level 1 compresses 6.3× faster than level 6 for ~15% more bytes. |
+| `meta.clean_shutdown` flag | Not used | A Boolean marker cannot tell whether another process still writes. Correctness rests on SQLite's WAL recovery plus full verification on every load (checksums, keys, manifest digest); `verify=True` adds `PRAGMA integrity_check`. |
+| `file_id` column | Not stored | It serves Stage 2's file-id-keyed BM25 state (§9.5); Stage 1 keys everything by path. |
+| Excluded table reasons | `max_files` truncation is not recorded | Truncated files were never read; the scan reports truncation in `IndexingDiagnostics`. |
+
+**Additions beyond the design:**
+- **Artifact keys** also include the extractor's Stage 0 input signature (`input_sig`, a SHA-256 of the exact extraction
+  inputs and configuration), and the reader recomputes every key from the expected inputs before reuse.
+- **Fingerprints include source digests.** Each extractor fingerprint includes a SHA-256 of the source code of every module the
+  extractor runs (line endings normalised), so a code change invalidates its artifacts even if no version constant is
+  bumped. The explicit `ARTIFACT_VERSIONS` constants remain.
+- **`secure_delete=ON`** on the writer connection, then incremental vacuum and `wal_checkpoint(TRUNCATE)` after every
+  publish, so artifacts removed by garbage collection (for example after a file becomes `persist_exclude`d) do not
+  survive in free pages or the WAL. This is not a forensic-erasure guarantee for the storage medium.
+- **Size defaults remain provisional.** Stage 1 measured actual databases of 244.9 MB (10,000 realistic files, 2.7× the source), 103.6 MB (10,000 reduced) and 311.0 MB (30,000 reduced). The 100,000-file run could not be completed on the measurement machine, because the in-memory engine exceeded 15.5 GB of RAM. The §12.1 exit criterion is therefore only partly met, and `max_db_bytes`/`max_total_bytes` keep their provisional defaults ([Stage 1 report §10](../reports/v2_completion/persistent_indexing/STAGE1_REPORT.md#10-database-size-and-performance)).
+- **Restart speedup.** It is measured at 2.03× (1,000 realistic files), 1.66× (2,500) and 1.32× (10,000 reduced). At larger sizes the recomputed global work dominates, led by the function graph's superlinear call resolution, and the paging-affected 10,000-realistic and 30,000-reduced runs were not faster. Stage 1 is not a large-repository speedup; that is the Stage 2 target.
+- **Optional components take the uncached route.** `structural_parser="tree_sitter"` and `scip_config` builds do not open the
+  database at all and report `state="disabled"` with the reason (Stage 4).
