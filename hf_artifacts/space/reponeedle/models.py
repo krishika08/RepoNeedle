@@ -3,8 +3,8 @@ Pydantic data models and schemas for RepoNeedle.
 """
 
 from enum import Enum
-from typing import List, Literal, Optional, Dict, Any
-from pydantic import BaseModel, Field
+from typing import List, Literal, Optional, Dict, Any, Tuple
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class TaskType(str, Enum):
@@ -393,3 +393,102 @@ class ScipConfig(BaseModel):
         description="'raise': a SCIP problem raises ScipIngestionError. 'skip': continue without SCIP; "
                     "the reason is recorded in the SCIP diagnostics.",
     )
+
+
+class IndexCacheConfig(BaseModel):
+    """
+    Opt-in persistent index cache (V2 Stage 1): ``RepoNeedleEngine.from_directory(..., index_cache=...)``.
+
+    Per-file derived data (document metadata, BM25 term counts, semantic features, abstainer vocabularies and
+    function-graph extraction records) is stored in a per-repository SQLite database and reused on later starts
+    for files whose decoded text and extraction inputs are unchanged. Every global structure (BM25 statistics,
+    the semantic vocabulary and matrix, both graphs, PageRank) is still recomputed in full by the existing code,
+    so results are identical to a build without a cache. Raw source text is never stored.
+    See docs/PERSISTENT_INDEXING_DESIGN.md.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    cache_dir: Optional[str] = Field(
+        default=None,
+        description="Directory for cache databases. Default: a per-user cache directory outside the repository.",
+    )
+    enabled: bool = Field(default=True, description="False: behave exactly as without a cache configuration.")
+    validation: Literal["content", "stat"] = Field(
+        default="content",
+        description=(
+            "How unchanged files are recognised. Stage 1 reads every file eagerly, so it always compares content "
+            "digests; 'stat' is accepted and reported as 'content' in the diagnostics."
+        ),
+    )
+    rebuild_policy: Literal["auto", "never", "always"] = Field(
+        default="auto",
+        description=(
+            "'auto': set an unusable cache aside and rebuild. 'never': raise IndexCacheError instead. "
+            "'always': ignore any existing cache and build it again."
+        ),
+    )
+    read_only: bool = Field(default=False, description="Use a valid cache but never write to it.")
+    verify: bool = Field(
+        default=False,
+        description="Also run PRAGMA integrity_check and verify artifacts no published generation references.",
+    )
+    persist_exclude: List[str] = Field(
+        default_factory=list,
+        description=(
+            "gitwildmatch patterns (repository-relative). Matching files are indexed in memory as usual, but "
+            "nothing derived from them is written to the cache."
+        ),
+    )
+    max_db_bytes: int = Field(default=2 * 1024 ** 3, gt=0, description="Per-repository database size limit.")
+    max_total_bytes: int = Field(default=10 * 1024 ** 3, gt=0, description="Limit across the cache directory.")
+    busy_timeout_s: float = Field(default=30.0, gt=0, le=3600, description="SQLite busy timeout in seconds.")
+
+    @field_validator("cache_dir")
+    @classmethod
+    def _check_cache_dir(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and (not v.strip() or "\x00" in v):
+            raise ValueError("cache_dir must be a non-empty path without NUL characters")
+        return v
+
+    @field_validator("persist_exclude")
+    @classmethod
+    def _check_patterns(cls, patterns: List[str]) -> List[str]:
+        import pathspec
+
+        for p in patterns:
+            if not isinstance(p, str) or not p.strip() or "\x00" in p:
+                raise ValueError(f"invalid persist_exclude pattern {p!r}")
+        try:
+            pathspec.PathSpec.from_lines("gitwildmatch", patterns)
+        except Exception as exc:  # pathspec raises several exception types for malformed patterns
+            raise ValueError(f"invalid persist_exclude pattern: {exc}") from exc
+        return list(patterns)
+
+    @model_validator(mode="after")
+    def _check_limits(self) -> "IndexCacheConfig":
+        if self.max_total_bytes < self.max_db_bytes:
+            raise ValueError("max_total_bytes must be at least max_db_bytes")
+        return self
+
+
+class IndexUpdateReport(BaseModel):
+    """What one cached build or ``RepoNeedleEngine.refresh()`` did. Counts and paths only, never contents."""
+    state: str = Field(description="'published', 'loaded_read_only', 'not_persisted' or 'disabled'.")
+    reason: str = ""
+    generation: Optional[int] = None
+    validation: str = "content"
+    files_indexed: int = 0
+    files_persisted: int = 0
+    files_persist_excluded: int = 0
+    files_reused: int = 0
+    files_extracted: int = 0
+    added: List[str] = Field(default_factory=list)
+    modified: List[str] = Field(default_factory=list)
+    deleted: List[str] = Field(default_factory=list)
+    renamed: List[Tuple[str, str]] = Field(default_factory=list)
+    artifacts_written: int = 0
+    artifacts_reused: int = 0
+    artifacts_collected: int = 0
+    global_structures: Dict[str, str] = Field(default_factory=dict)
+    rebuilt_from_scratch: bool = False
+    timings_ms: Dict[str, float] = Field(default_factory=dict)

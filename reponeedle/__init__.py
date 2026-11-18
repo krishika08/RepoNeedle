@@ -14,7 +14,10 @@ from reponeedle.models import (
     AbstentionDiagnostics,
     IndexingDiagnostics,
     ScipConfig,
+    IndexCacheConfig,
+    IndexUpdateReport,
 )
+from reponeedle.core.index_cache import IndexCacheError
 from reponeedle.engine import RepoNeedleEngine, DEFAULT_MAX_FILE_SIZE_BYTES
 from reponeedle.core.change_impact import ChangeImpactRanker, ChangeImpactConfig
 from reponeedle.core.packer import (
@@ -38,6 +41,9 @@ __all__ = [
     "AbstentionDiagnostics",
     "IndexingDiagnostics",
     "ScipConfig",
+    "IndexCacheConfig",
+    "IndexUpdateReport",
+    "IndexCacheError",
     "DEFAULT_MAX_FILE_SIZE_BYTES",
     "ChangeImpactRanker",
     "ChangeImpactConfig",
