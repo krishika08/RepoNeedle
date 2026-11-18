@@ -131,10 +131,11 @@ reponeedle/core/index_cache/
 | Run | Result |
 | :--- | :--- |
 | Baseline `main` `cccd91f`, Python 3.11.9 | 833 passed, 23 skipped |
-| This branch, Python 3.11.9 | **987 passed, 19 skipped, 0 failed** |
+| This branch, Python 3.11.9 (final commit) | **989 passed, 19 skipped, 0 failed** |
+| This branch, Python 3.12.10 with the `scip` and `mcp` extras: Stage 1 suites, bundle and Stage 0 removal tests | **170 passed, 2 skipped** (symlink, POSIX permissions) |
 
 The 19 skips are:
-- 10 for the missing Tree-sitter and SCIP extras in this venv (CI runs those);
+- 10 for the missing Tree-sitter and SCIP extras in this venv. CI runs those. Locally, Windows Application Control blocks the Tree-sitter native extension, so Tree-sitter could only be validated in CI;
 - 8 for Windows symlink and POSIX-permission tests;
 - 1 for the MCP symlink test.
 
