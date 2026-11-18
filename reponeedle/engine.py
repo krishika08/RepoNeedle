@@ -9,7 +9,7 @@ import logging
 import pathlib
 import numbers
 import stat
-from typing import Any, List, Optional, Union, Dict, Set
+from typing import Any, Iterable, List, Optional, Union, Dict, Set
 import numpy as np
 import pathspec
 
@@ -192,9 +192,10 @@ class RepoNeedleEngine:
             if config.on_error == "raise":
                 raise
             logger.warning("SCIP ingestion skipped: %s", exc)
-            self.function_graph.diagnostics["scip"] = {
-                "requested": True, "status": "skipped", "error": str(exc), "index_path": config.index_path,
-            }
+            skipped = {"requested": True, "status": "skipped", "error": str(exc), "index_path": config.index_path}
+            # Kept by the function graph across rebuilds (its build-derived diagnostics are reset per build).
+            self.function_graph.scip_load_diagnostics = skipped
+            self.function_graph.diagnostics["scip"] = skipped
             return
         self.function_graph.scip_index = index
 
@@ -270,6 +271,54 @@ class RepoNeedleEngine:
         self.function_graph.build_graph(clean_docs)
         self.abstainer.fit(clean_docs)
         self.indexing_diagnostics.indexed_files = len(clean_docs)
+
+    def remove_documents(self, paths: Iterable[str]) -> List[str]:
+        """
+        Removes documents by repository-relative path and refits every index over the remaining documents, which
+        keep their existing relative order. The engine then has the same index state as one built from the
+        remaining documents in that order. In memory only: no document file is read and nothing is persisted.
+        With an opt-in SCIP index, the refit re-runs SCIP resolution, which checks the index's document paths
+        against the repository on disk, as every build and ``update_documents()`` does.
+
+        Paths are matched exactly against ``FileDoc.path`` (no normalisation). Duplicates in ``paths`` are removed
+        once. An empty request changes nothing.
+
+        Returns:
+            The removed paths, in index order.
+
+        Raises:
+            TypeError: if ``paths`` is a single string or contains a non-string.
+            KeyError: if any requested path is not indexed (for example, already removed). Nothing is removed.
+
+        Not transactional. Inputs are validated before any state changes. If refitting the remaining documents
+        raises, the previous document collection is refitted before the exception propagates; if that refit also
+        fails, the engine is inconsistent and must be rebuilt.
+        """
+        if isinstance(paths, (str, bytes)):
+            raise TypeError("remove_documents() expects an iterable of paths, not a single string")
+        requested = list(dict.fromkeys(paths))
+        non_str = [p for p in requested if not isinstance(p, str)]
+        if non_str:
+            raise TypeError(f"remove_documents() paths must be str, got {non_str!r}")
+        unknown = [p for p in requested if p not in self.path_to_doc]
+        if unknown:
+            raise KeyError(f"not indexed: {unknown!r}")
+        if not requested:
+            return []
+
+        drop = set(requested)
+        previous = list(self.docs)
+        removed = [d.path for d in previous if d.path in drop]
+        remaining = [d for d in previous if d.path not in drop]
+        try:
+            self._fit(remaining)
+        except Exception:
+            try:
+                self._fit(previous)
+            except Exception:  # the original error is the one to report
+                logger.error("remove_documents(): restoring the previous documents failed; rebuild the engine")
+            raise
+        return removed
 
     def query(self, *args, **kwargs) -> RetrievalResult:
         """Alias for retrieve() to provide intuitive querying API."""

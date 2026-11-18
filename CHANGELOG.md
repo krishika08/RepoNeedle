@@ -25,8 +25,17 @@ All notable changes to RepoNeedle are documented here. Versions follow [Semantic
   - `extract_block_span(..., cap_lines=None)`: `cap_lines` is a soft selection budget that never truncates a block (the best block is always rendered whole). It is also passed to the legacy fallback, and it is part of the cache key.
   - New: `reponeedle.core.block_slicing`, `reponeedle.core.bounded_cache`, `CodeSpanExtractor.extract_block_span()`, `CodeSpanExtractor.slice_blocks()` and `CodeSpanExtractor.block_cache_stats()`. **No retrieval-quality improvement is claimed or measured.** In a packing-level comparison, complete blocks used more tokens per file, so compact packs held fewer files. See [docs/AST_BLOCK_SLICING.md](docs/AST_BLOCK_SLICING.md) and `reports/v2_completion/ast_block_slicing/REPORT.md`.
 
+- **`RepoNeedleEngine.remove_documents(paths)`** (V2 Stage 0): removes documents by exact repository-relative path, in memory (no document file is read; with an opt-in SCIP index the refit re-validates SCIP document paths on disk, like any build), and refits every index over the remaining documents in their existing order. The result equals a fresh build over those documents. It returns the removed paths in index order. Duplicates in the request are removed once; an empty request changes nothing. A single string or a non-string path raises `TypeError`. An unknown or already removed path raises `KeyError` before anything changes. It is not transactional: if the refit raises, the previous documents are refitted before the error propagates.
+
+### Fixed
+
+- **Function-graph rebuilds kept state from earlier document collections** (V2 Stage 0). `FunctionGraphEngine.build_graph()` did not clear `module_to_path` or `package_to_files`, so rebuilding on a smaller document set could resolve calls to files no longer indexed. It also kept Tree-sitter/SCIP diagnostics and SCIP relationships from an earlier build. Every build-derived structure is now reset per build; the per-document extraction caches are kept. Not reachable through the 1.2.0 engine, which never removed documents.
+- **`BM25Index.fit([])` and `SubwordSemanticIndex.fit([])` kept the previous fit's arrays, IDF and vocabulary.** An empty fit now leaves the same state as a never-fitted index.
+- **Per-document cache signatures** (BM25 terms, semantic features, abstainer vocabulary, function-graph and Tree-sitter extractions) used Python's per-process-randomised `hash()` and joined symbols with `,` (so `["a,b"]` and `["a", "b"]` collided). They are now SHA-256 over type- and length-framed extractor inputs plus a versioned namespace (`reponeedle.core.signatures`), identical across processes. Extraction results are unchanged.
+
 ### Not changed
 
+- V2 Stage 0 adds no persistence: no SQLite, index cache or `IndexCacheConfig`. Retrieval scores, rankings, routing, packing and defaults are unchanged; the differential equivalence harness (`tests/index_equivalence.py`) checks the lifecycle operations against fresh builds.
 - The default extraction (`structural_parser="regex"`) reproduces 1.2.0 exactly; this is checked against a golden snapshot of the 1.2.0 implementation. Without `scip_config` no SCIP code or Protobuf import runs. With the default `focus_span_strategy="legacy"`, focus spans, skeletons and packs are identical to the baseline packer (checked against a golden snapshot). Ranking weights, routing, packing, abstention defaults, the MCP tools and the core dependencies are unchanged.
 
 ## [1.2.0] — 2026-11-12

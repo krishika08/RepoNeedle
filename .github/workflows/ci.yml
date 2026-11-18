@@ -157,7 +157,7 @@ jobs:
         env:
           REPONEEDLE_FAIL_ON_SKIP: "1"
         run: |
-          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py tests/test_block_slicing.py tests/test_block_slicing_tree_sitter.py tests/test_block_slicing_packing.py tests/test_block_slicing_cache.py
+          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py tests/test_block_slicing.py tests/test_block_slicing_tree_sitter.py tests/test_block_slicing_packing.py tests/test_block_slicing_cache.py tests/test_stage0_function_graph_lifecycle.py
 
   package-install:
     name: Wheel install with and without the optional extras (Linux, Python 3.12)
@@ -265,7 +265,7 @@ jobs:
           REPONEEDLE_FAIL_ON_SKIP: ${{ matrix.strict && '1' || '0' }}
         run: |
           if [ -n "${{ matrix.impl }}" ]; then export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="${{ matrix.impl }}"; fi
-          TESTS="tests/test_scip_core.py tests/test_scip_parsing.py tests/test_scip_security.py tests/test_scip_graph.py"
+          TESTS="tests/test_scip_core.py tests/test_scip_parsing.py tests/test_scip_security.py tests/test_scip_graph.py tests/test_stage0_remove_documents.py::test_removing_a_file_with_scip_relationships"
           if [[ "${{ matrix.extras }}" == *treesitter* ]]; then
             TESTS="$TESTS tests/test_scip_tree_sitter.py tests/test_tree_sitter_graph.py"
           fi

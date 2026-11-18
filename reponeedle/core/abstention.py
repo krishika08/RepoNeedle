@@ -13,7 +13,11 @@ from typing import List, Dict, Set, Tuple
 import numpy as np
 
 from reponeedle.models import FileDoc
+from reponeedle.core.signatures import stable_signature
 from reponeedle.core.tokenizer import CodeTokenizer
+
+# Bump when the per-document vocabulary extraction changes its output for the same inputs.
+DOC_VOCAB_SIGNATURE_VERSION = "abstainer-doc-vocab/1"
 
 
 class SelectiveAbstainer:
@@ -36,6 +40,11 @@ class SelectiveAbstainer:
                 return w[:-len(suf)]
         return w
 
+    @staticmethod
+    def doc_signature(doc: FileDoc) -> str:
+        """Deterministic signature of everything the per-document vocabulary extraction reads."""
+        return stable_signature(DOC_VOCAB_SIGNATURE_VERSION, doc.path, doc.symbols, doc.content[:3000])
+
     def fit(self, docs: List[FileDoc]) -> "SelectiveAbstainer":
         """
         Builds repository vocabulary from paths, symbols, and contents.
@@ -43,8 +52,7 @@ class SelectiveAbstainer:
         self.repo_vocabulary = set()
         for doc in docs:
             cache_key = doc.path
-            sym_str = ",".join(doc.symbols) if doc.symbols else ""
-            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            content_sig = self.doc_signature(doc)
             if cache_key in self._doc_vocab_cache and self._doc_vocab_cache[cache_key][0] == content_sig:
                 doc_vocab = self._doc_vocab_cache[cache_key][1]
             else:
