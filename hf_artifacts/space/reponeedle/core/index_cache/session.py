@@ -312,11 +312,19 @@ class IndexCacheSession:
     def _persist(self, engine, report, scan, persisted_docs, infos, reused, fps, fps_hex, loaded, refresh) -> None:
         cfg, loc = self.config, self.location
         try:
-            conn = open_writer(loc.db_path, cfg.busy_timeout_s)
+            try:
+                conn = open_writer(loc.db_path, cfg.busy_timeout_s)
+            except PersistenceUnavailable as exc:
+                if not (exc.corrupt and cfg.rebuild_policy != "never"):
+                    raise
+                moved = quarantine(loc.db_path)   # not a usable database (e.g. rebuild_policy="always" skipped reading)
+                report.reason = (report.reason + "; " if report.reason else "") +                     f"unusable database set aside as {moved}: {exc.reason}"
+                conn = open_writer(loc.db_path, cfg.busy_timeout_s)
         except PersistenceUnavailable as exc:
             if cfg.rebuild_policy == "never":
                 raise IndexCacheError(f"index cache cannot be written: {exc.reason}") from exc
-            report.state, report.reason = "not_persisted", exc.reason
+            report.state = "not_persisted"
+            report.reason = (report.reason + "; " if report.reason else "") + exc.reason
             return
         writer = CacheWriter(conn)
         gen_id = None

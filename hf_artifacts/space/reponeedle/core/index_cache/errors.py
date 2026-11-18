@@ -17,8 +17,12 @@ class CacheUnusable(Exception):
 
 
 class PersistenceUnavailable(Exception):
-    """Internal: persistence cannot be used in this environment (settings, filesystem, permissions)."""
+    """
+    Internal: persistence cannot be used in this environment (settings, filesystem, permissions, locks).
+    ``corrupt`` is True only when SQLite reported that the existing file is not a usable database.
+    """
 
-    def __init__(self, reason: str):
+    def __init__(self, reason: str, corrupt: bool = False):
         super().__init__(reason)
         self.reason = reason
+        self.corrupt = corrupt

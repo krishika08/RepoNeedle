@@ -18,9 +18,10 @@ from pathlib import Path
 from reponeedle.core.index_cache.errors import PersistenceUnavailable
 from reponeedle.core.index_cache.schema import APPLICATION_ID, DDL, SCHEMA_VERSION
 
-# Lowest SQLite version exercised by the test suite and CI (recorded in the Stage 1 report). Older libraries are
-# not known to behave as the protocol requires, so persistence is disabled on them.
-MIN_SQLITE_VERSION = (3, 37, 0)
+# Lowest SQLite version on which the full Stage 1 test suite passed in CI: 3.40.1 (Windows, Python 3.10.11). Also
+# tested: 3.45.1, 3.46.1, 3.49.1. Older libraries are not known to behave as the protocol requires, so persistence
+# is disabled on them (the in-memory build is unaffected).
+MIN_SQLITE_VERSION = (3, 40, 1)
 
 
 def check_sqlite_version() -> None:

@@ -18,9 +18,10 @@ from pathlib import Path
 from reponeedle.core.index_cache.errors import PersistenceUnavailable
 from reponeedle.core.index_cache.schema import APPLICATION_ID, DDL, SCHEMA_VERSION
 
-# Lowest SQLite version exercised by the test suite and CI (recorded in the Stage 1 report). Older libraries are
-# not known to behave as the protocol requires, so persistence is disabled on them.
-MIN_SQLITE_VERSION = (3, 37, 0)
+# Lowest SQLite version on which the full Stage 1 test suite passed in CI: 3.40.1 (Windows, Python 3.10.11). Also
+# tested: 3.45.1, 3.46.1, 3.49.1. Older libraries are not known to behave as the protocol requires, so persistence
+# is disabled on them (the in-memory build is unaffected).
+MIN_SQLITE_VERSION = (3, 40, 1)
 
 
 def check_sqlite_version() -> None:
@@ -87,7 +88,10 @@ def open_writer(path: Path, busy_timeout_s: float) -> sqlite3.Connection:
         raise
     except sqlite3.Error as exc:
         conn.close()
-        raise PersistenceUnavailable(f"cannot configure the cache database: {type(exc).__name__}: {exc}") from exc
+        # DatabaseError itself (not its OperationalError subclass, e.g. "database is locked") means the file is not
+        # a usable SQLite database ("file is not a database", "malformed").
+        raise PersistenceUnavailable(f"cannot configure the cache database: {type(exc).__name__}: {exc}",
+                                     corrupt=type(exc) is sqlite3.DatabaseError) from exc
 
 
 def open_reader(path: Path, busy_timeout_s: float, read_only: bool) -> sqlite3.Connection:
