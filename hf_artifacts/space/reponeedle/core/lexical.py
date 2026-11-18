@@ -7,8 +7,13 @@ from typing import List, Dict, Tuple
 from collections import defaultdict
 import numpy as np
 
+from reponeedle.core.signatures import stable_signature
 from reponeedle.core.tokenizer import CodeTokenizer
 from reponeedle.models import FileDoc
+
+
+# Bump when the per-document term extraction changes its output for the same inputs.
+DOC_TERMS_SIGNATURE_VERSION = "bm25-doc-terms/1"
 
 
 class BM25Index:
@@ -51,6 +56,13 @@ class BM25Index:
         self.doc_len_norms: np.ndarray = np.array([], dtype=np.float32)
         self._doc_term_cache: Dict[str, Tuple[str, Dict[str, float], float]] = {}
 
+    def doc_signature(self, doc: FileDoc) -> str:
+        """Deterministic signature of everything the per-document term extraction reads."""
+        return stable_signature(
+            DOC_TERMS_SIGNATURE_VERSION, doc.path, doc.symbols, doc.content,
+            self.path_weight, self.symbol_weight, self.body_weight, self.decouple_symbols,
+        )
+
     def fit(self, docs: List[FileDoc]) -> "BM25Index":
         """
         Indexes a collection of FileDoc objects.
@@ -63,13 +75,17 @@ class BM25Index:
         doc_lengths_list: List[float] = []
 
         if self.num_docs == 0:
+            # Same derived state as a never-fitted index: nothing from an earlier fit may survive.
             self.avg_doc_len = 0.0
+            self.idf = {}
+            self.doc_lengths = np.array([], dtype=np.float32)
+            self.inverted_index = {}
+            self.doc_len_norms = np.array([], dtype=np.float32)
             return self
 
         for doc in docs:
             cache_key = doc.path
-            sym_str = ",".join(doc.symbols) if doc.symbols else ""
-            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            content_sig = self.doc_signature(doc)
             if cache_key in self._doc_term_cache and self._doc_term_cache[cache_key][0] == content_sig:
                 _, weighted_counts, effective_len = self._doc_term_cache[cache_key]
             else:

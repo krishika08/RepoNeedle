@@ -17,6 +17,7 @@ from collections import defaultdict
 import networkx as nx
 
 from reponeedle.models import FileDoc
+from reponeedle.core.signatures import stable_signature
 
 logger = logging.getLogger("reponeedle.function_graph")
 
@@ -81,6 +82,11 @@ class FunctionGraphEdge:
     provenance: Optional[str] = None
 
 
+# Bump when an extractor changes its output for the same (path, content).
+POLYGLOT_SIGNATURE_VERSION = "function-graph-polyglot/1"
+TREE_SITTER_SIGNATURE_VERSION = "function-graph-tree-sitter/1"
+
+
 class FunctionGraphEngine:
     """
     Constructs fine-grained function-level call graphs across repositories.
@@ -124,6 +130,10 @@ class FunctionGraphEngine:
         self.callees_map: Dict[str, Dict[str, float]] = defaultdict(dict)  # caller -> {callee: conf}
 
         self.diagnostics: Dict[str, Any] = {}
+        # Set by RepoNeedleEngine when a requested SCIP index could not be loaded; kept across builds.
+        self.scip_load_diagnostics: Optional[Dict[str, Any]] = None
+        self._ts_norm_to_path: Dict[str, str] = {}
+        self._ts_resolver: Optional[Any] = None
         self._polyglot_cache: Dict[str, Tuple[str, Tuple[List[FunctionSymbol], List[CallSite], List[str], List[str]]]] = {}
 
     def _normalize_module_name(self, path: str) -> str:
@@ -372,17 +382,43 @@ class FunctionGraphEngine:
 
         return funcs, calls, list(dict.fromkeys(symbols)), list(dict.fromkeys(imports))
 
-    def build_graph(self, docs: List[FileDoc]) -> "FunctionGraphEngine":
-        self.docs = docs
-        self.doc_paths = [d.path for d in docs]
-        self.path_to_idx = {d.path: idx for idx, d in enumerate(docs)}
+    @staticmethod
+    def polyglot_signature(doc: FileDoc) -> str:
+        """Deterministic signature of the regex/AST extraction inputs: path and content."""
+        return stable_signature(POLYGLOT_SIGNATURE_VERSION, doc.path, doc.content)
+
+    @staticmethod
+    def tree_sitter_signature(doc: FileDoc) -> str:
+        """Deterministic signature of the Tree-sitter extraction inputs: path (language, is_test) and content."""
+        return stable_signature(TREE_SITTER_SIGNATURE_VERSION, doc.path, doc.content)
+
+    def _reset_build_state(self) -> None:
+        """
+        Clears everything derived from a document collection, so a rebuild on this instance equals a build on a
+        fresh instance. Configuration, the loaded SCIP index and the signature-validated per-document extraction
+        caches (``_polyglot_cache``, ``_ts_cache``) are kept.
+        """
         self.graph.clear()
+        self.module_to_path.clear()
+        self.package_to_files.clear()
         self.functions.clear()
         self.call_sites.clear()
         self.edges.clear()
         self.file_to_file_edges.clear()
         self.callers_map.clear()
         self.callees_map.clear()
+        self.scip_relationships = []
+        self._ts_norm_to_path = {}
+        self._ts_resolver = None
+        self.diagnostics.clear()
+        if self.scip_index is None and self.scip_load_diagnostics is not None:
+            self.diagnostics["scip"] = self.scip_load_diagnostics
+
+    def build_graph(self, docs: List[FileDoc]) -> "FunctionGraphEngine":
+        self._reset_build_state()
+        self.docs = docs
+        self.doc_paths = [d.path for d in docs]
+        self.path_to_idx = {d.path: idx for idx, d in enumerate(docs)}
 
         for doc in docs:
             self.graph.add_node(doc.path, is_test=doc.is_test)
@@ -418,11 +454,9 @@ class FunctionGraphEngine:
 
         for doc in docs:
             cache_key = doc.path
-            sym_str = ",".join(doc.symbols) if doc.symbols else ""
-            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
             extraction = None
             if ts_mode:
-                extraction, regex_result = self._ts_extract_doc(doc, content_sig, ts_diag)
+                extraction, regex_result = self._ts_extract_doc(doc, ts_diag)
                 if extraction is not None:
                     ts_extractions[doc.path] = extraction
                     funcs, calls, syms, imps = (extraction.functions, extraction.calls,
@@ -430,6 +464,7 @@ class FunctionGraphEngine:
                 else:
                     funcs, calls, syms, imps = regex_result
             if extraction is None and not ts_mode:
+                content_sig = self.polyglot_signature(doc)
                 if cache_key in self._polyglot_cache and self._polyglot_cache[cache_key][0] == content_sig:
                     funcs, calls, syms, imps = self._polyglot_cache[cache_key][1]
                 else:
@@ -669,7 +704,8 @@ class FunctionGraphEngine:
             },
         }
 
-    def _regex_extract_cached(self, doc: FileDoc, content_sig: str):
+    def _regex_extract_cached(self, doc: FileDoc):
+        content_sig = self.polyglot_signature(doc)
         cached = self._polyglot_cache.get(doc.path)
         if cached is not None and cached[0] == content_sig:
             return cached[1]
@@ -677,20 +713,21 @@ class FunctionGraphEngine:
         self._polyglot_cache[doc.path] = (content_sig, result)
         return result
 
-    def _ts_extract_doc(self, doc: FileDoc, content_sig: str, diag: Dict[str, Any]):
+    def _ts_extract_doc(self, doc: FileDoc, diag: Dict[str, Any]):
         """Returns (TreeSitterExtraction, None) or (None, regex/AST extraction tuple)."""
         from reponeedle.core import tree_sitter_extraction as tse
 
         path = doc.path
         if path.replace("\\", "/").lower().endswith(".py"):
             diag["files"]["python_ast"] += 1
-            return None, self._regex_extract_cached(doc, content_sig)
+            return None, self._regex_extract_cached(doc)
         language = tse.detect_language(path)
         if language is None:
             diag["files"]["regex_other_languages"] += 1
-            return None, self._regex_extract_cached(doc, content_sig)
+            return None, self._regex_extract_cached(doc)
 
         lang_diag = diag["languages"].setdefault(language, {"tree_sitter_files": 0, "regex_fallback_files": 0})
+        content_sig = self.tree_sitter_signature(doc)
         cached = self._ts_cache.get(path)
         reason = None
         if cached is not None and cached[0] == content_sig:
@@ -708,7 +745,7 @@ class FunctionGraphEngine:
             reason = reason or tse.load_errors().get(language, "parser unavailable")
             diag["files"]["regex_fallback"][path] = reason
             lang_diag["regex_fallback_files"] += 1
-            return None, self._regex_extract_cached(doc, content_sig)
+            return None, self._regex_extract_cached(doc)
 
         lang_diag["tree_sitter_files"] += 1
         diag["files"]["tree_sitter"].append(path)

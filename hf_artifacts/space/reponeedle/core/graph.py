@@ -44,6 +44,7 @@ class RepoGraph:
         self.graph = nx.DiGraph()
         self.docs: List[FileDoc] = []
         self.doc_paths: List[str] = []
+        self.num_docs: int = 0
         self.path_to_idx: Dict[str, int] = {}
         self.module_to_path: Dict[str, str] = {}
         self.test_to_target_map: Dict[str, Set[str]] = {}

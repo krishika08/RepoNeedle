@@ -23,9 +23,11 @@ separately:
    measured);
 7. global state.
 
-Part 3 checks that structurally valid but altered data (a re-encoded payload with a changed count, two swapped
-payloads, an altered or moved string, altered global state) is rejected by the checksums, and times verification
-and a string-table sweep (the mark phase of string garbage collection).
+Part 3 verifies each written database with a reader-side check (``verify_database``: published generation,
+manifest digest, artifact references, artifact metadata identity with a recomputed key, checksums, decoding), then
+applies the corruptions of ``corruption_suite`` to copies of the database file, for BOTH encodings, and requires
+every corruption to be rejected. It also times verification and a string-table sweep (the mark phase of string
+garbage collection, encoding A only).
 
 Not covered: provides/consumes rows are approximated from FileDoc symbols/imports (the real key sets do not exist yet);
 `repo_graph_facts` artifacts are not measured (RepoGraph has no per-document extraction to encode). The 100,000-file
@@ -68,6 +70,7 @@ CREATE TABLE manifest (
   ctime_ns INTEGER, inode INTEGER, content_sha256 BLOB NOT NULL, text_sha256 BLOB NOT NULL, language TEXT NOT NULL,
   is_test INTEGER NOT NULL, line_count INTEGER NOT NULL, token_estimate INTEGER NOT NULL, artifact_set BLOB NOT NULL,
   doc_meta_fp BLOB NOT NULL);
+CREATE TABLE excluded (path TEXT PRIMARY KEY, reason TEXT NOT NULL);
 CREATE TABLE artifacts (
   artifact_key BLOB PRIMARY KEY, kind TEXT NOT NULL, extractor_fp BLOB NOT NULL, path TEXT NOT NULL,
   codec TEXT NOT NULL, payload BLOB NOT NULL, checksum BLOB NOT NULL, created_gen INTEGER NOT NULL,
@@ -134,8 +137,32 @@ def enc_json(obj) -> bytes:
     return zlib.compress(json.dumps(obj, separators=(",", ":"), default=str).encode("utf-8"), 6)
 
 
-def artifact_checksum(key: bytes, codec: str, payload: bytes) -> bytes:
-    return hashlib.sha256(b"artifact\0" + key + b"\0" + codec.encode() + b"\0" + payload).digest()
+KINDS = ("lexical", "semantic", "abstainer", "function_graph", "symbols")
+# Prototype stand-ins for extractor_fp[kind] (design section 7.1).
+EXTRACTOR_FP = {k: hashlib.sha256(b"prototype-extractor-fp\0" + k.encode()).digest() for k in KINDS}
+ALLOWED_CODECS = {
+    "lexical": {"sid-pairs+zlib/1", "inline-pairs+zlib/1"},
+    "semantic": {"sid-pairs+zlib/1", "inline-pairs+zlib/1"},
+    "abstainer": {"sid-list+zlib/1", "inline-list+zlib/1"},
+    "function_graph": {"json+zlib/1"},
+    "symbols": {"json+zlib/1"},
+}
+
+
+def _framed(*parts: bytes) -> bytes:
+    return b"".join(len(x).to_bytes(8, "big") + x for x in parts)
+
+
+def artifact_key(kind: str, extractor_fp: bytes, path: str, text_sha256: bytes) -> bytes:
+    """Recomputable from the expected inputs, so a reader can verify a row's key before reusing it."""
+    return hashlib.sha256(_framed(b"artifact-key", kind.encode(), extractor_fp, path.encode("utf-8"),
+                                  text_sha256)).digest()
+
+
+def artifact_checksum(key: bytes, kind: str, extractor_fp: bytes, path: str, codec: str, payload: bytes) -> bytes:
+    """Binds the payload to every metadata column of its row (design section 6.1)."""
+    return hashlib.sha256(_framed(b"artifact", key, kind.encode(), extractor_fp, path.encode("utf-8"),
+                                  codec.encode(), payload)).digest()
 
 
 def string_checksum(sid: int, text: str) -> bytes:
@@ -332,9 +359,10 @@ def encode_all(engine, enc) -> dict:
         }
         keys = []
         for kind, (codec, payload) in per.items():
-            key = hashlib.sha256(f"{kind}\0fp\0{d.path}\0".encode() + text_sha).digest()
-            arts.append((key, kind, b"fp-" + kind.encode(), d.path, codec, payload,
-                         artifact_checksum(key, codec, payload), 1, 1))
+            fp = EXTRACTOR_FP[kind]
+            key = artifact_key(kind, fp, d.path, text_sha)
+            arts.append((key, kind, fp, d.path, codec, payload,
+                         artifact_checksum(key, kind, fp, d.path, codec, payload), 1, 1))
             file_arts.append((d.path, kind, key))
             by_kind[kind] = by_kind.get(kind, 0) + len(payload)
             keys.append(key)
@@ -413,7 +441,10 @@ def write_db(data: dict, workdir: Path, n_docs: int) -> dict:
     mid2 = db_bytes(c)
     c.executemany("INSERT INTO global_state VALUES (?, 1, ?, ?, ?)",
                   [(n, codec, p, global_checksum(n, 1, codec, p)) for n, (codec, p) in data["glob"].items()])
-    c.execute("UPDATE generations SET state='published', published_at='now', file_count=? WHERE gen_id=1", (n_docs,))
+    digest = manifest_digest({"manifest": data["manifest"], "file_artifacts": data["file_arts"],
+                              "provides": data["provides"], "consumes": data["consumes"], "excluded": []})
+    c.execute("UPDATE generations SET state='published', published_at='now', file_count=?, manifest_sha256=? "
+              "WHERE gen_id=1", (n_docs, digest))
     c.execute("INSERT INTO meta VALUES ('current_generation', '1')")
     end = db_bytes(c)
     commit()
@@ -444,8 +475,9 @@ def write_db(data: dict, workdir: Path, n_docs: int) -> dict:
     load_strings_s = time.perf_counter() - t
     t = time.perf_counter()
     n_ok = 0
-    for key, codec, payload, ck in c.execute("SELECT artifact_key, codec, payload, checksum FROM artifacts"):
-        if artifact_checksum(key, codec, payload) != ck:
+    for key, kind, fp, apath, codec, payload, ck in c.execute(
+            "SELECT artifact_key, kind, extractor_fp, path, codec, payload, checksum FROM artifacts"):
+        if artifact_checksum(key, kind, fp, apath, codec, payload) != ck:
             raise RuntimeError("artifact checksum")
         decode(codec, payload)
         n_ok += 1
@@ -493,27 +525,191 @@ def write_db(data: dict, workdir: Path, n_docs: int) -> dict:
     }
 
 
-def corruption_checks(data: dict) -> dict:
-    """Structurally valid alterations must fail the checksums (variant A data)."""
-    out = {}
-    key, kind, _, _, codec, payload, ck, _, _ = next(a for a in data["arts"] if a[1] == "lexical")
-    vals = dec_ints(payload)
-    vals[1] += 2                                              # one term weight +1.0: still a valid payload
-    altered = enc_ints(vals)
-    out["altered_payload_still_decodes"] = len(dec_ints(altered)) == len(vals)
-    out["altered_payload_rejected"] = artifact_checksum(key, codec, altered) != ck
-    a1, a2 = [a for a in data["arts"] if a[1] == "lexical"][:2]
-    out["swapped_payloads_rejected"] = (artifact_checksum(a1[0], a1[4], a2[5]) != a1[6]
-                                        and artifact_checksum(a2[0], a2[4], a1[5]) != a2[6])
-    text, s = next(iter(data["strings"].items()))
-    out["altered_string_rejected"] = string_checksum(s, text + "x") != string_checksum(s, text)
-    out["string_moved_to_another_sid_rejected"] = string_checksum(s + 1, text) != string_checksum(s, text)
-    codec, payload = data["glob"]["bm25.lengths"]
+MANIFEST_TABLES = {  # table -> primary-key column positions (insert column order), used for canonical sorting
+    "manifest": (0,),
+    "file_artifacts": (0, 1),
+    "provides": (1, 2, 0, 3),
+    "consumes": (1, 2, 0),
+    "excluded": (0,),
+}
+
+
+def _canon(value):
+    if isinstance(value, (bytes, bytearray)):
+        return {"b": bytes(value).hex()}
+    return value
+
+
+def manifest_digest(tables: dict) -> bytes:
+    """generations.manifest_sha256: canonical JSON of every published row, de-duplicated and sorted by primary key."""
+    h = hashlib.sha256(b"manifest-v1\0")
+    for name, pk in MANIFEST_TABLES.items():
+        rows = {tuple(row[i] for i in pk): tuple(row) for row in tables.get(name, [])}
+        h.update(_framed(name.encode(), json.dumps(
+            [[_canon(v) for v in rows[k]] for k in sorted(rows)], separators=(",", ":")).encode()))
+    return h.digest()
+
+
+def verify_database(path: Path) -> list:
+    """
+    Reader-side verification of a prototype database, in one read transaction. Returns the problems found (empty
+    when the database may be used). Checks: a published current generation; the manifest digest; for every manifest
+    path and kind, an artifact reference, an existing artifact row whose kind, path, extractor fingerprint, codec and
+    key equal what the reader expects (the key is recomputed from the expected inputs), a valid checksum and a
+    payload that decodes; no reference from an unknown path; global-state checksums; shared-string checksums.
+    """
+    problems = []
+    c = sqlite3.connect(path, isolation_level=None)
+    c.execute("PRAGMA query_only = ON")
+    c.execute("BEGIN")
+    try:
+        meta = dict(c.execute("SELECT key, value FROM meta"))
+        gen = c.execute("SELECT state, manifest_sha256 FROM generations WHERE gen_id = ?",
+                        (int(meta.get("current_generation", -1)),)).fetchone()
+        if gen is None or gen[0] != "published":
+            return ["no published current generation"]
+        tables = {name: c.execute(f"SELECT * FROM {name}").fetchall() for name in MANIFEST_TABLES}
+        if manifest_digest(tables) != gen[1]:
+            problems.append("manifest_sha256 does not match the published rows")
+        manifest = {row[0]: row for row in tables["manifest"]}
+        refs = {(p, k): key for p, k, key in tables["file_artifacts"]}
+        problems += [f"artifact reference for unknown path {p!r}" for p, _ in refs if p not in manifest]
+        for p, row in manifest.items():
+            text_sha = row[7]
+            for kind in KINDS:
+                key = refs.get((p, kind))
+                if key is None:
+                    problems.append(f"{p}: no {kind} artifact reference")
+                    continue
+                art = c.execute("SELECT kind, extractor_fp, path, codec, payload, checksum FROM artifacts "
+                                "WHERE artifact_key = ?", (key,)).fetchone()
+                if art is None:
+                    problems.append(f"{p}: {kind} artifact missing")
+                    continue
+                a_kind, a_fp, a_path, codec, payload, ck = art
+                expected_fp = EXTRACTOR_FP[kind]
+                if (a_kind, a_path, a_fp) != (kind, p, expected_fp):
+                    problems.append(f"{p}: {kind} artifact metadata differs (kind/path/extractor_fp)")
+                if codec not in ALLOWED_CODECS[kind]:
+                    problems.append(f"{p}: {kind} artifact has unexpected codec {codec!r}")
+                if key != artifact_key(kind, expected_fp, p, text_sha):
+                    problems.append(f"{p}: {kind} artifact key does not match the expected inputs")
+                if ck != artifact_checksum(key, a_kind, a_fp, a_path, codec, payload):
+                    problems.append(f"{p}: {kind} artifact checksum mismatch")
+                    continue
+                try:
+                    decode(codec, payload)
+                except Exception as exc:  # report, never trust
+                    problems.append(f"{p}: {kind} payload does not decode ({type(exc).__name__})")
+        for name, gen_id, codec, payload, ck in c.execute(
+                "SELECT name, gen_id, codec, payload, checksum FROM global_state"):
+            if ck != global_checksum(name, gen_id, codec, payload):
+                problems.append(f"global state {name!r} checksum mismatch")
+        for sid, text, ck in c.execute("SELECT sid, text, checksum FROM strings"):
+            if ck != string_checksum(sid, text):
+                problems.append(f"string {sid} checksum mismatch")
+                break
+    finally:
+        c.execute("COMMIT")
+        c.close()
+    return problems
+
+
+def _first(c, sql, *args):
+    return c.execute(sql, args).fetchone()
+
+
+def _reencode_with_changed_count(codec: str, payload: bytes) -> bytes:
+    if codec.startswith("sid-pairs"):
+        vals = dec_ints(payload)
+        vals[1] += 2
+        return enc_ints(vals)
+    pairs = decode_inline(payload, True)
+    pairs[0] = (pairs[0][0], pairs[0][1] + 2)
+    return InlineStrings().pairs(pairs)[1]
+
+
+def _corrupt_reencoded_payload(c):
+    key, codec, payload = _first(c, "SELECT artifact_key, codec, payload FROM artifacts WHERE kind = 'lexical'")
+    altered = _reencode_with_changed_count(codec, payload)
+    decode(codec, altered)  # precondition: the corrupted payload is structurally valid
+    assert altered != payload
+    c.execute("UPDATE artifacts SET payload = ? WHERE artifact_key = ?", (altered, key))
+
+
+def _swap(c, columns):
+    (k1, *v1), (k2, *v2) = c.execute(
+        f"SELECT artifact_key, {columns} FROM artifacts WHERE kind = 'lexical' LIMIT 2").fetchall()
+    sets = ", ".join(f"{col.strip()} = ?" for col in columns.split(","))
+    c.execute(f"UPDATE artifacts SET {sets} WHERE artifact_key = ?", (*v2, k1))
+    c.execute(f"UPDATE artifacts SET {sets} WHERE artifact_key = ?", (*v1, k2))
+
+
+def _corrupt_global_state(c):
+    codec, payload = _first(c, "SELECT codec, payload FROM global_state WHERE name = 'bm25.lengths'")
     arr = np.frombuffer(zlib.decompress(payload), "<f4").copy()
     arr[0] += 1.0
-    out["altered_global_state_rejected"] = (global_checksum("bm25.lengths", 1, codec, zlib.compress(arr.tobytes(), 6))
-                                            != global_checksum("bm25.lengths", 1, codec, payload))
-    return out
+    c.execute("UPDATE global_state SET payload = ? WHERE name = 'bm25.lengths'", (zlib.compress(arr.tobytes(), 6),))
+
+
+def _lexical_key(c):
+    return _first(c, "SELECT artifact_key FROM artifacts WHERE kind = 'lexical'")[0]
+
+
+def _change_key_consistently(c):
+    old = _lexical_key(c)
+    new = hashlib.sha256(b"forged" + old).digest()
+    c.execute("UPDATE artifacts SET artifact_key = ? WHERE artifact_key = ?", (new, old))
+    c.execute("UPDATE file_artifacts SET artifact_key = ? WHERE artifact_key = ?", (new, old))
+
+
+CORRUPTIONS = {
+    "payload_reencoded_with_a_changed_count (decodes)": _corrupt_reencoded_payload,
+    "two_payloads_swapped": lambda c: _swap(c, "payload"),
+    "two_payloads_swapped_with_their_checksums": lambda c: _swap(c, "payload, checksum"),
+    "global_state_array_value_changed (decodes)": _corrupt_global_state,
+    "artifact_kind_changed": lambda c: c.execute(
+        "UPDATE artifacts SET kind = 'semantic' WHERE artifact_key = ?", (_lexical_key(c),)),
+    "artifact_path_changed": lambda c: c.execute(
+        "UPDATE artifacts SET path = 'elsewhere.py' WHERE artifact_key = ?", (_lexical_key(c),)),
+    "artifact_extractor_fp_changed": lambda c: c.execute(
+        "UPDATE artifacts SET extractor_fp = ? WHERE artifact_key = ?", (b"\x00" * 32, _lexical_key(c))),
+    "artifact_codec_changed": lambda c: c.execute(
+        "UPDATE artifacts SET codec = 'json+zlib/1' WHERE artifact_key = ?", (_lexical_key(c),)),
+    "artifact_key_changed_consistently_in_both_tables": _change_key_consistently,
+    "manifest_content_sha256_changed": lambda c: c.execute(
+        "UPDATE manifest SET content_sha256 = ? WHERE rowid = (SELECT min(rowid) FROM manifest)", (b"\x01" * 32,)),
+    "manifest_is_test_flipped": lambda c: c.execute(
+        "UPDATE manifest SET is_test = 1 - is_test WHERE rowid = (SELECT min(rowid) FROM manifest)"),
+    "file_artifacts_reference_deleted": lambda c: c.execute(
+        "DELETE FROM file_artifacts WHERE rowid = (SELECT min(rowid) FROM file_artifacts)"),
+    "referenced_artifact_row_deleted": lambda c: c.execute(
+        "DELETE FROM artifacts WHERE artifact_key = ?", (_lexical_key(c),)),
+    "current_generation_not_published": lambda c: c.execute("UPDATE generations SET state = 'building'"),
+}
+STRING_CORRUPTIONS = {
+    "shared_string_text_changed": lambda c: c.execute(
+        "UPDATE strings SET text = text || 'x' WHERE sid = (SELECT min(sid) FROM strings)"),
+}
+
+
+def corruption_suite(db_path: Path, workdir: Path) -> dict:
+    """Applies each corruption to a fresh copy of ``db_path`` and records whether verify_database rejects it."""
+    workdir.mkdir(parents=True, exist_ok=True)
+    baseline = verify_database(db_path)
+    results = {"baseline_problems": baseline}
+    has_strings = sqlite3.connect(db_path).execute("SELECT count(*) FROM strings").fetchone()[0] > 0
+    cases = {**CORRUPTIONS, **(STRING_CORRUPTIONS if has_strings else {})}
+    for i, (name, corrupt) in enumerate(cases.items()):
+        copy = workdir / f"case{i}.sqlite3"
+        shutil.copyfile(db_path, copy)
+        c = sqlite3.connect(copy, isolation_level=None)   # foreign_keys stays OFF: simulate external corruption
+        corrupt(c)
+        c.close()
+        problems = verify_database(copy)
+        results[name] = {"rejected": bool(problems), "first_problems": problems[:2]}
+    results["all_rejected"] = all(v["rejected"] for k, v in results.items() if isinstance(v, dict))
+    return results
 
 
 def measure(repo: str, workdir: Path, snap=None) -> dict:
@@ -545,8 +741,8 @@ def measure(repo: str, workdir: Path, snap=None) -> dict:
                                                         + res["2_string_table"]["utf8_text_bytes"]) / source, 3),
             "database_file": round(db / source, 3)}
         res["projection_100k_files_database_bytes (linear, estimate)"] = int(db / len(docs) * 100_000)
-        if isinstance(enc, SharedStrings):
-            res["corruption_checks"] = corruption_checks(data)
+        res["verification_of_the_written_database"] = verify_database(work / "prototype.sqlite3") or "clean"
+        res["corruption_suite"] = corruption_suite(work / "prototype.sqlite3", work / "corrupted")
         out[enc.name] = res
     return out
 

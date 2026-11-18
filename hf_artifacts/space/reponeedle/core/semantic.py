@@ -4,12 +4,16 @@ Operates completely offline with zero network dependency using vectorized n-gram
 """
 
 import math
-from typing import List, Dict, Set, Optional, Sequence
+from typing import List, Dict, Set, Optional, Sequence, Tuple
 import numpy as np
 from scipy import sparse
 
 from reponeedle.models import FileDoc
+from reponeedle.core.signatures import stable_signature
 from reponeedle.core.tokenizer import CodeTokenizer
+
+# Bump when the per-document feature extraction changes its output for the same inputs.
+FEATURES_SIGNATURE_VERSION = "semantic-doc-features/1"
 
 
 class SubwordSemanticIndex:
@@ -56,6 +60,15 @@ class SubwordSemanticIndex:
 
         return features
 
+    @staticmethod
+    def _feature_text(doc: FileDoc) -> str:
+        """The exact text features are extracted from: path, symbols and the first 8,000 characters."""
+        return f"{doc.path} {' '.join(doc.symbols)} {doc.content[:8000]}"
+
+    def doc_signature(self, doc: FileDoc) -> str:
+        """Deterministic signature of everything the per-document feature extraction reads."""
+        return stable_signature(FEATURES_SIGNATURE_VERSION, self.min_n, self.max_n, self._feature_text(doc))
+
     def fit(self, docs: List[FileDoc]) -> "SubwordSemanticIndex":
         """
         Fits semantic index on repository documents.
@@ -64,6 +77,10 @@ class SubwordSemanticIndex:
         self.num_docs = len(docs)
         self.doc_paths = [d.path for d in docs]
         if self.num_docs == 0:
+            # Same derived state as a never-fitted index: nothing from an earlier fit may survive.
+            self.vocabulary = {}
+            self.idf = np.array([], dtype=np.float32)
+            self.doc_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
             return self
 
         # 1. Count document frequencies
@@ -72,12 +89,11 @@ class SubwordSemanticIndex:
 
         for doc in docs:
             cache_key = doc.path
-            sym_str = ",".join(doc.symbols) if doc.symbols else ""
-            content_sig = f"{doc.path}::{len(doc.content)}::{hash(doc.content)}::{sym_str}"
+            content_sig = self.doc_signature(doc)
             if cache_key in self._doc_feature_cache and self._doc_feature_cache[cache_key][0] == content_sig:
                 counts = self._doc_feature_cache[cache_key][1]
             else:
-                combined_text = f"{doc.path} {' '.join(doc.symbols)} {doc.content[:8000]}"
+                combined_text = self._feature_text(doc)
                 feats = self._extract_features(combined_text)
                 counts = {}
                 for f in feats:

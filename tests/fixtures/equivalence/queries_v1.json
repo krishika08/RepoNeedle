@@ -1,0 +1,1132 @@
+{
+ "version": 1,
+ "description": "Frozen query corpus for the index-equivalence harness (tests/index_equivalence.py). Do not edit in place: add a new version file so earlier results stay comparable.",
+ "count": 225,
+ "queries": [
+  {
+   "id": "identifier-000",
+   "category": "identifier",
+   "text": "Cart"
+  },
+  {
+   "id": "identifier-001",
+   "category": "identifier",
+   "text": "add_item"
+  },
+  {
+   "id": "identifier-002",
+   "category": "identifier",
+   "text": "remove_item"
+  },
+  {
+   "id": "identifier-003",
+   "category": "identifier",
+   "text": "apply_discount"
+  },
+  {
+   "id": "identifier-004",
+   "category": "identifier",
+   "text": "price_for"
+  },
+  {
+   "id": "identifier-005",
+   "category": "identifier",
+   "text": "Inventory"
+  },
+  {
+   "id": "identifier-006",
+   "category": "identifier",
+   "text": "OutOfStock"
+  },
+  {
+   "id": "identifier-007",
+   "category": "identifier",
+   "text": "normalize"
+  },
+  {
+   "id": "identifier-008",
+   "category": "identifier",
+   "text": "slugify"
+  },
+  {
+   "id": "identifier-009",
+   "category": "identifier",
+   "text": "load_config"
+  },
+  {
+   "id": "identifier-010",
+   "category": "identifier",
+   "text": "checkout_handler"
+  },
+  {
+   "id": "identifier-011",
+   "category": "identifier",
+   "text": "health_handler"
+  },
+  {
+   "id": "identifier-012",
+   "category": "identifier",
+   "text": "import_rows"
+  },
+  {
+   "id": "identifier-013",
+   "category": "identifier",
+   "text": "fetchCart"
+  },
+  {
+   "id": "identifier-014",
+   "category": "identifier",
+   "text": "formatPrice"
+  },
+  {
+   "id": "identifier-015",
+   "category": "identifier",
+   "text": "Reserve"
+  },
+  {
+   "id": "identifier-016",
+   "category": "identifier",
+   "text": "quote"
+  },
+  {
+   "id": "identifier-017",
+   "category": "identifier",
+   "text": "Checkout"
+  },
+  {
+   "id": "identifier-018",
+   "category": "identifier",
+   "text": "Discount"
+  },
+  {
+   "id": "identifier-019",
+   "category": "identifier",
+   "text": "rule_0042"
+  },
+  {
+   "id": "identifier-020",
+   "category": "identifier",
+   "text": "GRÖSSEN"
+  },
+  {
+   "id": "identifier-021",
+   "category": "identifier",
+   "text": "PRICES"
+  },
+  {
+   "id": "identifier-022",
+   "category": "identifier",
+   "text": "reserve"
+  },
+  {
+   "id": "identifier-023",
+   "category": "identifier",
+   "text": "total"
+  },
+  {
+   "id": "identifier-024",
+   "category": "identifier",
+   "text": "stock"
+  },
+  {
+   "id": "identifier-025",
+   "category": "identifier",
+   "text": "rules"
+  },
+  {
+   "id": "identifier-026",
+   "category": "identifier",
+   "text": "apply"
+  },
+  {
+   "id": "identifier-027",
+   "category": "identifier",
+   "text": "settings"
+  },
+  {
+   "id": "identifier-028",
+   "category": "identifier",
+   "text": "tax_rate"
+  },
+  {
+   "id": "identifier-029",
+   "category": "identifier",
+   "text": "currency"
+  },
+  {
+   "id": "function_name-000",
+   "category": "function_name",
+   "text": "where is apply_discount defined"
+  },
+  {
+   "id": "function_name-001",
+   "category": "function_name",
+   "text": "callers of normalize"
+  },
+  {
+   "id": "function_name-002",
+   "category": "function_name",
+   "text": "who calls price_for"
+  },
+  {
+   "id": "function_name-003",
+   "category": "function_name",
+   "text": "definition of Cart.total"
+  },
+  {
+   "id": "function_name-004",
+   "category": "function_name",
+   "text": "implementation of Inventory.reserve"
+  },
+  {
+   "id": "function_name-005",
+   "category": "function_name",
+   "text": "function slugify"
+  },
+  {
+   "id": "function_name-006",
+   "category": "function_name",
+   "text": "load_config function"
+  },
+  {
+   "id": "function_name-007",
+   "category": "function_name",
+   "text": "checkout_handler implementation"
+  },
+  {
+   "id": "function_name-008",
+   "category": "function_name",
+   "text": "fetchCart async function"
+  },
+  {
+   "id": "function_name-009",
+   "category": "function_name",
+   "text": "formatPrice rounding"
+  },
+  {
+   "id": "function_name-010",
+   "category": "function_name",
+   "text": "Reserve in the stock package"
+  },
+  {
+   "id": "function_name-011",
+   "category": "function_name",
+   "text": "quote function in the rust crate"
+  },
+  {
+   "id": "function_name-012",
+   "category": "function_name",
+   "text": "Discount.apply static method"
+  },
+  {
+   "id": "function_name-013",
+   "category": "function_name",
+   "text": "import_rows legacy"
+  },
+  {
+   "id": "function_name-014",
+   "category": "function_name",
+   "text": "rule_0123 pricing rule"
+  },
+  {
+   "id": "function_name-015",
+   "category": "function_name",
+   "text": "rule_0399"
+  },
+  {
+   "id": "function_name-016",
+   "category": "function_name",
+   "text": "health_handler endpoint"
+  },
+  {
+   "id": "function_name-017",
+   "category": "function_name",
+   "text": "Cart.__init__ inventory"
+  },
+  {
+   "id": "function_name-018",
+   "category": "function_name",
+   "text": "remove_item from cart"
+  },
+  {
+   "id": "function_name-019",
+   "category": "function_name",
+   "text": "größe_für function"
+  },
+  {
+   "id": "function_name-020",
+   "category": "function_name",
+   "text": "翻訳 function"
+  },
+  {
+   "id": "function_name-021",
+   "category": "function_name",
+   "text": "OutOfStock exception class"
+  },
+  {
+   "id": "function_name-022",
+   "category": "function_name",
+   "text": "price_for tax"
+  },
+  {
+   "id": "function_name-023",
+   "category": "function_name",
+   "text": "apply_discount percent"
+  },
+  {
+   "id": "function_name-024",
+   "category": "function_name",
+   "text": "Checkout.total java"
+  },
+  {
+   "id": "path-000",
+   "category": "path",
+   "text": "shop/cart.py"
+  },
+  {
+   "id": "path-001",
+   "category": "path",
+   "text": "shop/pricing.py"
+  },
+  {
+   "id": "path-002",
+   "category": "path",
+   "text": "shop/inventory.py"
+  },
+  {
+   "id": "path-003",
+   "category": "path",
+   "text": "shop/utils/strings.py"
+  },
+  {
+   "id": "path-004",
+   "category": "path",
+   "text": "shop/utils/config.py"
+  },
+  {
+   "id": "path-005",
+   "category": "path",
+   "text": "shop/api/routes.py"
+  },
+  {
+   "id": "path-006",
+   "category": "path",
+   "text": "legacy/utils.py"
+  },
+  {
+   "id": "path-007",
+   "category": "path",
+   "text": "legacy/importer.py"
+  },
+  {
+   "id": "path-008",
+   "category": "path",
+   "text": "tests/test_cart.py"
+  },
+  {
+   "id": "path-009",
+   "category": "path",
+   "text": "tests/test_pricing.py"
+  },
+  {
+   "id": "path-010",
+   "category": "path",
+   "text": "tests/test_routes.py"
+  },
+  {
+   "id": "path-011",
+   "category": "path",
+   "text": "web/src/api.ts"
+  },
+  {
+   "id": "path-012",
+   "category": "path",
+   "text": "web/src/format.ts"
+  },
+  {
+   "id": "path-013",
+   "category": "path",
+   "text": "web/src/cart.test.ts"
+  },
+  {
+   "id": "path-014",
+   "category": "path",
+   "text": "svc/main.go"
+  },
+  {
+   "id": "path-015",
+   "category": "path",
+   "text": "svc/stock/stock.go"
+  },
+  {
+   "id": "path-016",
+   "category": "path",
+   "text": "svc/go.mod"
+  },
+  {
+   "id": "path-017",
+   "category": "path",
+   "text": "engine/src/lib.rs"
+  },
+  {
+   "id": "path-018",
+   "category": "path",
+   "text": "engine/Cargo.toml"
+  },
+  {
+   "id": "path-019",
+   "category": "path",
+   "text": "java/src/main/java/shop/Checkout.java"
+  },
+  {
+   "id": "path-020",
+   "category": "path",
+   "text": "config/settings.yaml"
+  },
+  {
+   "id": "path-021",
+   "category": "path",
+   "text": "README.md"
+  },
+  {
+   "id": "path-022",
+   "category": "path",
+   "text": "docs/ARCHITECTURE.md"
+  },
+  {
+   "id": "path-023",
+   "category": "path",
+   "text": "shop/rules_catalogue.py"
+  },
+  {
+   "id": "path-024",
+   "category": "path",
+   "text": "i18n/übersetzung.py"
+  },
+  {
+   "id": "natural_language-000",
+   "category": "natural_language",
+   "text": "add a coupon field to the cart total"
+  },
+  {
+   "id": "natural_language-001",
+   "category": "natural_language",
+   "text": "make discounts reject values above one hundred percent"
+  },
+  {
+   "id": "natural_language-002",
+   "category": "natural_language",
+   "text": "change the tax rate used for prices"
+  },
+  {
+   "id": "natural_language-003",
+   "category": "natural_language",
+   "text": "support multiple warehouses in the inventory"
+  },
+  {
+   "id": "natural_language-004",
+   "category": "natural_language",
+   "text": "return 404 when the cart is missing"
+  },
+  {
+   "id": "natural_language-005",
+   "category": "natural_language",
+   "text": "log every checkout request"
+  },
+  {
+   "id": "natural_language-006",
+   "category": "natural_language",
+   "text": "cache the configuration after the first load"
+  },
+  {
+   "id": "natural_language-007",
+   "category": "natural_language",
+   "text": "rename the normalize helper"
+  },
+  {
+   "id": "natural_language-008",
+   "category": "natural_language",
+   "text": "speed up the pricing rules catalogue"
+  },
+  {
+   "id": "natural_language-009",
+   "category": "natural_language",
+   "text": "add a health check to the api"
+  },
+  {
+   "id": "natural_language-010",
+   "category": "natural_language",
+   "text": "validate quantities before reserving stock"
+  },
+  {
+   "id": "natural_language-011",
+   "category": "natural_language",
+   "text": "format prices in the web client"
+  },
+  {
+   "id": "natural_language-012",
+   "category": "natural_language",
+   "text": "handle network errors when fetching the cart"
+  },
+  {
+   "id": "natural_language-013",
+   "category": "natural_language",
+   "text": "add currency conversion"
+  },
+  {
+   "id": "natural_language-014",
+   "category": "natural_language",
+   "text": "fix rounding errors in discounts"
+  },
+  {
+   "id": "natural_language-015",
+   "category": "natural_language",
+   "text": "translate size labels"
+  },
+  {
+   "id": "natural_language-016",
+   "category": "natural_language",
+   "text": "remove the legacy importer"
+  },
+  {
+   "id": "natural_language-017",
+   "category": "natural_language",
+   "text": "add a go endpoint to reserve stock"
+  },
+  {
+   "id": "natural_language-018",
+   "category": "natural_language",
+   "text": "expose the rust price engine"
+  },
+  {
+   "id": "natural_language-019",
+   "category": "natural_language",
+   "text": "apply the java discount in checkout"
+  },
+  {
+   "id": "natural_language-020",
+   "category": "natural_language",
+   "text": "make the cart thread safe"
+  },
+  {
+   "id": "natural_language-021",
+   "category": "natural_language",
+   "text": "store the cart in a database"
+  },
+  {
+   "id": "natural_language-022",
+   "category": "natural_language",
+   "text": "add pagination to the api"
+  },
+  {
+   "id": "natural_language-023",
+   "category": "natural_language",
+   "text": "write documentation for the pricing rules"
+  },
+  {
+   "id": "natural_language-024",
+   "category": "natural_language",
+   "text": "deprecate the old normalize function"
+  },
+  {
+   "id": "natural_language-025",
+   "category": "natural_language",
+   "text": "support pears and apples in the price list"
+  },
+  {
+   "id": "natural_language-026",
+   "category": "natural_language",
+   "text": "check stock before adding items"
+  },
+  {
+   "id": "natural_language-027",
+   "category": "natural_language",
+   "text": "raise a clear error when stock runs out"
+  },
+  {
+   "id": "natural_language-028",
+   "category": "natural_language",
+   "text": "compute totals with tax included"
+  },
+  {
+   "id": "natural_language-029",
+   "category": "natural_language",
+   "text": "add a slug to product names"
+  },
+  {
+   "id": "natural_language-030",
+   "category": "natural_language",
+   "text": "migrate settings from yaml to json"
+  },
+  {
+   "id": "natural_language-031",
+   "category": "natural_language",
+   "text": "add logging to inventory reservations"
+  },
+  {
+   "id": "natural_language-032",
+   "category": "natural_language",
+   "text": "the checkout total is wrong when a coupon is used"
+  },
+  {
+   "id": "natural_language-033",
+   "category": "natural_language",
+   "text": "unit tests fail after changing discount rules"
+  },
+  {
+   "id": "natural_language-034",
+   "category": "natural_language",
+   "text": "refactor pricing into its own service"
+  },
+  {
+   "id": "natural_language-035",
+   "category": "natural_language",
+   "text": "add types to the web api client"
+  },
+  {
+   "id": "natural_language-036",
+   "category": "natural_language",
+   "text": "bump the package version"
+  },
+  {
+   "id": "natural_language-037",
+   "category": "natural_language",
+   "text": "describe the architecture of the shop"
+  },
+  {
+   "id": "natural_language-038",
+   "category": "natural_language",
+   "text": "where are configuration values read"
+  },
+  {
+   "id": "natural_language-039",
+   "category": "natural_language",
+   "text": "how does the cart compute its total"
+  },
+  {
+   "id": "test_discovery-000",
+   "category": "test_discovery",
+   "text": "tests for Cart.add_item"
+  },
+  {
+   "id": "test_discovery-001",
+   "category": "test_discovery",
+   "text": "which test covers apply_discount"
+  },
+  {
+   "id": "test_discovery-002",
+   "category": "test_discovery",
+   "text": "test for out of stock errors"
+  },
+  {
+   "id": "test_discovery-003",
+   "category": "test_discovery",
+   "text": "unit tests for pricing"
+  },
+  {
+   "id": "test_discovery-004",
+   "category": "test_discovery",
+   "text": "tests for checkout_handler"
+  },
+  {
+   "id": "test_discovery-005",
+   "category": "test_discovery",
+   "text": "test file for the cart"
+  },
+  {
+   "id": "test_discovery-006",
+   "category": "test_discovery",
+   "text": "tests that use Inventory"
+  },
+  {
+   "id": "test_discovery-007",
+   "category": "test_discovery",
+   "text": "test negative discount"
+  },
+  {
+   "id": "test_discovery-008",
+   "category": "test_discovery",
+   "text": "what tests exercise price_for"
+  },
+  {
+   "id": "test_discovery-009",
+   "category": "test_discovery",
+   "text": "web test for fetchCart"
+  },
+  {
+   "id": "test_discovery-010",
+   "category": "test_discovery",
+   "text": "tests for routes"
+  },
+  {
+   "id": "test_discovery-011",
+   "category": "test_discovery",
+   "text": "pytest raises ValueError discount"
+  },
+  {
+   "id": "test_discovery-012",
+   "category": "test_discovery",
+   "text": "test_add_item_updates_total"
+  },
+  {
+   "id": "test_discovery-013",
+   "category": "test_discovery",
+   "text": "test_out_of_stock_raises"
+  },
+  {
+   "id": "test_discovery-014",
+   "category": "test_discovery",
+   "text": "test_apply_discount"
+  },
+  {
+   "id": "test_discovery-015",
+   "category": "test_discovery",
+   "text": "test_negative_discount_rejected"
+  },
+  {
+   "id": "test_discovery-016",
+   "category": "test_discovery",
+   "text": "test_checkout_handler"
+  },
+  {
+   "id": "test_discovery-017",
+   "category": "test_discovery",
+   "text": "regression tests for normalize"
+  },
+  {
+   "id": "test_discovery-018",
+   "category": "test_discovery",
+   "text": "tests for the legacy importer"
+  },
+  {
+   "id": "test_discovery-019",
+   "category": "test_discovery",
+   "text": "tests for the go stock service"
+  },
+  {
+   "id": "test_discovery-020",
+   "category": "test_discovery",
+   "text": "tests for the rust engine"
+  },
+  {
+   "id": "test_discovery-021",
+   "category": "test_discovery",
+   "text": "tests for java checkout"
+  },
+  {
+   "id": "test_discovery-022",
+   "category": "test_discovery",
+   "text": "add a test for slugify"
+  },
+  {
+   "id": "test_discovery-023",
+   "category": "test_discovery",
+   "text": "missing tests for load_config"
+  },
+  {
+   "id": "test_discovery-024",
+   "category": "test_discovery",
+   "text": "tests covering remove_item"
+  },
+  {
+   "id": "stack_trace-000",
+   "category": "stack_trace",
+   "text": "Traceback (most recent call last):\n  File \"shop/cart.py\", line 14, in add_item\n    self.inventory.reserve(sku, quantity)\n  File \"shop/inventory.py\", line 13, in reserve\n    raise OutOfStock(sku)\nshop.inventory.OutOfStock: PEAR"
+  },
+  {
+   "id": "stack_trace-001",
+   "category": "stack_trace",
+   "text": "Traceback (most recent call last):\n  File \"shop/pricing.py\", line 10, in apply_discount\n    raise ValueError('discount must be positive')\nValueError: discount must be positive"
+  },
+  {
+   "id": "stack_trace-002",
+   "category": "stack_trace",
+   "text": "Traceback (most recent call last):\n  File \"shop/api/routes.py\", line 8, in checkout_handler\n    cart.add_item(line['sku'], line['qty'])\nKeyError: 'qty'"
+  },
+  {
+   "id": "stack_trace-003",
+   "category": "stack_trace",
+   "text": "Traceback (most recent call last):\n  File \"shop/pricing.py\", line 6, in price_for\n    return PRICES.get(sku, 0) * (1 + load_config()['tax_rate'])\nKeyError: 'tax_rate'"
+  },
+  {
+   "id": "stack_trace-004",
+   "category": "stack_trace",
+   "text": "AttributeError: 'NoneType' object has no attribute 'strip' in normalize shop/utils/strings.py line 2"
+  },
+  {
+   "id": "stack_trace-005",
+   "category": "stack_trace",
+   "text": "TypeError: unsupported operand type(s) for *: 'NoneType' and 'float' in price_for"
+  },
+  {
+   "id": "stack_trace-006",
+   "category": "stack_trace",
+   "text": "panic: runtime error: invalid memory address\ngoroutine 1 [running]:\nexample.com/svc/stock.Reserve(...)\n\tsvc/stock/stock.go:4\nmain.main()\n\tsvc/main.go:6"
+  },
+  {
+   "id": "stack_trace-007",
+   "category": "stack_trace",
+   "text": "TypeError: Cannot read properties of undefined (reading 'json')\n    at fetchCart (web/src/api.ts:4:30)"
+  },
+  {
+   "id": "stack_trace-008",
+   "category": "stack_trace",
+   "text": "thread 'main' panicked at engine/src/rules.rs:2:5 in rules::apply"
+  },
+  {
+   "id": "stack_trace-009",
+   "category": "stack_trace",
+   "text": "Exception in thread \"main\" java.lang.NullPointerException\n\tat shop.Checkout.total(Checkout.java:5)\n\tat shop.Discount.apply(Discount.java:4)"
+  },
+  {
+   "id": "stack_trace-010",
+   "category": "stack_trace",
+   "text": "ImportError: cannot import name 'normalize' from 'legacy.utils'"
+  },
+  {
+   "id": "stack_trace-011",
+   "category": "stack_trace",
+   "text": "ModuleNotFoundError: No module named 'shop.utils.config'"
+  },
+  {
+   "id": "stack_trace-012",
+   "category": "stack_trace",
+   "text": "RecursionError: maximum recursion depth exceeded in slugify"
+  },
+  {
+   "id": "stack_trace-013",
+   "category": "stack_trace",
+   "text": "AssertionError: assert 0 > 0 in tests/test_cart.py::test_add_item_updates_total"
+  },
+  {
+   "id": "stack_trace-014",
+   "category": "stack_trace",
+   "text": "UnicodeDecodeError in i18n/übersetzung.py größe_für"
+  },
+  {
+   "id": "empty_match-000",
+   "category": "empty_match",
+   "text": "qwxzv"
+  },
+  {
+   "id": "empty_match-001",
+   "category": "empty_match",
+   "text": "zzzzzz"
+  },
+  {
+   "id": "empty_match-002",
+   "category": "empty_match",
+   "text": "xylophone quartz"
+  },
+  {
+   "id": "empty_match-003",
+   "category": "empty_match",
+   "text": "!!!"
+  },
+  {
+   "id": "empty_match-004",
+   "category": "empty_match",
+   "text": "???"
+  },
+  {
+   "id": "empty_match-005",
+   "category": "empty_match",
+   "text": "---"
+  },
+  {
+   "id": "empty_match-006",
+   "category": "empty_match",
+   "text": "0000"
+  },
+  {
+   "id": "empty_match-007",
+   "category": "empty_match",
+   "text": "lorem ipsum dolor"
+  },
+  {
+   "id": "empty_match-008",
+   "category": "empty_match",
+   "text": "abcdefghijk"
+  },
+  {
+   "id": "empty_match-009",
+   "category": "empty_match",
+   "text": "qqqq wwww"
+  },
+  {
+   "id": "empty_match-010",
+   "category": "empty_match",
+   "text": "plmokn"
+  },
+  {
+   "id": "empty_match-011",
+   "category": "empty_match",
+   "text": "vbnmzx"
+  },
+  {
+   "id": "empty_match-012",
+   "category": "empty_match",
+   "text": "jjjjjj kkkkk"
+  },
+  {
+   "id": "empty_match-013",
+   "category": "empty_match",
+   "text": "zxcvbnmasdf"
+  },
+  {
+   "id": "empty_match-014",
+   "category": "empty_match",
+   "text": "uuuuuuuu"
+  },
+  {
+   "id": "out_of_scope-000",
+   "category": "out_of_scope",
+   "text": "how to bake sourdough bread"
+  },
+  {
+   "id": "out_of_scope-001",
+   "category": "out_of_scope",
+   "text": "kubernetes ingress tls certificate rotation"
+  },
+  {
+   "id": "out_of_scope-002",
+   "category": "out_of_scope",
+   "text": "best hiking trails in the alps"
+  },
+  {
+   "id": "out_of_scope-003",
+   "category": "out_of_scope",
+   "text": "react native push notifications on ios"
+  },
+  {
+   "id": "out_of_scope-004",
+   "category": "out_of_scope",
+   "text": "train a convolutional neural network on imagenet"
+  },
+  {
+   "id": "out_of_scope-005",
+   "category": "out_of_scope",
+   "text": "postgres vacuum tuning"
+  },
+  {
+   "id": "out_of_scope-006",
+   "category": "out_of_scope",
+   "text": "terraform aws vpc module"
+  },
+  {
+   "id": "out_of_scope-007",
+   "category": "out_of_scope",
+   "text": "spark dataframe join optimisation"
+  },
+  {
+   "id": "out_of_scope-008",
+   "category": "out_of_scope",
+   "text": "configure nginx reverse proxy"
+  },
+  {
+   "id": "out_of_scope-009",
+   "category": "out_of_scope",
+   "text": "write a haiku about autumn"
+  },
+  {
+   "id": "out_of_scope-010",
+   "category": "out_of_scope",
+   "text": "monetary policy and inflation"
+  },
+  {
+   "id": "out_of_scope-011",
+   "category": "out_of_scope",
+   "text": "assemble a gaming pc"
+  },
+  {
+   "id": "out_of_scope-012",
+   "category": "out_of_scope",
+   "text": "football world cup winners"
+  },
+  {
+   "id": "out_of_scope-013",
+   "category": "out_of_scope",
+   "text": "learn to play the violin"
+  },
+  {
+   "id": "out_of_scope-014",
+   "category": "out_of_scope",
+   "text": "dns over https setup"
+  },
+  {
+   "id": "tie_candidates-000",
+   "category": "tie_candidates",
+   "text": "Checkout Discount"
+  },
+  {
+   "id": "tie_candidates-001",
+   "category": "tie_candidates",
+   "text": "java shop"
+  },
+  {
+   "id": "tie_candidates-002",
+   "category": "tie_candidates",
+   "text": "stock reserve"
+  },
+  {
+   "id": "tie_candidates-003",
+   "category": "tie_candidates",
+   "text": "rules apply"
+  },
+  {
+   "id": "tie_candidates-004",
+   "category": "tie_candidates",
+   "text": "engine quote"
+  },
+  {
+   "id": "tie_candidates-005",
+   "category": "tie_candidates",
+   "text": "normalize value"
+  },
+  {
+   "id": "tie_candidates-006",
+   "category": "tie_candidates",
+   "text": "currency warehouse"
+  },
+  {
+   "id": "tie_candidates-007",
+   "category": "tie_candidates",
+   "text": "utils"
+  },
+  {
+   "id": "tie_candidates-008",
+   "category": "tie_candidates",
+   "text": "test"
+  },
+  {
+   "id": "tie_candidates-009",
+   "category": "tie_candidates",
+   "text": "src"
+  },
+  {
+   "id": "multi_signal-000",
+   "category": "multi_signal",
+   "text": "fix the discount validation in pricing and update the cart tests"
+  },
+  {
+   "id": "multi_signal-001",
+   "category": "multi_signal",
+   "text": "the checkout handler returns the wrong total because apply_discount rounds"
+  },
+  {
+   "id": "multi_signal-002",
+   "category": "multi_signal",
+   "text": "inventory reserve raises OutOfStock when adding items to the cart"
+  },
+  {
+   "id": "multi_signal-003",
+   "category": "multi_signal",
+   "text": "normalize is used by both the cart and the inventory"
+  },
+  {
+   "id": "multi_signal-004",
+   "category": "multi_signal",
+   "text": "load_config tax_rate is read in price_for"
+  },
+  {
+   "id": "multi_signal-005",
+   "category": "multi_signal",
+   "text": "web fetchCart uses formatPrice from format.ts"
+  },
+  {
+   "id": "multi_signal-006",
+   "category": "multi_signal",
+   "text": "go main calls stock.Reserve"
+  },
+  {
+   "id": "multi_signal-007",
+   "category": "multi_signal",
+   "text": "rust quote calls rules::apply"
+  },
+  {
+   "id": "multi_signal-008",
+   "category": "multi_signal",
+   "text": "java Checkout total calls Discount apply"
+  },
+  {
+   "id": "multi_signal-009",
+   "category": "multi_signal",
+   "text": "legacy importer normalize differs from shop normalize"
+  },
+  {
+   "id": "multi_signal-010",
+   "category": "multi_signal",
+   "text": "rule_0042 uses apply_discount from shop.pricing"
+  },
+  {
+   "id": "multi_signal-011",
+   "category": "multi_signal",
+   "text": "translate GRÖSSEN labels with größe_für"
+  },
+  {
+   "id": "multi_signal-012",
+   "category": "multi_signal",
+   "text": "checkout_handler builds a Cart and calls add_item"
+  },
+  {
+   "id": "multi_signal-013",
+   "category": "multi_signal",
+   "text": "test_checkout_handler covers routes and cart"
+  },
+  {
+   "id": "multi_signal-014",
+   "category": "multi_signal",
+   "text": "settings.yaml currency and tax_rate used by pricing"
+  },
+  {
+   "id": "unicode-000",
+   "category": "unicode",
+   "text": "größe"
+  },
+  {
+   "id": "unicode-001",
+   "category": "unicode",
+   "text": "größe_für"
+  },
+  {
+   "id": "unicode-002",
+   "category": "unicode",
+   "text": "Übersetzungen"
+  },
+  {
+   "id": "unicode-003",
+   "category": "unicode",
+   "text": "翻訳"
+  },
+  {
+   "id": "unicode-004",
+   "category": "unicode",
+   "text": "翻訳テーブル"
+  },
+  {
+   "id": "unicode-005",
+   "category": "unicode",
+   "text": "🛒"
+  },
+  {
+   "id": "unicode-006",
+   "category": "unicode",
+   "text": "groß"
+  },
+  {
+   "id": "unicode-007",
+   "category": "unicode",
+   "text": "Größenangaben"
+  },
+  {
+   "id": "unicode-008",
+   "category": "unicode",
+   "text": "übersetzung"
+  },
+  {
+   "id": "unicode-009",
+   "category": "unicode",
+   "text": "GRÖSSEN größe"
+  }
+ ]
+}
