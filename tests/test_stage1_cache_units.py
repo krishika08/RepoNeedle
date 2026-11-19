@@ -158,10 +158,14 @@ def test_fingerprints_follow_configuration_versions_and_sources(monkeypatch):
     assert bumped["abstainer"] != base["abstainer"] and bumped["semantic"] == base["semantic"]
     monkeypatch.setitem(fingerprints.ARTIFACT_VERSIONS, "abstainer", 1)
     real = fingerprints.module_source_digest
+    # V2 Stage 3: per-document semantic extraction lives in semantic_features; semantic.py is global assembly only.
     monkeypatch.setattr(fingerprints, "module_source_digest",
-                        lambda n: "edited" if n == "reponeedle.core.semantic" else real(n))
+                        lambda n: "edited" if n == "reponeedle.core.semantic_features" else real(n))
     edited = fingerprints.extractor_fingerprints(RepoNeedleEngine())
     assert edited["semantic"] != base["semantic"] and edited["lexical"] == base["lexical"]
+    monkeypatch.setattr(fingerprints, "module_source_digest",
+                        lambda n: "edited" if n == "reponeedle.core.semantic" else real(n))
+    assert fingerprints.extractor_fingerprints(RepoNeedleEngine()) == base
 
 
 def test_source_digest_ignores_line_endings_only(tmp_path, monkeypatch):

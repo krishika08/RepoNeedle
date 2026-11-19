@@ -142,6 +142,29 @@ def reference_semantic():
         engine_module.SubwordSemanticIndex = real
 
 
+@contextmanager
+def engine_semantic(config: Optional[dict] = None, reference: bool = False):
+    """
+    Engines constructed inside use a semantic index with ``config`` (the engine has no parameter for it), either
+    the production class or, with ``reference=True``, the Stage 2 reference.
+    """
+    import reponeedle.engine as engine_module
+
+    base = ReferenceSemanticIndex if reference else SubwordSemanticIndex
+    config = dict(config or {})
+
+    def __init__(self):
+        base.__init__(self, **config)
+
+    configured = type("ConfiguredSemanticIndex", (base,), {"__init__": __init__})
+    real = engine_module.SubwordSemanticIndex
+    engine_module.SubwordSemanticIndex = configured
+    try:
+        yield
+    finally:
+        engine_module.SubwordSemanticIndex = real
+
+
 def is_float32_product() -> bool:
     """What the expression the Stage 2 fit evaluates (Python float times a numpy float32 scalar) returns here."""
     return isinstance(1.0 * np.float32(1.0), np.float32)

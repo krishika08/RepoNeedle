@@ -1,19 +1,48 @@
 """
 Subword and semantic vector similarity index for code repositories.
 Operates completely offline with zero network dependency using vectorized n-gram and term embeddings.
+
+V2 Stage 3 (exact high-performance reconstruction): ``fit()`` recomputes the whole index on every call, exactly as
+the Stage 2 implementation did (``tests/reference_stage2_semantic.py`` is a verbatim copy, and the tests compare
+every structure with it bit for bit), but in a single pass over the documents' ordered feature counts followed by
+array operations instead of per-pair Python loops. Per-document feature extraction lives in ``semantic_features``.
 """
 
 import math
-from typing import List, Dict, Set, Optional, Sequence, Tuple
+import time
+import warnings
+from itertools import count
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
 import numpy as np
 from scipy import sparse
 
+from reponeedle.core import semantic_features
+from reponeedle.core.semantic_features import FEATURES_SIGNATURE_VERSION  # noqa: F401  (re-exported)
 from reponeedle.models import FileDoc
-from reponeedle.core.signatures import stable_signature
-from reponeedle.core.tokenizer import CodeTokenizer
 
-# Bump when the per-document feature extraction changes its output for the same inputs.
-FEATURES_SIGNATURE_VERSION = "semantic-doc-features/1"
+__all__ = ["SubwordSemanticIndex", "FEATURES_SIGNATURE_VERSION", "product_rule", "PRODUCT_FLOAT32",
+           "PRODUCT_FLOAT64_THEN_FLOAT32", "PRODUCT_SCALAR"]
+
+# How each matrix value ``tf * idf[c]`` (a Python float times a numpy float32 scalar) is evaluated, as observed for
+# the expression itself on every fit: numpy >= 2 (NEP 50) and numpy 1.x with weak promotion return float32; numpy
+# 1.x with legacy promotion returns float64, which the CSR constructor then rounds to float32.
+PRODUCT_FLOAT32 = "float32"
+PRODUCT_FLOAT64_THEN_FLOAT32 = "float64_then_float32"
+PRODUCT_SCALAR = "scalar"          # an unrecognised result type: the Stage 2 per-value loop is used instead
+SELF_CHECK_SAMPLES = 64
+
+
+def product_rule() -> str:
+    """The result type of the expression the matrix values use, evaluated now (promotion can change at runtime)."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        probe = 1.0 * np.float32(1.0)
+    if type(probe) is np.float32:
+        return PRODUCT_FLOAT32
+    if type(probe) is np.float64:
+        return PRODUCT_FLOAT64_THEN_FLOAT32
+    return PRODUCT_SCALAR
 
 
 class SubwordSemanticIndex:
@@ -22,6 +51,12 @@ class SubwordSemanticIndex:
     Constructs high-dimensional subword feature representations to bridge lexical vocabulary mismatches,
     abbreviations, and morphological variations in code identifiers and task descriptions.
     """
+
+    # Per-document extraction (fingerprinted for persisted artifacts as ``semantic_features``), bound directly.
+    _extract_features = semantic_features.extract_features
+    _feature_text = staticmethod(semantic_features.feature_text)
+    doc_signature = semantic_features.doc_signature
+    _count_features = semantic_features.count_features
 
     def __init__(
         self,
@@ -32,8 +67,8 @@ class SubwordSemanticIndex:
         self.min_n = min_n
         self.max_n = max_n
         self.max_features = max_features
-        self.tokenizer = CodeTokenizer()
-        
+        self.tokenizer = semantic_features.new_tokenizer()
+
         self.vocabulary: Dict[str, int] = {}
         self.idf: np.ndarray = np.array([], dtype=np.float32)
         self.doc_matrix: sparse.csr_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
@@ -41,118 +76,184 @@ class SubwordSemanticIndex:
         self.doc_paths: List[str] = []
         self._query_cache: Dict[str, Optional[sparse.csr_matrix]] = {}
         self._doc_feature_cache: Dict[str, Tuple[str, Dict[str, int]]] = {}
-
-    def _extract_features(self, text: str) -> List[str]:
-        """
-        Extracts both word tokens and character n-grams from text.
-        """
-        words = self.tokenizer.tokenize_text(text)
-        features: List[str] = list(words)
-
-        for w in words:
-            if len(w) < self.min_n:
-                continue
-            # Add character n-grams
-            w_bound = f"<{w}>"
-            for n in range(self.min_n, min(len(w_bound) + 1, self.max_n + 1)):
-                for i in range(len(w_bound) - n + 1):
-                    features.append(w_bound[i : i + n])
-
-        return features
-
-    @staticmethod
-    def _feature_text(doc: FileDoc) -> str:
-        """The exact text features are extracted from: path, symbols and the first 8,000 characters."""
-        return f"{doc.path} {' '.join(doc.symbols)} {doc.content[:8000]}"
-
-    def doc_signature(self, doc: FileDoc) -> str:
-        """Deterministic signature of everything the per-document feature extraction reads."""
-        return stable_signature(FEATURES_SIGNATURE_VERSION, self.min_n, self.max_n, self._feature_text(doc))
+        # Diagnostics of the last fit only (not index state: never read by scoring or compared for equivalence).
+        self.fit_stats: Dict[str, Any] = {}
+        self._fits = 0
 
     def fit(self, docs: List[FileDoc]) -> "SubwordSemanticIndex":
         """
         Fits semantic index on repository documents.
+
+        The result is identical to the Stage 2 algorithm: document frequencies in first-seen order (documents in
+        the given order, each document's features in first-occurrence order), the top ``max_features`` features
+        by (document frequency, feature length) descending with ties in first-seen order, smooth IDF
+        ``ln((1 + N) / (1 + df)) + 1`` stored as float32, sublinear TF ``1 + ln(tf)``, and L2-normalised rows.
         """
+        t_start = time.perf_counter()
         self._query_cache.clear()
+        previous = set(self.vocabulary) if self._fits else None
+        self._fits += 1
         self.num_docs = len(docs)
         self.doc_paths = [d.path for d in docs]
-        if self.num_docs == 0:
-            # Same derived state as a never-fitted index: nothing from an earlier fit may survive.
-            self.vocabulary = {}
-            self.idf = np.array([], dtype=np.float32)
-            self.doc_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
+        stats: Dict[str, Any] = {"documents": self.num_docs, "feature_cache_hits": 0, "feature_cache_misses": 0,
+                                 "documents_reextracted": 0, "document_feature_pairs": 0, "distinct_features": 0,
+                                 "vocabulary_size": 0, "matrix_nnz": 0, "idf_entries_computed": 0,
+                                 "product_rule": None, "product_self_check_values": 0,
+                                 "vocabulary_added": None, "vocabulary_removed": None}
+        timings = {"feature_collection_ms": 0.0, "feature_counting_ms": 0.0, "vocabulary_selection_ms": 0.0,
+                   "idf_ms": 0.0, "matrix_assembly_ms": 0.0, "normalisation_ms": 0.0}
+        try:
+            if self.num_docs == 0:
+                # Same derived state as a never-fitted index: nothing from an earlier fit may survive.
+                self.vocabulary = {}
+                self.idf = np.array([], dtype=np.float32)
+                self.doc_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
+                return self
+            self._fit_documents(docs, stats, timings)
             return self
+        finally:
+            if previous is not None:
+                stats["vocabulary_added"] = sum(1 for f in self.vocabulary if f not in previous)
+                stats["vocabulary_removed"] = sum(1 for f in previous if f not in self.vocabulary)
+            stats.update({k: round(v * 1000, 3) for k, v in timings.items()})
+            stats["fit_ms"] = round((time.perf_counter() - t_start) * 1000, 3)
+            self.fit_stats = stats
 
-        # 1. Count document frequencies
+    def _fit_documents(self, docs: List[FileDoc], stats: Dict[str, Any], timings: Dict[str, float]) -> None:
+        # 1. Per-document feature counts: the signature-validated cache, else extraction.
+        t = time.perf_counter()
         doc_feat_counts: List[Dict[str, int]] = []
-        df_counts: Dict[str, int] = {}
-
+        cache = self._doc_feature_cache
         for doc in docs:
             cache_key = doc.path
             content_sig = self.doc_signature(doc)
-            if cache_key in self._doc_feature_cache and self._doc_feature_cache[cache_key][0] == content_sig:
-                counts = self._doc_feature_cache[cache_key][1]
+            cached = cache.get(cache_key)
+            if cached is not None and cached[0] == content_sig:
+                counts = cached[1]
+                stats["feature_cache_hits"] += 1
             else:
-                combined_text = self._feature_text(doc)
-                feats = self._extract_features(combined_text)
-                counts = {}
-                for f in feats:
-                    counts[f] = counts.get(f, 0) + 1
-                self._doc_feature_cache[cache_key] = (content_sig, counts)
-
+                counts = self._count_features(doc)
+                cache[cache_key] = (content_sig, counts)
+                stats["feature_cache_misses"] += 1
             doc_feat_counts.append(counts)
+        stats["documents_reextracted"] = stats["feature_cache_misses"]
+        timings["feature_collection_ms"] = time.perf_counter() - t
 
-            for f in counts.keys():
-                df_counts[f] = df_counts.get(f, 0) + 1
+        # 2. One pass over every (document, feature) pair, in document order and each document's insertion order.
+        # ``first_ticket.setdefault(feature, ticket)`` records, for a feature's FIRST occurrence, the running pair
+        # number at that moment; every later occurrence returns that same number. Features' insertion order is
+        # therefore the Stage 2 ``df_counts`` order, and the recorded numbers increase in that order.
+        t = time.perf_counter()
+        lengths = np.fromiter(map(len, doc_feat_counts), dtype=np.int64, count=len(doc_feat_counts))
+        n_pairs = int(lengths.sum())
+        first_ticket: Dict[str, int] = {}
+        setdefault = first_ticket.setdefault
+        ticket = count()
+        pair_ticket = np.empty(n_pairs, dtype=np.int64)
+        pair_count = np.empty(n_pairs, dtype=np.int64)
+        pos = 0
+        for counts in doc_feat_counts:
+            n = len(counts)
+            pair_ticket[pos:pos + n] = np.fromiter(map(setdefault, counts, ticket), dtype=np.int64, count=n)
+            pair_count[pos:pos + n] = np.fromiter(counts.values(), dtype=np.int64, count=n)
+            pos += n
+        features = list(first_ticket)
+        n_features = len(features)
+        firsts = np.fromiter(first_ticket.values(), dtype=np.int64, count=n_features)
+        del first_ticket
+        # Dense feature id = first-seen index (``firsts`` is strictly increasing, and every pair's ticket is exactly
+        # its feature's first ticket).
+        pair_feature = np.searchsorted(firsts, pair_ticket)
+        del pair_ticket, firsts
+        # A document's counts have each feature once, so pairs per feature = documents containing it.
+        df = np.bincount(pair_feature, minlength=n_features).astype(np.int64, copy=False)
+        stats.update(document_feature_pairs=n_pairs, distinct_features=n_features)
+        timings["feature_counting_ms"] = time.perf_counter() - t
 
-        # 2. Select top features by document frequency
-        # Filter terms that appear in at least 1 doc, sort by DF
-        sorted_feats = sorted(
-            df_counts.items(),
-            key=lambda x: (x[1], len(x[0])),
-            reverse=True,
-        )
-        selected_feats = sorted_feats[: self.max_features]
-        self.vocabulary = {f: idx for idx, (f, _) in enumerate(selected_feats)}
+        # 3. Vocabulary: Stage 2 sorts (df, len) descending with a STABLE sort, so ties keep first-seen order.
+        # lexsort's last key is the primary key; the first-seen index makes the order total (and the sort stable).
+        t = time.perf_counter()
+        feat_len = np.fromiter(map(len, features), dtype=np.int64, count=n_features)
+        order = np.lexsort((np.arange(n_features, dtype=np.int64), -feat_len, -df))
+        selected = order[: self.max_features].tolist()
+        self.vocabulary = {features[i]: idx for idx, i in enumerate(selected)}
         num_features = len(self.vocabulary)
+        stats["vocabulary_size"] = num_features
+        timings["vocabulary_selection_ms"] = time.perf_counter() - t
 
         if num_features == 0:
             self.doc_matrix = sparse.csr_matrix((self.num_docs, 0), dtype=np.float32)
             self.idf = np.zeros(0, dtype=np.float32)
-            return self
+            return
 
-        # 3. Compute smooth IDF: ln((1 + N) / (1 + df)) + 1
+        # 4. Smooth IDF: ln((1 + N) / (1 + df)) + 1, the same scalar expression per entry, stored as float32.
+        t = time.perf_counter()
         idf_vec = np.zeros(num_features, dtype=np.float32)
-        for f, idx in self.vocabulary.items():
-            df = df_counts.get(f, 0)
-            idf_vec[idx] = math.log((1.0 + self.num_docs) / (1.0 + df)) + 1.0
+        df_selected = df[selected].tolist()
+        for idx in range(num_features):
+            idf_vec[idx] = math.log((1.0 + self.num_docs) / (1.0 + df_selected[idx])) + 1.0
         self.idf = idf_vec
+        stats["idf_entries_computed"] = num_features
+        timings["idf_ms"] = time.perf_counter() - t
 
-        # 4. Construct sparse document matrix with sublinear TF: 1 + ln(tf)
-        rows, cols, data = [], [], []
-        for d_idx, counts in enumerate(doc_feat_counts):
-            for f, cnt in counts.items():
-                if f in self.vocabulary:
-                    c_idx = self.vocabulary[f]
-                    tf = 1.0 + math.log(cnt)
-                    val = tf * self.idf[c_idx]
-                    rows.append(d_idx)
-                    cols.append(c_idx)
-                    data.append(val)
-
+        # 5. Sparse document matrix with sublinear TF 1 + ln(tf), through the same SciPy constructor.
+        t = time.perf_counter()
+        column_of = np.full(n_features, -1, dtype=np.int64)
+        column_of[selected] = np.arange(num_features, dtype=np.int64)
+        cols = column_of[pair_feature]
+        del pair_feature, column_of
+        keep = cols >= 0
+        cols = cols[keep]
+        rows = np.repeat(np.arange(self.num_docs, dtype=np.int64), lengths)[keep]
+        tf_counts = pair_count[keep]
+        del keep, pair_count
+        data, rule, checked = self._matrix_values(tf_counts, cols, idf_vec)
+        stats.update(product_rule=rule, product_self_check_values=checked)
         mat = sparse.csr_matrix(
             (data, (rows, cols)),
             shape=(self.num_docs, num_features),
             dtype=np.float32,
         )
-        
-        # L2 normalize rows
+        del data, rows, cols, tf_counts
+        stats["matrix_nnz"] = int(mat.nnz)
+        timings["matrix_assembly_ms"] = time.perf_counter() - t
+
+        # L2 normalize rows (unchanged)
+        t = time.perf_counter()
         row_norms = sparse.linalg.norm(mat, axis=1)
         row_norms[row_norms == 0.0] = 1.0
         mat_norm = mat.multiply(sparse.csr_matrix(1.0 / row_norms[:, np.newaxis]))
         self.doc_matrix = mat_norm.tocsr()
+        timings["normalisation_ms"] = time.perf_counter() - t
 
-        return self
+    @staticmethod
+    def _matrix_values(tf_counts: np.ndarray, cols: np.ndarray, idf: np.ndarray) -> Tuple[Any, str, int]:
+        """
+        The values ``(1.0 + math.log(cnt)) * idf[c]`` of every kept pair, evaluated exactly as the Stage 2 scalar
+        expression is in this numpy (see ``product_rule``). TF values come from the same ``math.log`` expression,
+        once per distinct count. A sample of values is re-evaluated with the scalar expression itself; any
+        difference (or an unrecognised promotion rule) falls back to the scalar expression for every value.
+        """
+        rule = product_rule()
+        if rule != PRODUCT_SCALAR:
+            distinct, inverse = np.unique(tf_counts, return_inverse=True)
+            tf_table = np.array([1.0 + math.log(int(c)) for c in distinct.tolist()], dtype=np.float64)
+            tf = tf_table[inverse.reshape(-1)]
+            if rule == PRODUCT_FLOAT32:
+                data = tf.astype(np.float32) * idf[cols]
+            else:
+                data = (tf * idf[cols].astype(np.float64)).astype(np.float32)
+            n = len(data)
+            sample = sorted(set(np.linspace(0, n - 1, num=min(n, SELF_CHECK_SAMPLES), dtype=np.int64).tolist()))
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                expected = np.array([(1.0 + math.log(int(tf_counts[i]))) * idf[int(cols[i])] for i in sample],
+                                    dtype=np.float32)
+            if expected.tobytes() == data[sample].tobytes():
+                return data, rule, len(sample)
+        # The Stage 2 per-value expression, verbatim.
+        values = [(1.0 + math.log(cnt)) * idf[c] for cnt, c in zip(tf_counts.tolist(), cols.tolist())]
+        return values, PRODUCT_SCALAR, 0
 
     def _get_query_vector(self, query: str) -> Optional[sparse.csr_matrix]:
         """
@@ -230,4 +331,3 @@ class SubwordSemanticIndex:
         scores = self.doc_matrix.dot(q_vec.T).toarray().flatten()
         scores = np.clip(scores, 0.0, 1.0)
         return scores
-

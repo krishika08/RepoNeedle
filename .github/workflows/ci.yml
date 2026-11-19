@@ -305,12 +305,54 @@ jobs:
         run: |
           python -c "import sqlite3, sys; print('Python', sys.version.split()[0], 'SQLite', sqlite3.sqlite_version)"
 
-      - name: Run the persistent index-cache suites, Stage 1 and Stage 2 (skips fail on Linux and macOS)
+      - name: Run the persistent index-cache suites, Stages 1-3 (skips fail on Linux and macOS)
         shell: bash
         env:
           REPONEEDLE_FAIL_ON_SKIP: ${{ matrix.strict && '1' || '0' }}
         run: |
-          pytest -q -rs tests/test_stage1_cache_units.py tests/test_stage1_cache_lifecycle.py tests/test_stage1_cache_corruption.py tests/test_stage1_cache_processes.py tests/test_stage1_persist_exclude.py tests/test_stage2_resolvers.py tests/test_stage2_bookkeeping.py tests/test_stage2_mutations.py tests/test_stage2_cache_safety.py
+          pytest -q -rs tests/test_stage1_cache_units.py tests/test_stage1_cache_lifecycle.py tests/test_stage1_cache_corruption.py tests/test_stage1_cache_processes.py tests/test_stage1_persist_exclude.py tests/test_stage2_resolvers.py tests/test_stage2_bookkeeping.py tests/test_stage2_mutations.py tests/test_stage2_cache_safety.py tests/test_v2_stage3_semantic_reference.py tests/test_v2_stage3_semantic_numerics.py tests/test_v2_stage3_semantic_features.py tests/test_v2_stage3_semantic_diagnostics.py tests/test_v2_stage3_semantic_mutations.py tests/test_v2_stage3_semantic_lifecycle.py tests/test_index_equivalence.py
+
+  semantic-compat:
+    name: Semantic numerics (${{ matrix.label }}, skips fail)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # numpy 1.x evaluates a Python float times a float32 scalar in float64 (legacy promotion) or, with
+          # NPY_PROMOTION_STATE=weak, in float32 like numpy 2.x; the semantic fit must reproduce whichever applies.
+          - { python-version: "3.10", label: "Python 3.10, numpy 1.24.4 / SciPy 1.10.1 minimum, legacy promotion", pins: "numpy==1.24.4 scipy==1.10.1", promotion: "legacy", expect: "float64_then_float32" }
+          - { python-version: "3.10", label: "Python 3.10, numpy 1.24.4 / SciPy 1.10.1 minimum, weak promotion", pins: "numpy==1.24.4 scipy==1.10.1", promotion: "weak", expect: "float32" }
+          - { python-version: "3.12", label: "Python 3.12, numpy 2.x / current SciPy", pins: "numpy>=2", promotion: "", expect: "float32" }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install the package with pinned numpy and SciPy (prebuilt wheels only)
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          read -ra PINS <<< "${{ matrix.pins }}"
+          pip install --only-binary=numpy,scipy "${PINS[@]}" -e ".[dev]"
+          python -c "import numpy, scipy; print('numpy', numpy.__version__, 'scipy', scipy.__version__)"
+
+      - name: Run the semantic reference, Stage 1-3 and equivalence suites
+        shell: bash
+        env:
+          REPONEEDLE_FAIL_ON_SKIP: "1"
+          REPONEEDLE_EXPECT_PRODUCT_RULE: ${{ matrix.expect }}
+        run: |
+          if [ -n "${{ matrix.promotion }}" ]; then export NPY_PROMOTION_STATE="${{ matrix.promotion }}"; fi
+          python -c "import numpy as np; from reponeedle.core.semantic import product_rule; print('promotion', np.__version__, product_rule())"
+          pytest -q -rs tests/test_semantic.py tests/test_stage0_signatures.py tests/test_v2_stage3_semantic_reference.py tests/test_v2_stage3_semantic_numerics.py tests/test_v2_stage3_semantic_features.py tests/test_v2_stage3_semantic_diagnostics.py tests/test_v2_stage3_semantic_mutations.py tests/test_v2_stage3_semantic_lifecycle.py tests/test_stage1_cache_units.py tests/test_stage1_cache_lifecycle.py tests/test_stage1_cache_corruption.py tests/test_stage1_cache_processes.py tests/test_stage1_persist_exclude.py tests/test_stage2_resolvers.py tests/test_stage2_bookkeeping.py tests/test_stage2_mutations.py tests/test_stage2_cache_safety.py tests/test_index_equivalence.py
 
   research-parity:
     name: Research Benchmark Parity (Python 3.11)

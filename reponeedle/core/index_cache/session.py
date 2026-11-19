@@ -12,7 +12,8 @@ A build (V2 Stage 2):
 4. seeds the per-document caches (BM25, semantic, abstainer, function-graph extraction, RepoGraph class-to-test
    facts) with verified artifacts, only where the artifact key recomputed from the CURRENT inputs matches;
 5. assembles the indexes through ``engine._fit(docs, assembly=CachedAssembly(...))``: BM25 partially incrementally
-   when the in-process index can be updated, the semantic index in full (Stage 3), both graphs with
+   when the in-process index can be updated, the semantic index in full (by design; V2 Stage 3 made that
+   reconstruction an exact single pass, reported in ``work_counters['semantic']``), both graphs with
    dependency-scoped re-resolution (only affected files are resolved; every other file's stored edges are replayed
    in discovery order; PageRank and the other global graph quantities are recomputed), the abstainer from reference
    counts. Every path leaves the indexes exactly as the existing fits would;
@@ -66,6 +67,15 @@ class _DocInfo:
     meta: Dict[str, Any]
     doc_meta_sha256: bytes
     meta_reused: bool
+
+
+SEMANTIC_REASON = ("recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document "
+                   "frequencies, vocabulary, IDF and the matrix are not maintained incrementally)")
+
+
+def semantic_counters(sem) -> Dict[str, Any]:
+    """The semantic index's diagnostics of its last fit, for ``IndexUpdateReport.work_counters['semantic']``."""
+    return {**sem.fit_stats, "reason": SEMANTIC_REASON}
 
 
 def _text_digest(content: str) -> bytes:
@@ -138,7 +148,7 @@ class CachedAssembly:
         t = self._lap("bm25_ms", t)
 
         engine.semantic_index.fit(docs)
-        self.counters["semantic"] = {"documents": len(docs), "reason": "vocabulary maintenance is Stage 3"}
+        self.counters["semantic"] = semantic_counters(engine.semantic_index)
         t = self._lap("semantic_ms", t)
 
         excluded = [d for d in docs if self.infos[d.path].excluded]
@@ -766,6 +776,8 @@ class IndexCacheSession:
         report.files_indexed = report.files_extracted = len(scan.docs)
         report.global_structures = {k: MODE_FULL for k in ("bm25", "semantic", "repo_graph", "function_graph",
                                                            "abstainer")}
+        if scan.docs or engine.docs:
+            report.work_counters = {"semantic": semantic_counters(engine.semantic_index)}
         return self._finish(report, timer)
 
     def _unavailable(self, engine, report, timer, reason) -> IndexUpdateReport:
