@@ -499,5 +499,6 @@ python $D/stage2_benchmark.py --files 30000 --profile reduced --rounds 1 --serie
   recomputed in full on every build and reported as such; fallbacks are labelled `fallback_full` with a reason.
 - No raw source text is stored. No Stage 3 (semantic) or Stage 4 (optional components, CLI/MCP, cache commands)
   work was introduced. No new runtime dependency.
-- Package version `1.2.0`. No release, tag, PyPI upload, Hugging Face upload or Render deployment. The bundled Space
-  copy of the package was re-synchronised locally only. The PR is not merged.
+- Package version `1.2.0`. PR #25 was merged into `main` as merge commit
+  `95581df365052a8d368a0ba0a092f052296a7626`. No release, tag, PyPI upload, Hugging Face upload or Render
+  deployment was performed. The bundled Space copy of the package was re-synchronised locally only.
