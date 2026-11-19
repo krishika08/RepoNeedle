@@ -2,7 +2,7 @@
 
 This roadmap is grounded in empirical limitations observed during benchmark evaluations. Status labels distinguish what has been **released** (1.1.0 and 1.2.0) and what is **not implemented**.
 
-*Last reconciled with the source code: 2026-11-18.*
+*Last reconciled with the source code: 2026-11-19.*
 
 ---
 
@@ -30,7 +30,7 @@ Test coverage is measured, not assumed: on the pre-release 1.2.0 development bra
 ## Not implemented
 | Capability | Status |
 | :--- | :--- |
-| Incremental index maintenance | Partial, opt-in, unreleased. With the persistent cache (Stages 1–2), graph call and import resolution is limited to affected files and BM25 bookkeeping is partially incremental for in-process `refresh()`; the semantic index, PageRank and other global graph quantities are recomputed in full, and `update_documents()`/`remove_documents()` still refit every index in memory. Stages 3–4: [PERSISTENT_INDEXING_DESIGN.md](PERSISTENT_INDEXING_DESIGN.md) |
+| Incremental index maintenance | Partial, opt-in, implemented on `main` through Stages 0–2, but not included in a published package release. With the persistent cache (Stages 1–2), graph call and import resolution is limited to affected files and BM25 bookkeeping is partially incremental for in-process `refresh()`; the semantic index, PageRank and other global graph quantities are recomputed in full, and `update_documents()`/`remove_documents()` still refit every index in memory. Stages 3–4: [PERSISTENT_INDEXING_DESIGN.md](PERSISTENT_INDEXING_DESIGN.md) |
 | Automatic live filesystem updates / file watching | Not implemented (restart the MCP server to refresh) |
 | HTTP / SSE MCP transport | Not implemented (STDIO only) |
 | AST block slicing (sub-function spans of large files) | Opt-in on `main`, not released ([AST_BLOCK_SLICING.md](AST_BLOCK_SLICING.md)) |
