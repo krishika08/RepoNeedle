@@ -1,6 +1,6 @@
 # Persistent and Incremental Indexing: Design
 
-**Status:** **Stages 0 and 1 are implemented.** Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 adds the opt-in persistent index cache: `from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()` and `engine.index_cache_diagnostics`, backed by SQLite (§17; [Stage 1 report](../reports/v2_completion/persistent_indexing/STAGE1_REPORT.md)). **Global structures are still recomputed in full on every start: this is persistence, not incremental indexing** (Stages 2–4 are not implemented). Without `index_cache` nothing changes.
+**Status:** **Stages 0, 1 and 2 are implemented.** Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 added the opt-in persistent index cache (`from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()`, `engine.index_cache_diagnostics`, SQLite; §17). Stage 2 adds dependency-scoped re-resolution of both graphs with canonical replay, partially incremental BM25 bookkeeping for in-process `refresh()`, abstainer reference counts, stable file ids (schema version 2, migrated in place), eviction leases and pending-purge reporting (§18; [Stage 2 report](../reports/v2_completion/persistent_indexing/STAGE2_REPORT.md)). **The semantic index, PageRank and the other global graph quantities are still recomputed in full** (Stage 3 and later). Without `index_cache` nothing changes except the resolvers' lookup indexes, which are proven identical to the previous implementation.
 **Milestone:** V2 Milestone 4A (architecture and research). **Revision 2** applies the corrections from an independent architecture review; the report's §14 maps each review point to its resolution.
 **Evidence:** [reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md), with the measurements behind every number quoted here. All repository measurements use one pinned snapshot (commit `bac30c8`, 890 files, 8,173,201 bytes of indexed text).
 
@@ -23,6 +23,7 @@
 15. [Staged implementation plan](#15-staged-implementation-plan)
 16. [Design decisions](#16-design-decisions)
 17. [Stage 1 as built](#17-stage-1-as-built)
+18. [Stage 2 as built](#18-stage-2-as-built)
 
 ---
 
@@ -913,7 +914,7 @@ Each stage is its own PR. A stage ships only with the §14 equivalence harness g
 | :--- | :--- | :--- |
 | **0. Prerequisites** (no persistence) — **implemented** | Reset every build-derived function-graph structure; `remove_documents()`, refit-based like today; SHA-256 per-document cache signatures; the **equivalence harness** (§14.2) with a frozen 225-query corpus, run against `remove_documents()`, `update_documents()` and mutation sequences. Today's `update_documents()` matches a fresh build for in-place replacement; an addition matches only a build with the new file appended, and the harness reports the divergence from a discovery-ordered build. | Done: harness and mutation suite in CI; existing tests unchanged; see the [Stage 0 report](../reports/v2_completion/persistent_indexing/STAGE0_REPORT.md) |
 | **1. Persistent artifacts, global reassembly** — **implemented** (§17) | `IndexCacheConfig`; SQLite schema with self-contained, checksummed payloads (§4, §6.1); the writer and reader connection protocol with settings verification (§10.1); per-file artifacts for every index; manifest with `doc_meta_sha256`; all four fingerprint levels (§7); publish protocol; validation modes; corruption handling; artifact GC; `persist_exclude`. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order. Eager `FileDoc.content` as today (§16.2). | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental"; **size defaults set from actual databases at 10k, 30k and 100k files** (§12.1) |
-| **2. Incremental bookkeeping; dependency-scoped graphs** | BM25 df by delta and IDF of changed-df terms, with `avg_doc_len`, `doc_len_norms` and positional postings recomputed as global O(N) work (§9.5); abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters that separate proportional from global work. BM25 is reported as "partially incremental", or stays globally reassembled if bookkeeping does not pay. |
+| **2. Incremental bookkeeping; dependency-scoped graphs** — **implemented** (§18) | BM25 df by delta and IDF of changed-df terms, with `avg_doc_len`, `doc_len_norms` and positional postings recomputed as global O(N) work (§9.5); abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters that separate proportional from global work. BM25 is reported as "partially incremental", or stays globally reassembled if bookkeeping does not pay. |
 | **3. Semantic** | df by delta; exact vocabulary maintenance with canonical first-seen order; vectorised IDF/norm recomputation, **only if bit-identical**; otherwise documented as global | Equivalence; or an explicit decision to keep the semantic index globally recomputed |
 | **4. Optional components and surfaces** | Tree-sitter artifacts and availability changes, with their sizes measured; SCIP: full re-resolution on change (§16.4), per-document reuse only if measured to be worth it; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories | Equivalence including optional extras; documentation |
 
@@ -1008,3 +1009,144 @@ uncached build by construction (and checked by the Stage 0 harness).
 - **Restart speedup.** It is measured at 2.03× (1,000 realistic files), 1.66× (2,500) and 1.32× (10,000 reduced). At larger sizes the recomputed global work dominates, led by the function graph's superlinear call resolution, and the paging-affected 10,000-realistic and 30,000-reduced runs were not faster. Stage 1 is not a large-repository speedup; that is the Stage 2 target.
 - **Optional components take the uncached route.** `structural_parser="tree_sitter"` and `scip_config` builds do not open the
   database at all and report `state="disabled"` with the reason (Stage 4).
+
+## 18. Stage 2 as built
+
+Stage 2 adds dependency-scoped graph re-resolution and incremental bookkeeping to the opt-in cache of §17, plus two
+cache-safety hardenings. Evidence, measurements and limitations: [STAGE2_REPORT.md](../reports/v2_completion/persistent_indexing/STAGE2_REPORT.md).
+Without `index_cache` nothing in the build path changes except the optimised resolvers of §18.1, which are proven
+identical to the previous implementation (verbatim copies of it are the test oracle).
+
+### 18.1 Full-build lookup indexes (every build, cached or not)
+
+The 1.2.0 function-graph resolver scanned every class and method for each unresolved attribute call (step E), and
+the local function list, a module's function list and a class's method list for every call (steps A, B, B'). Its cost
+grew about N^2 (§17). `FunctionGraphEngine._build_graph_regex` now builds lookup indexes once per build from the
+ordered documents (`_FunctionLookup`: per-file name sets, ordered definition paths per name, class-method paths, the
+set of files defining each method name) and resolves each caller file on its own (`_resolve_file`), then replays its
+edges in discovery order (`_replay_edges`): the same maps, steps, uniqueness rules, winners, edge order, confidences,
+edge types and `graph.add_edge` weight overwrites. Tree-sitter builds keep the original loop unchanged.
+
+`RepoGraph.fit` resolves each file's import edges on its own (`_resolve_doc_edges`, steps A–H unchanged) and replays
+them in discovery order. The class-to-test linkage no longer re-parses every production file on every fit: its
+per-document part (class catalog entries of production files, invocation candidates of test files, in the order the
+1.2.0 code found them) is a signature-validated per-document cache (`doc_facts`), persisted as the
+`repo_graph_facts` artifact; the repository-wide part (filtering candidates by the production catalog, method and
+existing-edge lookups through indexes built in the same order as the scans they replace) runs on every fit.
+
+### 18.2 Typed dependency keys
+
+Every lookup a resolver makes into a structure built from OTHER files goes through a lookup object that records a
+typed key and returns exactly the key's value (`key_value`). Keys are derived from the code, one family per lookup:
+
+| Key | Value read by the resolver | Resolver step |
+| :--- | :--- | :--- |
+| `fg.module:<q>` | `module_to_path[q]` or none | function graph B (qualified call), C (import base module) |
+| `fg.def:<path>\0<name>` | whether that file defines `name` | B (verification in the winning module) |
+| `fg.cmeth:<class>\0<name>` | ordered files of `class`'s methods named `name` | B' (class-qualified call) |
+| `fg.func:<name>` | ordered definition files of `name`, with multiplicity | D (global uniqueness, directory-local) |
+| `fg.meth:<name>` | sorted set of files defining a method `name` | E (unique method across classes) |
+| `rg.module:<k>` | `module_to_path[k]` or none | RepoGraph A (exact, `src.`-stripped, every prefix probed) |
+| `rg.path:<path>` | whether the path is indexed | B (`mod:` submodules), E (relative candidates), F (entrypoints) |
+| `rg.symbol:<s>` | ordered `symbol_to_paths[s]` | C |
+| `rg.package:<p>` | ordered `package_to_files[p]` | D, G (Go primary file) |
+| `rg.crate:<c>` | `manifest_crates[c]` or none | F |
+| `rg.cdeps:<c>` | sorted `crate_dependencies[c]` or none | H |
+| `rg.entry:<prefix>` | ordered entrypoints under `crates/` or `packages/` | H |
+
+**Providers.** For every file, `provides(doc)` lists its provider events in emission order: (key, contributed value),
+with the module-map role (`a:` assigned, last wins; `d:` set only if absent) and manifest-derived values (crate
+directories, path dependencies). For every key, the concatenation of all files' events in discovery order is its
+**ordered provider list**; the key's value is a function of that list (tested: equal lists give equal values).
+
+**Consumers.** A tracked resolution records exactly the keys it consulted, in the order of its actual evaluation path.
+
+### 18.3 Affected files and reuse (design §9.1)
+
+For each graph, a build:
+1. loads every file's previous provider events (`provides` artifact) and resolution (`fg_edges` / `rg_edges`
+   artifact: edges plus consumed keys);
+2. marks a file **own-changed** when it is new, its decoded text or metadata digest changed, or its stored resolution
+   is unusable (another extractor or resolver fingerprint);
+3. computes the **changed keys**: keys whose ordered provider list differs. When the files with unchanged provider
+   events keep their relative discovery order, only keys provided (before or after) by the other files can change, so
+   only those lists are compared and an unchanged repository compares nothing; after a discovery-order change every
+   list is compared;
+4. **affected** = own-changed files plus every consumer of a changed key: only these are re-resolved;
+5. every other file's stored edges are replayed, but only after its **dependency context** is recomputed from the
+   CURRENT build: the SHA-256 of its consumed keys bound to their current values. The resolution artifact's key binds
+   that context (with the file's path, text and metadata digests and the resolver fingerprint), so the stored key must
+   equal the key recomputed now. A mismatch re-resolves the file and is counted
+   (`context_mismatches_outside_dependency_index`; every test asserts zero);
+6. maps, edge lists, NetworkX insertion order and weight overwrites are rebuilt by replaying every file's edges in the
+   current discovery order (O(N + E), reported as global); PageRank, the test-target maps, class-to-test linkage and
+   the degree-matched control graph are recomputed in full.
+
+Reusing a file is never required: any re-resolution is correct, so the only property that matters is that a file is
+reused only when every value its previous resolution read is unchanged (tested over seeded random mutations, and by
+the full equivalence harness after every mutation).
+
+### 18.4 Bookkeeping
+
+- **BM25 is partially incremental, in-process only.** `refresh()` updates the index from its previous fit when the
+  document paths and order are unchanged: document frequencies by ±1 per changed term set, IDF only for those terms,
+  only the changed documents' posting entries (binary search on the document index), and the first-seen insertion
+  order of `doc_frequencies`, `idf` and `inverted_index` rebuilt only for affected first-document groups.
+  `avg_doc_len` (float32 `np.mean`) and every `doc_len_norms` entry are recomputed in full whenever a length changes.
+  Additions, deletions or reordering take `fit()`. **A warm restart in a new process also takes `fit()`**: the order of
+  `doc_frequencies` follows the term-set iteration order, which depends on the per-process string-hash seed, so a
+  persisted copy cannot reproduce a fresh build's dictionary order in another process. BM25 global state is
+  therefore not persisted, and positional postings never are.
+- **Abstainer reference counts** (`token -> persisted documents containing it`) are a checksummed, generation-bound
+  global-state row; a build applies per-document deltas and the vocabulary is the set of tokens with a positive count
+  plus the vocabularies of `persist_exclude`d documents (never counted).
+- **Semantic index:** recomputed in full (Stage 3).
+
+### 18.5 Persistence, schema version 2 and file ids
+
+- **Schema version 2** (minor, additive; file name unchanged): `manifest.file_id` (unique) and `meta.next_file_id`;
+  artifact kinds `repo_graph_facts`, `provides`, `fg_edges`, `rg_edges`; the global-state row of the abstainer
+  reference counts; `meta.purge_pending`. A version-1 database is migrated in place by the first writer, in one
+  transaction: the published version-1 generation is verified first (an unverifiable one is not migrated),
+  `file_id` is added and assigned in manifest-ordinal order, and the generation's manifest digest is recomputed with
+  the version-2 rows. The migration is idempotent and crash-safe (a crash leaves version 1); read-only clients never
+  migrate (they build uncached and report why). Every Stage 1 artifact stays reusable; the first Stage 2 build
+  re-resolves the graphs because version 1 has no provider index.
+- **File ids** are allocated inside the publish transaction from the rows published at that moment (a concurrent
+  writer's included): a path keeps its id through edits and reordering; a new path, including a renamed or re-added
+  one, receives `next_file_id`, so a retired id is never reused. `persist_exclude`d files never receive one, and
+  ordinals stay dense over persisted files. Artifacts remain keyed by path because every artifact embeds it.
+- **Fingerprints** of the new kinds include the resolver versions and configuration (`min_confidence`,
+  `enable_structural_edges`) and the source digests of the resolver, dependency and codec modules; the index
+  fingerprint includes the Stage 2 bookkeeping versions.
+
+### 18.6 `persist_exclude`
+
+Excluded files are indexed in memory and contribute provider keys to the in-memory maps, so other files' edges can
+depend on them. While any excluded file is indexed, graph contributions are therefore neither reused nor persisted
+(both graphs report `fallback_full` with the reason), no provider, consumer or resolution artifact exists for an
+excluded file, and reference counts cover persisted files only. Per-file artifacts of the other files are persisted
+as in Stage 1.
+
+### 18.7 Cache-safety hardening
+
+- **Eviction leases.** Every process that opens a cache database holds a shared operating-system file lock on
+  `<database>.lease` (POSIX `flock`, Windows `LockFileEx` through `ctypes`) until its connections are closed.
+  `max_total_bytes` eviction deletes a database and its WAL and SHM only while holding the exclusive lock, taken
+  without waiting; databases in use are skipped and reported, so the limit may stay exceeded. Locks are released by
+  the operating system when a process dies (no PID records), and lock files are never deleted.
+- **Privacy purge.** When previously persisted files become `persist_exclude`d, the publish transaction records
+  `meta.purge_pending='1'`. After garbage collection (with `secure_delete`) and incremental vacuum, the purge is
+  reported complete only if `wal_checkpoint(TRUNCATE)` (run without waiting) backfilled every frame and truncated the
+  WAL; otherwise another connection still holds an older snapshot, the report says `privacy_purge="pending"`, and
+  the marker stays until a later writer (any `refresh()` or cached start) completes it. This is not a guarantee about
+  the physical storage medium.
+
+### 18.8 Deviations from sections 6–15
+
+| Design | As built | Reason |
+| :--- | :--- | :--- |
+| `provides` and `consumes` row tables in the manifest digest | Per-file `provides` artifacts (ordered typed events) and consumed keys inside each file's resolution artifact; the reverse indexes are built in memory | The same typed keys and order, verified by the existing artifact identity and checksum machinery. Row tables would add about 1.7 million separately digested rows at 10,000 realistic files, rewritten or re-hashed on every publish. |
+| BM25 global state (`bm25.df`) persisted, keyed by term or file id | Not persisted; the in-process `refresh()` is partially incremental, a warm restart refits | Dictionary insertion order depends on the per-process hash seed (term sets), so persisted order cannot reproduce a fresh build in another process (§18.4). |
+| Delta replacement of changed manifest and key rows at publish | The manifest and `file_artifacts` are replaced in full (as in Stage 1) | O(N) rows; simple and safe with concurrent writers. Resolution and provider artifacts are content-addressed and written only when new. |
+| `generations.kind = 'incremental'` | `'cold'` or `'refresh'` | The work done is described per stage by the work counters, not by one label. |
