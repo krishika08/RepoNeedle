@@ -358,6 +358,54 @@ def compare_index_state(actual, reference) -> Dict[str, List[str]]:
     return result
 
 
+def capture_all(engine, *, queries: Optional[Sequence[Dict[str, str]]] = None, retrieval: bool = True,
+                task_types: Iterable[Optional[TaskType]] = (None,), packing_queries: Optional[int] = 12
+                ) -> Dict[str, Any]:
+    """
+    Everything the harness compares, as one plain structure (index state first, then retrieval stages). It can be
+    pickled, so an engine built in another process (for example a warm restart from a persistent cache) can be
+    captured there and compared here with ``compare_captures``.
+    """
+    queries = load_queries() if queries is None else list(queries)
+    task_types = tuple(task_types)
+    captured: Dict[str, Any] = dict(capture_index_state(engine))
+    if retrieval:
+        captured["scores"] = capture_scores(engine, queries)
+        captured["retrieval"] = capture_retrieval(engine, queries, RANKERS, task_types)
+        captured["abstention_and_anchors"] = capture_abstention_and_anchors(engine, queries)
+        if packing_queries:
+            captured["packing"] = capture_packing(engine, queries[::packing_queries])
+    return captured
+
+
+def compare_captures(actual: Dict[str, Any], reference: Dict[str, Any], *, label: str,
+                     mutations: Sequence[str] = (), config: Optional[Dict[str, Any]] = None,
+                     description: str = "") -> None:
+    """Raises AssertionError listing every located mismatch between two ``capture_all`` results."""
+    report: Dict[str, List[str]] = {}
+    for component in reference:
+        found: List[str] = []
+        if component not in actual:
+            found.append(f"{component}: missing from the actual capture")
+        else:
+            diff(reference[component], actual[component], component, found)
+        report[component] = found
+    extra = [c for c in actual if c not in reference]
+    if extra:
+        report["capture"] = [f"components only in the actual capture: {extra}"]
+    failing = {k: v for k, v in report.items() if v}
+    if failing:
+        lines = [f"Index equivalence failed: {label}",
+                 f"  configuration: {config or {}}",
+                 f"  mutation sequence: {list(mutations) or '(none)'}"]
+        if description:
+            lines.append(f"  {description}")
+        for component, items in failing.items():
+            lines.append(f"  [{component}] {len(items)} mismatch(es)" + (" (truncated)" if len(items) >= MAX_MISMATCHES else ""))
+            lines += [f"    - {m}" for m in items]
+        raise AssertionError("\n".join(lines))
+
+
 def assert_equivalent(actual, reference, *, label: str, mutations: Sequence[str] = (),
                       queries: Optional[Sequence[Dict[str, str]]] = None, retrieval: bool = True,
                       task_types: Iterable[Optional[TaskType]] = (None,), packing_queries: Optional[int] = 12,
@@ -366,29 +414,13 @@ def assert_equivalent(actual, reference, *, label: str, mutations: Sequence[str]
     Raises AssertionError listing every located mismatch between ``actual`` and the fresh ``reference``.
 
     ``queries`` defaults to the full frozen corpus. ``packing_queries`` takes every n-th query for the CUD-Pack
-    matrix (None disables packing). Index state is always compared in full.
+    matrix (None disables packing). Index state is always compared in full. Each engine's index state is captured
+    before any retrieval runs on it.
     """
     queries = load_queries() if queries is None else list(queries)
-    report: Dict[str, List[str]] = compare_index_state(actual, reference)
-    if retrieval:
-        stages: List[Tuple[str, Callable[[Any], Dict[str, Any]]]] = [
-            ("scores", lambda e: capture_scores(e, queries)),
-            ("retrieval", lambda e: capture_retrieval(e, queries, RANKERS, task_types)),
-            ("abstention_and_anchors", lambda e: capture_abstention_and_anchors(e, queries)),
-        ]
-        if packing_queries:
-            stages.append(("packing", lambda e: capture_packing(e, queries[::packing_queries])))
-        for name, capture in stages:
-            found: List[str] = []
-            diff(capture(reference), capture(actual), name, found)
-            report[name] = found
-    failing = {k: v for k, v in report.items() if v}
-    if failing:
-        lines = [f"Index equivalence failed: {label}",
-                 f"  configuration: {config or {}}",
-                 f"  mutation sequence: {list(mutations) or '(none)'}",
-                 f"  queries: {len(queries)}; task types: {[t.value if t else 'auto' for t in task_types]}"]
-        for component, items in failing.items():
-            lines.append(f"  [{component}] {len(items)} mismatch(es)" + (" (truncated)" if len(items) >= MAX_MISMATCHES else ""))
-            lines += [f"    - {m}" for m in items]
-        raise AssertionError("\n".join(lines))
+    task_types = tuple(task_types)
+    kwargs = dict(queries=queries, retrieval=retrieval, task_types=task_types, packing_queries=packing_queries)
+    compare_captures(capture_all(actual, **kwargs), capture_all(reference, **kwargs), label=label,
+                     mutations=mutations, config=config,
+                     description=f"queries: {len(queries)}; task types: "
+                                 f"{[t.value if t else 'auto' for t in task_types]}")

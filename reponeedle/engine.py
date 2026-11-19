@@ -9,7 +9,8 @@ import logging
 import pathlib
 import numbers
 import stat
-from typing import Any, Iterable, List, Optional, Union, Dict, Set
+from dataclasses import dataclass
+from typing import Any, Callable, Iterable, List, Optional, Union, Dict, Set
 import numpy as np
 import pathspec
 
@@ -26,6 +27,8 @@ from reponeedle.models import (
     AbstentionDiagnostics,
     IndexingDiagnostics,
     ScipConfig,
+    IndexCacheConfig,
+    IndexUpdateReport,
 )
 from reponeedle.core.function_graph import FunctionGraphEngine
 from reponeedle.core.arm101 import ARM101Ranker
@@ -120,6 +123,261 @@ def validate_max_file_size_bytes(value) -> int:
     return value
 
 
+@dataclass
+class _ScanResult:
+    """Result of one repository scan: the documents in discovery order, plus the scan diagnostics."""
+    docs: List[FileDoc]
+    ignore_patterns: List[str]
+    skipped_large: List[str]
+    unreadable: List[str]
+    outside_root: List[str]
+    skipped_dirs: List[str]
+    skipped_dirs_outside: int
+    max_files_reached: bool
+
+
+def _build_file_doc(rel_path: str, ext: str, content: str, ablation_config: Optional[AblationConfig]) -> FileDoc:
+    """Per-file document metadata and symbol extraction, exactly as from_directory() has always done it."""
+    # Detect if test file
+    norm_lower = rel_path.lower()
+    is_test = (
+        "test" in norm_lower or
+        "tests/" in norm_lower or
+        norm_lower.startswith("test_") or
+        norm_lower.endswith("_test.py")
+    )
+
+    # AST symbol extraction (Python or Polyglot)
+    symbols, imports = [], []
+    if ablation_config and ablation_config.enable_polyglot_symbols:
+        symbols, imports = RepoGraph.extract_polyglot_symbols(content, rel_path)
+    elif ext == ".py":
+        symbols, imports = RepoGraph.extract_python_ast(content, rel_path)
+
+    tokens = estimate_tokens(content)
+    return FileDoc(
+        path=rel_path,
+        content=content,
+        token_count=tokens,
+        language="python" if ext == ".py" else ext[1:],
+        symbols=symbols,
+        imports=imports,
+        is_test=is_test,
+        line_count=len(content.splitlines()),
+    )
+
+
+def _scan_repository(
+    repo_dir: str,
+    extra_ignore: Optional[List[str]],
+    max_files: int,
+    max_file_size_bytes: int,
+    make_doc: Callable[[str, str, str], FileDoc],
+) -> _ScanResult:
+    """
+    Discovery for from_directory(): walks ``repo_dir`` (an absolute path) in os.walk order with the ignore rules,
+    link containment and size limit, reads each eligible file as UTF-8 (errors ignored) and builds its document
+    with ``make_doc(rel_path, ext, content)``. The default ``make_doc`` is ``_build_file_doc``.
+    """
+    ignore_patterns = list(DEFAULT_IGNORE_PATTERNS)
+    if extra_ignore:
+        ignore_patterns.extend(extra_ignore)
+
+    gitignore_path = os.path.join(repo_dir, ".gitignore")
+    if os.path.isfile(gitignore_path):
+        try:
+            with open(gitignore_path, "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        ignore_patterns.append(line)
+        except Exception:
+            pass
+
+    spec = pathspec.PathSpec.from_lines("gitwildmatch", ignore_patterns)
+    docs: List[FileDoc] = []
+    skipped_large: List[str] = []
+    unreadable: List[str] = []
+    outside_root: List[str] = []
+    max_files_reached = False
+    # Canonical repository root: every indexed file must resolve beneath it.
+    real_root = os.path.realpath(repo_dir)
+    # Directory traversal is bounded by the real directory tree: links are never followed and
+    # each physical directory (st_dev, st_ino) is entered at most once.
+    skipped_dirs: List[str] = []
+    skipped_dirs_outside = 0
+    visited_dirs: Set = set()
+    try:
+        root_st = os.stat(repo_dir)
+        visited_dirs.add((root_st.st_dev, root_st.st_ino))
+    except OSError:
+        pass
+
+    for root, dirs, files in os.walk(repo_dir, followlinks=False):
+        # Prune ignored directories
+        rel_root = os.path.relpath(root, repo_dir).replace("\\", "/")
+        if rel_root == ".":
+            rel_root = ""
+
+        dirs[:] = [
+            d for d in dirs
+            if not spec.match_file(f"{rel_root}/{d}" if rel_root else d)
+            and d not in DEFAULT_IGNORE_PATTERNS
+        ]
+
+        # Prune directory links / junctions, cycles and directories outside the canonical root.
+        # Only the in-repository path is recorded; link targets are never listed or read.
+        kept_dirs = []
+        for d in dirs:
+            child = os.path.join(root, d)
+            rel_child = f"{rel_root}/{d}" if rel_root else d
+            outside = False
+            if is_directory_link(child):
+                keep = False
+                try:
+                    outside = resolve_within_root(child, real_root) is None
+                except (OSError, RuntimeError, ValueError):  # broken link or loop
+                    outside = True
+            else:
+                # A plain directory beneath an in-root directory is itself in-root; the
+                # (st_dev, st_ino) set catches cycles that are not links (e.g. bind mounts).
+                try:
+                    child_st = os.stat(child)
+                    key = (child_st.st_dev, child_st.st_ino)
+                    keep = key not in visited_dirs
+                    if keep:
+                        visited_dirs.add(key)
+                except OSError:
+                    keep = False
+            if keep:
+                kept_dirs.append(d)
+            else:
+                skipped_dirs.append(rel_child)
+                skipped_dirs_outside += int(outside)
+        dirs[:] = kept_dirs
+
+        for file in files:
+            rel_path = os.path.relpath(os.path.join(root, file), repo_dir).replace("\\", "/")
+            if spec.match_file(rel_path):
+                continue
+
+            # Filter non-code/text files
+            ext = os.path.splitext(file)[1].lower()
+            if ext not in (".py", ".js", ".ts", ".jsx", ".tsx", ".go", ".rs", ".java", ".c", ".cpp", ".h", ".md", ".toml", ".yaml", ".yml", ".json"):
+                continue
+
+            full_path = os.path.join(root, file)
+            # Containment: resolve links BEFORE touching the target, and read only the
+            # validated canonical path (never the link itself). Links resolving outside the
+            # repository are skipped and recorded by their in-repository path only.
+            try:
+                resolved = resolve_within_root(full_path, real_root)
+            except (OSError, RuntimeError, ValueError):  # broken link, loop, permission error
+                unreadable.append(rel_path)
+                continue
+            if resolved is None:
+                outside_root.append(rel_path)
+                continue
+            try:
+                file_size = os.path.getsize(resolved)
+            except OSError:
+                unreadable.append(rel_path)
+                continue
+            # Exclude oversized files (strictly greater than the limit), but record them.
+            if file_size > max_file_size_bytes:
+                skipped_large.append(rel_path)
+                continue
+            try:
+                with open(resolved, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+            except Exception:
+                unreadable.append(rel_path)
+                continue
+
+            docs.append(make_doc(rel_path, ext, content))
+
+            if len(docs) >= max_files:
+                max_files_reached = True
+                break
+        if len(docs) >= max_files:
+            max_files_reached = True
+            break
+
+    return _ScanResult(
+        docs=docs,
+        ignore_patterns=ignore_patterns,
+        skipped_large=skipped_large,
+        unreadable=unreadable,
+        outside_root=outside_root,
+        skipped_dirs=skipped_dirs,
+        skipped_dirs_outside=skipped_dirs_outside,
+        max_files_reached=max_files_reached,
+    )
+
+
+def _finish_directory_engine(engine: "RepoNeedleEngine", scan: _ScanResult, max_file_size_bytes: int,
+                             max_files: int) -> None:
+    """Sets the scan diagnostics on a directory-built engine and logs the exclusion summaries."""
+    skipped_large, unreadable, outside_root, skipped_dirs = (
+        scan.skipped_large, scan.unreadable, scan.outside_root, scan.skipped_dirs)
+    skipped_dirs_outside, max_files_reached = scan.skipped_dirs_outside, scan.max_files_reached
+    skipped_large.sort()
+    unreadable.sort()
+    outside_root.sort()
+    skipped_dirs.sort()
+    engine.indexing_diagnostics = IndexingDiagnostics(
+        source="directory",
+        indexed_files=len(engine.docs),
+        max_file_size_bytes=max_file_size_bytes,
+        skipped_large_files=len(skipped_large),
+        skipped_paths=skipped_large,
+        skipped_unreadable_files=len(unreadable),
+        unreadable_paths=unreadable,
+        skipped_symlink_outside_repository=len(outside_root),
+        symlink_outside_repository_paths=outside_root,
+        skipped_directories=len(skipped_dirs),
+        skipped_directory_paths=skipped_dirs,
+        skipped_directories_outside_repository=skipped_dirs_outside,
+        max_files=max_files,
+        max_files_reached=max_files_reached,
+    )
+    if outside_root:
+        logger.warning(
+            "RepoNeedle skipped %d linked file(s) that resolve outside the repository root "
+            "(reason: symlink_outside_repository); their targets were not read. See indexing "
+            "diagnostics (symlink_outside_repository_paths) for the in-repository link paths.",
+            len(outside_root),
+        )
+
+    if skipped_dirs_outside:
+        logger.warning(
+            "RepoNeedle did not traverse %d directory link(s) that resolve outside the repository "
+            "root (or cannot be resolved); their contents were not listed or read. See indexing "
+            "diagnostics (skipped_directory_paths) for the in-repository paths.",
+            skipped_dirs_outside,
+        )
+
+    # Summaries only (counts + limit): no paths or contents in log records.
+    if skipped_large:
+        logger.warning(
+            "RepoNeedle skipped %d file(s) larger than max_file_size_bytes=%d; they are not "
+            "indexed or searchable. See indexing diagnostics (skipped_paths) for details.",
+            len(skipped_large),
+            max_file_size_bytes,
+        )
+    if unreadable:
+        logger.warning(
+            "RepoNeedle could not read %d file(s) during indexing. See indexing diagnostics "
+            "(unreadable_paths) for details.",
+            len(unreadable),
+        )
+    if max_files_reached:
+        logger.warning(
+            "RepoNeedle stopped indexing at max_files=%d; remaining files were not indexed.",
+            max_files,
+        )
+
+
 class RepoNeedleEngine:
     """
     High-performance, workflow-adaptive repository context retrieval engine.
@@ -168,6 +426,8 @@ class RepoNeedleEngine:
 
         # Populated with scan statistics by from_directory(); "documents" source otherwise.
         self.indexing_diagnostics = IndexingDiagnostics(source="documents", indexed_files=0)
+        # Set only by from_directory(..., index_cache=...): the persistent index-cache session.
+        self._index_cache_session = None
 
         self.scip_config = scip_config
         if scip_config is not None:
@@ -249,6 +509,8 @@ class RepoNeedleEngine:
         """
         if not docs:
             return
+        if self._index_cache_session is not None:
+            self._index_cache_session.note_in_memory_change()
 
         for d in docs:
             self.path_to_doc[d.path] = d
@@ -306,6 +568,8 @@ class RepoNeedleEngine:
         if not requested:
             return []
 
+        if self._index_cache_session is not None:
+            self._index_cache_session.note_in_memory_change()
         drop = set(requested)
         previous = list(self.docs)
         removed = [d.path for d in previous if d.path in drop]
@@ -319,6 +583,33 @@ class RepoNeedleEngine:
                 logger.error("remove_documents(): restoring the previous documents failed; rebuild the engine")
             raise
         return removed
+
+    def refresh(self, validation: Optional[str] = None) -> IndexUpdateReport:
+        """
+        Rescans the repository from disk and rebuilds every index, reusing verified per-file artifacts from the
+        persistent index cache for unchanged files, then publishes a complete new cache generation (V2 Stage 1).
+
+        Only engines built with ``from_directory(..., index_cache=IndexCacheConfig(...))`` support it. Global
+        structures are always recomputed in full; this is persistence, not incremental indexing. It is the only
+        operation that writes the cache: ``update_documents()`` and ``remove_documents()`` stay in memory.
+
+        Args:
+            validation: overrides ``IndexCacheConfig.validation`` for this call ("content" or "stat").
+
+        Raises:
+            RuntimeError: if the engine was not built with an index cache.
+            IndexCacheError: if the cache is unusable and ``rebuild_policy="never"``.
+        """
+        if self._index_cache_session is None:
+            raise RuntimeError("refresh() requires an engine built with from_directory(..., index_cache=...)")
+        return self._index_cache_session.refresh(self, validation)
+
+    @property
+    def index_cache_diagnostics(self) -> Optional[Dict[str, Any]]:
+        """State of the persistent index cache, or None when the engine was built without one."""
+        if self._index_cache_session is None:
+            return None
+        return self._index_cache_session.diagnostics()
 
     def query(self, *args, **kwargs) -> RetrievalResult:
         """Alias for retrieve() to provide intuitive querying API."""
@@ -363,9 +654,14 @@ class RepoNeedleEngine:
         change_impact_config: Optional[ChangeImpactConfig] = None,
         max_file_size_bytes: int = DEFAULT_MAX_FILE_SIZE_BYTES,
         scip_config: Optional[ScipConfig] = None,
+        index_cache: Optional[IndexCacheConfig] = None,
     ) -> "RepoNeedleEngine":
         """
         Scans a local repository directory, parses files, and builds the retrieval index.
+
+        ``index_cache`` (opt-in, V2 Stage 1) persists per-file derived data in a SQLite database and reuses it on
+        later starts for unchanged files; global index structures are always recomputed, and results are
+        identical to a build without it. Without it (the default) no database is opened or created.
 
         Files strictly larger than ``max_file_size_bytes`` (default 500,000) are excluded from
         the index. Every exclusion (oversized or unreadable) is recorded by repository-relative
@@ -386,160 +682,21 @@ class RepoNeedleEngine:
                     f"ScipConfig.repo_root {scip_config.repo_root!r} differs from repo_dir {repo_dir!r}; "
                     "leave repo_root unset when using from_directory()."
                 )
-        ignore_patterns = list(DEFAULT_IGNORE_PATTERNS)
-        if extra_ignore:
-            ignore_patterns.extend(extra_ignore)
+        if index_cache is not None and index_cache.enabled:
+            from reponeedle.core.index_cache.session import build_cached_engine
 
-        gitignore_path = os.path.join(repo_dir, ".gitignore")
-        if os.path.isfile(gitignore_path):
-            try:
-                with open(gitignore_path, "r", encoding="utf-8", errors="ignore") as f:
-                    for line in f:
-                        line = line.strip()
-                        if line and not line.startswith("#"):
-                            ignore_patterns.append(line)
-            except Exception:
-                pass
+            return build_cached_engine(
+                cls, repo_dir, index_cache,
+                engine_kwargs=dict(budget_config=budget_config, ablation_config=ablation_config, ranker=ranker,
+                                   ranking_engine=ranking_engine, change_impact_config=change_impact_config,
+                                   scip_config=scip_config),
+                max_files=max_files, extra_ignore=extra_ignore, max_file_size_bytes=max_file_size_bytes,
+            )
 
-        spec = pathspec.PathSpec.from_lines("gitwildmatch", ignore_patterns)
-        docs: List[FileDoc] = []
-        skipped_large: List[str] = []
-        unreadable: List[str] = []
-        outside_root: List[str] = []
-        max_files_reached = False
-        # Canonical repository root: every indexed file must resolve beneath it.
-        real_root = os.path.realpath(repo_dir)
-        # Directory traversal is bounded by the real directory tree: links are never followed and
-        # each physical directory (st_dev, st_ino) is entered at most once.
-        skipped_dirs: List[str] = []
-        skipped_dirs_outside = 0
-        visited_dirs: Set = set()
-        try:
-            root_st = os.stat(repo_dir)
-            visited_dirs.add((root_st.st_dev, root_st.st_ino))
-        except OSError:
-            pass
-
-        for root, dirs, files in os.walk(repo_dir, followlinks=False):
-            # Prune ignored directories
-            rel_root = os.path.relpath(root, repo_dir).replace("\\", "/")
-            if rel_root == ".":
-                rel_root = ""
-
-            dirs[:] = [
-                d for d in dirs
-                if not spec.match_file(f"{rel_root}/{d}" if rel_root else d)
-                and d not in DEFAULT_IGNORE_PATTERNS
-            ]
-
-            # Prune directory links / junctions, cycles and directories outside the canonical root.
-            # Only the in-repository path is recorded; link targets are never listed or read.
-            kept_dirs = []
-            for d in dirs:
-                child = os.path.join(root, d)
-                rel_child = f"{rel_root}/{d}" if rel_root else d
-                outside = False
-                if is_directory_link(child):
-                    keep = False
-                    try:
-                        outside = resolve_within_root(child, real_root) is None
-                    except (OSError, RuntimeError, ValueError):  # broken link or loop
-                        outside = True
-                else:
-                    # A plain directory beneath an in-root directory is itself in-root; the
-                    # (st_dev, st_ino) set catches cycles that are not links (e.g. bind mounts).
-                    try:
-                        child_st = os.stat(child)
-                        key = (child_st.st_dev, child_st.st_ino)
-                        keep = key not in visited_dirs
-                        if keep:
-                            visited_dirs.add(key)
-                    except OSError:
-                        keep = False
-                if keep:
-                    kept_dirs.append(d)
-                else:
-                    skipped_dirs.append(rel_child)
-                    skipped_dirs_outside += int(outside)
-            dirs[:] = kept_dirs
-
-            for file in files:
-                rel_path = os.path.relpath(os.path.join(root, file), repo_dir).replace("\\", "/")
-                if spec.match_file(rel_path):
-                    continue
-
-                # Filter non-code/text files
-                ext = os.path.splitext(file)[1].lower()
-                if ext not in (".py", ".js", ".ts", ".jsx", ".tsx", ".go", ".rs", ".java", ".c", ".cpp", ".h", ".md", ".toml", ".yaml", ".yml", ".json"):
-                    continue
-
-                full_path = os.path.join(root, file)
-                # Containment: resolve links BEFORE touching the target, and read only the
-                # validated canonical path (never the link itself). Links resolving outside the
-                # repository are skipped and recorded by their in-repository path only.
-                try:
-                    resolved = resolve_within_root(full_path, real_root)
-                except (OSError, RuntimeError, ValueError):  # broken link, loop, permission error
-                    unreadable.append(rel_path)
-                    continue
-                if resolved is None:
-                    outside_root.append(rel_path)
-                    continue
-                try:
-                    file_size = os.path.getsize(resolved)
-                except OSError:
-                    unreadable.append(rel_path)
-                    continue
-                # Exclude oversized files (strictly greater than the limit), but record them.
-                if file_size > max_file_size_bytes:
-                    skipped_large.append(rel_path)
-                    continue
-                try:
-                    with open(resolved, "r", encoding="utf-8", errors="ignore") as f:
-                        content = f.read()
-                except Exception:
-                    unreadable.append(rel_path)
-                    continue
-
-                # Detect if test file
-                norm_lower = rel_path.lower()
-                is_test = (
-                    "test" in norm_lower or
-                    "tests/" in norm_lower or
-                    norm_lower.startswith("test_") or
-                    norm_lower.endswith("_test.py")
-                )
-
-                # AST symbol extraction (Python or Polyglot)
-                symbols, imports = [], []
-                if ablation_config and ablation_config.enable_polyglot_symbols:
-                    symbols, imports = RepoGraph.extract_polyglot_symbols(content, rel_path)
-                elif ext == ".py":
-                    symbols, imports = RepoGraph.extract_python_ast(content, rel_path)
-
-                tokens = estimate_tokens(content)
-                docs.append(
-                    FileDoc(
-                        path=rel_path,
-                        content=content,
-                        token_count=tokens,
-                        language="python" if ext == ".py" else ext[1:],
-                        symbols=symbols,
-                        imports=imports,
-                        is_test=is_test,
-                        line_count=len(content.splitlines()),
-                    )
-                )
-
-                if len(docs) >= max_files:
-                    max_files_reached = True
-                    break
-            if len(docs) >= max_files:
-                max_files_reached = True
-                break
-
+        scan = _scan_repository(repo_dir, extra_ignore, max_files, max_file_size_bytes,
+                                lambda rel_path, ext, content: _build_file_doc(rel_path, ext, content, ablation_config))
         engine = cls(
-            docs=docs,
+            docs=scan.docs,
             budget_config=budget_config,
             ablation_config=ablation_config,
             ranker=ranker,
@@ -547,63 +704,7 @@ class RepoNeedleEngine:
             change_impact_config=change_impact_config,
             scip_config=scip_config,
         )
-
-        skipped_large.sort()
-        unreadable.sort()
-        outside_root.sort()
-        skipped_dirs.sort()
-        engine.indexing_diagnostics = IndexingDiagnostics(
-            source="directory",
-            indexed_files=len(engine.docs),
-            max_file_size_bytes=max_file_size_bytes,
-            skipped_large_files=len(skipped_large),
-            skipped_paths=skipped_large,
-            skipped_unreadable_files=len(unreadable),
-            unreadable_paths=unreadable,
-            skipped_symlink_outside_repository=len(outside_root),
-            symlink_outside_repository_paths=outside_root,
-            skipped_directories=len(skipped_dirs),
-            skipped_directory_paths=skipped_dirs,
-            skipped_directories_outside_repository=skipped_dirs_outside,
-            max_files=max_files,
-            max_files_reached=max_files_reached,
-        )
-        if outside_root:
-            logger.warning(
-                "RepoNeedle skipped %d linked file(s) that resolve outside the repository root "
-                "(reason: symlink_outside_repository); their targets were not read. See indexing "
-                "diagnostics (symlink_outside_repository_paths) for the in-repository link paths.",
-                len(outside_root),
-            )
-
-        if skipped_dirs_outside:
-            logger.warning(
-                "RepoNeedle did not traverse %d directory link(s) that resolve outside the repository "
-                "root (or cannot be resolved); their contents were not listed or read. See indexing "
-                "diagnostics (skipped_directory_paths) for the in-repository paths.",
-                skipped_dirs_outside,
-            )
-
-        # Summaries only (counts + limit): no paths or contents in log records.
-        if skipped_large:
-            logger.warning(
-                "RepoNeedle skipped %d file(s) larger than max_file_size_bytes=%d; they are not "
-                "indexed or searchable. See indexing diagnostics (skipped_paths) for details.",
-                len(skipped_large),
-                max_file_size_bytes,
-            )
-        if unreadable:
-            logger.warning(
-                "RepoNeedle could not read %d file(s) during indexing. See indexing diagnostics "
-                "(unreadable_paths) for details.",
-                len(unreadable),
-            )
-        if max_files_reached:
-            logger.warning(
-                "RepoNeedle stopped indexing at max_files=%d; remaining files were not indexed.",
-                max_files,
-            )
-
+        _finish_directory_engine(engine, scan, max_file_size_bytes, max_files)
         return engine
 
     def retrieve(
