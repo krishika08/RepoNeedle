@@ -86,6 +86,120 @@ class FunctionGraphEdge:
 POLYGLOT_SIGNATURE_VERSION = "function-graph-polyglot/1"
 TREE_SITTER_SIGNATURE_VERSION = "function-graph-tree-sitter/1"
 
+# Typed lookup keys of the default (regex/AST) resolver (V2 Stage 2, design section 9.2). Every lookup the
+# resolver makes into a structure built from OTHER files goes through ``_FunctionLookup``, which records the key.
+# A file's resolved edges are therefore a function of its own extraction plus the values of the keys it consumed.
+KEY_MODULE = "fg.module:"      # module_to_path[q]                      -> path or None
+KEY_DEFINES = "fg.def:"        # does file P define a function named n   -> bool          ("fg.def:P\0n")
+KEY_CLASS_METHOD = "fg.cmeth:" # files of class q's methods named n      -> ordered paths ("fg.cmeth:q\0n")
+KEY_FUNCTION = "fg.func:"      # every definition of a function named n  -> ordered paths (with multiplicity)
+KEY_METHOD = "fg.meth:"        # files defining a method named n         -> sorted distinct paths
+KEY_SEP = "\x00"
+# Bump when the regex resolver's edges can change for the same inputs and key values.
+RESOLVER_VERSION = "function-graph-resolver/2"
+
+
+@dataclass
+class FileResolution:
+    """
+    One caller file's resolved contribution: its edges, in resolution order, as
+    (target_path, source_func, target_func, edge_type, confidence), plus the sorted typed keys the resolver consulted
+    (empty unless resolution was tracked).
+    """
+    edges: List[Tuple[str, Optional[str], str, str, float]]
+    consumed: Tuple[str, ...] = ()
+
+
+class _FunctionLookup:
+    """
+    Read-only lookup indexes for one build, built once from the ordered document set. They replace the per-call scans
+    of the 1.2.0 resolver (local functions, a module's functions, class methods and the scan of every class for an
+    attribute call) with dictionary lookups that return exactly the same values in the same order.
+    """
+
+    def __init__(self, module_to_path, doc_functions, func_name_to_defs, class_to_methods):
+        self.module_to_path = module_to_path
+        self.names_of = {p: frozenset(f.name for f in fs) for p, fs in doc_functions.items()}
+        self.func_paths = {n: tuple(f.filepath for f in defs) for n, defs in func_name_to_defs.items()}
+        class_method: Dict[Tuple[str, str], List[str]] = {}
+        method_paths: Dict[str, Dict[str, None]] = {}
+        for cls, pairs in class_to_methods.items():          # class insertion order, then definition order
+            for m, p in pairs:
+                class_method.setdefault((cls, m), []).append(p)
+                method_paths.setdefault(m, {})[p] = None
+        self.class_method = {k: tuple(v) for k, v in class_method.items()}
+        # Step E only asks whether exactly ONE file defines the method; the files are kept as a sorted set, so the
+        # value depends only on which files define it (not on the global class order).
+        self.method_paths = {k: tuple(sorted(v)) for k, v in method_paths.items()}
+        self.track: Optional[Set[str]] = None
+
+    def module(self, q: str) -> Optional[str]:
+        if self.track is not None:
+            self.track.add(KEY_MODULE + q)
+        return self.module_to_path.get(q)
+
+    def defines(self, path: str, name: str) -> bool:
+        if self.track is not None:
+            self.track.add(KEY_DEFINES + path + KEY_SEP + name)
+        return name in self.names_of.get(path, ())
+
+    def class_methods(self, cls: str, name: str) -> Tuple[str, ...]:
+        if self.track is not None:
+            self.track.add(KEY_CLASS_METHOD + cls + KEY_SEP + name)
+        return self.class_method.get((cls, name), ())
+
+    def function_paths(self, name: str) -> Tuple[str, ...]:
+        if self.track is not None:
+            self.track.add(KEY_FUNCTION + name)
+        return self.func_paths.get(name, ())
+
+    def method_files(self, name: str) -> Tuple[str, ...]:
+        if self.track is not None:
+            self.track.add(KEY_METHOD + name)
+        return self.method_paths.get(name, ())
+
+    def value(self, key: str) -> Any:
+        """The current value of a typed key, exactly as the resolver sees it (JSON-compatible)."""
+        if key.startswith(KEY_MODULE):
+            return self.module_to_path.get(key[len(KEY_MODULE):])
+        if key.startswith(KEY_DEFINES):
+            path, name = key[len(KEY_DEFINES):].split(KEY_SEP, 1)
+            return name in self.names_of.get(path, ())
+        if key.startswith(KEY_CLASS_METHOD):
+            cls, name = key[len(KEY_CLASS_METHOD):].split(KEY_SEP, 1)
+            return list(self.class_method.get((cls, name), ()))
+        if key.startswith(KEY_FUNCTION):
+            return list(self.func_paths.get(key[len(KEY_FUNCTION):], ()))
+        if key.startswith(KEY_METHOD):
+            return list(self.method_paths.get(key[len(KEY_METHOD):], ()))
+        raise KeyError(f"unknown function-graph key {key!r}")
+
+
+def _module_keys(path: str, normalize) -> List[str]:
+    norm_p = path.replace("\\", "/")
+    raw_p = norm_p[:-3] if norm_p.endswith(".py") else norm_p
+    mod_name = normalize(path)
+    keys = [raw_p.replace("/", "."), mod_name]
+    if "." in mod_name:
+        keys.append(mod_name.split(".")[-1])
+    return keys
+
+
+def function_graph_provides(path: str, funcs: List["FunctionSymbol"], normalize) -> List[Tuple[str, str]]:
+    """
+    The provider events of one file, in emission order: (typed key, contributed value). For every key, the
+    concatenation of all files' events in discovery order determines the value the resolver reads (last-wins module
+    map, ordered definition lists, class-method lists, method files).
+    """
+    events = [(KEY_MODULE + k, path) for k in _module_keys(path, normalize)]
+    for f in funcs:
+        events.append((KEY_FUNCTION + f.name, f.filepath))
+        events.append((KEY_DEFINES + path + KEY_SEP + f.name, path))
+        if f.parent_class:
+            events.append((KEY_CLASS_METHOD + f.parent_class + KEY_SEP + f.name, path))
+            events.append((KEY_METHOD + f.name, path))
+    return events
+
 
 class FunctionGraphEngine:
     """
@@ -135,6 +249,11 @@ class FunctionGraphEngine:
         self._ts_norm_to_path: Dict[str, str] = {}
         self._ts_resolver: Optional[Any] = None
         self._polyglot_cache: Dict[str, Tuple[str, Tuple[List[FunctionSymbol], List[CallSite], List[str], List[str]]]] = {}
+        # Per-build state of the default resolver (V2 Stage 2): lookup indexes and, when a build is tracked or given a
+        # reuse hook, each caller file's resolution. Neither is part of the index's retrieval state.
+        self._lookup: Optional[_FunctionLookup] = None
+        self.file_resolutions: Dict[str, FileResolution] = {}
+        self.resolution_stats: Dict[str, int] = {}
 
     def _normalize_module_name(self, path: str) -> str:
         norm = path.replace("\\", "/")
@@ -410,11 +529,229 @@ class FunctionGraphEngine:
         self.scip_relationships = []
         self._ts_norm_to_path = {}
         self._ts_resolver = None
+        self._lookup = None
+        self.file_resolutions = {}
+        self.resolution_stats = {}
         self.diagnostics.clear()
         if self.scip_index is None and self.scip_load_diagnostics is not None:
             self.diagnostics["scip"] = self.scip_load_diagnostics
 
-    def build_graph(self, docs: List[FileDoc]) -> "FunctionGraphEngine":
+    def build_graph(self, docs: List[FileDoc], reuse=None, track: bool = False) -> "FunctionGraphEngine":
+        """
+        Builds the function graph. The default extractor uses indexed lookups (``_build_graph_regex``);
+        ``structural_parser="tree_sitter"`` keeps the original resolution loop unchanged.
+
+        ``reuse`` (persistent index cache only): ``reuse(engine, doc) -> Optional[FileResolution]`` may supply a
+        caller file's previously resolved edges once the lookup indexes exist; files for which it returns None are
+        resolved. ``track=True`` records every caller's consulted keys in ``file_resolutions``.
+        """
+        if self.structural_parser != "tree_sitter":
+            return self._build_graph_regex(docs, reuse, track)
+        return self._build_graph_tree_sitter(docs)
+
+    def _extract_regex(self, doc: FileDoc):
+        content_sig = self.polyglot_signature(doc)
+        cached = self._polyglot_cache.get(doc.path)
+        if cached is not None and cached[0] == content_sig:
+            return cached[1]
+        result = self.extract_polyglot(doc.content, doc.path)
+        self._polyglot_cache[doc.path] = (content_sig, result)
+        return result
+
+    def _build_graph_regex(self, docs: List[FileDoc], reuse, track: bool) -> "FunctionGraphEngine":
+        """
+        The default resolver. Same maps, steps A-E, edge order and graph insertion order as the 1.2.0 loop, but every
+        cross-file lookup is a dictionary lookup through ``_FunctionLookup`` and each caller file is resolved on its
+        own (``_resolve_file``), then its edges are replayed in discovery order (``_replay_edges``).
+        """
+        self._reset_build_state()
+        self.docs = docs
+        self.doc_paths = [d.path for d in docs]
+        self.path_to_idx = {d.path: idx for idx, d in enumerate(docs)}
+
+        for doc in docs:
+            self.graph.add_node(doc.path, is_test=doc.is_test)
+
+        # 1. Map modules and namespaces
+        for doc in docs:
+            norm_p = doc.path.replace("\\", "/")
+            cur_dir = os.path.dirname(norm_p)
+            raw_p = norm_p[:-3] if norm_p.endswith(".py") else norm_p
+            self.module_to_path[raw_p.replace("/", ".")] = doc.path
+            mod_name = self._normalize_module_name(doc.path)
+            self.module_to_path[mod_name] = doc.path
+            if "." in mod_name:
+                self.module_to_path[mod_name.split(".")[-1]] = doc.path
+
+            if cur_dir:
+                self.package_to_files.setdefault(cur_dir, []).append(doc.path)
+                pkg_name = os.path.basename(cur_dir)
+                if pkg_name:
+                    self.package_to_files.setdefault(pkg_name, []).append(doc.path)
+
+        # 2. Extract functions and call sites per doc
+        doc_functions: Dict[str, List[FunctionSymbol]] = {}
+        doc_calls: Dict[str, List[CallSite]] = {}
+        doc_imports: Dict[str, List[str]] = {}
+        func_name_to_defs: Dict[str, List[FunctionSymbol]] = defaultdict(list)
+        class_to_methods: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
+        for doc in docs:
+            funcs, calls, _syms, imps = self._extract_regex(doc)
+            doc_functions[doc.path] = funcs
+            doc_calls[doc.path] = calls
+            doc_imports[doc.path] = list(dict.fromkeys(doc.imports + imps))
+            self.functions.extend(funcs)
+            self.call_sites.extend(calls)
+            for f in funcs:
+                func_name_to_defs[f.name].append(f)
+                if f.parent_class:
+                    class_to_methods[f.parent_class].append((f.name, doc.path))
+
+        self._lookup = _FunctionLookup(self.module_to_path, doc_functions, func_name_to_defs, class_to_methods)
+
+        # 3. Resolve (or reuse) each caller file's edges, then replay them in discovery order
+        resolved = reused = calls_resolved = edges_replayed = edges_reused = 0
+        for doc in docs:
+            res = reuse(self, doc) if reuse is not None else None
+            if res is None:
+                res = self._resolve_file(doc.path, doc_calls[doc.path], doc_imports[doc.path], track)
+                resolved += 1
+                calls_resolved += len(doc_calls[doc.path])
+            else:
+                reused += 1
+                edges_reused += len(res.edges)
+            if track or reuse is not None:
+                self.file_resolutions[doc.path] = res
+            self._replay_edges(doc.path, res.edges)
+            edges_replayed += len(res.edges)
+        self.resolution_stats = {"files_resolved": resolved, "files_reused": reused,
+                                 "calls_resolved": calls_resolved, "calls_total": len(self.call_sites),
+                                 "edges_replayed": edges_replayed, "edges_reused": edges_reused}
+        if self.scip_index is not None:
+            self._apply_scip(docs)
+        return self
+
+    def _resolve_file(self, caller_p: str, calls: List[CallSite], doc_imports: List[str],
+                      track: bool) -> FileResolution:
+        """Steps A-E of the 1.2.0 resolver for one caller file, with indexed lookups."""
+        lk = self._lookup
+        consumed: Optional[Set[str]] = set() if track else None
+        lk.track = consumed
+        local = lk.names_of.get(caller_p, frozenset())
+        caller_dir = os.path.dirname(caller_p.replace("\\", "/"))
+        import_bases: Dict[str, Tuple[str, ...]] = {}
+        min_conf, structural = self.min_confidence, self.enable_structural_edges
+        edges: List[Tuple[str, Optional[str], str, str, float]] = []
+        try:
+            for call in calls:
+                callee_name = call.callee_name
+                qualifier = call.qualifier
+                is_attr = call.is_attribute
+                target_file = None
+                conf = 0.0
+                edge_type = ""
+
+                # A. Intra-file calls
+                if callee_name in local:
+                    target_file = caller_p
+                    conf = 1.0
+                    edge_type = "intra_file_call"
+
+                # B. Qualified module calls
+                elif is_attr and qualifier:
+                    cand_file = lk.module(qualifier)
+                    if cand_file is not None:
+                        if lk.defines(cand_file, callee_name):
+                            target_file = cand_file
+                            conf = 1.0
+                            edge_type = "verified_call"
+                    else:
+                        matching = lk.class_methods(qualifier, callee_name)
+                        if len(matching) == 1:
+                            target_file = matching[0]
+                            conf = 0.90
+                            edge_type = "verified_call"
+
+                # C. Unqualified calls with active imports (the first matching import whose module is known)
+                if not target_file and not is_attr:
+                    bases = import_bases.get(callee_name)
+                    if bases is None:
+                        suffix = f".{callee_name}"
+                        bases = tuple((imp.rsplit(".", 1)[0] if "." in imp else imp) for imp in doc_imports
+                                      if imp.endswith(suffix) or imp == callee_name)
+                        import_bases[callee_name] = bases
+                    for base_mod in bases:
+                        cand_file = lk.module(base_mod)
+                        if cand_file is not None:
+                            target_file = cand_file
+                            conf = 1.0
+                            edge_type = "verified_call"
+                            break
+
+                # D. Globally unique functions in the repository
+                if not target_file:
+                    defs = lk.function_paths(callee_name)
+                    if defs:
+                        if len(defs) == 1:
+                            target_file = defs[0]
+                            conf = 0.90
+                            edge_type = "unique_global_call"
+                        elif len(defs) <= 3:
+                            same_dir = [p for p in defs if os.path.dirname(p.replace("\\", "/")) == caller_dir]
+                            if len(same_dir) == 1:
+                                target_file = same_dir[0]
+                                conf = 0.75
+                                edge_type = "directory_local_call"
+
+                # E. Unique method name across all classes (structural)
+                if not target_file and is_attr and callee_name not in GENERIC_METHOD_NAMES and len(callee_name) >= 4:
+                    files = lk.method_files(callee_name)
+                    if len(files) == 1:
+                        target_file = files[0]
+                        conf = 0.70
+                        edge_type = "structural_method_call"
+
+                # Filter by confidence and configuration
+                if target_file and target_file != caller_p:
+                    if conf < min_conf:
+                        continue
+                    if edge_type in ("structural_method_call", "directory_local_call") and not structural:
+                        continue
+                    edges.append((target_file, call.caller_func, callee_name, edge_type, conf))
+        finally:
+            lk.track = None
+        return FileResolution(edges, tuple(sorted(consumed)) if consumed is not None else ())
+
+    def _replay_edges(self, caller_p: str, edges) -> None:
+        """Adds one caller file's resolved edges exactly as the 1.2.0 loop did, in order."""
+        for target_file, source_func, target_func, edge_type, conf in edges:
+            e = FunctionGraphEdge(
+                source_path=caller_p,
+                target_path=target_file,
+                source_func=source_func,
+                target_func=target_func,
+                edge_type=edge_type,
+                confidence=conf,
+            )
+            self.edges.append(e)
+            self.file_to_file_edges[(caller_p, target_file)].append(e)
+            self.graph.add_edge(caller_p, target_file, weight=conf)
+            self.callees_map[caller_p][target_file] = max(self.callees_map[caller_p].get(target_file, 0.0), conf)
+            self.callers_map[target_file][caller_p] = max(self.callers_map[target_file].get(caller_p, 0.0), conf)
+
+    def key_value(self, key: str) -> Any:
+        """The value of a typed lookup key in the current build (see ``_FunctionLookup.value``)."""
+        if self._lookup is None:
+            raise RuntimeError("no default-resolver build is available")
+        return self._lookup.value(key)
+
+    def provides(self, doc: FileDoc) -> List[Tuple[str, str]]:
+        """Provider events of one document for the current build's extraction (``function_graph_provides``)."""
+        funcs = self._extract_regex(doc)[0]
+        return function_graph_provides(doc.path, funcs, self._normalize_module_name)
+
+    def _build_graph_tree_sitter(self, docs: List[FileDoc]) -> "FunctionGraphEngine":
+        """The original resolution loop, used unchanged for ``structural_parser="tree_sitter"``."""
         self._reset_build_state()
         self.docs = docs
         self.doc_paths = [d.path for d in docs]
@@ -705,13 +1042,7 @@ class FunctionGraphEngine:
         }
 
     def _regex_extract_cached(self, doc: FileDoc):
-        content_sig = self.polyglot_signature(doc)
-        cached = self._polyglot_cache.get(doc.path)
-        if cached is not None and cached[0] == content_sig:
-            return cached[1]
-        result = self.extract_polyglot(doc.content, doc.path)
-        self._polyglot_cache[doc.path] = (content_sig, result)
-        return result
+        return self._extract_regex(doc)
 
     def _ts_extract_doc(self, doc: FileDoc, diag: Dict[str, Any]):
         """Returns (TreeSitterExtraction, None) or (None, regex/AST extraction tuple)."""

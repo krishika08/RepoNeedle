@@ -15,13 +15,18 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from reponeedle.core.index_cache.errors import PersistenceUnavailable
-from reponeedle.core.index_cache.schema import APPLICATION_ID, DDL, SCHEMA_VERSION
+from reponeedle.core.index_cache.errors import CacheUnusable, PersistenceUnavailable
+from reponeedle.core.index_cache.schema import APPLICATION_ID, DDL, SCHEMA_VERSION, MigrationError, migrate
 
 # Lowest SQLite version on which the full Stage 1 test suite passed in CI: 3.40.1 (Windows, Python 3.10.11). Also
 # tested: 3.45.1, 3.46.1, 3.49.1. Older libraries are not known to behave as the protocol requires, so persistence
 # is disabled on them (the in-memory build is unaffected).
 MIN_SQLITE_VERSION = (3, 40, 1)
+
+
+class CacheConnection(sqlite3.Connection):
+    """A connection that records which schema versions ``open_writer`` migrated from (empty: none)."""
+    migrated_from = ()
 
 
 def check_sqlite_version() -> None:
@@ -48,7 +53,8 @@ def open_writer(path: Path, busy_timeout_s: float) -> sqlite3.Connection:
     """Opens (and if needed creates) the database for writing, with verified settings."""
     check_sqlite_version()
     try:
-        conn = sqlite3.connect(str(path), isolation_level=None, timeout=busy_timeout_s, check_same_thread=True)
+        conn = sqlite3.connect(str(path), isolation_level=None, timeout=busy_timeout_s, check_same_thread=True,
+                               factory=CacheConnection)
     except sqlite3.Error as exc:
         raise PersistenceUnavailable(f"cannot open the cache database: {type(exc).__name__}") from exc
     try:
@@ -82,8 +88,13 @@ def open_writer(path: Path, busy_timeout_s: float) -> sqlite3.Connection:
                 raise
             if _pragma(conn, "auto_vacuum") != 2:
                 raise PersistenceUnavailable("incremental auto-vacuum could not be enabled")
+        elif _pragma(conn, "application_id") == APPLICATION_ID:
+            try:
+                conn.migrated_from = migrate(conn)        # older minor schema: in place, one transaction
+            except MigrationError as exc:
+                raise CacheUnusable(str(exc)) from exc
         return conn
-    except PersistenceUnavailable:
+    except (PersistenceUnavailable, CacheUnusable):
         conn.close()
         raise
     except sqlite3.Error as exc:

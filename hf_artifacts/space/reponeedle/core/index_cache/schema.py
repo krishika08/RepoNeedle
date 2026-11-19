@@ -1,20 +1,35 @@
 """
-SQLite schema, artifact identity, checksums and the canonical manifest digest (design sections 6 and 6.1).
+SQLite schema, artifact identity, checksums and the canonical manifest digest (design sections 6, 6.1 and 10.6).
 
-Stage 1 stores only what is needed to reconstruct the per-document caches; every global structure is recomputed.
-The dependency tables (``provides``/``consumes``) of the design belong to Stage 2 and are not created.
+Schema version 2 (V2 Stage 2) adds, as a minor additive change to version 1 (Stage 1):
+- ``manifest.file_id``: a stable identity assigned when a persisted path is first seen, never reused, and
+  ``meta.next_file_id`` (monotonic);
+- artifact kinds ``repo_graph_facts``, ``provides``, ``fg_edges`` and ``rg_edges`` (no table change: ``kind`` is
+  free text);
+- ``meta.purge_pending``: a durable marker that a privacy purge has not reached the WAL yet.
+A version-1 database is migrated in place, in one transaction (``migrate``); the file name keeps the schema major.
 """
 
 import hashlib
 import json
+import sqlite3
 from typing import Dict, Iterable, List, Sequence, Tuple
 
 APPLICATION_ID = 0x524E4458          # 'RNDX'
 SCHEMA_MAJOR = 1                     # part of the file name: a new major means a new file (design section 10.6)
-SCHEMA_VERSION = 1                   # PRAGMA user_version; this file only reads exactly this version
-MANIFEST_DIGEST_VERSION = b"reponeedle-manifest-v1"
+SCHEMA_VERSION = 2                   # PRAGMA user_version; this code reads exactly this version
+MIGRATABLE_VERSIONS = (1,)           # older minor versions migrated in place by ``migrate``
+MANIFEST_DIGEST_VERSION = b"reponeedle-manifest-v2"
+MANIFEST_DIGEST_VERSION_1 = b"reponeedle-manifest-v1"
 
-KINDS = ("doc_meta", "lexical", "semantic", "abstainer", "function_graph")
+# Stage 1 kinds: per-document caches of the indexes (``doc_meta`` is required for every manifest entry).
+STAGE1_KINDS = ("doc_meta", "lexical", "semantic", "abstainer", "function_graph")
+# Stage 2 kinds: per-document class-to-test facts, the typed provider events (design section 9.1) and the per-file
+# resolved graph contributions with their consumed keys (sections 9.1-9.4).
+STAGE2_KINDS = ("repo_graph_facts", "provides", "fg_edges", "rg_edges")
+KINDS = STAGE1_KINDS + STAGE2_KINDS
+# Kinds whose key depends on other files (through the dependency context): never decoded into a per-document cache.
+RESOLUTION_KINDS = ("fg_edges", "rg_edges")
 
 DDL = """
 CREATE TABLE meta (
@@ -44,8 +59,10 @@ CREATE TABLE manifest (
   is_test         INTEGER NOT NULL CHECK (is_test IN (0, 1)),
   line_count      INTEGER NOT NULL CHECK (line_count >= 0),
   token_estimate  INTEGER NOT NULL CHECK (token_estimate >= 0),
-  doc_meta_sha256 BLOB NOT NULL CHECK (length(doc_meta_sha256) = 32)
+  doc_meta_sha256 BLOB NOT NULL CHECK (length(doc_meta_sha256) = 32),
+  file_id         INTEGER CHECK (file_id >= 1)
 ) WITHOUT ROWID;
+CREATE UNIQUE INDEX manifest_by_file_id ON manifest(file_id);
 
 CREATE TABLE excluded (
   path   TEXT PRIMARY KEY,
@@ -91,6 +108,12 @@ CREATE TABLE optional_components (
 TABLES = ("meta", "generations", "manifest", "excluded", "artifacts", "file_artifacts", "global_state",
           "optional_components")
 
+# Version 1 -> 2: additive. Statements run inside the migration transaction (``migrate``).
+MIGRATION_1_TO_2 = (
+    "ALTER TABLE manifest ADD COLUMN file_id INTEGER CHECK (file_id >= 1)",
+    "CREATE UNIQUE INDEX manifest_by_file_id ON manifest(file_id)",
+)
+
 
 def framed(*parts: bytes) -> bytes:
     """Unambiguous concatenation: every part is prefixed with its 8-byte big-endian length."""
@@ -108,7 +131,8 @@ def artifact_key(kind: str, extractor_fp: bytes, path: str, text_sha256: bytes, 
                  input_sig: bytes) -> bytes:
     """
     Canonical artifact identity: every input that defines the artifact. ``input_sig`` is the extractor's Stage 0
-    signature (``doc_signature``), i.e. a SHA-256 of the exact extraction inputs including its configuration.
+    signature (``doc_signature``), i.e. a SHA-256 of the exact extraction inputs including its configuration; for
+    the resolution kinds it also binds the file's dependency context (``dependencies.resolution_input_sig``).
     """
     return hashlib.sha256(framed(b"reponeedle-artifact-key-v1", _b(kind), extractor_fp, _b(path), text_sha256,
                                  doc_meta_sha256, input_sig)).digest()
@@ -133,13 +157,15 @@ def _canon(value):
 
 
 def manifest_digest(gen_id: int, manifest: Iterable[Sequence], file_artifacts: Iterable[Sequence],
-                    excluded: Iterable[Sequence], optional_components: Iterable[Sequence]) -> bytes:
+                    excluded: Iterable[Sequence], optional_components: Iterable[Sequence],
+                    version: bytes = MANIFEST_DIGEST_VERSION) -> bytes:
     """
     Versioned, canonical digest of the published rows: each table is sorted by its primary key, so the digest does
-    not depend on row iteration order. Row tuples use the column order of the DDL.
+    not depend on row iteration order. Row tuples use the column order of the DDL (version 2: the manifest rows end
+    with ``file_id``).
     """
     h = hashlib.sha256()
-    h.update(framed(MANIFEST_DIGEST_VERSION, str(gen_id).encode("ascii")))
+    h.update(framed(version, str(gen_id).encode("ascii")))
     tables: List[Tuple[str, Iterable[Sequence], Tuple[int, ...]]] = [
         ("manifest", manifest, (0,)),
         ("file_artifacts", file_artifacts, (0, 1)),
@@ -165,3 +191,63 @@ def doc_meta_digest(meta: Dict[str, object]) -> bytes:
                                                  "imports")}, sort_keys=True, separators=(",", ":"),
                            ensure_ascii=False).encode("utf-8", "surrogatepass")
     return hashlib.sha256(framed(b"reponeedle-doc-meta-v1", canonical)).digest()
+
+
+class MigrationError(Exception):
+    """The database cannot be migrated (it is then treated as unusable)."""
+
+
+def migrate(conn: sqlite3.Connection) -> List[int]:
+    """
+    Migrates an older minor schema version in place, in ONE transaction (``BEGIN IMMEDIATE`` ... ``COMMIT``), so a
+    crash leaves the previous version intact. Idempotent: a database already at ``SCHEMA_VERSION`` is untouched.
+    Returns the versions migrated from (empty when nothing was done).
+
+    Version 1 -> 2: the published version-1 generation's manifest digest is verified first (an unverifiable
+    database is not migrated: MigrationError); then ``manifest.file_id`` is added, the published files receive
+    ids 1..n in manifest-ordinal order, ``meta.next_file_id`` is set, and the generation's manifest digest is
+    recomputed with the version-2 rows. Superseded or abandoned generations are not migrated (garbage collection
+    removes them).
+    """
+    version = conn.execute("PRAGMA user_version").fetchone()[0]
+    if version == SCHEMA_VERSION:
+        return []
+    if version not in MIGRATABLE_VERSIONS:
+        raise MigrationError(f"schema version {version} cannot be migrated to {SCHEMA_VERSION}")
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        # Re-read inside the write transaction: another process may have migrated meanwhile.
+        version = conn.execute("PRAGMA user_version").fetchone()[0]
+        if version == SCHEMA_VERSION:
+            conn.execute("COMMIT")
+            return []
+        meta = dict(conn.execute("SELECT key, value FROM meta"))
+        current = meta.get("current_generation")
+        rows = conn.execute("SELECT path, ordinal, text_sha256, language, is_test, line_count, token_estimate, "
+                            "doc_meta_sha256 FROM manifest").fetchall()
+        fa = conn.execute("SELECT path, kind, artifact_key FROM file_artifacts").fetchall()
+        excluded = conn.execute("SELECT path, reason FROM excluded").fetchall()
+        optional = conn.execute("SELECT component, status FROM optional_components").fetchall()
+        if current is not None:
+            gen_id = int(current)
+            gen = conn.execute("SELECT state, manifest_sha256 FROM generations WHERE gen_id = ?",
+                               (gen_id,)).fetchone()
+            if gen is None or gen[0] != "published" or gen[1] != manifest_digest(
+                    gen_id, rows, fa, excluded, optional, version=MANIFEST_DIGEST_VERSION_1):
+                raise MigrationError("the version-1 generation does not verify; it is not migrated")
+        for statement in MIGRATION_1_TO_2:
+            conn.execute(statement)
+        ordered = sorted(rows, key=lambda r: r[1])
+        conn.executemany("UPDATE manifest SET file_id = ? WHERE path = ?",
+                         [(i + 1, r[0]) for i, r in enumerate(ordered)])
+        conn.execute("INSERT OR REPLACE INTO meta VALUES ('next_file_id', ?)", (str(len(ordered) + 1),))
+        if current is not None:
+            new_rows = [tuple(r) + (i + 1,) for i, r in enumerate(ordered)]
+            conn.execute("UPDATE generations SET manifest_sha256 = ? WHERE gen_id = ?",
+                         (manifest_digest(gen_id, new_rows, fa, excluded, optional), gen_id))
+        conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+        conn.execute("COMMIT")
+    except BaseException:
+        conn.execute("ROLLBACK")
+        raise
+    return [1]

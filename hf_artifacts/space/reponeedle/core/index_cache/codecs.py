@@ -207,10 +207,135 @@ def decode_polyglot(payload: bytes) -> Tuple[List[FunctionSymbol], List[CallSite
     return funcs, calls, _str_list(obj["symbols"], "symbols"), _str_list(obj["imports"], "imports")
 
 
+# ------------------------------------------------------------------------------------- Stage 2: repository graph
+
+_FACT_ARITY = {"class": 3, "C": 2, "A": 2, "I": 2, "M": 2, "K": 3}
+
+
+def encode_repo_facts(facts: List[tuple]) -> bytes:
+    return _compress(_json_dumps([list(f) for f in facts]))
+
+
+def decode_repo_facts(payload: bytes) -> List[tuple]:
+    rows = _json_loads(_decompress(payload))
+    if not isinstance(rows, list):
+        raise CodecError("repo_graph_facts must be a list")
+    out: List[tuple] = []
+    for row in rows:
+        if not isinstance(row, list) or not row or _FACT_ARITY.get(row[0]) != len(row):
+            raise CodecError("repo_graph_facts record")
+        if row[0] == "class":
+            if not isinstance(row[1], str):
+                raise CodecError("class name")
+            out.append(("class", row[1], _str_list(row[2], "class methods")))
+        else:
+            out.append(tuple(_str_list(row, "fact")))
+    return out
+
+
+def _typed_keys(value: Any, what: str) -> Tuple[str, ...]:
+    keys = _str_list(value, what)
+    if any(a >= b for a, b in zip(keys, keys[1:])):
+        raise CodecError(f"{what} not sorted and unique")
+    return tuple(keys)
+
+
+def encode_provides(events: Dict[str, List[Tuple[str, str]]]) -> bytes:
+    return _compress(_json_dumps({g: [list(e) for e in events[g]] for g in ("fg", "rg")}))
+
+
+def decode_provides(payload: bytes) -> Dict[str, List[Tuple[str, str]]]:
+    obj = _json_loads(_decompress(payload))
+    if not isinstance(obj, dict) or set(obj) != {"fg", "rg"}:
+        raise CodecError("provides keys")
+    out = {}
+    for g in ("fg", "rg"):
+        rows = obj[g]
+        if not isinstance(rows, list) or not all(isinstance(r, list) and len(r) == 2 and isinstance(r[0], str)
+                                                 and isinstance(r[1], str) for r in rows):
+            raise CodecError("provider events must be [key, value] string pairs")
+        out[g] = [(k, v) for k, v in rows]
+    return out
+
+
+FG_EDGE_TYPES = ("verified_call", "intra_file_call", "unique_global_call", "directory_local_call",
+                 "structural_method_call")
+
+
+def encode_fg_resolution(resolution) -> bytes:
+    return _compress(_json_dumps({"c": list(resolution.consumed),
+                                  "e": [[t, sf, tf, et, float(c)] for t, sf, tf, et, c in resolution.edges]}))
+
+
+def decode_fg_resolution(payload: bytes):
+    from reponeedle.core.function_graph import FileResolution
+
+    obj = _json_loads(_decompress(payload))
+    if not isinstance(obj, dict) or set(obj) != {"c", "e"} or not isinstance(obj["e"], list):
+        raise CodecError("fg_edges keys")
+    edges = []
+    for row in obj["e"]:
+        if not isinstance(row, list) or len(row) != 5:
+            raise CodecError("fg edge record")
+        target, sf, tf, et, conf = row
+        if not isinstance(target, str) or not isinstance(tf, str) or et not in FG_EDGE_TYPES:
+            raise CodecError("fg edge fields")
+        if type(conf) is not float or not math.isfinite(conf):
+            raise CodecError("fg edge confidence")
+        edges.append((target, _opt_str(sf, "source_func"), tf, et, conf))
+    return FileResolution(edges, _typed_keys(obj["c"], "consumed keys"))
+
+
+def encode_rg_resolution(resolution) -> bytes:
+    return _compress(_json_dumps({"c": list(resolution.consumed), "e": [[u, v] for u, v in resolution.edges]}))
+
+
+def decode_rg_resolution(payload: bytes):
+    from reponeedle.core.graph import DocResolution
+
+    obj = _json_loads(_decompress(payload))
+    if not isinstance(obj, dict) or set(obj) != {"c", "e"} or not isinstance(obj["e"], list):
+        raise CodecError("rg_edges keys")
+    if not all(isinstance(r, list) and len(r) == 2 and isinstance(r[0], str) and isinstance(r[1], str)
+               for r in obj["e"]):
+        raise CodecError("rg edge record")
+    return DocResolution([(u, v) for u, v in obj["e"]], _typed_keys(obj["c"], "consumed keys"))
+
+
+CODECS.update({
+    "repo_graph_facts": "repo-facts-json/1",
+    "provides": "provides-json/1",
+    "fg_edges": "fg-resolution-json/1",
+    "rg_edges": "rg-resolution-json/1",
+})
+
 ENCODERS = {"doc_meta": encode_doc_meta, "semantic": encode_semantic, "abstainer": encode_vocab,
-            "function_graph": encode_polyglot}
+            "function_graph": encode_polyglot, "repo_graph_facts": encode_repo_facts, "provides": encode_provides,
+            "fg_edges": encode_fg_resolution, "rg_edges": encode_rg_resolution}
 DECODERS = {"doc_meta": decode_doc_meta, "lexical": decode_lexical, "semantic": decode_semantic,
-            "abstainer": decode_vocab, "function_graph": decode_polyglot}
+            "abstainer": decode_vocab, "function_graph": decode_polyglot, "repo_graph_facts": decode_repo_facts,
+            "provides": decode_provides, "fg_edges": decode_fg_resolution, "rg_edges": decode_rg_resolution}
+
+
+# --------------------------------------------------------------------------------------------- global state rows
+
+def encode_refcounts(counts: Dict[str, int]) -> bytes:
+    items = sorted(counts.items())
+    return _compress(_json_dumps({"t": [t for t, _ in items], "n": [n for _, n in items]}))
+
+
+def decode_refcounts(payload: bytes) -> Dict[str, int]:
+    obj = _json_loads(_decompress(payload))
+    if not isinstance(obj, dict) or set(obj) != {"t", "n"}:
+        raise CodecError("refcount keys")
+    tokens, counts = obj["t"], obj["n"]
+    _str_list(tokens, "refcount tokens")
+    if any(a >= b for a, b in zip(tokens, tokens[1:])):
+        raise CodecError("refcount tokens not sorted and unique")
+    if not isinstance(counts, list) or len(counts) != len(tokens) or \
+            not all(type(n) is int and n >= 1 for n in counts):
+        raise CodecError("refcounts must be integers >= 1, one per token")
+    return dict(zip(tokens, counts))
 
 
 def decode(kind: str, codec: str, payload: bytes) -> Any:
