@@ -51,35 +51,37 @@ class SelectiveAbstainer:
         """
         self.repo_vocabulary = set()
         for doc in docs:
-            cache_key = doc.path
-            content_sig = self.doc_signature(doc)
-            if cache_key in self._doc_vocab_cache and self._doc_vocab_cache[cache_key][0] == content_sig:
-                doc_vocab = self._doc_vocab_cache[cache_key][1]
-            else:
-                doc_vocab = set()
-                # Add path tokens
-                for t in self.tokenizer.tokenize_path(doc.path):
+            self.repo_vocabulary.update(self.doc_vocabulary(doc))
+
+        return self
+
+    def doc_vocabulary(self, doc: FileDoc) -> Set[str]:
+        """One document's vocabulary, from the signature-validated cache or extracted and cached."""
+        cache_key = doc.path
+        content_sig = self.doc_signature(doc)
+        if cache_key in self._doc_vocab_cache and self._doc_vocab_cache[cache_key][0] == content_sig:
+            return self._doc_vocab_cache[cache_key][1]
+        doc_vocab = set()
+        # Add path tokens
+        for t in self.tokenizer.tokenize_path(doc.path):
+            tl = t.lower()
+            doc_vocab.add(tl)
+            doc_vocab.add(self._stem(tl))
+        # Add symbol tokens
+        for s in doc.symbols:
+            for t in self.tokenizer.tokenize_text(s):
+                tl = t.lower()
+                doc_vocab.add(tl)
+                doc_vocab.add(self._stem(tl))
+        # Add content identifiers if doc.content is present
+        if doc.content:
+            for t in self.tokenizer.tokenize_text(doc.content[:3000]):
+                if len(t) > 2:
                     tl = t.lower()
                     doc_vocab.add(tl)
                     doc_vocab.add(self._stem(tl))
-                # Add symbol tokens
-                for s in doc.symbols:
-                    for t in self.tokenizer.tokenize_text(s):
-                        tl = t.lower()
-                        doc_vocab.add(tl)
-                        doc_vocab.add(self._stem(tl))
-                # Add content identifiers if doc.content is present
-                if doc.content:
-                    for t in self.tokenizer.tokenize_text(doc.content[:3000]):
-                        if len(t) > 2:
-                            tl = t.lower()
-                            doc_vocab.add(tl)
-                            doc_vocab.add(self._stem(tl))
-                self._doc_vocab_cache[cache_key] = (content_sig, doc_vocab)
-
-            self.repo_vocabulary.update(doc_vocab)
-
-        return self
+        self._doc_vocab_cache[cache_key] = (content_sig, doc_vocab)
+        return doc_vocab
 
     def evaluate_abstention(
         self,
