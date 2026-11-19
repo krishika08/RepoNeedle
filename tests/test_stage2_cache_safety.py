@@ -54,6 +54,22 @@ def _kill(proc):
     proc.wait(timeout=60)
 
 
+def _released(db, timeout=15.0):
+    """
+    True once the exclusive lease can be taken. Windows releases a killed process's file locks asynchronously
+    ("depending on available system resources"), so a release is observed within a short delay, not instantly.
+    """
+    deadline = time.monotonic() + timeout
+    while True:
+        probe = CacheLease(db)
+        if probe.try_exclusive():
+            probe.release()
+            return True
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.1)
+
+
 # A child that holds a cache-use lease exactly as a reader or writer does, plus (optionally) an open SQLite read
 # snapshot or write lock, until it is killed.
 HOLDER = r'''
@@ -106,9 +122,7 @@ def test_a_shared_lease_blocks_the_exclusive_lease_until_its_process_dies(tmp_pa
         assert not probe.try_exclusive(), "an exclusive lease must fail while another process holds a shared one"
     finally:
         _kill(holder)                                      # killed, no cleanup: the OS releases the lock
-    probe = CacheLease(db)
-    assert probe.try_exclusive()
-    probe.release()
+    assert _released(db), "the lease of a killed process must be released by the operating system"
 
 
 def test_shared_leases_coexist(tmp_path):
@@ -137,6 +151,7 @@ def test_eviction_skips_a_database_in_use_and_evicts_it_once_unused(tmp_path, mo
         assert result["removed"] == [] and db_b.name in result["in_use"]
     finally:
         _kill(holder)
+    assert _released(db_b)
     engine = cached(repo_a, _limit_cfg(tmp_path, db_a, db_b))
     assert not db_b.exists() and not Path(str(db_b) + "-wal").exists() and not Path(str(db_b) + "-shm").exists()
     assert "removed 1 other cache database" in last(engine)["reason"]
