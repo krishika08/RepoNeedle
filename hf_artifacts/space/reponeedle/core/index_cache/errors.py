@@ -9,11 +9,15 @@ class IndexCacheError(RuntimeError):
 
 
 class CacheUnusable(Exception):
-    """Internal: the database exists but must not be used (corrupt, foreign, incompatible or unpublished)."""
+    """
+    Internal: the database exists but must not be used (corrupt, foreign, incompatible or unpublished).
+    ``migratable`` is True when it has an older minor schema version that a writer migrates in place.
+    """
 
-    def __init__(self, reason: str):
+    def __init__(self, reason: str, migratable: bool = False):
         super().__init__(reason)
         self.reason = reason
+        self.migratable = migratable
 
 
 class PersistenceUnavailable(Exception):

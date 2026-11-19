@@ -63,6 +63,40 @@ class BM25Index:
             self.path_weight, self.symbol_weight, self.body_weight, self.decouple_symbols,
         )
 
+    def doc_terms(self, doc: FileDoc) -> Tuple[Dict[str, float], float]:
+        """
+        Field-weighted term counts and effective length of one document, from the signature-validated cache when
+        its inputs are unchanged (the cached dict object is returned as is), otherwise extracted and cached.
+        """
+        cache_key = doc.path
+        content_sig = self.doc_signature(doc)
+        if cache_key in self._doc_term_cache and self._doc_term_cache[cache_key][0] == content_sig:
+            _, weighted_counts, effective_len = self._doc_term_cache[cache_key]
+            return weighted_counts, effective_len
+        # 1. Path tokens
+        path_tokens = self.tokenizer.tokenize_path(doc.path)
+
+        # 2. Symbol tokens
+        symbol_tokens = []
+        for s in doc.symbols:
+            symbol_tokens.extend(self.tokenizer.tokenize_text(s))
+
+        # 3. Content body tokens
+        body_tokens = self.tokenizer.tokenize_text(doc.content)
+
+        # Combined term counts with field weights
+        weighted_counts = {}
+        for t in path_tokens:
+            weighted_counts[t] = weighted_counts.get(t, 0.0) + self.path_weight
+        for t in symbol_tokens:
+            weighted_counts[t] = weighted_counts.get(t, 0.0) + self.symbol_weight
+        for t in body_tokens:
+            weighted_counts[t] = weighted_counts.get(t, 0.0) + self.body_weight
+
+        effective_len = max(1.0, float(len(body_tokens) + len(path_tokens))) if self.decouple_symbols else sum(weighted_counts.values())
+        self._doc_term_cache[cache_key] = (content_sig, weighted_counts, effective_len)
+        return weighted_counts, effective_len
+
     def fit(self, docs: List[FileDoc]) -> "BM25Index":
         """
         Indexes a collection of FileDoc objects.
@@ -84,34 +118,7 @@ class BM25Index:
             return self
 
         for doc in docs:
-            cache_key = doc.path
-            content_sig = self.doc_signature(doc)
-            if cache_key in self._doc_term_cache and self._doc_term_cache[cache_key][0] == content_sig:
-                _, weighted_counts, effective_len = self._doc_term_cache[cache_key]
-            else:
-                # 1. Path tokens
-                path_tokens = self.tokenizer.tokenize_path(doc.path)
-                
-                # 2. Symbol tokens
-                symbol_tokens = []
-                for s in doc.symbols:
-                    symbol_tokens.extend(self.tokenizer.tokenize_text(s))
-                
-                # 3. Content body tokens
-                body_tokens = self.tokenizer.tokenize_text(doc.content)
-
-                # Combined term counts with field weights
-                weighted_counts = {}
-                for t in path_tokens:
-                    weighted_counts[t] = weighted_counts.get(t, 0.0) + self.path_weight
-                for t in symbol_tokens:
-                    weighted_counts[t] = weighted_counts.get(t, 0.0) + self.symbol_weight
-                for t in body_tokens:
-                    weighted_counts[t] = weighted_counts.get(t, 0.0) + self.body_weight
-
-                effective_len = max(1.0, float(len(body_tokens) + len(path_tokens))) if self.decouple_symbols else sum(weighted_counts.values())
-                self._doc_term_cache[cache_key] = (content_sig, weighted_counts, effective_len)
-
+            weighted_counts, effective_len = self.doc_terms(doc)
             doc_lengths_list.append(effective_len)
             self.doc_term_freqs.append(weighted_counts)
 

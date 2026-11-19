@@ -21,8 +21,10 @@ from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from reponeedle.core.index_cache import codecs
 from reponeedle.core.index_cache.errors import CacheUnusable, PersistenceUnavailable
-from reponeedle.core.index_cache.schema import (APPLICATION_ID, KINDS, SCHEMA_VERSION, TABLES, artifact_checksum,
-                                                artifact_key, doc_meta_digest, global_checksum, manifest_digest)
+from reponeedle.core.index_cache.lease import CacheLease
+from reponeedle.core.index_cache.schema import (APPLICATION_ID, KINDS, MIGRATABLE_VERSIONS, SCHEMA_VERSION, TABLES,
+                                                artifact_checksum, artifact_key, doc_meta_digest, global_checksum,
+                                                manifest_digest)
 
 SUMMARY_STATE = "stage1.summary"
 SUMMARY_CODEC = "summary-json/1"
@@ -52,6 +54,7 @@ class ManifestEntry:
     line_count: int
     token_estimate: int
     doc_meta_sha256: bytes
+    file_id: int = 0
     artifacts: Dict[str, bytes] = field(default_factory=dict)     # kind -> artifact key
 
 
@@ -69,6 +72,22 @@ class LoadedGeneration:
     meta: Dict[str, str]
     manifest: Dict[str, ManifestEntry]
     artifacts: Dict[bytes, LoadedArtifact]
+    global_state: Dict[str, Tuple[str, bytes]] = field(default_factory=dict)   # name -> (codec, verified payload)
+
+    @property
+    def ordered_paths(self) -> List[str]:
+        return [e.path for e in sorted(self.manifest.values(), key=lambda e: e.ordinal)]
+
+    @property
+    def purge_pending(self) -> bool:
+        return self.meta.get("purge_pending") == "1"
+
+    def data(self, path: str, kind: str):
+        """The decoded artifact of ``kind`` for ``path`` (None if absent or from another extractor fingerprint)."""
+        entry = self.manifest.get(path)
+        key = entry.artifacts.get(kind) if entry is not None else None
+        art = self.artifacts.get(key) if key is not None else None
+        return art.data if art is not None else None
 
 
 def _pragma(conn, name):
@@ -93,7 +112,8 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
         raise CacheUnusable("not a RepoNeedle index cache (application_id)")
     version = _pragma(conn, "user_version")
     if version != SCHEMA_VERSION:
-        raise CacheUnusable(f"unsupported schema version {version} (this version reads {SCHEMA_VERSION})")
+        raise CacheUnusable(f"unsupported schema version {version} (this version reads {SCHEMA_VERSION})",
+                            migratable=version in MIGRATABLE_VERSIONS)
     present = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
     if not set(TABLES) <= present:
         raise CacheUnusable("schema tables missing")
@@ -109,7 +129,7 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
         raise CacheUnusable("current generation is not published")
 
     manifest_rows = conn.execute("SELECT path, ordinal, text_sha256, language, is_test, line_count, token_estimate, "
-                                 "doc_meta_sha256 FROM manifest").fetchall()
+                                 "doc_meta_sha256, file_id FROM manifest").fetchall()
     fa_rows = conn.execute("SELECT path, kind, artifact_key FROM file_artifacts").fetchall()
     excluded_rows = conn.execute("SELECT path, reason FROM excluded").fetchall()
     optional_rows = conn.execute("SELECT component, status FROM optional_components").fetchall()
@@ -121,10 +141,12 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
         raise CacheUnusable("manifest digest does not match the published rows")
 
     summary_ok = False
+    global_state: Dict[str, Tuple[str, bytes]] = {}
     for name, row_gen, codec, payload, checksum in conn.execute(
             "SELECT name, gen_id, codec, payload, checksum FROM global_state"):
         if row_gen != gen_id or checksum != global_checksum(name, row_gen, codec, payload):
             raise CacheUnusable(f"global state {name!r} failed verification")
+        global_state[name] = (codec, bytes(payload))
         if name == SUMMARY_STATE and codec == SUMMARY_CODEC:
             try:
                 summary = json.loads(bytes(payload).decode("utf-8"))
@@ -136,13 +158,22 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
 
     manifest: Dict[str, ManifestEntry] = {}
     ordinals = []
-    for path, ordinal, text_sha, language, is_test, lines, tokens, meta_sha in manifest_rows:
+    for path, ordinal, text_sha, language, is_test, lines, tokens, meta_sha, file_id in manifest_rows:
         if not valid_relative_path(path):
             raise CacheUnusable("manifest contains an invalid path")
-        manifest[path] = ManifestEntry(path, ordinal, text_sha, language, bool(is_test), lines, tokens, meta_sha)
+        if type(file_id) is not int or file_id < 1:
+            raise CacheUnusable("manifest entry without a valid file id")
+        manifest[path] = ManifestEntry(path, ordinal, text_sha, language, bool(is_test), lines, tokens, meta_sha,
+                                       file_id)
         ordinals.append(ordinal)
     if sorted(ordinals) != list(range(len(ordinals))):
         raise CacheUnusable("manifest ordinals are not dense")
+    try:
+        next_file_id = int(meta.get("next_file_id", "1"))
+    except ValueError:
+        raise CacheUnusable("next_file_id is not an integer")
+    if manifest and next_file_id <= max(e.file_id for e in manifest.values()):
+        raise CacheUnusable("next_file_id would reuse an assigned file id")
 
     joined = conn.execute(
         "SELECT fa.path, fa.kind, a.artifact_key, a.kind, a.extractor_fp, a.path, a.input_sig, a.codec, a.payload, "
@@ -181,7 +212,7 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
                 "SELECT artifact_key, kind, extractor_fp, path, input_sig, codec, payload, checksum FROM artifacts"):
             if checksum != artifact_checksum(key, kind, fp, a_path, input_sig, codec, payload):
                 raise CacheUnusable("an unreferenced artifact failed its checksum")
-    return LoadedGeneration(gen_id, meta, manifest, artifacts)
+    return LoadedGeneration(gen_id, meta, manifest, artifacts, global_state)
 
 
 ArtifactRow = Tuple[bytes, str, bytes, str, bytes, str, bytes, bytes, int]
@@ -238,18 +269,37 @@ class CacheWriter:
 
     def publish(self, gen_id: int, meta: Dict[str, str], manifest_rows: List[tuple], fa_rows: List[tuple],
                 excluded_rows: List[tuple], optional_rows: List[tuple], summary: Dict[str, object],
-                artifact_for: Callable[[bytes], Optional[ArtifactRow]], work_counters: Dict[str, object]) -> int:
+                artifact_for: Callable[[bytes], Optional[ArtifactRow]], work_counters: Dict[str, object],
+                global_rows: Sequence[Tuple[str, str, bytes]] = (), purge_required: bool = False
+                ) -> Dict[str, int]:
         """
         The single publish transaction. Replaces the published rows, re-inserts any referenced artifact that a
         concurrent writer's garbage collection removed meanwhile, writes the manifest digest and global state,
-        supersedes the previous generation and moves ``current_generation``. Returns artifacts re-inserted.
-        Foreign keys are DEFERRED, so they are checked at COMMIT: a dangling reference aborts the publish.
+        supersedes the previous generation and moves ``current_generation``. Foreign keys are DEFERRED, so they are
+        checked at COMMIT: a dangling reference aborts the publish.
+
+        ``manifest_rows`` omit ``file_id``: ids are allocated HERE, under the write lock, from the rows that are
+        published at this moment (which may come from a concurrent writer): a path keeps its id; a path not in the
+        published manifest receives ``next_file_id`` (monotonic, so a retired id is never reused).
+        ``purge_required`` records ``meta.purge_pending='1'`` in the same transaction (cleared by ``maintain`` once
+        the WAL has been checkpointed and truncated). Returns counts: reinserted, file_ids_assigned, retired.
         """
         def run():
             c = self.conn
+            current_ids = dict(c.execute("SELECT path, file_id FROM manifest WHERE file_id IS NOT NULL"))
+            row = c.execute("SELECT value FROM meta WHERE key = 'next_file_id'").fetchone()
+            next_id = max(int(row[0]) if row else 1, max(current_ids.values(), default=0) + 1)
+            rows, assigned = [], 0
+            for r in manifest_rows:
+                fid = current_ids.get(r[0])
+                if fid is None:
+                    fid, next_id, assigned = next_id, next_id + 1, assigned + 1
+                rows.append(tuple(r) + (fid,))
+            published = {r[0] for r in manifest_rows}
+            retired = sum(1 for p in current_ids if p not in published)
             for table in ("file_artifacts", "manifest", "excluded", "optional_components", "global_state"):
                 c.execute(f"DELETE FROM {table}")
-            c.executemany("INSERT INTO manifest VALUES (?, ?, ?, ?, ?, ?, ?, ?)", manifest_rows)
+            c.executemany("INSERT INTO manifest VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
             c.executemany("INSERT INTO file_artifacts VALUES (?, ?, ?)", fa_rows)
             c.executemany("INSERT INTO excluded VALUES (?, ?)", excluded_rows)
             c.executemany("INSERT INTO optional_components VALUES (?, ?)", optional_rows)
@@ -261,20 +311,22 @@ class CacheWriter:
                 if row is None:
                     raise PersistenceUnavailable("a referenced artifact is missing and cannot be re-created")
                 c.execute("INSERT INTO artifacts VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", row)
-            digest = manifest_digest(gen_id, manifest_rows, fa_rows, excluded_rows, optional_rows)
+            digest = manifest_digest(gen_id, rows, fa_rows, excluded_rows, optional_rows)
             payload = json.dumps(summary, sort_keys=True, separators=(",", ":")).encode("utf-8")
-            c.execute("INSERT INTO global_state VALUES (?, ?, ?, ?, ?)",
-                      (SUMMARY_STATE, gen_id, SUMMARY_CODEC, payload,
-                       global_checksum(SUMMARY_STATE, gen_id, SUMMARY_CODEC, payload)))
+            for name, codec, data in [(SUMMARY_STATE, SUMMARY_CODEC, payload), *global_rows]:
+                c.execute("INSERT INTO global_state VALUES (?, ?, ?, ?, ?)",
+                          (name, gen_id, codec, data, global_checksum(name, gen_id, codec, data)))
             c.execute("UPDATE generations SET state = 'superseded' WHERE state = 'published'")
             c.execute("UPDATE generations SET state = 'published', published_at = ?, file_count = ?, "
                       "manifest_sha256 = ?, work_counters = ? WHERE gen_id = ? AND state = 'building'",
                       (utc_now(), len(manifest_rows), digest, json.dumps(work_counters, sort_keys=True), gen_id))
             if c.execute("SELECT changes()").fetchone()[0] != 1:
                 raise PersistenceUnavailable("the building generation disappeared before publish")
-            c.executemany("INSERT OR REPLACE INTO meta VALUES (?, ?)",
-                          sorted({**meta, "current_generation": str(gen_id)}.items()))
-            return len(missing)
+            extra = {"current_generation": str(gen_id), "next_file_id": str(next_id)}
+            if purge_required:
+                extra["purge_pending"] = "1"
+            c.executemany("INSERT OR REPLACE INTO meta VALUES (?, ?)", sorted({**meta, **extra}.items()))
+            return {"reinserted": len(missing), "file_ids_assigned": assigned, "file_ids_retired": retired}
         return self._tx(run)
 
     def abandon(self, gen_id: int) -> None:
@@ -301,11 +353,38 @@ class CacheWriter:
             return removed
         return self._tx(run)
 
+    def _checkpoint_truncate(self) -> Tuple[int, int, int]:
+        """
+        ``wal_checkpoint(TRUNCATE)`` without waiting: an open read snapshot makes it report busy instead of blocking
+        for the busy timeout. The busy timeout is restored afterwards (it is not a durability setting).
+        """
+        busy_ms = _pragma(self.conn, "busy_timeout")
+        self.conn.execute("PRAGMA busy_timeout = 0")
+        try:
+            return tuple(self.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone())
+        finally:
+            self.conn.execute(f"PRAGMA busy_timeout = {int(busy_ms)}")
+
     def maintain(self) -> Dict[str, object]:
-        """Reclaims free pages and truncates the WAL (both outside any transaction)."""
+        """
+        Reclaims free pages and truncates the WAL (both outside any transaction). If a privacy purge is pending
+        (``meta.purge_pending``), it is complete only when this checkpoint backfilled every WAL frame and truncated
+        the WAL: then no frame or database page holds the deleted rows (``secure_delete`` overwrote them), and the
+        marker is cleared. Otherwise it stays pending, durably, for a later writer.
+        """
         self.conn.execute("PRAGMA incremental_vacuum").fetchall()
-        busy, log_frames, checkpointed = self.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
-        return {"checkpoint_busy": bool(busy), "wal_frames": log_frames, "checkpointed_frames": checkpointed}
+        busy, log_frames, checkpointed = self._checkpoint_truncate()
+        row = self.conn.execute("SELECT value FROM meta WHERE key = 'purge_pending'").fetchone()
+        purge = None
+        if row is not None and row[0] == "1":
+            if busy:
+                purge = "pending"
+            else:
+                self._tx(lambda: self.conn.execute("DELETE FROM meta WHERE key = 'purge_pending'"))
+                self._checkpoint_truncate()          # best effort: the marker's own frame holds no file data
+                purge = "complete"
+        return {"checkpoint_busy": bool(busy), "wal_frames": log_frames, "checkpointed_frames": checkpointed,
+                "purge": purge}
 
 
 def quarantine(db_path: Path) -> str:
@@ -324,29 +403,34 @@ def quarantine(db_path: Path) -> str:
     return os.path.basename(target)
 
 
-def enforce_total_limit(cache_dir: Path, keep: Path, max_total_bytes: int) -> List[str]:
-    """Deletes least-recently-modified OTHER cache databases until the directory fits; never one in use."""
+def enforce_total_limit(cache_dir: Path, keep: Path, max_total_bytes: int) -> Dict[str, List[str]]:
+    """
+    Deletes least-recently-modified OTHER cache databases until the directory fits. A database is deleted only
+    while this process holds its EXCLUSIVE lease (``lease.CacheLease``), which no process can obtain while another
+    RepoNeedle process holds a shared lease (every reader and writer does while its connections are open). Databases
+    in use are skipped, so the limit may stay exceeded. Returns {"removed": [...], "in_use": [...]}.
+    """
     def size(base: Path) -> int:
         return sum(Path(str(base) + s).stat().st_size for s in ("", "-wal", "-shm") if Path(str(base) + s).exists())
 
     dbs = [p for p in cache_dir.glob("*-s*.sqlite3") if p.is_file()]
     total = sum(size(p) for p in dbs)
-    removed = []
+    removed, in_use = [], []
     for candidate in sorted((p for p in dbs if p.resolve() != keep.resolve()), key=lambda p: p.stat().st_mtime):
         if total <= max_total_bytes:
             break
+        lease = CacheLease(candidate)
+        if not lease.try_exclusive():
+            in_use.append(candidate.name)
+            continue
         try:
-            probe = sqlite3.connect(str(candidate), timeout=0, isolation_level=None)
-            try:
-                probe.execute("BEGIN EXCLUSIVE")       # fails while another process uses the database
-                probe.execute("ROLLBACK")
-            finally:
-                probe.close()
             freed = size(candidate)
             for s in ("", "-wal", "-shm"):
                 Path(str(candidate) + s).unlink(missing_ok=True)
             total -= freed
             removed.append(candidate.name)
-        except (sqlite3.Error, OSError):
-            continue
-    return removed
+        except OSError:
+            in_use.append(candidate.name)
+        finally:
+            lease.release()
+    return {"removed": removed, "in_use": in_use}

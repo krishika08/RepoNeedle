@@ -11,8 +11,9 @@ Cache fingerprints (design section 7). Each is a SHA-256 ``stable_signature`` ov
   limits, the ``pathspec`` version and path case-sensitivity. It identifies the file set; a change produces an
   ordinary file-set diff, because artifacts never depend on it;
 - **index fingerprint**: everything global assembly depends on (all of the above plus the global parameters and
-  the source of the global-assembly code). Stage 1 recomputes global structures on every start, so a mismatch is
-  reported but never needs invalidation.
+  the source of the global-assembly code and the Stage 2 bookkeeping versions). Global state that is reused across
+  starts (the abstainer reference counts) is keyed by its own extractor fingerprint; resolution artifacts are keyed
+  by their dependency context (``dependencies.py``).
 """
 
 import functools
@@ -23,16 +24,23 @@ import unicodedata
 from importlib import import_module
 from typing import Dict, List, Optional
 
+from reponeedle.core.function_graph import RESOLVER_VERSION as FG_RESOLVER_VERSION
+from reponeedle.core.graph import RESOLVER_VERSION as RG_RESOLVER_VERSION
 from reponeedle.core.index_cache.codecs import CODECS
 from reponeedle.core.index_cache.schema import SCHEMA_VERSION
 from reponeedle.core.signatures import stable_signature
 
 FINGERPRINT_VERSION = "reponeedle-index-fingerprints/1"
 # Explicit per-kind versions: bump to invalidate a kind's artifacts without a code change elsewhere.
-ARTIFACT_VERSIONS: Dict[str, int] = {"doc_meta": 1, "lexical": 1, "semantic": 1, "abstainer": 1, "function_graph": 1}
+ARTIFACT_VERSIONS: Dict[str, int] = {"doc_meta": 1, "lexical": 1, "semantic": 1, "abstainer": 1, "function_graph": 1,
+                                     "repo_graph_facts": 1, "provides": 1, "fg_edges": 1, "rg_edges": 1}
+# Versions of the Stage 2 bookkeeping that is not a per-file artifact (part of the index fingerprint).
+BOOKKEEPING_VERSIONS: Dict[str, str] = {"dependency_keys": "typed-keys/1", "graph_replay": "canonical-replay/1",
+                                        "bm25": "bm25-partial/1", "abstainer_refcounts": "abstainer-refcounts/1"}
 DECODING = "utf-8/errors=ignore/universal-newlines"
 
 _CODECS_MODULE = "reponeedle.core.index_cache.codecs"
+_DEPENDENCIES_MODULE = "reponeedle.core.index_cache.dependencies"
 _EXTRACTOR_MODULES = {
     "doc_meta": ("reponeedle.engine", "reponeedle.models", "reponeedle.core.graph", "reponeedle.core.tokenizer",
                  _CODECS_MODULE),
@@ -42,9 +50,14 @@ _EXTRACTOR_MODULES = {
     "abstainer": ("reponeedle.core.abstention", "reponeedle.core.tokenizer", "reponeedle.core.signatures",
                   _CODECS_MODULE),
     "function_graph": ("reponeedle.core.function_graph", "reponeedle.core.signatures", _CODECS_MODULE),
+    "repo_graph_facts": ("reponeedle.core.graph", "reponeedle.core.signatures", _CODECS_MODULE),
+    "provides": ("reponeedle.core.function_graph", "reponeedle.core.graph", _CODECS_MODULE),
+    "fg_edges": ("reponeedle.core.function_graph", _DEPENDENCIES_MODULE, _CODECS_MODULE),
+    "rg_edges": ("reponeedle.core.graph", _DEPENDENCIES_MODULE, _CODECS_MODULE),
 }
 _GLOBAL_MODULES = ("reponeedle.core.lexical", "reponeedle.core.semantic", "reponeedle.core.graph",
-                   "reponeedle.core.function_graph", "reponeedle.core.abstention")
+                   "reponeedle.core.function_graph", "reponeedle.core.abstention", _DEPENDENCIES_MODULE,
+                   "reponeedle.core.index_cache.incremental")
 
 
 @functools.lru_cache(maxsize=None)
@@ -78,6 +91,12 @@ def extractor_fingerprints(engine) -> Dict[str, str]:
         "semantic": [json.dumps([sem.min_n, sem.max_n])],
         "abstainer": [],
         "function_graph": [f"structural_parser={engine.function_graph.structural_parser}"],
+        "repo_graph_facts": [],
+        "provides": [f"polyglot_symbols={polyglot}", f"structural_parser={engine.function_graph.structural_parser}"],
+        "fg_edges": [FG_RESOLVER_VERSION, f"structural_parser={engine.function_graph.structural_parser}",
+                     f"polyglot_symbols={polyglot}",
+                     json.dumps([engine.function_graph.min_confidence, engine.function_graph.enable_structural_edges])],
+        "rg_edges": [RG_RESOLVER_VERSION, f"polyglot_symbols={polyglot}"],
     }
     out = {}
     for kind, modules in _EXTRACTOR_MODULES.items():
@@ -105,13 +124,13 @@ def index_fingerprint(engine, extractor_fps: Dict[str, str]) -> str:
                          "repo_graph": [engine.repo_graph.enable_class_to_test,
                                         engine.repo_graph.enable_degree_matched_control]}, sort_keys=True)
     return stable_signature(FINGERPRINT_VERSION, "index", SCHEMA_VERSION, [extractor_fps[k] for k in sorted(
-        extractor_fps)], params, _sources(_GLOBAL_MODULES))
+        extractor_fps)], params, json.dumps(BOOKKEEPING_VERSIONS, sort_keys=True), _sources(_GLOBAL_MODULES))
 
 
 def unsupported_configuration(engine) -> Optional[str]:
-    """Stage 1 persists the default extractors only; optional components take the uncached route (Stage 4)."""
+    """Only the default extractors are persisted; optional components take the uncached route (Stage 4)."""
     if engine.function_graph.structural_parser != "regex":
-        return "structural_parser='tree_sitter' is not persisted in Stage 1"
+        return "structural_parser='tree_sitter' is not persisted (Stage 4)"
     if engine.scip_config is not None:
-        return "SCIP ingestion is not persisted in Stage 1"
+        return "SCIP ingestion is not persisted (Stage 4)"
     return None

@@ -464,9 +464,12 @@ class RepoNeedleEngine:
         """SCIP ingestion diagnostics, or None if no SCIP index was requested."""
         return self.function_graph.diagnostics.get("scip")
 
-    def _fit(self, docs: List[FileDoc]):
+    def _fit(self, docs: List[FileDoc], assembly=None):
         """
         Fits all internal indices on the document collection.
+
+        ``assembly`` (persistent index cache only, V2 Stage 2) replaces the five index fits with
+        ``assembly.fit_all(self, docs)``, which must leave every index exactly as these fits would.
         """
         # Deduplicate docs by path (preserving latest content)
         deduped: Dict[str, FileDoc] = {}
@@ -486,11 +489,14 @@ class RepoNeedleEngine:
                         d.symbols = syms
                         d.imports = imps
 
-        self.lexical_index.fit(clean_docs)
-        self.semantic_index.fit(clean_docs)
-        self.repo_graph.fit(clean_docs)
-        self.function_graph.build_graph(clean_docs)
-        self.abstainer.fit(clean_docs)
+        if assembly is not None:
+            assembly.fit_all(self, clean_docs)
+        else:
+            self.lexical_index.fit(clean_docs)
+            self.semantic_index.fit(clean_docs)
+            self.repo_graph.fit(clean_docs)
+            self.function_graph.build_graph(clean_docs)
+            self.abstainer.fit(clean_docs)
         self.indexing_diagnostics.indexed_files = len(clean_docs)
 
     def update_document(self, doc: FileDoc):
@@ -586,11 +592,13 @@ class RepoNeedleEngine:
 
     def refresh(self, validation: Optional[str] = None) -> IndexUpdateReport:
         """
-        Rescans the repository from disk and rebuilds every index, reusing verified per-file artifacts from the
-        persistent index cache for unchanged files, then publishes a complete new cache generation (V2 Stage 1).
+        Rescans the repository from disk and brings every index up to date, reusing verified per-file artifacts
+        from the persistent index cache for unchanged files, then publishes a complete new cache generation.
 
         Only engines built with ``from_directory(..., index_cache=IndexCacheConfig(...))`` support it. Global
-        structures are always recomputed in full; this is persistence, not incremental indexing. It is the only
+        structures are maintained as described in the design (V2 Stage 2): graph resolution is limited to affected files,
+        BM25 is partially incremental when the document set and order are unchanged, the semantic index and PageRank
+        are recomputed in full; the result is always identical to an uncached build. It is the only
         operation that writes the cache: ``update_documents()`` and ``remove_documents()`` stay in memory.
 
         Args:
@@ -659,9 +667,10 @@ class RepoNeedleEngine:
         """
         Scans a local repository directory, parses files, and builds the retrieval index.
 
-        ``index_cache`` (opt-in, V2 Stage 1) persists per-file derived data in a SQLite database and reuses it on
-        later starts for unchanged files; global index structures are always recomputed, and results are
-        identical to a build without it. Without it (the default) no database is opened or created.
+        ``index_cache`` (opt-in, V2 Stages 1-2) persists per-file derived data in a SQLite database and reuses it on
+        later starts for unchanged files; graph resolution is limited to files affected by a change, the other
+        global structures are recomputed, and results are identical to a build without it. Without it (the
+        default) no database is opened or created.
 
         Files strictly larger than ``max_file_size_bytes`` (default 500,000) are excluded from
         the index. Every exclusion (oversized or unreadable) is recorded by repository-relative

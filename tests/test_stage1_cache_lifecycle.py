@@ -13,7 +13,7 @@ import pytest
 
 from cache_support import (FILES, SAMPLE, assert_same_as_fresh, cache_config, cached, db_files, db_path, fresh,
                            last, make_repo, published_generation, write)
-from reponeedle.core.index_cache import IndexCacheError, fingerprints
+from reponeedle.core.index_cache import IndexCacheError, fingerprints, schema
 from reponeedle.engine import RepoNeedleEngine
 from reponeedle.models import AblationConfig, IndexCacheConfig
 
@@ -26,9 +26,9 @@ def test_cold_start_creates_a_database_and_matches_a_fresh_build(tmp_path):
     r = last(engine)
     assert r["state"] == "published" and r["generation"] == 1
     assert r["files_persisted"] == r["files_indexed"] == len(engine.docs) > 0
-    assert r["files_reused"] == 0 and r["artifacts_written"] == 5 * len(engine.docs)
-    assert r["global_structures"] == {k: "recomputed in full" for k in
-                                      ("bm25", "semantic", "repo_graph", "function_graph", "abstainer")}
+    # Stage 2: every file has the nine per-file kinds (schema.KINDS), including its two resolution artifacts.
+    assert r["files_reused"] == 0 and r["artifacts_written"] == len(schema.KINDS) * len(engine.docs)
+    assert set(r["global_structures"].values()) == {"recomputed_in_full"}, r["global_structures"]
     assert len(db_files(cfg)) == 1
     assert_same_as_fresh(engine, repo, "cold cached build")
 
@@ -46,7 +46,7 @@ def test_warm_restart_reuses_every_artifact(tmp_path, monkeypatch):
     monkeypatch.undo()
     r = last(engine)
     assert r["files_reused"] == len(engine.docs) and r["files_extracted"] == 0
-    assert r["artifacts_written"] == 0 and r["artifacts_reused"] == 5 * len(engine.docs)
+    assert r["artifacts_written"] == 0 and r["artifacts_reused"] == len(schema.KINDS) * len(engine.docs)
     assert r["generation"] == 2 and r["added"] == r["deleted"] == r["modified"] == []
     assert_same_as_fresh(engine, repo, "warm cached restart")
 
@@ -67,7 +67,10 @@ def test_one_changed_file(tmp_path):
     engine = cached(repo, cfg)
     r = last(engine)
     assert r["modified"] == ["shop/pricing.py"] and r["files_extracted"] == 1
-    assert r["artifacts_written"] == 5
+    # The changed file's seven per-file artifacts and its two resolutions, plus the resolutions of files whose
+    # dependency context changed (re-resolved files whose context is unchanged keep their artifact key).
+    resolved = r["work_counters"]["function_graph"]["files_resolved"] + r["work_counters"]["repo_graph"]["files_resolved"]
+    assert 9 <= r["artifacts_written"] <= 7 + resolved
     assert_same_as_fresh(engine, repo, "one changed file")
 
 
@@ -176,12 +179,12 @@ def test_changed_fingerprint_inputs_invalidate_exactly_the_affected_artifacts(tm
     else:
         monkeypatch.setattr(fingerprints, "module_source_digest",
                             lambda name: "changed" if name.endswith(".codecs") else real_digest(name))
-        expected_kinds = {"doc_meta", "lexical", "semantic", "abstainer", "function_graph"}
+        expected_kinds = set(schema.KINDS)        # every kind's fingerprint covers the codecs module
     engine = cached(repo, cfg)
     r = last(engine)
     # Re-extracted kinds are re-written; doc_meta values are unchanged, so dependent kinds stay reusable.
     assert r["artifacts_written"] == n * len(expected_kinds), (change, r)
-    assert r["artifacts_reused"] == n * (5 - len(expected_kinds)), (change, r)
+    assert r["artifacts_reused"] == n * (len(schema.KINDS) - len(expected_kinds)), (change, r)
     assert_same_as_fresh(engine, repo, f"fingerprint change: {change}")
 
 
@@ -320,7 +323,7 @@ def test_optional_components_take_the_uncached_route(tmp_path, option):
         {"scip_config": ScipConfig(index_path=str(tmp_path / "missing.scip"), on_error="skip")}
     engine = cached(repo, cfg, **kw)
     r = last(engine)
-    assert r["state"] == "disabled" and "not persisted in Stage 1" in r["reason"]
+    assert r["state"] == "disabled" and "not persisted (Stage 4)" in r["reason"]
     assert not db_files(cfg), "nothing may be written for configurations Stage 1 does not persist"
     assert_same_as_fresh(engine, repo, f"uncached route for {option}", **kw)
 

@@ -1,5 +1,5 @@
 """
-Persistent index cache (V2 Stage 1). Opt-in via ``RepoNeedleEngine.from_directory(..., index_cache=IndexCacheConfig())``.
+Persistent index cache (V2 Stages 1 and 2). Opt-in via ``RepoNeedleEngine.from_directory(..., index_cache=IndexCacheConfig())``.
 
 Per-file derived data is stored in a per-repository SQLite database (standard-library ``sqlite3``) and reused on
 later starts for files whose decoded text and extraction inputs are unchanged. Every global structure is

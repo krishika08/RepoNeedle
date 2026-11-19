@@ -157,7 +157,7 @@ jobs:
         env:
           REPONEEDLE_FAIL_ON_SKIP: "1"
         run: |
-          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py tests/test_block_slicing.py tests/test_block_slicing_tree_sitter.py tests/test_block_slicing_packing.py tests/test_block_slicing_cache.py tests/test_stage0_function_graph_lifecycle.py tests/test_stage1_cache_lifecycle.py::test_optional_components_take_the_uncached_route
+          pytest -q -rs tests/test_tree_sitter_extraction.py tests/test_tree_sitter_graph.py tests/test_tree_sitter_fallback.py tests/test_stage3_11_function_graph.py tests/test_stage3_21_production_quality.py tests/test_hf_space_bundle.py tests/test_block_slicing.py tests/test_block_slicing_tree_sitter.py tests/test_block_slicing_packing.py tests/test_block_slicing_cache.py tests/test_stage0_function_graph_lifecycle.py tests/test_stage1_cache_lifecycle.py::test_optional_components_take_the_uncached_route tests/test_stage2_resolvers.py
 
   package-install:
     name: Wheel install with and without the optional extras (Linux, Python 3.12)
@@ -305,12 +305,12 @@ jobs:
         run: |
           python -c "import sqlite3, sys; print('Python', sys.version.split()[0], 'SQLite', sqlite3.sqlite_version)"
 
-      - name: Run the persistent index-cache suites (skips fail on Linux and macOS)
+      - name: Run the persistent index-cache suites, Stage 1 and Stage 2 (skips fail on Linux and macOS)
         shell: bash
         env:
           REPONEEDLE_FAIL_ON_SKIP: ${{ matrix.strict && '1' || '0' }}
         run: |
-          pytest -q -rs tests/test_stage1_cache_units.py tests/test_stage1_cache_lifecycle.py tests/test_stage1_cache_corruption.py tests/test_stage1_cache_processes.py tests/test_stage1_persist_exclude.py
+          pytest -q -rs tests/test_stage1_cache_units.py tests/test_stage1_cache_lifecycle.py tests/test_stage1_cache_corruption.py tests/test_stage1_cache_processes.py tests/test_stage1_persist_exclude.py tests/test_stage2_resolvers.py tests/test_stage2_bookkeeping.py tests/test_stage2_mutations.py tests/test_stage2_cache_safety.py
 
   research-parity:
     name: Research Benchmark Parity (Python 3.11)

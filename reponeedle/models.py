@@ -397,13 +397,14 @@ class ScipConfig(BaseModel):
 
 class IndexCacheConfig(BaseModel):
     """
-    Opt-in persistent index cache (V2 Stage 1): ``RepoNeedleEngine.from_directory(..., index_cache=...)``.
+    Opt-in persistent index cache (V2 Stages 1-2): ``RepoNeedleEngine.from_directory(..., index_cache=...)``.
 
-    Per-file derived data (document metadata, BM25 term counts, semantic features, abstainer vocabularies and
-    function-graph extraction records) is stored in a per-repository SQLite database and reused on later starts
-    for files whose decoded text and extraction inputs are unchanged. Every global structure (BM25 statistics,
-    the semantic vocabulary and matrix, both graphs, PageRank) is still recomputed in full by the existing code,
-    so results are identical to a build without a cache. Raw source text is never stored.
+    Per-file derived data (document metadata, BM25 term counts, semantic features, abstainer vocabularies,
+    function-graph and class-to-test extraction records, typed dependency keys and each file's resolved graph
+    edges) is stored in a per-repository SQLite database and reused on later starts for files whose inputs are
+    unchanged. Graph resolution is repeated only for files affected by a change; the semantic index, PageRank and
+    the other global structures are recomputed, so results are identical to a build without a cache. Raw source
+    text is never stored.
     See docs/PERSISTENT_INDEXING_DESIGN.md.
     """
     model_config = ConfigDict(extra="forbid")
@@ -416,8 +417,8 @@ class IndexCacheConfig(BaseModel):
     validation: Literal["content", "stat"] = Field(
         default="content",
         description=(
-            "How unchanged files are recognised. Stage 1 reads every file eagerly, so it always compares content "
-            "digests; 'stat' is accepted and reported as 'content' in the diagnostics."
+            "How unchanged files are recognised. Every file is read eagerly, so content digests are always "
+            "compared; 'stat' is accepted and reported as 'content' in the diagnostics."
         ),
     )
     rebuild_policy: Literal["auto", "never", "always"] = Field(
@@ -489,6 +490,28 @@ class IndexUpdateReport(BaseModel):
     artifacts_written: int = 0
     artifacts_reused: int = 0
     artifacts_collected: int = 0
-    global_structures: Dict[str, str] = Field(default_factory=dict)
+    global_structures: Dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "How each stage was produced: 'incremental' (work proportional to the change), 'partially_incremental' "
+            "(proportional parts plus named global O(N) parts), 'recomputed_in_full', 'reused' or 'fallback_full' "
+            "(an incremental path was available but could not be used; see fallbacks)."
+        ),
+    )
+    fallbacks: Dict[str, str] = Field(default_factory=dict, description="Stage -> why it fell back to full work.")
+    work_counters: Dict[str, Dict[str, Any]] = Field(
+        default_factory=dict, description="Per-stage work counters (files, keys, edges, postings, tokens).")
+    file_ids_assigned: int = 0
+    file_ids_retired: int = 0
+    migrated_from_schema: Optional[int] = None
+    privacy_purge: str = Field(
+        default="not_required",
+        description=(
+            "'not_required'; 'complete' (previously persisted data of persist_exclude'd files was deleted, freed "
+            "pages were overwritten and the WAL was checkpointed and truncated); or 'pending' (another connection "
+            "still held an older read snapshot, so old pages may remain in the database file or WAL until a later "
+            "refresh() completes the checkpoint). Not a guarantee about the physical storage medium."
+        ),
+    )
     rebuilt_from_scratch: bool = False
     timings_ms: Dict[str, float] = Field(default_factory=dict)

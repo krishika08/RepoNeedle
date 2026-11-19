@@ -14,7 +14,7 @@ import zlib
 from pathlib import Path
 
 from cache_support import FILES, assert_same_as_fresh, cache_config, cached, db_path, last, make_repo
-from reponeedle.core.index_cache import codecs
+from reponeedle.core.index_cache import codecs, schema
 
 SECRET_PATH = "private/zqxj_vault_settings.py"
 MARKERS = ["ZQXJ_UNIQUE_MARKER_7f3a91", "zqxj_secret_function", "ZqxjCredentialHolder", "zqxj_vault_settings",
@@ -99,12 +99,15 @@ def test_excluded_from_the_start_is_never_persisted(tmp_path):
 
 def test_newly_excluded_file_is_purged_from_every_cache_file(tmp_path):
     repo = _repo(tmp_path)
-    cached(repo, cache_config(tmp_path))
+    first = cached(repo, cache_config(tmp_path))
     cfg = cache_config(tmp_path, persist_exclude=["**/zqxj_*"])
     engine = cached(repo, cfg)
     r = last(engine)
     assert r["state"] == "published" and r["files_persist_excluded"] == 1 and SECRET_PATH in r["deleted"]
-    assert r["artifacts_collected"] == 5, "the excluded file's five artifacts must be collected"
+    # The excluded file's nine artifacts, plus every other file's two resolution artifacts: while an excluded file
+    # is indexed, graph contributions are not persisted (they could depend on it).
+    assert r["artifacts_collected"] == len(schema.KINDS) + 2 * (len(first.docs) - 1)
+    assert r["privacy_purge"] == "complete"
     assert find_secret_traces(Path(cfg.cache_dir), db_path(cfg)) == []
     assert _ordinals(db_path(cfg)) == list(range(len(engine.docs) - 1))
     assert_same_as_fresh(engine, repo, "file excluded after it was persisted")
