@@ -597,9 +597,8 @@ class RepoNeedleEngine:
 
         Only engines built with ``from_directory(..., index_cache=IndexCacheConfig(...))`` support it. Global
         structures are maintained as described in the design (V2 Stage 2): graph resolution is limited to affected files,
-        BM25 is partially incremental when the document set and order are unchanged, the semantic index (an exact
-        single-pass reconstruction since V2 Stage 3) and PageRank are recomputed in full; the result is always
-        identical to an uncached build. It is the only
+        BM25 is partially incremental when the document set and order are unchanged, the semantic index and PageRank
+        are recomputed in full; the result is always identical to an uncached build. It is the only
         operation that writes the cache: ``update_documents()`` and ``remove_documents()`` stay in memory.
 
         Args:

@@ -402,9 +402,9 @@ class IndexCacheConfig(BaseModel):
     Per-file derived data (document metadata, BM25 term counts, semantic features, abstainer vocabularies,
     function-graph and class-to-test extraction records, typed dependency keys and each file's resolved graph
     edges) is stored in a per-repository SQLite database and reused on later starts for files whose inputs are
-    unchanged. Graph resolution is repeated only for files affected by a change; the semantic index (exact
-    single-pass reconstruction, V2 Stage 3), PageRank and the other global structures are recomputed in full, so
-    results are identical to a build without a cache. Raw source text is never stored.
+    unchanged. Graph resolution is repeated only for files affected by a change; the semantic index, PageRank and
+    the other global structures are recomputed, so results are identical to a build without a cache. Raw source
+    text is never stored.
     See docs/PERSISTENT_INDEXING_DESIGN.md.
     """
     model_config = ConfigDict(extra="forbid")
@@ -500,10 +500,7 @@ class IndexUpdateReport(BaseModel):
     )
     fallbacks: Dict[str, str] = Field(default_factory=dict, description="Stage -> why it fell back to full work.")
     work_counters: Dict[str, Dict[str, Any]] = Field(
-        default_factory=dict,
-        description=("Per-stage work counters (files, keys, edges, postings, tokens). 'semantic' holds the semantic "
-                     "index's fit diagnostics (feature-cache hits and misses, pairs, distinct features, vocabulary "
-                     "size, non-zeros, the numeric product rule, sub-stage timings); it is recomputed in full."))
+        default_factory=dict, description="Per-stage work counters (files, keys, edges, postings, tokens).")
     file_ids_assigned: int = 0
     file_ids_retired: int = 0
     migrated_from_schema: Optional[int] = None
