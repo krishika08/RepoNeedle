@@ -556,6 +556,10 @@ class IndexCacheSession:
                 current = cache.get(doc.path)
                 if current is None or current[0] != sig:
                     data = art.data
+                    if kind == "semantic":
+                        # Shared feature strings (V2 Stage 4); the loaded artifact keeps the same object, so the
+                        # decoded copy with one string per (document, feature) pair can be freed during the build.
+                        data = art.data = engine.semantic_index.shared_feature_counts(data)
                     if kind == "lexical":
                         cache[doc.path] = (sig, data[0], data[1])
                     else:
