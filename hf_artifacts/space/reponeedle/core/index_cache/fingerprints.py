@@ -45,7 +45,9 @@ _EXTRACTOR_MODULES = {
     "doc_meta": ("reponeedle.engine", "reponeedle.models", "reponeedle.core.graph", "reponeedle.core.tokenizer",
                  _CODECS_MODULE),
     "lexical": ("reponeedle.core.lexical", "reponeedle.core.tokenizer", "reponeedle.core.signatures", _CODECS_MODULE),
-    "semantic": ("reponeedle.core.semantic", "reponeedle.core.tokenizer", "reponeedle.core.signatures",
+    # V2 Stage 3: per-document extraction only (``semantic_features``); the global assembly in
+    # ``reponeedle.core.semantic`` is covered by the index fingerprint, so changing it does not invalidate artifacts.
+    "semantic": ("reponeedle.core.semantic_features", "reponeedle.core.tokenizer", "reponeedle.core.signatures",
                  _CODECS_MODULE),
     "abstainer": ("reponeedle.core.abstention", "reponeedle.core.tokenizer", "reponeedle.core.signatures",
                   _CODECS_MODULE),
@@ -55,7 +57,8 @@ _EXTRACTOR_MODULES = {
     "fg_edges": ("reponeedle.core.function_graph", _DEPENDENCIES_MODULE, _CODECS_MODULE),
     "rg_edges": ("reponeedle.core.graph", _DEPENDENCIES_MODULE, _CODECS_MODULE),
 }
-_GLOBAL_MODULES = ("reponeedle.core.lexical", "reponeedle.core.semantic", "reponeedle.core.graph",
+_GLOBAL_MODULES = ("reponeedle.core.lexical", "reponeedle.core.semantic", "reponeedle.core.semantic_features",
+                   "reponeedle.core.graph",
                    "reponeedle.core.function_graph", "reponeedle.core.abstention", _DEPENDENCIES_MODULE,
                    "reponeedle.core.index_cache.incremental")
 

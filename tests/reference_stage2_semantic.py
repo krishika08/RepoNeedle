@@ -1,0 +1,240 @@
+"""
+VERBATIM REFERENCE (V2 Stage 3 oracle): ``reponeedle/core/semantic.py`` at commit
+0b273814ba6b31ffa7aa1f13d612057ce0cfa7b9 (Stage 2, after PR #26), below this docstring unchanged. It imports nothing
+from ``reponeedle.core.semantic`` or ``reponeedle.core.semantic_features``, so the optimised implementation is compared
+with an independent copy of the Stage 2 algorithm. Do not edit: tests compare every semantic structure with it.
+"""
+
+"""
+Subword and semantic vector similarity index for code repositories.
+Operates completely offline with zero network dependency using vectorized n-gram and term embeddings.
+"""
+
+import math
+from typing import List, Dict, Set, Optional, Sequence, Tuple
+import numpy as np
+from scipy import sparse
+
+from reponeedle.models import FileDoc
+from reponeedle.core.signatures import stable_signature
+from reponeedle.core.tokenizer import CodeTokenizer
+
+# Bump when the per-document feature extraction changes its output for the same inputs.
+FEATURES_SIGNATURE_VERSION = "semantic-doc-features/1"
+
+
+class SubwordSemanticIndex:
+    """
+    Subword character n-gram and semantic term similarity index.
+    Constructs high-dimensional subword feature representations to bridge lexical vocabulary mismatches,
+    abbreviations, and morphological variations in code identifiers and task descriptions.
+    """
+
+    def __init__(
+        self,
+        min_n: int = 3,
+        max_n: int = 5,
+        max_features: int = 15000,
+    ):
+        self.min_n = min_n
+        self.max_n = max_n
+        self.max_features = max_features
+        self.tokenizer = CodeTokenizer()
+        
+        self.vocabulary: Dict[str, int] = {}
+        self.idf: np.ndarray = np.array([], dtype=np.float32)
+        self.doc_matrix: sparse.csr_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
+        self.num_docs: int = 0
+        self.doc_paths: List[str] = []
+        self._query_cache: Dict[str, Optional[sparse.csr_matrix]] = {}
+        self._doc_feature_cache: Dict[str, Tuple[str, Dict[str, int]]] = {}
+
+    def _extract_features(self, text: str) -> List[str]:
+        """
+        Extracts both word tokens and character n-grams from text.
+        """
+        words = self.tokenizer.tokenize_text(text)
+        features: List[str] = list(words)
+
+        for w in words:
+            if len(w) < self.min_n:
+                continue
+            # Add character n-grams
+            w_bound = f"<{w}>"
+            for n in range(self.min_n, min(len(w_bound) + 1, self.max_n + 1)):
+                for i in range(len(w_bound) - n + 1):
+                    features.append(w_bound[i : i + n])
+
+        return features
+
+    @staticmethod
+    def _feature_text(doc: FileDoc) -> str:
+        """The exact text features are extracted from: path, symbols and the first 8,000 characters."""
+        return f"{doc.path} {' '.join(doc.symbols)} {doc.content[:8000]}"
+
+    def doc_signature(self, doc: FileDoc) -> str:
+        """Deterministic signature of everything the per-document feature extraction reads."""
+        return stable_signature(FEATURES_SIGNATURE_VERSION, self.min_n, self.max_n, self._feature_text(doc))
+
+    def fit(self, docs: List[FileDoc]) -> "SubwordSemanticIndex":
+        """
+        Fits semantic index on repository documents.
+        """
+        self._query_cache.clear()
+        self.num_docs = len(docs)
+        self.doc_paths = [d.path for d in docs]
+        if self.num_docs == 0:
+            # Same derived state as a never-fitted index: nothing from an earlier fit may survive.
+            self.vocabulary = {}
+            self.idf = np.array([], dtype=np.float32)
+            self.doc_matrix = sparse.csr_matrix((0, 0), dtype=np.float32)
+            return self
+
+        # 1. Count document frequencies
+        doc_feat_counts: List[Dict[str, int]] = []
+        df_counts: Dict[str, int] = {}
+
+        for doc in docs:
+            cache_key = doc.path
+            content_sig = self.doc_signature(doc)
+            if cache_key in self._doc_feature_cache and self._doc_feature_cache[cache_key][0] == content_sig:
+                counts = self._doc_feature_cache[cache_key][1]
+            else:
+                combined_text = self._feature_text(doc)
+                feats = self._extract_features(combined_text)
+                counts = {}
+                for f in feats:
+                    counts[f] = counts.get(f, 0) + 1
+                self._doc_feature_cache[cache_key] = (content_sig, counts)
+
+            doc_feat_counts.append(counts)
+
+            for f in counts.keys():
+                df_counts[f] = df_counts.get(f, 0) + 1
+
+        # 2. Select top features by document frequency
+        # Filter terms that appear in at least 1 doc, sort by DF
+        sorted_feats = sorted(
+            df_counts.items(),
+            key=lambda x: (x[1], len(x[0])),
+            reverse=True,
+        )
+        selected_feats = sorted_feats[: self.max_features]
+        self.vocabulary = {f: idx for idx, (f, _) in enumerate(selected_feats)}
+        num_features = len(self.vocabulary)
+
+        if num_features == 0:
+            self.doc_matrix = sparse.csr_matrix((self.num_docs, 0), dtype=np.float32)
+            self.idf = np.zeros(0, dtype=np.float32)
+            return self
+
+        # 3. Compute smooth IDF: ln((1 + N) / (1 + df)) + 1
+        idf_vec = np.zeros(num_features, dtype=np.float32)
+        for f, idx in self.vocabulary.items():
+            df = df_counts.get(f, 0)
+            idf_vec[idx] = math.log((1.0 + self.num_docs) / (1.0 + df)) + 1.0
+        self.idf = idf_vec
+
+        # 4. Construct sparse document matrix with sublinear TF: 1 + ln(tf)
+        rows, cols, data = [], [], []
+        for d_idx, counts in enumerate(doc_feat_counts):
+            for f, cnt in counts.items():
+                if f in self.vocabulary:
+                    c_idx = self.vocabulary[f]
+                    tf = 1.0 + math.log(cnt)
+                    val = tf * self.idf[c_idx]
+                    rows.append(d_idx)
+                    cols.append(c_idx)
+                    data.append(val)
+
+        mat = sparse.csr_matrix(
+            (data, (rows, cols)),
+            shape=(self.num_docs, num_features),
+            dtype=np.float32,
+        )
+        
+        # L2 normalize rows
+        row_norms = sparse.linalg.norm(mat, axis=1)
+        row_norms[row_norms == 0.0] = 1.0
+        mat_norm = mat.multiply(sparse.csr_matrix(1.0 / row_norms[:, np.newaxis]))
+        self.doc_matrix = mat_norm.tocsr()
+
+        return self
+
+    def _get_query_vector(self, query: str) -> Optional[sparse.csr_matrix]:
+        """
+        Extracts features and builds normalized sparse query vector with caching.
+        """
+        if query in self._query_cache:
+            return self._query_cache[query]
+
+        q_feats = self._extract_features(query)
+        if not q_feats:
+            self._query_cache[query] = None
+            return None
+
+        q_counts: Dict[str, int] = {}
+        for f in q_feats:
+            q_counts[f] = q_counts.get(f, 0) + 1
+
+        # Build query vector
+        q_cols, q_data = [], []
+        for f, cnt in q_counts.items():
+            if f in self.vocabulary:
+                c_idx = self.vocabulary[f]
+                tf = 1.0 + math.log(cnt)
+                val = tf * self.idf[c_idx]
+                q_cols.append(c_idx)
+                q_data.append(val)
+
+        if not q_cols:
+            self._query_cache[query] = None
+            return None
+
+        q_vec = sparse.csr_matrix(
+            (q_data, ([0] * len(q_cols), q_cols)),
+            shape=(1, len(self.vocabulary)),
+            dtype=np.float32,
+        )
+        q_norm = sparse.linalg.norm(q_vec)
+        if q_norm > 0:
+            q_vec = q_vec.multiply(1.0 / q_norm)
+
+        # LRU eviction if cache exceeds 512 entries
+        if len(self._query_cache) >= 512:
+            self._query_cache.pop(next(iter(self._query_cache)))
+        self._query_cache[query] = q_vec
+        return q_vec
+
+    def score(
+        self,
+        query: str,
+        candidate_indices: Optional[Sequence[int]] = None,
+    ) -> np.ndarray:
+        """
+        Computes cosine similarity between query and documents.
+        Supports candidate_indices to evaluate sparse cascaded candidate subsets.
+        Returns a float array of length num_docs in [0, 1].
+        """
+        if self.num_docs == 0 or len(self.vocabulary) == 0:
+            return np.zeros(self.num_docs, dtype=np.float32)
+
+        q_vec = self._get_query_vector(query)
+        if q_vec is None:
+            return np.zeros(self.num_docs, dtype=np.float32)
+
+        if candidate_indices is not None:
+            cand_list = list(candidate_indices) if not isinstance(candidate_indices, list) else candidate_indices
+            if not cand_list:
+                return np.zeros(self.num_docs, dtype=np.float32)
+            sub_matrix = self.doc_matrix[cand_list]
+            cand_scores = sub_matrix.dot(q_vec.T).toarray().flatten()
+            scores = np.zeros(self.num_docs, dtype=np.float32)
+            scores[cand_list] = np.clip(cand_scores, 0.0, 1.0)
+            return scores
+
+        # Dot product with normalized document matrix yields cosine similarities across all docs
+        scores = self.doc_matrix.dot(q_vec.T).toarray().flatten()
+        scores = np.clip(scores, 0.0, 1.0)
+        return scores
+

@@ -1,6 +1,6 @@
 # Persistent and Incremental Indexing: Design
 
-**Status:** **Stages 0, 1 and 2 are implemented.** Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 added the opt-in persistent index cache (`from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()`, `engine.index_cache_diagnostics`, SQLite; §17). Stage 2 adds dependency-scoped re-resolution of both graphs with canonical replay, partially incremental BM25 bookkeeping for in-process `refresh()`, abstainer reference counts, stable file ids (schema version 2, migrated in place), eviction leases and pending-purge reporting (§18; [Stage 2 report](../reports/v2_completion/persistent_indexing/STAGE2_REPORT.md)). **The semantic index, PageRank and the other global graph quantities are still recomputed in full** (Stage 3 and later). Without `index_cache` nothing changes except the resolvers' lookup indexes, which are proven identical to the previous implementation.
+**Status:** **Stages 0, 1, 2 and 3 are implemented.** Stage 3, *Exact High-Performance Semantic Index Reconstruction* (§19; [Stage 3 report](../reports/v2_completion/persistent_indexing/STAGE3_REPORT.md)), keeps the semantic index **recomputed in full** but replaces its per-pair Python loops with an exact single pass and array operations (proven bit-identical to a verbatim copy of the Stage 2 code), and moves per-document semantic extraction into its own fingerprinted module; incremental semantic document frequencies were evaluated and rejected (§19.1). Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 added the opt-in persistent index cache (`from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()`, `engine.index_cache_diagnostics`, SQLite; §17). Stage 2 adds dependency-scoped re-resolution of both graphs with canonical replay, partially incremental BM25 bookkeeping for in-process `refresh()`, abstainer reference counts, stable file ids (schema version 2, migrated in place), eviction leases and pending-purge reporting (§18; [Stage 2 report](../reports/v2_completion/persistent_indexing/STAGE2_REPORT.md)). **The semantic index, PageRank and the other global graph quantities are still recomputed in full** (the semantic index by design, §19.1; Stage 4 covers the optional components). Without `index_cache` nothing changes except the resolvers' lookup indexes, which are proven identical to the previous implementation.
 **Milestone:** V2 Milestone 4A (architecture and research). **Revision 2** applies the corrections from an independent architecture review; the report's §14 maps each review point to its resolution.
 **Evidence:** [reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md), with the measurements behind every number quoted here. All repository measurements use one pinned snapshot (commit `bac30c8`, 890 files, 8,173,201 bytes of indexed text).
 
@@ -24,6 +24,7 @@
 16. [Design decisions](#16-design-decisions)
 17. [Stage 1 as built](#17-stage-1-as-built)
 18. [Stage 2 as built](#18-stage-2-as-built)
+19. [Stage 3 as built: exact high-performance semantic index reconstruction](#19-stage-3-as-built-exact-high-performance-semantic-index-reconstruction)
 
 ---
 
@@ -525,6 +526,7 @@ The vocabulary is the top `max_features` features by `(df, len)` descending. Tie
 - The exact path is to persist per-file ordered feature counts and recompute vocabulary, IDF and normalised rows with the **same code** (warm refit: 4.3 s here). This is exact by construction and is Stage 1.
 - An incremental vocabulary needs df by delta plus a first-seen key per feature. Positional first-seen shifts when files are inserted, so this requires the canonical order of §9.4. The IDF/norm recomputation is a sparse matrix-vector product over persisted TF.
 - Before adoption, this must be proven bit-identical to the existing float32 procedure (§14.2). If it cannot be, the semantic index stays "persistent, globally recomputed", and this design says so.
+- **Stage 3 decision (§19.1):** the incremental vocabulary was prototyped and is exact, but it is **not adopted**. Any change makes the matrix rebuild walk every (document, feature) pair anyway, and the single-pass reconstruction counts document frequencies in that same pass, so incremental document frequencies would save essentially nothing while adding persisted global state. The semantic index stays globally recomputed, with a faster exact algorithm.
 
 ### 9.4 Canonical order and replay
 
@@ -853,7 +855,7 @@ For every test state, build `fresh = RepoNeedleEngine.from_directory(repo, <same
 | :--- | :--- |
 | Discovery | `[d.path for d in docs]` (order), `FileDoc` fields except `content` (compared by digest), `IndexingDiagnostics` |
 | Lexical | `num_docs`, `avg_doc_len` (float bit pattern), `doc_lengths`, `doc_len_norms` (`np.array_equal`), `doc_frequencies`, `idf`, inverted postings as ordered lists; `score(q)` arrays for the query set (`np.array_equal`) |
-| Semantic | `vocabulary` **including order**, `idf` (`array_equal`), `doc_matrix` CSR `indptr`/`indices`/`data` (`array_equal` after canonical sorting of indices per row); `score(q)` arrays |
+| Semantic | `vocabulary` **including order** (keys, values and value types), `idf` (dtype and bytes), `num_docs`, `doc_paths`, `doc_matrix` format, shape and the **raw** CSR `indptr`/`indices`/`data` arrays (dtype and bytes, **without** any re-sorting: the final matrix does not have sorted indices, and its layout must match exactly); `score(q)` arrays (bytes) |
 | RepoGraph | node list in insertion order, edge list with attributes in insertion order, `module_to_path`, `symbol_to_paths`, `package_to_files`, `manifest_crates`, test↔target maps, invocation edges, degree-matched maps, `pagerank_scores` (`array_equal`) |
 | FunctionGraph | `functions`, `call_sites`, `edges` (ordered, all fields), `file_to_file_edges`, `graph` edges with weights, `callers_map`/`callees_map`, `module_to_path`, Tree-sitter and SCIP diagnostics, `scip_relationships` |
 | Abstainer | `repo_vocabulary` |
@@ -915,7 +917,7 @@ Each stage is its own PR. A stage ships only with the §14 equivalence harness g
 | **0. Prerequisites** (no persistence) — **implemented** | Reset every build-derived function-graph structure; `remove_documents()`, refit-based like today; SHA-256 per-document cache signatures; the **equivalence harness** (§14.2) with a frozen 225-query corpus, run against `remove_documents()`, `update_documents()` and mutation sequences. Today's `update_documents()` matches a fresh build for in-place replacement; an addition matches only a build with the new file appended, and the harness reports the divergence from a discovery-ordered build. | Done: harness and mutation suite in CI; existing tests unchanged; see the [Stage 0 report](../reports/v2_completion/persistent_indexing/STAGE0_REPORT.md) |
 | **1. Persistent artifacts, global reassembly** — **implemented** (§17) | `IndexCacheConfig`; SQLite schema with self-contained, checksummed payloads (§4, §6.1); the writer and reader connection protocol with settings verification (§10.1); per-file artifacts for every index; manifest with `doc_meta_sha256`; all four fingerprint levels (§7); publish protocol; validation modes; corruption handling; artifact GC; `persist_exclude`. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order. Eager `FileDoc.content` as today (§16.2). | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental"; **size defaults set from actual databases at 10k, 30k and 100k files** (§12.1) |
 | **2. Incremental bookkeeping; dependency-scoped graphs** — **implemented** (§18) | BM25 df by delta and IDF of changed-df terms, with `avg_doc_len`, `doc_len_norms` and positional postings recomputed as global O(N) work (§9.5); abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters that separate proportional from global work. BM25 is reported as "partially incremental", or stays globally reassembled if bookkeeping does not pay. |
-| **3. Semantic** | df by delta; exact vocabulary maintenance with canonical first-seen order; vectorised IDF/norm recomputation, **only if bit-identical**; otherwise documented as global | Equivalence; or an explicit decision to keep the semantic index globally recomputed |
+| **3. Exact high-performance semantic index reconstruction** — **implemented** (§19) | Planned: df by delta and exact vocabulary maintenance. Built instead, after a feasibility audit: the semantic index stays **recomputed in full**, by an exact single-pass reconstruction (first-seen feature ids, document frequencies, stable `lexsort` vocabulary, array-built CSR values with the run-time numpy product rule; IDF and normalisation by the unchanged expressions); per-document extraction moved to `semantic_features.py` with its own fingerprint | Done: bit-identical to a verbatim copy of the Stage 2 code (every structure, raw CSR arrays, scores, all 225 queries), under numpy 1.24.4 / SciPy 1.10.1 (legacy and weak promotion) and numpy 2.x; the explicit decision to keep the semantic index globally recomputed (§19.1) |
 | **4. Optional components and surfaces** | Tree-sitter artifacts and availability changes, with their sizes measured; SCIP: full re-resolution on change (§16.4), per-document reuse only if measured to be worth it; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories | Equivalence including optional extras; documentation |
 
 ## 16. Design decisions
@@ -1100,7 +1102,7 @@ the full equivalence harness after every mutation).
 - **Abstainer reference counts** (`token -> persisted documents containing it`) are a checksummed, generation-bound
   global-state row; a build applies per-document deltas and the vocabulary is the set of tokens with a positive count
   plus the vocabularies of `persist_exclude`d documents (never counted).
-- **Semantic index:** recomputed in full (Stage 3).
+- **Semantic index:** recomputed in full (by design; Stage 3 made the reconstruction an exact single pass, §19).
 
 ### 18.5 Persistence, schema version 2 and file ids
 
@@ -1150,3 +1152,94 @@ as in Stage 1.
 | BM25 global state (`bm25.df`) persisted, keyed by term or file id | Not persisted; the in-process `refresh()` is partially incremental, a warm restart refits | Dictionary insertion order depends on the per-process hash seed (term sets), so persisted order cannot reproduce a fresh build in another process (§18.4). |
 | Delta replacement of changed manifest and key rows at publish | The manifest and `file_artifacts` are replaced in full (as in Stage 1) | O(N) rows; simple and safe with concurrent writers. Resolution and provider artifacts are content-addressed and written only when new. |
 | `generations.kind = 'incremental'` | `'cold'` or `'refresh'` | The work done is described per stage by the work counters, not by one label. |
+
+## 19. Stage 3 as built: exact high-performance semantic index reconstruction
+
+Stage 3 keeps the semantic index **recomputed in full** on every build (`global_structures["semantic"] ==
+"recomputed_in_full"`) and makes that reconstruction cheaper without changing a single bit of its output. Evidence,
+measurements and limitations: [STAGE3_REPORT.md](../reports/v2_completion/persistent_indexing/STAGE3_REPORT.md).
+`tests/reference_stage2_semantic.py` is a verbatim copy of the Stage 2 `semantic.py` (its SHA-256 is pinned by a
+test); every semantic structure of the new code is compared with it exactly.
+
+**Measured** (report §5; 1,000 and 2,500 realistic files, three rounds each, Stage 2 re-measured in the same rounds):
+the semantic phase of every restart was faster than Stage 2's in all 58 paired comparisons; medians of the
+warm-restart semantic phase 3.36 s → 1.29 s (2.60×) and 11.00 s → 2.56 s (4.30×); the semantic fit's transient memory
+halved. The measurement machine's speed drifted widely, and at 2,500 files two scenario medians are below 2×
+(vocabulary-cutoff transition 1.84×, discovery-order reversal 1.92×). 10,000 reduced, 10,000 realistic and 30,000
+reduced files were **not measured**.
+
+### 19.1 Why the semantic index is not maintained incrementally
+
+The plan in §9.3 and §15 was document frequencies by delta with exact vocabulary maintenance. A feasibility audit
+prototyped it (document frequencies, first-seen order kept as per-document groups, orphaned features re-resolved by a
+bounded scan of unchanged documents, a fallback when the relative order of surviving documents changes) and found it
+exact (0 mismatches over random mutation sequences) but not worth adopting:
+- any change that alters N, an IDF value or a vocabulary column changes most matrix rows, so the CSR matrix must be
+  rebuilt from every (document, feature) pair anyway;
+- the single-pass reconstruction (§19.2) counts document frequencies in that same pass, so maintaining them
+  incrementally would save only the counting step (about 0.1 s at 1,000 realistic files) while adding the decoding of a
+  persisted global table (0.09–0.31 s measured), an encode on every publish, a privacy fallback and a new class of
+  consistency failures;
+- reusing matrix rows (in-process only) and persisting the matrix (17.7 MB compressed at 1,000 files, against a 29 MB
+  database, with numeric-environment binding) were rejected for the same reason.
+
+### 19.2 The single-pass reconstruction
+
+`SubwordSemanticIndex.fit()`:
+1. collects each document's ordered feature counts from the signature-validated per-document cache, extracting only
+   on a miss (unchanged semantics);
+2. walks every (document, feature) pair once, in document order and each document's insertion order:
+   `first_ticket.setdefault(feature, running_pair_number)` (C-level, via `map`) records each feature's first
+   occurrence. The dictionary's insertion order is exactly the Stage 2 `df_counts` order; dense feature ids are
+   first-seen indexes (a gather through an array mapping each first ticket to its index); document frequencies are a
+   `bincount` (a document's counts contain each feature once);
+3. selects the vocabulary with `np.lexsort((first_seen_index, -length, -df))[:max_features]`: Stage 2's stable
+   `sorted(..., key=(df, len), reverse=True)` keeps ties in first-seen order, and the first-seen index makes the
+   array order total. `max_features` slicing follows Python slice semantics (0, negative and oversized values
+   included);
+4. computes IDF with the **same scalar expression** per vocabulary entry (`math.log`, stored into float32);
+5. builds the CSR values from arrays. TF values come from the same `1.0 + math.log(count)` expression, once per
+   distinct count (a dense lookup table; counts above 2^24 use `np.unique`). The product `tf * idf[c]` must reproduce the Stage 2 expression (a Python float times a numpy
+   float32 scalar), whose result type depends on numpy's promotion rules: **float32** under numpy 2.x and numpy 1.x
+   with weak promotion, **float64 rounded to float32 by the CSR constructor** under numpy 1.x legacy promotion. The two
+   rules differ on about 4% of values. The rule is detected on **every fit** by evaluating that expression
+   (`semantic.product_rule()`); a sample of 64 values is re-evaluated with the scalar expression itself, and any
+   mismatch, or an unrecognised result type, falls back to the scalar expression for every value;
+6. constructs the matrix through the same `sparse.csr_matrix((data, (rows, cols)), shape, dtype=np.float32)` call and
+   normalises it with the unchanged `sparse.linalg.norm` / `multiply` / `tocsr` sequence. The final matrix's layout
+   (indices not sorted) and dtype (float64 under recent SciPy, float32 under SciPy 1.10, because the row norms' dtype
+   differs) are therefore the reference's in every environment;
+7. clears the query-vector cache at the start of every fit, as before.
+
+Diagnostics of the last fit are in `fit_stats` and in `IndexUpdateReport.work_counters["semantic"]` (cached, refreshed
+and uncached routes): documents, feature-cache hits and misses, pairs, distinct features, vocabulary size, non-zeros,
+IDF entries, the product rule and its self-check sample, vocabulary entries added and removed relative to the previous
+fit in the same process, and sub-stage timings. They are not index state and are not compared for equivalence.
+
+### 19.3 Extraction module and fingerprints
+
+Per-document extraction (feature text with the 8,000-character limit, word and character n-gram features, counts in
+first-occurrence order, `doc_signature`, `FEATURES_SIGNATURE_VERSION`) moved to `reponeedle/core/semantic_features.py`.
+The index binds those functions directly as its methods, so no extraction logic remains in `semantic.py`. The
+`semantic` artifact's extractor fingerprint now covers `semantic_features`, the tokenizer, the signature encoding and
+the codec, but **not** `semantic.py`; the index fingerprint covers both. Consequences:
+- **one-time invalidation:** the first Stage 3 build over a Stage 1 or Stage 2 cache re-extracts every `semantic`
+  artifact (the fingerprint changed) and reuses every other artifact, including graph resolutions; it is a normal
+  published build, not a rebuild from scratch;
+- later changes to the global assembly in `semantic.py` invalidate no per-file artifact;
+- Stage 3 deliberately leaves every other fingerprinted module byte-identical: an earlier revision edited docstrings in
+  `engine.py` and `models.py`, whose source is part of the document-metadata fingerprint, and upgrading a 1,000-file
+  cache then rewrote every `doc_meta` artifact too (2,000 artifacts instead of 1,000). With those files unchanged, every
+  extractor fingerprint except `semantic` equals the Stage 2 baseline's (checked with both checkouts in one
+  interpreter), and the upgrade benchmark measures the re-extraction of semantic artifacts alone.
+
+The `semantic-counts-json/1` codec, the artifact payloads and identities, schema version 2 and every other kind are
+unchanged. No semantic global state is persisted (tested).
+
+### 19.4 Deviations from sections 6–15
+
+| Design | As built | Reason |
+| :--- | :--- | :--- |
+| Semantic df by delta, exact incremental vocabulary (§9.3, §15) | Recomputed in full by an exact single pass | §19.1: the per-pair pass is needed for the matrix anyway |
+| Semantic global state (`semantic.df`, `semantic.vocabulary`, `semantic.idf`) in `global_state` (§6) | Not persisted | Nothing to reuse: every build recomputes them, faster than they could be decoded and verified |
+| Matrix comparison after canonical index sorting (§14.2, before this revision) | Raw arrays compared (as the harness always did) | The final matrix does not have sorted indices; comparing raw arrays is stricter |
