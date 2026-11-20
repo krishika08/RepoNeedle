@@ -134,8 +134,10 @@ def git_revision(root: Path) -> dict:
 
 
 def environment() -> dict:
+    # Path arguments are recorded by their last component only: no local directory names in published results.
+    argv = [Path(a).name if ("/" in a or "\\" in a) else a for a in sys.argv[1:]]
     env = {"platform": platform.platform(), "python": sys.version.split()[0], "sqlite": sqlite3.sqlite_version,
-           "cpu": platform.processor(), "logical_cpus": os.cpu_count(), "argv": sys.argv[1:]}
+           "cpu": platform.processor(), "logical_cpus": os.cpu_count(), "argv": argv}
     for mod in ("numpy", "scipy", "networkx", "pydantic", "pathspec"):
         try:
             env[mod] = __import__(mod).__version__
@@ -323,7 +325,7 @@ def markdown(result: dict) -> str:
                 lines.append(f"| {comp} | {a:.1f} | {b:.1f} |")
         ex = run["summary"]["excluded_phases"] + run["summary"]["failed_or_aborted"]
         lines += ["", f"Excluded, failed or aborted phases: {ex if ex else 'none'}", ""]
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines).rstrip("\n") + "\n"
 
 
 def main():

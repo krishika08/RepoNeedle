@@ -185,6 +185,7 @@ def test_end_to_end_tiny_run_writes_the_documented_schema(tmp_path):
     assert res.returncode == 0, res.stderr[-3000:]
     data = json.loads(out.read_text(encoding="utf-8"))
     assert {"platform", "python", "numpy", "scipy", "logical_cpus"} <= set(data["environment"])
+    assert not any("/" in a or "\\" in a for a in data["environment"]["argv"]), "no local paths in published results"
     assert all(len(data["revisions"][v]["commit"]) == 40 for v in ("baseline", "candidate"))
     run = data["runs"]["reduced 12 files"]
     assert run["dataset"]["file_count"] == 12 and len(run["dataset"]["manifest_sha256"]) == 64
