@@ -118,6 +118,17 @@ def test_a_wrong_or_unknown_rule_falls_back_to_the_scalar_expression(monkeypatch
         assert optimised.fit_stats["product_self_check_values"] == 0
 
 
+@pytest.mark.parametrize("limit", [0, 1, 7])
+def test_tf_values_without_the_dense_table_equal_the_reference(monkeypatch, limit):
+    """Counts above DENSE_TF_TABLE_LIMIT use np.unique instead of the dense table: the same values."""
+    monkeypatch.setattr(semantic, "DENSE_TF_TABLE_LIMIT", limit)
+    optimised, reference = fit_both(FIXTURE + [doc("rep.py", "repeated " * 40 + "once")])
+    assert_semantic_equal(optimised, reference, f"dense TF table limit {limit}", queries=QUERY_TEXTS[::20])
+    counts = np.array([1, 2, 3, 40, 9, 1, 40], dtype=np.int64)
+    expected = np.array([1.0 + math.log(c) for c in counts.tolist()], dtype=np.float64)
+    assert SubwordSemanticIndex._tf_values(counts).tobytes() == expected.tobytes()
+
+
 def test_the_two_vectorised_rules_really_differ_on_this_corpus():
     """Guards the self-check test above: on this corpus the rules are not accidentally interchangeable."""
     sem = SubwordSemanticIndex().fit(FIXTURE)

@@ -20,6 +20,12 @@ memory, physical memory available at the start (a phase whose committed memory e
 peak WAL size; plus database statistics. ``semantic_fit_memory`` measures, for each version, the transient
 tracemalloc peak of one warm semantic fit on the corpus (numpy reports its buffers to tracemalloc).
 
+Machine conditions: on Windows the parent asks the system to stay awake with the display on for its lifetime
+(``SetThreadExecutionState``; no setting is changed), because Modern Standby otherwise suspends the benchmark's
+processes when the machine is idle. Every child runs a heartbeat thread; a phase whose largest heartbeat gap exceeds
+5 s was suspended (``suspended_suspected``) and is excluded from the summaries. Each workload records the sleep and
+Modern Standby events (Windows event ids 42 and 506) logged while it ran.
+
 With --upgrade, each workload also measures the one-time cost of upgrading: a cache written by Stage 2, opened by
 Stage 3 (every semantic artifact is re-extracted because its extractor fingerprint changed; every other artifact is
 reused), then a Stage 3 restart.
@@ -30,6 +36,7 @@ the complete index state and of retrieval for a query sample.
 """
 
 import argparse
+import datetime
 import json
 import os
 import platform
@@ -49,8 +56,25 @@ sys.path.insert(0, str(HERE))
 import stage1_benchmark as s1  # noqa: E402  (the Stage 1 generator and database statistics)
 import stage2_benchmark as s2  # noqa: E402  (the Stage 2 child: memory watchdog, WAL watcher, digest)
 
+# Suspension detector for every child: a daemon thread ticks every 0.1 s and records the largest gap between
+# consecutive wall-clock readings. A process suspended by Modern Standby or sleep shows a gap of the suspension's
+# length; such a phase's timings are not measurements of the code and are excluded from comparisons.
+HEARTBEAT = r'''
+import threading as _threading, time as _hb_time
+_hb = {"max_gap_s": 0.0}
+def _heartbeat():
+    last = _hb_time.time()
+    while True:
+        _hb_time.sleep(0.1)
+        now = _hb_time.time()
+        _hb["max_gap_s"] = max(_hb["max_gap_s"], now - last)
+        last = now
+_threading.Thread(target=_heartbeat, daemon=True).start()
+'''
+SUSPENSION_GAP_S = 5.0
+
 # The Stage 2 child, plus a timer around every semantic fit (installed before the engine is imported).
-FIT_TIMER = r'''
+FIT_TIMER = HEARTBEAT + r'''
 import sys as _sys, time as _time
 _sys.path.insert(0, _sys.argv[1])
 from reponeedle.core import semantic as _semantic
@@ -67,9 +91,10 @@ _semantic.SubwordSemanticIndex.fit = _timed_fit
 '''
 CHILD = FIT_TIMER + s2.CHILD.replace(
     "print(json.dumps(out))",
-    "out['semantic_fit_calls'] = _fit_calls\nprint(json.dumps(out))")
+    "out['semantic_fit_calls'] = _fit_calls\nout['max_heartbeat_gap_s'] = round(_hb['max_gap_s'], 3)\n"
+    "print(json.dumps(out))")
 
-MEMORY_CHILD = r'''
+MEMORY_CHILD = HEARTBEAT + r'''
 import gc, json, sys, tracemalloc, time
 code_root, repo = sys.argv[1], sys.argv[2]
 sys.path.insert(0, code_root)
@@ -98,6 +123,7 @@ cur, peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 out["transient_peak_bytes"] = peak - before
 out["retained_delta_bytes"] = cur - before
+out["max_heartbeat_gap_s"] = round(_hb["max_gap_s"], 3)
 print(json.dumps(out))
 '''
 
@@ -120,9 +146,14 @@ json.dump({"words": outside, "cutoff_df": ranked[sem.max_features - 1][1] if len
 '''
 
 
+def _utc() -> str:
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
 def run_child(code: str, code_root: Path, args, timeout=None, env=None) -> dict:
     full_env = {**os.environ, **(env or {})}
     full_env.pop("PYTHONPATH", None)
+    started = _utc()
     proc = subprocess.Popen([sys.executable, "-c", code, str(code_root), *map(str, args)], stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, text=True, env=full_env, cwd=str(code_root))
     try:
@@ -130,14 +161,43 @@ def run_child(code: str, code_root: Path, args, timeout=None, env=None) -> dict:
     except subprocess.TimeoutExpired:
         s1._kill_tree(proc)
         proc.communicate()
-        return {"aborted": f"exceeded the time limit of {timeout} s"}
+        return {"aborted": f"exceeded the time limit of {timeout} s", "started_utc": started, "ended_utc": _utc()}
     lines = stdout.strip().splitlines()
     if lines:
         try:
-            return json.loads(lines[-1])
+            out = json.loads(lines[-1])
+            out.update(started_utc=started, ended_utc=_utc())
+            gap = out.get("max_heartbeat_gap_s")
+            out["suspended_suspected"] = bool(gap is not None and gap > SUSPENSION_GAP_S)
+            return out
         except ValueError:
             pass
-    return {"failed": f"exit {proc.returncode}: {stderr[-1500:]}"}
+    return {"failed": f"exit {proc.returncode}: {stderr[-1500:]}", "started_utc": started, "ended_utc": _utc()}
+
+
+def keep_awake(on: bool) -> bool:
+    """Windows: ask the system to stay awake with the display on while this process runs (no setting is changed;
+    the request ends with the process). Modern Standby otherwise suspends the benchmark's processes when idle."""
+    if sys.platform != "win32":
+        return False
+    import ctypes
+
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED, ES_DISPLAY_REQUIRED = 0x80000000, 0x00000001, 0x00000002
+    flags = ES_CONTINUOUS | (ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED if on else 0)
+    return bool(ctypes.windll.kernel32.SetThreadExecutionState(flags))
+
+
+def power_events_since(start_utc: str) -> list:
+    """Windows: sleep and Modern Standby events (ids 42, 506) logged since ``start_utc`` (empty elsewhere)."""
+    if sys.platform != "win32":
+        return []
+    query = (f"*[System[(EventID=42 or EventID=506) and TimeCreated[@SystemTime>='{start_utc[:23]}Z']]]")
+    try:
+        res = subprocess.run(["wevtutil", "qe", "System", f"/q:{query}", "/f:text", "/c:200"], capture_output=True,
+                             text=True, timeout=60)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return [f"could not query: {exc}"]
+    return [line.split(":", 1)[1].strip() for line in res.stdout.splitlines() if line.strip().startswith("Date:")]
 
 
 def run_phase(code_root: Path, repo: Path, cache_dir: Path, mode: str, limit: int, timeout, env=None) -> dict:
@@ -258,12 +318,15 @@ def summarise(runs: list) -> dict:
     """Median and range per (variant, phase) over the rounds: time to a ready engine and the semantic fit."""
     out = {}
     for variant in ("stage2", "stage3"):
-        phases = {}
+        phases, suspended = {}, {}
         for r in runs:
             for phase, val in r.get(variant, {}).items():
                 if isinstance(val, dict) and "seconds_to_ready_engine" in val:
+                    if val.get("suspended_suspected"):          # not a measurement of the code: excluded
+                        suspended[phase] = suspended.get(phase, 0) + 1
+                        continue
                     phases.setdefault(phase, []).append(val)
-        summary = {}
+        summary = {"suspended_phases_excluded": suspended}
         for p, vals in phases.items():
             sem = [s for s in (_semantic_s(v) for v in vals) if s is not None]
             summary[p] = {"median_s": round(statistics.median(v["seconds_to_ready_engine"] for v in vals), 3),
@@ -272,7 +335,8 @@ def summarise(runs: list) -> dict:
                           "semantic_fit_median_s": round(statistics.median(sem), 3) if sem else None,
                           "paging_suspected_rounds": sum(1 for v in vals if v.get("paging_suspected"))}
         mem = [r[variant]["semantic_fit_memory"] for r in runs
-               if "transient_peak_bytes" in r.get(variant, {}).get("semantic_fit_memory", {})]
+               if "transient_peak_bytes" in r.get(variant, {}).get("semantic_fit_memory", {})
+               and not r[variant]["semantic_fit_memory"].get("suspended_suspected")]
         if mem:
             summary["semantic_fit_memory"] = {
                 "transient_peak_mb_median": round(statistics.median(m["transient_peak_bytes"] for m in mem) / 2 ** 20, 1),
@@ -311,9 +375,18 @@ def main():
         result = json.loads(Path(args.out).read_text(encoding="utf-8"))
     limit = int(args.memory_limit_gb * 1024 ** 3)
     full = args.series == "full"
+    awake = keep_awake(True)
+    try:
+        _run_workloads(args, result, stage2_root, limit, full, awake)
+    finally:
+        keep_awake(False)
+
+
+def _run_workloads(args, result, stage2_root: Path, limit: int, full: bool, awake: bool) -> None:
     for n in args.files:
         key = f"{args.profile} {n} files"
         work = Path(tempfile.mkdtemp(prefix=f"rn_s3_{args.profile}_{n}_"))
+        started = _utc()
         try:
             pristine = work / "pristine"
             t = time.perf_counter()
@@ -341,6 +414,12 @@ def main():
                                                   result["runs"][key]["upgrade"].items()}), flush=True)
                 if args.out:
                     Path(args.out).write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8")
+            result["runs"][key]["conditions"] = {
+                "started_utc": started, "ended_utc": _utc(), "keep_awake_requested": awake,
+                "sleep_or_standby_events_during_workload": power_events_since(started)}
+            print(key, "conditions", json.dumps(result["runs"][key]["conditions"])[:400], flush=True)
+            if args.out:
+                Path(args.out).write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8")
         finally:
             shutil.rmtree(work, ignore_errors=True)
 

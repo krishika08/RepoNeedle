@@ -31,6 +31,7 @@ PRODUCT_FLOAT32 = "float32"
 PRODUCT_FLOAT64_THEN_FLOAT32 = "float64_then_float32"
 PRODUCT_SCALAR = "scalar"          # an unrecognised result type: the Stage 2 per-value loop is used instead
 SELF_CHECK_SAMPLES = 64
+DENSE_TF_TABLE_LIMIT = 1 << 24     # largest count served by a dense TF lookup table (else np.unique)
 
 
 def product_rule() -> str:
@@ -161,10 +162,12 @@ class SubwordSemanticIndex:
         n_features = len(features)
         firsts = np.fromiter(first_ticket.values(), dtype=np.int64, count=n_features)
         del first_ticket
-        # Dense feature id = first-seen index (``firsts`` is strictly increasing, and every pair's ticket is exactly
-        # its feature's first ticket).
-        pair_feature = np.searchsorted(firsts, pair_ticket)
-        del pair_ticket, firsts
+        # Dense feature id = first-seen index: every pair's ticket is exactly its feature's first ticket, and first
+        # tickets are distinct pair numbers (< n_pairs), so one gather maps each pair to its feature.
+        dense_of_ticket = np.empty(n_pairs, dtype=np.int64)
+        dense_of_ticket[firsts] = np.arange(n_features, dtype=np.int64)
+        pair_feature = dense_of_ticket[pair_ticket]
+        del pair_ticket, firsts, dense_of_ticket
         # A document's counts have each feature once, so pairs per feature = documents containing it.
         df = np.bincount(pair_feature, minlength=n_features).astype(np.int64, copy=False)
         stats.update(document_feature_pairs=n_pairs, distinct_features=n_features)
@@ -227,6 +230,21 @@ class SubwordSemanticIndex:
         timings["normalisation_ms"] = time.perf_counter() - t
 
     @staticmethod
+    def _tf_values(tf_counts: np.ndarray) -> np.ndarray:
+        """``1.0 + math.log(count)`` per pair (float64), evaluated once per distinct count by the same expression."""
+        if tf_counts.size == 0:
+            return np.zeros(0, dtype=np.float64)
+        largest = int(tf_counts.max())
+        if largest <= DENSE_TF_TABLE_LIMIT:
+            table = np.zeros(largest + 1, dtype=np.float64)
+            for c in np.flatnonzero(np.bincount(tf_counts, minlength=largest + 1)).tolist():
+                table[c] = 1.0 + math.log(c)
+            return table[tf_counts]
+        distinct, inverse = np.unique(tf_counts, return_inverse=True)
+        table = np.array([1.0 + math.log(int(c)) for c in distinct.tolist()], dtype=np.float64)
+        return table[inverse.reshape(-1)]
+
+    @staticmethod
     def _matrix_values(tf_counts: np.ndarray, cols: np.ndarray, idf: np.ndarray) -> Tuple[Any, str, int]:
         """
         The values ``(1.0 + math.log(cnt)) * idf[c]`` of every kept pair, evaluated exactly as the Stage 2 scalar
@@ -236,9 +254,7 @@ class SubwordSemanticIndex:
         """
         rule = product_rule()
         if rule != PRODUCT_SCALAR:
-            distinct, inverse = np.unique(tf_counts, return_inverse=True)
-            tf_table = np.array([1.0 + math.log(int(c)) for c in distinct.tolist()], dtype=np.float64)
-            tf = tf_table[inverse.reshape(-1)]
+            tf = SubwordSemanticIndex._tf_values(tf_counts)
             if rule == PRODUCT_FLOAT32:
                 data = tf.astype(np.float32) * idf[cols]
             else:
