@@ -9,6 +9,7 @@ array operations instead of per-pair Python loops. Per-document feature extracti
 """
 
 import math
+import sys
 import time
 import warnings
 from itertools import count
@@ -32,6 +33,16 @@ PRODUCT_FLOAT64_THEN_FLOAT32 = "float64_then_float32"
 PRODUCT_SCALAR = "scalar"          # an unrecognised result type: the Stage 2 per-value loop is used instead
 SELF_CHECK_SAMPLES = 64
 DENSE_TF_TABLE_LIMIT = 1 << 24     # largest count served by a dense TF lookup table (else np.unique)
+
+
+def shared_feature_counts(counts: Dict[str, int]) -> Dict[str, int]:
+    """
+    The same counts (same keys, values and insertion order) with every feature string interned, so a feature that
+    occurs in many documents is stored once instead of once per document (V2 Stage 4). Per-document feature caches
+    dominate the retained memory of a built engine; without this, each (document, feature) pair holds its own string
+    object. Applied to extracted counts (``fit``) and to counts decoded from the persistent cache (``store``).
+    """
+    return dict(zip(map(sys.intern, counts), counts.values()))
 
 
 def product_rule() -> str:
@@ -133,7 +144,7 @@ class SubwordSemanticIndex:
                 counts = cached[1]
                 stats["feature_cache_hits"] += 1
             else:
-                counts = self._count_features(doc)
+                counts = self.shared_feature_counts(self._count_features(doc))
                 cache[cache_key] = (content_sig, counts)
                 stats["feature_cache_misses"] += 1
             doc_feat_counts.append(counts)
@@ -228,6 +239,8 @@ class SubwordSemanticIndex:
         mat_norm = mat.multiply(sparse.csr_matrix(1.0 / row_norms[:, np.newaxis]))
         self.doc_matrix = mat_norm.tocsr()
         timings["normalisation_ms"] = time.perf_counter() - t
+
+    shared_feature_counts = staticmethod(shared_feature_counts)
 
     @staticmethod
     def _tf_values(tf_counts: np.ndarray) -> np.ndarray:

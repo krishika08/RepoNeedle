@@ -21,6 +21,7 @@ from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from reponeedle.core.index_cache import codecs
 from reponeedle.core.index_cache.errors import CacheUnusable, PersistenceUnavailable
+from reponeedle.core.semantic import shared_feature_counts
 from reponeedle.core.index_cache.lease import CacheLease
 from reponeedle.core.index_cache.schema import (APPLICATION_ID, KINDS, MIGRATABLE_VERSIONS, SCHEMA_VERSION, TABLES,
                                                 artifact_checksum, artifact_key, doc_meta_digest, global_checksum,
@@ -195,6 +196,10 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
                 data = codecs.decode(kind, codec, payload)
             except codecs.CodecError as exc:
                 raise CacheUnusable(f"artifact payload does not decode: {exc}") from exc
+            if kind == "semantic":
+                # V2 Stage 4: one string per distinct feature across all decoded documents, from the moment each
+                # artifact is decoded (the whole generation is loaded at once, so this bounds the load-time peak).
+                data = shared_feature_counts(data)
         if kind == "doc_meta" and data is not None:
             if (doc_meta_digest(data) != entry.doc_meta_sha256 or data["language"] != entry.language
                     or data["is_test"] != entry.is_test or data["line_count"] != entry.line_count

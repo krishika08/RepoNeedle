@@ -1,6 +1,6 @@
 # Persistent and Incremental Indexing: Design
 
-**Status:** **Stages 0, 1, 2 and 3 are implemented.** Stage 3, *Exact High-Performance Semantic Index Reconstruction* (§19; [Stage 3 report](../reports/v2_completion/persistent_indexing/STAGE3_REPORT.md)), keeps the semantic index **recomputed in full** but replaces its per-pair Python loops with an exact single pass and array operations (proven bit-identical to a verbatim copy of the Stage 2 code), and moves per-document semantic extraction into its own fingerprinted module; incremental semantic document frequencies were evaluated and rejected (§19.1). Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 added the opt-in persistent index cache (`from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()`, `engine.index_cache_diagnostics`, SQLite; §17). Stage 2 adds dependency-scoped re-resolution of both graphs with canonical replay, partially incremental BM25 bookkeeping for in-process `refresh()`, abstainer reference counts, stable file ids (schema version 2, migrated in place), eviction leases and pending-purge reporting (§18; [Stage 2 report](../reports/v2_completion/persistent_indexing/STAGE2_REPORT.md)). **The semantic index, PageRank and the other global graph quantities are still recomputed in full** (the semantic index by design, §19.1; Stage 4 covers the optional components). Without `index_cache` nothing changes except the resolvers' lookup indexes, which are proven identical to the previous implementation.
+**Status:** **Stages 0–3 are implemented; Stage 4 (large-repository scalability) has started** (§20; [Stage 4 report](../reports/v2_completion/persistent_indexing/STAGE4_SCALABILITY_REPORT.md)): measured per-component memory, shared semantic feature strings (retained index memory −39% to −43% at 10,000 files, at a measured time cost) and reproducible large-repository benchmarks. Stage 3, *Exact High-Performance Semantic Index Reconstruction* (§19; [Stage 3 report](../reports/v2_completion/persistent_indexing/STAGE3_REPORT.md)), keeps the semantic index **recomputed in full** but replaces its per-pair Python loops with an exact single pass and array operations (proven bit-identical to a verbatim copy of the Stage 2 code), and moves per-document semantic extraction into its own fingerprinted module; incremental semantic document frequencies were evaluated and rejected (§19.1). Stage 0 fixed function-graph rebuild state, replaced process-randomised cache signatures with SHA-256, added `remove_documents()` and the differential equivalence harness. Stage 1 added the opt-in persistent index cache (`from_directory(..., index_cache=IndexCacheConfig(...))`, `engine.refresh()`, `engine.index_cache_diagnostics`, SQLite; §17). Stage 2 adds dependency-scoped re-resolution of both graphs with canonical replay, partially incremental BM25 bookkeeping for in-process `refresh()`, abstainer reference counts, stable file ids (schema version 2, migrated in place), eviction leases and pending-purge reporting (§18; [Stage 2 report](../reports/v2_completion/persistent_indexing/STAGE2_REPORT.md)). **The semantic index, PageRank and the other global graph quantities are still recomputed in full** (the semantic index by design, §19.1). Optional components and surfaces, previously listed as Stage 4, are not started (§20.6). Without `index_cache` nothing changes except the resolvers' lookup indexes, which are proven identical to the previous implementation.
 **Milestone:** V2 Milestone 4A (architecture and research). **Revision 2** applies the corrections from an independent architecture review; the report's §14 maps each review point to its resolution.
 **Evidence:** [reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md](../reports/v2_completion/persistent_indexing/ARCHITECTURE_REPORT.md), with the measurements behind every number quoted here. All repository measurements use one pinned snapshot (commit `bac30c8`, 890 files, 8,173,201 bytes of indexed text).
 
@@ -25,6 +25,7 @@
 17. [Stage 1 as built](#17-stage-1-as-built)
 18. [Stage 2 as built](#18-stage-2-as-built)
 19. [Stage 3 as built: exact high-performance semantic index reconstruction](#19-stage-3-as-built-exact-high-performance-semantic-index-reconstruction)
+20. [Stage 4 (large-repository scalability) as built](#20-stage-4-large-repository-scalability-as-built)
 
 ---
 
@@ -918,7 +919,8 @@ Each stage is its own PR. A stage ships only with the §14 equivalence harness g
 | **1. Persistent artifacts, global reassembly** — **implemented** (§17) | `IndexCacheConfig`; SQLite schema with self-contained, checksummed payloads (§4, §6.1); the writer and reader connection protocol with settings verification (§10.1); per-file artifacts for every index; manifest with `doc_meta_sha256`; all four fingerprint levels (§7); publish protocol; validation modes; corruption handling; artifact GC; `persist_exclude`. Global structures recomputed **in full** from artifacts with the *existing* code paths, in current discovery order. Eager `FileDoc.content` as today (§16.2). | Exact equivalence by construction; the restart speedup measured and reported as "persistent, not incremental"; **size defaults set from actual databases at 10k, 30k and 100k files** (§12.1) |
 | **2. Incremental bookkeeping; dependency-scoped graphs** — **implemented** (§18) | BM25 df by delta and IDF of changed-df terms, with `avg_doc_len`, `doc_len_norms` and positional postings recomputed as global O(N) work (§9.5); abstainer refcounts; provider/consumer keys; affected-file re-resolution for RepoGraph and FunctionGraph with canonical replay; PageRank in full | Equivalence under mutation sequences; work counters that separate proportional from global work. BM25 is reported as "partially incremental", or stays globally reassembled if bookkeeping does not pay. |
 | **3. Exact high-performance semantic index reconstruction** — **implemented** (§19) | Planned: df by delta and exact vocabulary maintenance. Built instead, after a feasibility audit: the semantic index stays **recomputed in full**, by an exact single-pass reconstruction (first-seen feature ids, document frequencies, stable `lexsort` vocabulary, array-built CSR values with the run-time numpy product rule; IDF and normalisation by the unchanged expressions); per-document extraction moved to `semantic_features.py` with its own fingerprint | Done: bit-identical to a verbatim copy of the Stage 2 code (every structure, raw CSR arrays, scores, all 225 queries), under numpy 1.24.4 / SciPy 1.10.1 (legacy and weak promotion) and numpy 2.x; the explicit decision to keep the semantic index globally recomputed (§19.1) |
-| **4. Optional components and surfaces** | Tree-sitter artifacts and availability changes, with their sizes measured; SCIP: full re-resolution on change (§16.4), per-document reuse only if measured to be worth it; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories | Equivalence including optional extras; documentation |
+| **4. Large-repository scalability** — **started** (§20) | Measured per-component memory; shared semantic feature strings; reproducible 10,000/30,000-file benchmarks with dataset manifests and commit provenance | Exact equivalence; measured at 10,000 reduced (3 rounds), 10,000 realistic and 30,000 reduced files (1 round each): memory −39% to −44% retained, time +5% to +28%; open: a lower-cost representation (§20.5) |
+| **Optional components and surfaces** (previously Stage 4; not started) | Tree-sitter artifacts and availability changes, with their sizes measured; SCIP: full re-resolution on change (§16.4), per-document reuse only if measured to be worth it; CLI/MCP flags; `cache info/clear/verify`; size limits across repositories | Equivalence including optional extras; documentation |
 
 ## 16. Design decisions
 
@@ -1243,3 +1245,58 @@ unchanged. No semantic global state is persisted (tested).
 | Semantic df by delta, exact incremental vocabulary (§9.3, §15) | Recomputed in full by an exact single pass | §19.1: the per-pair pass is needed for the matrix anyway |
 | Semantic global state (`semantic.df`, `semantic.vocabulary`, `semantic.idf`) in `global_state` (§6) | Not persisted | Nothing to reuse: every build recomputes them, faster than they could be decoded and verified |
 | Matrix comparison after canonical index sorting (§14.2, before this revision) | Raw arrays compared (as the harness always did) | The final matrix does not have sorted indices; comparing raw arrays is stricter |
+
+## 20. Stage 4 (large-repository scalability) as built
+
+The project's Stage 4 milestone is large-repository scalability. Evidence, measurements and limitations:
+[STAGE4_SCALABILITY_REPORT.md](../reports/v2_completion/persistent_indexing/STAGE4_SCALABILITY_REPORT.md).
+
+### 20.1 What limits repository size
+
+Measured per component (deep object sizes of a built engine): the semantic per-document feature cache held 58% of the
+retained index memory at 1,000 realistic files, 71% at 10,000 reduced files and 64% at 10,000 realistic files,
+because every (document, feature) pair had its own string object (40.2 million string objects for 1.08 million
+distinct features at 10,000 realistic files). On the measurement machine, memory, not CPU, decides whether a large
+repository can be indexed without paging.
+
+### 20.2 Shared feature strings
+
+`semantic.shared_feature_counts` re-keys a document's feature counts through `sys.intern` (same keys, counts and
+insertion order). It is applied when `SubwordSemanticIndex.fit()` extracts a document's features and when
+`store._load` decodes each semantic artifact; the loader decodes the whole generation at once, so sharing at decode
+time is what lowers a warm restart's peak. `semantic_features.py` and `codecs.py`, which define artifact
+fingerprints, are unchanged: no artifact is invalidated and all nine extractor fingerprints equal Stage 3's.
+Persisted payloads, artifact keys, the schema (version 2), every index structure and retrieval are unchanged
+(four-way digest verification in every 10,000-reduced round; tests compare payloads and loader output).
+
+### 20.3 Trade-off
+
+At 10,000 reduced files (three rounds): retained index memory −43%; peak working set −28% to −33%; time to a ready
+engine +10.6% (uncached), +11.3% (cold cached), +21.7% (warm restart: cache loading 8.7 → 13.3 s); query latency
+median +9.5% (cause not established). At 10,000 realistic files (one round): retained −39%, peak working set −27% to
+−35%; the baseline's warm restart was paging-suspected and the candidate's was not. At 30,000 reduced files (one
+round): retained −44%, peak working set −33% to −34%, but time to a ready engine +12.6% (uncached) and +27.9% (cold
+cached), and the candidate's warm restart (112.4 s, cache loading 61.3 s) was slower than the baseline's even though
+the baseline's paged (73.4 s, excluded). **The time cost grows with repository size and was not repaid by avoided
+paging in these runs**; whether to keep interning at decode time, or to replace it with a shared-feature codec
+(§20.5), is open.
+
+### 20.4 Benchmark infrastructure
+
+`reports/v2_completion/persistent_indexing/stage4_benchmark.py`: deterministic dataset manifests (SHA-256 over every
+file's path and content digest), commit SHAs and clean-tree flags of both revisions, environment metadata, per-phase
+timings, retrieval latency, per-component retained memory, median/min/max/standard deviation with visible exclusions,
+and four-way digest verification.
+
+### 20.5 Not addressed (measured, ranked in the report)
+
+Eager decoding and verification of the whole generation on a warm restart (`store._load`; 40% of a 10,000-reduced
+warm restart, now more); full manifest replacement when publishing; per-document extraction cost (fingerprinted
+module); eager reading and hashing of every file; per-document string duplication in the lexical, abstainer and
+function-graph caches (fingerprinted modules). A cache codec that stores each distinct feature once per generation
+(integer ids per document) would cut both decode time and memory, but needs a codec version and migration.
+
+### 20.6 Optional components and surfaces (previously listed as Stage 4)
+
+The work that §15 listed as Stage 4 (Tree-sitter and SCIP artifacts, CLI/MCP flags, cache commands, size limits
+across repositories) is unchanged in scope and **not started**.
