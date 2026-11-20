@@ -171,6 +171,23 @@ def test_statistics_and_visible_exclusions():
     assert out["per_round_ratio_baseline_over_candidate"]["warm_restart"]["ready_engine_s"] == [2.0, None]
 
 
+def test_environment_probe_tolerates_missing_sysconf_names(monkeypatch):
+    """macOS has no SC_AVPHYS_PAGES: the probe and the child record unknown memory instead of failing."""
+    import os
+
+    def sysconf(name):
+        if name == "SC_AVPHYS_PAGES":
+            raise ValueError("unrecognized configuration name")
+        return {"SC_PHYS_PAGES": 1000, "SC_PAGE_SIZE": 4096}[name]
+
+    monkeypatch.setattr(s4.sys, "platform", "darwin")
+    monkeypatch.setattr(os, "sysconf", sysconf, raising=False)
+    env = s4.environment()
+    assert env["ram_total_bytes"] == 4096000 and env["ram_available_bytes_at_start"] is None
+    assert "except (AttributeError, ValueError, OSError):\n        avail = 0" in s4.CHILD
+    compile(s4.CHILD, "<child>", "exec")
+
+
 def test_revisions_are_identified_by_commit():
     rev = s4.git_revision(ROOT)
     assert rev["commit"] and len(rev["commit"]) == 40 and rev["package_version"]

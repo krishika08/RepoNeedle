@@ -62,6 +62,13 @@ if os.environ.get("BENCH_QUERY_LATENCY") == "1":
 '''
 CHILD = s3.CHILD.replace("if os.environ.get(\"BENCH_VERIFY\") == \"1\":", LATENCY + "if os.environ.get(\"BENCH_VERIFY\") == \"1\":", 1)
 assert LATENCY in CHILD, "the Stage 3 child changed: latency hook not installed"
+# The Stage 2 child reads SC_AVPHYS_PAGES, which macOS lacks: there, available memory is recorded as 0 (unknown),
+# which disables the paging check instead of failing the phase.
+_AVAIL = 'avail = os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE") if hasattr(os, "sysconf") else 0'
+assert _AVAIL in CHILD, "the Stage 2 child changed: available-memory probe not found"
+CHILD = CHILD.replace(_AVAIL, 'try:\n        ' + _AVAIL.split(" if ")[0] +
+                      '\n    except (AttributeError, ValueError, OSError):\n        avail = 0', 1)
+compile(CHILD, "<stage4 child>", "exec")
 
 # Retained memory per engine component of an uncached build (each object counted once, in this order).
 MEMORY_CHILD = s3.HEARTBEAT + r'''
@@ -155,9 +162,15 @@ def environment() -> dict:
         m.dwLength = ctypes.sizeof(MS)
         ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m))
         env.update(ram_total_bytes=m.ullTotalPhys, ram_available_bytes_at_start=m.ullAvailPhys)
-    elif hasattr(os, "sysconf"):
-        env.update(ram_total_bytes=os.sysconf("SC_PHYS_PAGES") * os.sysconf("SC_PAGE_SIZE"),
-                   ram_available_bytes_at_start=os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE"))
+    else:
+        def conf(name):
+            try:
+                return os.sysconf(name)
+            except (AttributeError, ValueError, OSError):   # macOS has no SC_AVPHYS_PAGES
+                return None
+        pages, avail, size = conf("SC_PHYS_PAGES"), conf("SC_AVPHYS_PAGES"), conf("SC_PAGE_SIZE")
+        env.update(ram_total_bytes=pages * size if pages and size else None,
+                   ram_available_bytes_at_start=avail * size if avail and size else None)
     return env
 
 
@@ -299,8 +312,8 @@ def markdown(result: dict) -> str:
              f"Baseline `{result['revisions']['baseline']['commit']}` (clean: {result['revisions']['baseline']['tree_clean']}); "
              f"candidate `{result['revisions']['candidate']['commit']}` (clean: {result['revisions']['candidate']['tree_clean']}).",
              f"{env['platform']}, Python {env['python']}, numpy {env['numpy']}, SciPy {env['scipy']}, "
-             f"{env['logical_cpus']} logical CPUs, {env.get('ram_total_bytes', 0) / 2 ** 30:.1f} GB RAM "
-             f"({env.get('ram_available_bytes_at_start', 0) / 2 ** 30:.1f} GB available at start).", ""]
+             f"{env['logical_cpus']} logical CPUs, {(env.get('ram_total_bytes') or 0) / 2 ** 30:.1f} GB RAM "
+             f"({(env.get('ram_available_bytes_at_start') or 0) / 2 ** 30:.1f} GB available at start; 0 = unknown).", ""]
     for key, run in result["runs"].items():
         m = run["dataset"]
         lines += [f"## {key}", "",
