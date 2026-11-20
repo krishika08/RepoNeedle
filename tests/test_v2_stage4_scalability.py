@@ -14,8 +14,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 from cache_support import assert_same_as_fresh, cache_config, cached, db_path, last, make_repo
 from reponeedle.core.index_cache import codecs
 from reponeedle.core.semantic import SubwordSemanticIndex
@@ -77,6 +75,30 @@ def test_cached_restart_shares_decoded_feature_strings(tmp_path):
         ref = fresh(repo)
     assert_semantic_equal(warm.semantic_index, ref.semantic_index, "warm restart vs Stage 2 reference",
                           queries=QUERY_TEXTS[::10])
+
+
+def test_the_loader_shares_feature_strings_as_it_decodes(tmp_path):
+    """load_generation decodes every artifact at once; semantic keys are shared from decoding on (load-time peak)."""
+    from reponeedle.core.index_cache.connection import open_reader
+    from reponeedle.core.index_cache.fingerprints import extractor_fingerprints
+    from reponeedle.core.index_cache.paths import locate
+    from reponeedle.core.index_cache.store import load_generation
+
+    repo, cfg = make_repo(tmp_path), cache_config(tmp_path)
+    engine = cached(repo, cfg)
+    loc = locate(str(repo), cfg.cache_dir)
+    fps = {k: bytes.fromhex(v) for k, v in extractor_fingerprints(engine).items()}
+    conn = open_reader(loc.db_path, 5.0, True)
+    try:
+        loaded = load_generation(conn, loc.repo_root, loc.repo_id, fps)
+    finally:
+        conn.close()
+    decoded = [loaded.data(p, "semantic") for p in loaded.manifest]
+    keys = [f for counts in decoded for f in counts]
+    assert len(decoded) == len(engine.docs) and len(keys) > len(set(keys))
+    assert len({id(f) for f in keys}) == len(set(keys))
+    for p in loaded.manifest:
+        assert list(loaded.data(p, "semantic").items()) == list(engine.semantic_index._doc_feature_cache[p][1].items())
 
 
 def test_persisted_semantic_payloads_are_unchanged(tmp_path):

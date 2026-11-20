@@ -35,6 +35,16 @@ SELF_CHECK_SAMPLES = 64
 DENSE_TF_TABLE_LIMIT = 1 << 24     # largest count served by a dense TF lookup table (else np.unique)
 
 
+def shared_feature_counts(counts: Dict[str, int]) -> Dict[str, int]:
+    """
+    The same counts (same keys, values and insertion order) with every feature string interned, so a feature that
+    occurs in many documents is stored once instead of once per document (V2 Stage 4). Per-document feature caches
+    dominate the retained memory of a built engine; without this, each (document, feature) pair holds its own string
+    object. Applied to extracted counts (``fit``) and to counts decoded from the persistent cache (``store``).
+    """
+    return dict(zip(map(sys.intern, counts), counts.values()))
+
+
 def product_rule() -> str:
     """The result type of the expression the matrix values use, evaluated now (promotion can change at runtime)."""
     with warnings.catch_warnings():
@@ -230,16 +240,7 @@ class SubwordSemanticIndex:
         self.doc_matrix = mat_norm.tocsr()
         timings["normalisation_ms"] = time.perf_counter() - t
 
-    @staticmethod
-    def shared_feature_counts(counts: Dict[str, int]) -> Dict[str, int]:
-        """
-        The same counts (same keys, values and insertion order) with every feature string interned, so a feature that
-        occurs in many documents is stored once instead of once per document (V2 Stage 4). Per-document feature
-        caches dominate the retained memory of a built engine; without this, each (document, feature) pair holds its
-        own string object. Used for extracted counts and for counts decoded from the persistent cache.
-        """
-        intern = sys.intern
-        return {intern(f): c for f, c in counts.items()}
+    shared_feature_counts = staticmethod(shared_feature_counts)
 
     @staticmethod
     def _tf_values(tf_counts: np.ndarray) -> np.ndarray:
