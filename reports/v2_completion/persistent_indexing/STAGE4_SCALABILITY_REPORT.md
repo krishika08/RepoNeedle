@@ -252,13 +252,14 @@ The baseline's warm restart committed 7.93 GB with 7.67 GB available and is excl
   index state and of retrieval for the fixed query sample (`PYTHONHASHSEED=0`): baseline warm restart, baseline
   uncached build, candidate warm restart, candidate uncached build. The digest is `55b48fb2…` in every round. The
   10,000-realistic and 30,000-reduced runs were single rounds without digest verification (§9).
-- **Tests** (`tests/test_v2_stage4_scalability.py`, 11 tests): shared counts keep keys, values and order; after
+- **Tests** (`tests/test_v2_stage4_scalability.py`, 12 tests): shared counts keep keys, values and order; after
   extraction and after a cached restart, each distinct feature is exactly one interned object; the loader shares
   strings as it decodes and its output equals the engine's cache; `refresh()` keeps them shared; persisted semantic
   payloads are byte-identical to the encoding of the Stage 2 reference's extraction; every structure and score array
   equals the verbatim Stage 2 reference and a fresh uncached build. The benchmark tooling is covered by tests of
-  manifest determinism, statistics and exclusions, commit provenance, and an end-to-end run that checks the output
-  schema, the four-way digest and that key objects equal distinct features.
+  manifest determinism, statistics and exclusions, commit provenance, a platform without `SC_AVPHYS_PAGES` (macOS;
+  found by CI and fixed in `5b87eb9`), and an end-to-end run that checks the output schema, the four-way digest and
+  that key objects equal distinct features.
 - **Existing suites**: the Stage 0–3 cache, semantic, equivalence and bundle suites pass unchanged (§10).
 - **Fingerprints**: no change to `semantic_features.py`, `codecs.py` or any module in an extractor fingerprint; all nine
   extractor fingerprints are those of Stage 3.
