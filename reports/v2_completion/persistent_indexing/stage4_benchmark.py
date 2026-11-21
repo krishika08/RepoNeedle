@@ -224,9 +224,26 @@ def run_phase(code_root: Path, repo: Path, cache_dir: Path, mode: str, limit: in
     return s3.run_child(CHILD, code_root, [repo, cache_dir, mode, limit], timeout, env)
 
 
-def one_round(pristine: Path, work: Path, roots: dict, limit: int, timeout, first: str, verify: bool) -> dict:
+def variants_of(keys) -> list:
+    """Revision names in their fixed order: baseline, the extra revisions (as given), candidate."""
+    keys = [k for k in keys if k != "verification"]
+    return ["baseline"] + [k for k in keys if k not in ("baseline", "candidate")] + ["candidate"]
+
+
+def variant_order(roots: dict, round_index: int) -> list:
+    """Every revision, rotated so that each round starts with a different one."""
+    names = variants_of(roots)
+    k = round_index % len(names)
+    return names[k:] + names[:k]
+
+
+def one_round(pristine: Path, work: Path, roots: dict, limit: int, timeout, first, verify: bool) -> dict:
+    """``first``: "baseline" or "candidate" (two revisions, as in Stage 4), or the full order to run in."""
     out = {}
-    order = ["baseline", "candidate"] if first == "baseline" else ["candidate", "baseline"]
+    if isinstance(first, str):
+        order = ["baseline", "candidate"] if first == "baseline" else ["candidate", "baseline"]
+    else:
+        order = list(first)
     for variant in order:
         repo, cache = work / f"{variant}_repo", work / f"{variant}_cache"
         shutil.rmtree(repo, ignore_errors=True)
@@ -246,8 +263,9 @@ def one_round(pristine: Path, work: Path, roots: dict, limit: int, timeout, firs
             ph["verification_digests"] = {
                 "warm": run_phase(roots[variant], repo, cache, "cached", limit, timeout, env=env).get("state_digest"),
                 "uncached": run_phase(roots[variant], repo, cache, "uncached", limit, timeout, env=env).get("state_digest")}
-    if verify and all("verification_digests" in out.get(v, {}) for v in ("baseline", "candidate")):
-        digests = [out[v]["verification_digests"][k] for v in ("baseline", "candidate") for k in ("warm", "uncached")]
+    names = variants_of(order)
+    if verify and all("verification_digests" in out.get(v, {}) for v in names):
+        digests = [out[v]["verification_digests"][k] for v in names for k in ("warm", "uncached")]
         out["verification"] = {"digests": digests, "identical": all(digests) and len(set(digests)) == 1}
     return out
 
@@ -283,24 +301,26 @@ METRICS = {
 
 
 def summarise(rounds) -> dict:
+    names = variants_of(rounds[0]) if rounds else ["baseline", "candidate"]
     out = {"excluded_phases": [{"round": i + 1, "variant": v, "phase": p,
                                 "paging_suspected": bool(x.get("paging_suspected")),
                                 "suspended_suspected": bool(x.get("suspended_suspected")),
                                 "seconds_to_ready_engine": x.get("seconds_to_ready_engine")}
-                               for i, r in enumerate(rounds) for v in ("baseline", "candidate")
+                               for i, r in enumerate(rounds) for v in names
                                for p, x in r.get(v, {}).items()
                                if isinstance(x, dict) and (x.get("paging_suspected") or x.get("suspended_suspected"))],
            "failed_or_aborted": [{"round": i + 1, "variant": v, "phase": p, "detail": x.get("aborted") or x.get("failed")}
-                                 for i, r in enumerate(rounds) for v in ("baseline", "candidate")
+                                 for i, r in enumerate(rounds) for v in names
                                  for p, x in r.get(v, {}).items() if isinstance(x, dict) and ("aborted" in x or "failed" in x)]}
-    for variant in ("baseline", "candidate"):
+    for variant in names:
         out[variant] = {p: {m: stats(metric_values(rounds, variant, p, fn)) for m, fn in METRICS.items()} for p in PHASES}
-    out["per_round_ratio_baseline_over_candidate"] = {
-        p: {m: [round(METRICS[m](r["baseline"][p]) / METRICS[m](r["candidate"][p]), 3)
-                if _clean(r.get("baseline", {}).get(p)) and _clean(r.get("candidate", {}).get(p))
-                and METRICS[m](r["baseline"][p]) and METRICS[m](r["candidate"][p]) else None for r in rounds]
-            for m in ("ready_engine_s", "semantic_fit_s", "peak_working_set_gb", "peak_committed_gb")}
-        for p in PHASES}
+    for other in names[:-1]:
+        out[f"per_round_ratio_{other}_over_candidate"] = {
+            p: {m: [round(METRICS[m](r[other][p]) / METRICS[m](r["candidate"][p]), 3)
+                    if _clean(r.get(other, {}).get(p)) and _clean(r.get("candidate", {}).get(p))
+                    and METRICS[m](r[other][p]) and METRICS[m](r["candidate"][p]) else None for r in rounds]
+                for m in ("ready_engine_s", "semantic_fit_s", "peak_working_set_gb", "peak_committed_gb")}
+            for p in PHASES}
     out["verification"] = [r.get("verification", {}).get("identical") for r in rounds]
     return out
 
@@ -308,34 +328,36 @@ def summarise(rounds) -> dict:
 def markdown(result: dict) -> str:
     """Human-readable summary of the raw JSON (every number is copied from it)."""
     env = result["environment"]
-    lines = ["# Stage 4 benchmark summary (generated from `stage4_benchmark.json`)", "",
-             f"Baseline `{result['revisions']['baseline']['commit']}` (clean: {result['revisions']['baseline']['tree_clean']}); "
-             f"candidate `{result['revisions']['candidate']['commit']}` (clean: {result['revisions']['candidate']['tree_clean']}).",
+    names = variants_of(result["revisions"])
+    revs = "; ".join(f"{v} `{result['revisions'][v]['commit']}` (clean: {result['revisions'][v]['tree_clean']})"
+                     for v in names)
+    lines = [f"# Stage 4 benchmark summary (generated from `{result.get('json_name', 'stage4_benchmark.json')}`)", "",
+             f"Revisions: {revs}.",
              f"{env['platform']}, Python {env['python']}, numpy {env['numpy']}, SciPy {env['scipy']}, "
              f"{env['logical_cpus']} logical CPUs, {(env.get('ram_total_bytes') or 0) / 2 ** 30:.1f} GB RAM "
              f"({(env.get('ram_available_bytes_at_start') or 0) / 2 ** 30:.1f} GB available at start; 0 = unknown).", ""]
     for key, run in result["runs"].items():
         m = run["dataset"]
         lines += [f"## {key}", "",
-                  f"Dataset `{m['dataset_id']}`, manifest SHA-256 `{m['manifest_sha256'][:16]}â€¦`, {m['file_count']} files, "
+                  f"Dataset `{m['dataset_id']}`, manifest SHA-256 `{m['manifest_sha256'][:16]}…`, {m['file_count']} files, "
                   f"{m['size_bytes']['total'] / 2 ** 20:.1f} MB; rounds: {len(run['rounds'])}; "
                   f"verification: {run['summary']['verification']}; conditions: {run.get('conditions', {})}", ""]
-        lines += ["| Phase | Metric | Baseline median (minâ€“max, sd, n) | Candidate median (minâ€“max, sd, n) |",
-                  "| :--- | :--- | ---: | ---: |"]
+        lines += ["| Phase | Metric | " + " | ".join(f"{v.capitalize()} median (min–max, sd, n)" for v in names)
+                  + " |", "| :--- | :--- | " + " | ".join("---:" for _ in names) + " |"]
         for p in PHASES:
             for metric in METRICS:
-                a, b = run["summary"]["baseline"][p][metric], run["summary"]["candidate"][p][metric]
-                if not a.get("n") and not b.get("n"):
+                cells = [run["summary"][v][p][metric] for v in names]
+                if not any(c.get("n") for c in cells):
                     continue
-                fmt = lambda s: (f"{s['median']} ({s['min']}â€“{s['max']}, sd {s['stdev']}, n {s['n']})" if s.get("n") else "â€“")  # noqa: E731
-                lines.append(f"| {p} | {metric} | {fmt(a)} | {fmt(b)} |")
+                fmt = lambda s: (f"{s['median']} ({s['min']}–{s['max']}, sd {s['stdev']}, n {s['n']})" if s.get("n") else "–")  # noqa: E731
+                lines.append(f"| {p} | {metric} | " + " | ".join(fmt(c) for c in cells) + " |")
         if run.get("component_memory"):
-            lines += ["", "| Component (retained, uncached build) | Baseline MB | Candidate MB |", "| :--- | ---: | ---: |"]
+            lines += ["", "| Component (retained, uncached build) | " + " | ".join(f"{v.capitalize()} MB" for v in names)
+                      + " |", "| :--- | " + " | ".join("---:" for _ in names) + " |"]
             cb = run["component_memory"]
             for comp in cb.get("baseline", {}).get("component_bytes", {}):
-                a = cb["baseline"]["component_bytes"][comp] / 2 ** 20
-                b = cb.get("candidate", {}).get("component_bytes", {}).get(comp, 0) / 2 ** 20
-                lines.append(f"| {comp} | {a:.1f} | {b:.1f} |")
+                vals = [cb.get(v, {}).get("component_bytes", {}).get(comp, 0) / 2 ** 20 for v in names]
+                lines.append(f"| {comp} | " + " | ".join(f"{x:.1f}" for x in vals) + " |")
         ex = run["summary"]["excluded_phases"] + run["summary"]["failed_or_aborted"]
         lines += ["", f"Excluded, failed or aborted phases: {ex if ex else 'none'}", ""]
     return "\n".join(lines).rstrip("\n") + "\n"
@@ -347,17 +369,26 @@ def main():
     ap.add_argument("--profile", choices=("realistic", "reduced"), default="reduced")
     ap.add_argument("--rounds", type=int, default=3)
     ap.add_argument("--baseline-root", required=True, help="checkout of the baseline revision (git worktree)")
+    ap.add_argument("--extra-root", action="append", default=[], metavar="NAME=DIR",
+                    help="another revision to compare (git worktree), run between baseline and candidate; repeatable")
     ap.add_argument("--memory-limit-gb", type=float, default=12.0)
     ap.add_argument("--phase-timeout-s", type=float, default=None)
     ap.add_argument("--verify", action="store_true")
     ap.add_argument("--component-memory", action="store_true", help="retained memory per component, once per revision")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
-    roots = {"baseline": Path(args.baseline_root).resolve(), "candidate": ROOT}
+    roots = {"baseline": Path(args.baseline_root).resolve()}
+    for spec in args.extra_root:
+        name, _, path = spec.partition("=")
+        if not name.isidentifier() or name in ("baseline", "candidate", "verification") or not path:
+            ap.error(f"--extra-root expects NAME=DIR with a new identifier NAME: {spec!r}")
+        roots[name] = Path(path).resolve()
+    roots["candidate"] = ROOT
     out_path = Path(args.out)
     result = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {"runs": {}}
     result["environment"] = environment()
     result["revisions"] = {k: git_revision(v) for k, v in roots.items()}
+    result["json_name"] = out_path.name
     limit = int(args.memory_limit_gb * 1024 ** 3)
     awake = s3.keep_awake(True)
     try:
@@ -373,10 +404,10 @@ def main():
                 run = result["runs"][key] = {"dataset": dataset_manifest(pristine, n, args.profile, gen), "rounds": []}
                 if args.component_memory:
                     run["component_memory"] = {v: s3.run_child(MEMORY_CHILD, roots[v], [pristine], args.phase_timeout_s)
-                                               for v in ("baseline", "candidate")}
+                                               for v in variants_of(roots)}
                 for r in range(args.rounds):
-                    first = "baseline" if r % 2 == 0 else "candidate"
-                    run["rounds"].append(one_round(pristine, work, roots, limit, args.phase_timeout_s, first, args.verify))
+                    order = variant_order(roots, r)
+                    run["rounds"].append(one_round(pristine, work, roots, limit, args.phase_timeout_s, order, args.verify))
                     run["summary"] = summarise(run["rounds"])
                     print(key, "round", r + 1, "verification", run["summary"]["verification"], flush=True)
                     out_path.write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8")
