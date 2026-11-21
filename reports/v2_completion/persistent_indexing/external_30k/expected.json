@@ -1,0 +1,148 @@
+{
+ "package": "RepoNeedle V2 Stage 4.1 external 30,000-file scalability benchmark",
+ "revisions": {
+  "baseline": {
+   "role": "Stage 3 (merged main)",
+   "commit": "60fbfc072dcb35209aaea113ecd4162a9092a432",
+   "tree": "5491ca89c71f5c22e5405072845ac7996eeaed94",
+   "bundle_ref": "refs/remotes/origin/main",
+   "package_version": "1.2.0"
+  },
+  "intern": {
+   "role": "Stage 4 (PR #28 head, sys.intern)",
+   "commit": "643fa228a9ca01cf0088aa078f20856d77a4790e",
+   "tree": "e6e41e1b83be3e6c117e883590b19c3d0ee83223",
+   "bundle_ref": "refs/remotes/origin/stage4/large-repo-scalability",
+   "package_version": "1.2.0"
+  },
+  "candidate": {
+   "role": "Stage 4.1 (PR #29 head, shared feature dictionary)",
+   "commit": "42b59bb13fab027e104e31f3faf22d6069f9310c",
+   "tree": "49d760cee81960faeee26988744ae616b374ab5c",
+   "bundle_ref": "refs/remotes/origin/stage4.1/shared-feature-dictionary",
+   "package_version": "1.2.0"
+  }
+ },
+ "notes_on_revisions": [
+  "Stage 4.1 production code at 42b59bb is identical to 41991e8, the candidate of the 10,000-file round (git diff 41991e8 42b59bb touches docs and benchmark data only).",
+  "stage1_benchmark.py (generator), stage2_benchmark.py, stage3_benchmark.py and tests/index_equivalence.py are byte-identical (same blob) in all three revisions."
+ ],
+ "benchmark": {
+  "harness": "reports/v2_completion/persistent_indexing/stage4_benchmark.py in the candidate worktree (42b59bb)",
+  "args": [
+   "--files",
+   "30000",
+   "--profile",
+   "reduced",
+   "--rounds",
+   "3",
+   "--verify",
+   "--component-memory",
+   "--require-ac"
+  ],
+  "extra_root_name": "intern",
+  "memory_limit_gb": 12.0,
+  "phase_timeout_s": null,
+  "outputs": [
+   "stage4_1_benchmark_30k.json",
+   "stage4_1_benchmark_30k.md"
+  ]
+ },
+ "datasets": {
+  "reduced 10000 files": {
+   "dataset_id": "stage1-generator/reduced/10000/seed-7",
+   "generator_version": "stage1_benchmark.generate/seed-7 + stage4-manifest/1",
+   "seed": 7,
+   "profile": "reduced",
+   "requested_files": 10000,
+   "file_count": 10000,
+   "manifest_sha256": "4d7140fe8cdafc4785fa7d2f0733e7b6c1a87e22a4811e15d9cfe72d3577c1d6",
+   "size_bytes_total": 15464202,
+   "language_distribution": {
+    ".go": 663,
+    ".java": 466,
+    ".json": 776,
+    ".md": 1578,
+    ".py": 4478,
+    ".rs": 513,
+    ".ts": 1526
+   },
+   "recorded_in": [
+    "stage4_benchmark.json (generated 2026-11-20T19:29:30.322329Z)",
+    "stage4_1_benchmark.json (generated 2026-11-21T07:18:13.566014Z)"
+   ]
+  },
+  "realistic 10000 files": {
+   "dataset_id": "stage1-generator/realistic/10000/seed-7",
+   "generator_version": "stage1_benchmark.generate/seed-7 + stage4-manifest/1",
+   "seed": 7,
+   "profile": "realistic",
+   "requested_files": 10000,
+   "file_count": 10000,
+   "manifest_sha256": "32b892595492e42c45924f9c513ca00e4731c67e789987377607a4ec8275b41a",
+   "size_bytes_total": 89405607,
+   "language_distribution": {
+    ".go": 738,
+    ".java": 468,
+    ".json": 786,
+    ".md": 1516,
+    ".py": 4482,
+    ".rs": 507,
+    ".ts": 1503
+   },
+   "recorded_in": [
+    "stage4_benchmark.json (generated 2026-11-20T19:53:40.588464Z)"
+   ]
+  },
+  "reduced 30000 files": {
+   "dataset_id": "stage1-generator/reduced/30000/seed-7",
+   "generator_version": "stage1_benchmark.generate/seed-7 + stage4-manifest/1",
+   "seed": 7,
+   "profile": "reduced",
+   "requested_files": 30000,
+   "file_count": 30000,
+   "manifest_sha256": "9498fea5849c70bd31cde5e0025fb2edc82e47d9cb24546d7cebab6791326d94",
+   "size_bytes_total": 46158970,
+   "language_distribution": {
+    ".go": 2104,
+    ".java": 1461,
+    ".json": 2311,
+    ".md": 4576,
+    ".py": 13540,
+    ".rs": 1505,
+    ".ts": 4503
+   },
+   "recorded_in": [
+    "stage4_benchmark.json (generated 2026-11-20T20:14:45.979257Z)"
+   ]
+  }
+ },
+ "python": {
+  "version": "3.12.10",
+  "implementation": "CPython",
+  "bits": 64
+ },
+ "git": {
+  "core.autocrlf": "true",
+  "reason": "the recorded 10,000- and 30,000-file runs used Windows checkouts with core.autocrlf=true"
+ },
+ "memory_requirements": {
+  "reference_peak_committed_gib_at_30000": {
+   "baseline (uncached)": 6.96,
+   "baseline (cold_cached)": 7.09,
+   "baseline (warm_restart)": 7.93,
+   "candidate (uncached)": 4.93,
+   "candidate (cold_cached)": 5.06,
+   "candidate (warm_restart)": 5.92
+  },
+  "reference_source": "stage4_benchmark.json, reduced 30000 files, round 1 (baseline=60fbfc0, candidate=c5d9d22, an earlier Stage 4 revision)",
+  "minimum_available_gib_before_start": 16,
+  "minimum_total_ram_gib": 32,
+  "why": "a phase is excluded (paging_suspected) when its peak committed memory exceeds the physical memory available when it starts; Stage 3 warm restart committed 7.93 GiB at 30,000 files, and the harness's memory watchdog aborts any phase above 12 GiB"
+ },
+ "power_policy": {
+  "laptop_or_battery_present": "--require-ac waits for 30 s of mains power before every phase; a phase that starts or ends on battery is excluded",
+  "no_system_battery": "GetSystemPowerStatus BatteryFlag=128 at preflight and postflight: battery state is not applicable; ACLineStatus 1 or 255 accepted and recorded",
+  "refused": "ACLineStatus=255 (unknown) on a machine that reports a battery: battery throttling could not be detected, so preflight refuses to start"
+ }
+}
