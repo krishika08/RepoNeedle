@@ -1,0 +1,5282 @@
+{
+ "runs": {
+  "reduced 10000 files": {
+   "dataset": {
+    "dataset_id": "stage1-generator/reduced/10000/seed-7",
+    "generator_version": "stage1_benchmark.generate/seed-7 + stage4-manifest/1",
+    "seed": 7,
+    "profile": "reduced",
+    "requested_files": 10000,
+    "file_count": 10000,
+    "manifest_sha256": "4d7140fe8cdafc4785fa7d2f0733e7b6c1a87e22a4811e15d9cfe72d3577c1d6",
+    "generated_utc": "2026-11-21T07:18:13.566014Z",
+    "generation_seconds": 12.6,
+    "language_distribution": {
+     ".go": 663,
+     ".java": 466,
+     ".json": 776,
+     ".md": 1578,
+     ".py": 4478,
+     ".rs": 513,
+     ".ts": 1526
+    },
+    "size_bytes": {
+     "total": 15464202,
+     "mean": 1546,
+     "min": 153,
+     "p10": 443,
+     "p50": 1140,
+     "p90": 2984,
+     "p99": 7340,
+     "max": 23922
+    },
+    "directories": {
+     "count": 4000,
+     "max_depth": 2,
+     "files_per_directory_median": 3,
+     "files_per_directory_max": 3
+    },
+    "test_files": 0,
+    "import_lines": 16144,
+    "generator_config": {
+     "languages_weighted": [
+      [
+       "py",
+       45
+      ],
+      [
+       "ts",
+       15
+      ],
+      [
+       "md",
+       15
+      ],
+      [
+       "json",
+       8
+      ],
+      [
+       "go",
+       7
+      ],
+      [
+       "rs",
+       5
+      ],
+      [
+       "java",
+       5
+      ]
+     ],
+     "realistic_median_bytes": 6442,
+     "size_scale": 0.16666666666666666,
+     "lognormal_sigma": 0.79,
+     "max_file_bytes": 33333,
+     "packages": "pkg{i % 200}/sub{(i // 200) % 20}",
+     "identifier_pool": "Zipf s=1.1, 60,000 words"
+    }
+   },
+   "rounds": [
+    {
+     "baseline": {
+      "uncached": {
+       "seconds_to_ready_engine": 63.655,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 2199863296,
+       "peak_committed_bytes": 3333918720,
+       "available_physical_bytes_at_start": 3921809408,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 28.581,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 22607.699,
+          "feature_counting_ms": 3991.008,
+          "vocabulary_selection_ms": 112.751,
+          "idf_ms": 5.078,
+          "matrix_assembly_ms": 1249.748,
+          "normalisation_ms": 573.416,
+          "fit_ms": 28580.811
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.463,
+       "started_utc": "2026-11-21T11:15:53.290619Z",
+       "ended_utc": "2026-11-21T11:17:00.562569Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 13742.9
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 120.347,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 11.637,
+         "scan_ms": 8811.657,
+         "of_which_hashing_ms": 97.318,
+         "seed_ms": 0.016,
+         "fit_ms": 75442.409,
+         "of_which_bm25_ms": 9838.769,
+         "of_which_semantic_ms": 41800.108,
+         "of_which_provider_index_ms": 7085.806,
+         "of_which_repo_graph_ms": 3681.105,
+         "of_which_function_graph_ms": 1410.824,
+         "of_which_abstainer_ms": 11618.469,
+         "persist_ms": 36062.392,
+         "write_artifacts_ms": 3904.449,
+         "publish_ms": 4159.677,
+         "gc_ms": 839.103,
+         "maintenance_ms": 4.295,
+         "total_ms": 120328.111
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 33081.109,
+          "feature_counting_ms": 5991.212,
+          "vocabulary_selection_ms": 136.773,
+          "idf_ms": 7.896,
+          "matrix_assembly_ms": 1970.752,
+          "normalisation_ms": 559.416,
+          "fit_ms": 41800.044,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 2236624896,
+       "peak_committed_bytes": 3375714304,
+       "available_physical_bytes_at_start": 4520513536,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 41.8,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 33081.109,
+          "feature_counting_ms": 5991.212,
+          "vocabulary_selection_ms": 136.773,
+          "idf_ms": 7.896,
+          "matrix_assembly_ms": 1970.752,
+          "normalisation_ms": 559.416,
+          "fit_ms": 41800.044
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.601,
+       "started_utc": "2026-11-21T11:17:30.565774Z",
+       "ended_utc": "2026-11-21T11:19:34.522877Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 23.269,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 9348.583,
+         "scan_ms": 3265.923,
+         "of_which_hashing_ms": 60.663,
+         "seed_ms": 505.83,
+         "fit_ms": 7084.17,
+         "of_which_bm25_ms": 1299.992,
+         "of_which_semantic_ms": 3695.411,
+         "of_which_provider_index_ms": 103.541,
+         "of_which_repo_graph_ms": 785.526,
+         "of_which_function_graph_ms": 984.29,
+         "of_which_abstainer_ms": 211.388,
+         "persist_ms": 3050.574,
+         "write_artifacts_ms": 2.501,
+         "publish_ms": 2469.789,
+         "gc_ms": 325.607,
+         "maintenance_ms": 5.052,
+         "total_ms": 23255.08
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 58.99,
+          "feature_counting_ms": 2337.581,
+          "vocabulary_selection_ms": 42.114,
+          "idf_ms": 2.429,
+          "matrix_assembly_ms": 909.021,
+          "normalisation_ms": 321.947,
+          "fit_ms": 3695.369,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        47.267,
+        43.541,
+        30.675,
+        29.988,
+        42.635,
+        37.015,
+        39.343,
+        41.405,
+        37.031,
+        35.445,
+        34.559,
+        735.925,
+        37.823,
+        37.728,
+        40.999,
+        36.298,
+        41.777,
+        62.873,
+        43.112,
+        30.427,
+        33.085,
+        32.206,
+        36.071,
+        36.772,
+        21.411
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 2538856448,
+       "peak_committed_bytes": 3674779648,
+       "available_physical_bytes_at_start": 4406890496,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 3.695,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 58.99,
+          "feature_counting_ms": 2337.581,
+          "vocabulary_selection_ms": 42.114,
+          "idf_ms": 2.429,
+          "matrix_assembly_ms": 909.021,
+          "normalisation_ms": 321.947,
+          "fit_ms": 3695.369
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.708,
+       "started_utc": "2026-11-21T11:20:05.566776Z",
+       "ended_utc": "2026-11-21T11:20:33.088128Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "intern": {
+      "uncached": {
+       "seconds_to_ready_engine": 85.794,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 1483382784,
+       "peak_committed_bytes": 2615599104,
+       "available_physical_bytes_at_start": 4121145344,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 50.253,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 44839.751,
+          "feature_counting_ms": 4027.964,
+          "vocabulary_selection_ms": 44.929,
+          "idf_ms": 2.47,
+          "matrix_assembly_ms": 973.834,
+          "normalisation_ms": 345.657,
+          "fit_ms": 50253.061
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.53,
+       "started_utc": "2026-11-21T11:23:43.987593Z",
+       "ended_utc": "2026-11-21T11:25:11.952578Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 57.748,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 8.388,
+         "scan_ms": 5491.488,
+         "of_which_hashing_ms": 63.951,
+         "seed_ms": 0.012,
+         "fit_ms": 35627.14,
+         "of_which_bm25_ms": 4608.79,
+         "of_which_semantic_ms": 20904.463,
+         "of_which_provider_index_ms": 3081.897,
+         "of_which_repo_graph_ms": 1595.906,
+         "of_which_function_graph_ms": 608.761,
+         "of_which_abstainer_ms": 4824.533,
+         "persist_ms": 16601.542,
+         "write_artifacts_ms": 2281.477,
+         "publish_ms": 1631.511,
+         "gc_ms": 326.85,
+         "maintenance_ms": 1.91,
+         "total_ms": 57728.57
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 18029.92,
+          "feature_counting_ms": 1667.095,
+          "vocabulary_selection_ms": 39.645,
+          "idf_ms": 3.601,
+          "matrix_assembly_ms": 858.103,
+          "normalisation_ms": 289.598,
+          "fit_ms": 20904.427,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 1513836544,
+       "peak_committed_bytes": 2650595328,
+       "available_physical_bytes_at_start": 3557961728,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 20.904,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 18029.92,
+          "feature_counting_ms": 1667.095,
+          "vocabulary_selection_ms": 39.645,
+          "idf_ms": 3.601,
+          "matrix_assembly_ms": 858.103,
+          "normalisation_ms": 289.598,
+          "fit_ms": 20904.427
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.345,
+       "started_utc": "2026-11-21T11:25:41.957288Z",
+       "ended_utc": "2026-11-21T11:26:41.849333Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 27.361,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 13779.911,
+         "scan_ms": 3303.75,
+         "of_which_hashing_ms": 62.159,
+         "seed_ms": 483.875,
+         "fit_ms": 5976.696,
+         "of_which_bm25_ms": 1173.317,
+         "of_which_semantic_ms": 3150.121,
+         "of_which_provider_index_ms": 105.335,
+         "of_which_repo_graph_ms": 808.583,
+         "of_which_function_graph_ms": 502.619,
+         "of_which_abstainer_ms": 231.362,
+         "persist_ms": 3805.553,
+         "write_artifacts_ms": 2.284,
+         "publish_ms": 2691.429,
+         "gc_ms": 338.389,
+         "maintenance_ms": 5.714,
+         "total_ms": 27349.785
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 49.816,
+          "feature_counting_ms": 1751.068,
+          "vocabulary_selection_ms": 41.674,
+          "idf_ms": 3.666,
+          "matrix_assembly_ms": 922.656,
+          "normalisation_ms": 357.492,
+          "fit_ms": 3150.074,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        40.452,
+        49.57,
+        36.842,
+        36.348,
+        49.631,
+        40.873,
+        41.712,
+        43.813,
+        45.697,
+        40.302,
+        40.825,
+        36.408,
+        729.325,
+        43.072,
+        43.099,
+        43.474,
+        47.706,
+        66.369,
+        48.599,
+        28.63,
+        39.614,
+        41.519,
+        47.565,
+        42.294,
+        24.667
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 1838927872,
+       "peak_committed_bytes": 2972704768,
+       "available_physical_bytes_at_start": 4505989120,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 3.15,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 49.816,
+          "feature_counting_ms": 1751.068,
+          "vocabulary_selection_ms": 41.674,
+          "idf_ms": 3.666,
+          "matrix_assembly_ms": 922.656,
+          "normalisation_ms": 357.492,
+          "fit_ms": 3150.074
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.737,
+       "started_utc": "2026-11-21T11:27:12.311591Z",
+       "ended_utc": "2026-11-21T11:27:43.950632Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "candidate": {
+      "uncached": {
+       "seconds_to_ready_engine": 36.132,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 1167036416,
+       "peak_committed_bytes": 2298679296,
+       "available_physical_bytes_at_start": 4740771840,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 17.119,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15682.296,
+          "feature_counting_ms": 253.821,
+          "vocabulary_selection_ms": 46.267,
+          "idf_ms": 2.657,
+          "matrix_assembly_ms": 854.353,
+          "normalisation_ms": 270.579,
+          "fit_ms": 17118.904
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.289,
+       "started_utc": "2026-11-21T11:30:54.242744Z",
+       "ended_utc": "2026-11-21T11:31:32.398685Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 49.028,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 3.347,
+         "scan_ms": 5159.886,
+         "of_which_hashing_ms": 60.837,
+         "seed_ms": 0.011,
+         "fit_ms": 32131.978,
+         "of_which_bm25_ms": 4344.871,
+         "of_which_semantic_ms": 17026.909,
+         "of_which_provider_index_ms": 3038.113,
+         "of_which_repo_graph_ms": 1574.154,
+         "of_which_function_graph_ms": 330.592,
+         "of_which_abstainer_ms": 5814.591,
+         "persist_ms": 11714.259,
+         "write_artifacts_ms": 2269.826,
+         "publish_ms": 1572.319,
+         "gc_ms": 341.854,
+         "maintenance_ms": 1.802,
+         "total_ms": 49009.481
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15591.856,
+          "feature_counting_ms": 253.249,
+          "vocabulary_selection_ms": 35.576,
+          "idf_ms": 2.365,
+          "matrix_assembly_ms": 859.643,
+          "normalisation_ms": 275.09,
+          "fit_ms": 17026.869,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 1231224832,
+       "peak_committed_bytes": 2368667648,
+       "available_physical_bytes_at_start": 4946296832,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 17.027,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15591.856,
+          "feature_counting_ms": 253.249,
+          "vocabulary_selection_ms": 35.576,
+          "idf_ms": 2.365,
+          "matrix_assembly_ms": 859.643,
+          "normalisation_ms": 275.09,
+          "fit_ms": 17026.869
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.401,
+       "started_utc": "2026-11-21T11:32:02.403666Z",
+       "ended_utc": "2026-11-21T11:32:53.652766Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 22.58,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 11178.437,
+         "scan_ms": 3198.189,
+         "of_which_hashing_ms": 61.664,
+         "seed_ms": 472.41,
+         "fit_ms": 4759.274,
+         "of_which_bm25_ms": 1137.541,
+         "of_which_semantic_ms": 1534.412,
+         "of_which_provider_index_ms": 592.472,
+         "of_which_repo_graph_ms": 283.951,
+         "of_which_function_graph_ms": 996.428,
+         "of_which_abstainer_ms": 209.668,
+         "persist_ms": 2961.625,
+         "write_artifacts_ms": 2.902,
+         "publish_ms": 2365.069,
+         "gc_ms": 336.883,
+         "maintenance_ms": 6.762,
+         "total_ms": 22569.935
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 47.073,
+          "feature_counting_ms": 286.682,
+          "vocabulary_selection_ms": 40.088,
+          "idf_ms": 2.717,
+          "matrix_assembly_ms": 855.279,
+          "normalisation_ms": 292.022,
+          "fit_ms": 1534.374,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        34.522,
+        40.533,
+        31.245,
+        28.983,
+        42.115,
+        40.393,
+        36.433,
+        37.462,
+        34.016,
+        34.436,
+        34.0,
+        735.372,
+        39.275,
+        35.877,
+        38.483,
+        40.811,
+        43.593,
+        63.539,
+        46.614,
+        25.033,
+        33.271,
+        37.93,
+        36.467,
+        38.792,
+        17.84
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 1535627264,
+       "peak_committed_bytes": 2668769280,
+       "available_physical_bytes_at_start": 4977504256,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 1.534,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 47.073,
+          "feature_counting_ms": 286.682,
+          "vocabulary_selection_ms": 40.088,
+          "idf_ms": 2.717,
+          "matrix_assembly_ms": 855.279,
+          "normalisation_ms": 292.022,
+          "fit_ms": 1534.374
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.754,
+       "started_utc": "2026-11-21T11:33:24.040952Z",
+       "ended_utc": "2026-11-21T11:33:50.809476Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "verification": {
+      "digests": [
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      ],
+      "identical": true
+     }
+    },
+    {
+     "intern": {
+      "uncached": {
+       "seconds_to_ready_engine": 39.932,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 1482694656,
+       "peak_committed_bytes": 2614726656,
+       "available_physical_bytes_at_start": 4718583808,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 21.015,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 18039.265,
+          "feature_counting_ms": 1694.867,
+          "vocabulary_selection_ms": 41.666,
+          "idf_ms": 2.527,
+          "matrix_assembly_ms": 926.082,
+          "normalisation_ms": 292.902,
+          "fit_ms": 21014.64
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.292,
+       "started_utc": "2026-11-21T11:36:53.623694Z",
+       "ended_utc": "2026-11-21T11:37:35.470751Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 57.017,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 5.147,
+         "scan_ms": 5251.124,
+         "of_which_hashing_ms": 62.43,
+         "seed_ms": 0.011,
+         "fit_ms": 35635.791,
+         "of_which_bm25_ms": 4550.586,
+         "of_which_semantic_ms": 21019.417,
+         "of_which_provider_index_ms": 3104.074,
+         "of_which_repo_graph_ms": 1620.008,
+         "of_which_function_graph_ms": 630.935,
+         "of_which_abstainer_ms": 4708.18,
+         "persist_ms": 16114.673,
+         "write_artifacts_ms": 2234.595,
+         "publish_ms": 1586.314,
+         "gc_ms": 319.541,
+         "maintenance_ms": 1.684,
+         "total_ms": 57006.746
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 18145.849,
+          "feature_counting_ms": 1658.152,
+          "vocabulary_selection_ms": 43.233,
+          "idf_ms": 2.439,
+          "matrix_assembly_ms": 864.16,
+          "normalisation_ms": 288.563,
+          "fit_ms": 21019.38,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 1513533440,
+       "peak_committed_bytes": 2650542080,
+       "available_physical_bytes_at_start": 4744654848,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 21.019,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 18145.849,
+          "feature_counting_ms": 1658.152,
+          "vocabulary_selection_ms": 43.233,
+          "idf_ms": 2.439,
+          "matrix_assembly_ms": 864.16,
+          "normalisation_ms": 288.563,
+          "fit_ms": 21019.38
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.383,
+       "started_utc": "2026-11-21T11:38:05.475781Z",
+       "ended_utc": "2026-11-21T11:39:04.651607Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 26.846,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 13437.347,
+         "scan_ms": 3256.925,
+         "of_which_hashing_ms": 61.915,
+         "seed_ms": 472.098,
+         "fit_ms": 6405.143,
+         "of_which_bm25_ms": 1175.002,
+         "of_which_semantic_ms": 3117.147,
+         "of_which_provider_index_ms": 107.987,
+         "of_which_repo_graph_ms": 786.596,
+         "of_which_function_graph_ms": 998.742,
+         "of_which_abstainer_ms": 214.453,
+         "persist_ms": 3263.099,
+         "write_artifacts_ms": 2.585,
+         "publish_ms": 2659.39,
+         "gc_ms": 333.994,
+         "maintenance_ms": 6.274,
+         "total_ms": 26834.612
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 47.193,
+          "feature_counting_ms": 1742.965,
+          "vocabulary_selection_ms": 39.809,
+          "idf_ms": 2.855,
+          "matrix_assembly_ms": 923.969,
+          "normalisation_ms": 334.323,
+          "fit_ms": 3117.113,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        40.313,
+        47.822,
+        39.779,
+        36.049,
+        49.573,
+        40.783,
+        41.764,
+        41.621,
+        41.634,
+        38.217,
+        37.768,
+        35.682,
+        38.23,
+        740.421,
+        44.216,
+        45.421,
+        47.095,
+        64.935,
+        46.529,
+        25.386,
+        38.291,
+        37.332,
+        39.744,
+        40.264,
+        21.136
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 1839632384,
+       "peak_committed_bytes": 2973179904,
+       "available_physical_bytes_at_start": 4733349888,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 3.117,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 47.193,
+          "feature_counting_ms": 1742.965,
+          "vocabulary_selection_ms": 39.809,
+          "idf_ms": 2.855,
+          "matrix_assembly_ms": 923.969,
+          "normalisation_ms": 334.323,
+          "fit_ms": 3117.113
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.715,
+       "started_utc": "2026-11-21T11:39:35.032251Z",
+       "ended_utc": "2026-11-21T11:40:05.986795Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "candidate": {
+      "uncached": {
+       "seconds_to_ready_engine": 35.509,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 1165819904,
+       "peak_committed_bytes": 2297393152,
+       "available_physical_bytes_at_start": 4781547520,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.916,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15480.41,
+          "feature_counting_ms": 251.804,
+          "vocabulary_selection_ms": 41.735,
+          "idf_ms": 2.69,
+          "matrix_assembly_ms": 850.882,
+          "normalisation_ms": 280.218,
+          "fit_ms": 16915.713
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.251,
+       "started_utc": "2026-11-21T11:43:15.760735Z",
+       "ended_utc": "2026-11-21T11:43:53.248987Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 47.452,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 2.581,
+         "scan_ms": 5254.624,
+         "of_which_hashing_ms": 61.917,
+         "seed_ms": 0.011,
+         "fit_ms": 30697.124,
+         "of_which_bm25_ms": 4447.778,
+         "of_which_semantic_ms": 16615.295,
+         "of_which_provider_index_ms": 2991.912,
+         "of_which_repo_graph_ms": 1521.99,
+         "of_which_function_graph_ms": 598.531,
+         "of_which_abstainer_ms": 4518.579,
+         "persist_ms": 11486.374,
+         "write_artifacts_ms": 2162.692,
+         "publish_ms": 1634.107,
+         "gc_ms": 324.401,
+         "maintenance_ms": 1.726,
+         "total_ms": 47440.714
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15222.518,
+          "feature_counting_ms": 249.088,
+          "vocabulary_selection_ms": 39.783,
+          "idf_ms": 2.57,
+          "matrix_assembly_ms": 825.343,
+          "normalisation_ms": 267.761,
+          "fit_ms": 16615.264,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 1228296192,
+       "peak_committed_bytes": 2366177280,
+       "available_physical_bytes_at_start": 4733726720,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.615,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15222.518,
+          "feature_counting_ms": 249.088,
+          "vocabulary_selection_ms": 39.783,
+          "idf_ms": 2.57,
+          "matrix_assembly_ms": 825.343,
+          "normalisation_ms": 267.761,
+          "fit_ms": 16615.264
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.296,
+       "started_utc": "2026-11-21T11:44:23.265165Z",
+       "ended_utc": "2026-11-21T11:45:12.882103Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 21.924,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 10975.583,
+         "scan_ms": 2894.248,
+         "of_which_hashing_ms": 55.233,
+         "seed_ms": 465.094,
+         "fit_ms": 4651.947,
+         "of_which_bm25_ms": 1584.276,
+         "of_which_semantic_ms": 1472.186,
+         "of_which_provider_index_ms": 90.943,
+         "of_which_repo_graph_ms": 291.548,
+         "of_which_function_graph_ms": 1005.282,
+         "of_which_abstainer_ms": 204.178,
+         "persist_ms": 2926.229,
+         "write_artifacts_ms": 2.784,
+         "publish_ms": 2350.979,
+         "gc_ms": 325.622,
+         "maintenance_ms": 4.461,
+         "total_ms": 21913.101
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 45.819,
+          "feature_counting_ms": 284.557,
+          "vocabulary_selection_ms": 38.251,
+          "idf_ms": 2.532,
+          "matrix_assembly_ms": 826.719,
+          "normalisation_ms": 264.867,
+          "fit_ms": 1472.15,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        35.355,
+        40.477,
+        30.696,
+        30.152,
+        44.414,
+        36.107,
+        36.051,
+        36.552,
+        34.755,
+        33.379,
+        33.994,
+        31.26,
+        743.46,
+        37.754,
+        39.485,
+        36.643,
+        43.212,
+        61.437,
+        42.6,
+        25.907,
+        34.088,
+        33.379,
+        37.767,
+        35.972,
+        19.772
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 1533788160,
+       "peak_committed_bytes": 2667261952,
+       "available_physical_bytes_at_start": 4707344384,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 1.472,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 45.819,
+          "feature_counting_ms": 284.557,
+          "vocabulary_selection_ms": 38.251,
+          "idf_ms": 2.532,
+          "matrix_assembly_ms": 826.719,
+          "normalisation_ms": 264.867,
+          "fit_ms": 1472.15
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.797,
+       "started_utc": "2026-11-21T11:45:43.265353Z",
+       "ended_utc": "2026-11-21T11:46:09.208099Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "baseline": {
+      "uncached": {
+       "seconds_to_ready_engine": 34.895,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 2198872064,
+       "peak_committed_bytes": 3332177920,
+       "available_physical_bytes_at_start": 4557463552,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.649,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 13048.669,
+          "feature_counting_ms": 2279.83,
+          "vocabulary_selection_ms": 39.734,
+          "idf_ms": 2.456,
+          "matrix_assembly_ms": 933.226,
+          "normalisation_ms": 322.686,
+          "fit_ms": 16648.666
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.35,
+       "started_utc": "2026-11-21T11:49:08.955275Z",
+       "ended_utc": "2026-11-21T11:49:45.891067Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 50.886,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 2.851,
+         "scan_ms": 4941.118,
+         "of_which_hashing_ms": 57.249,
+         "seed_ms": 0.011,
+         "fit_ms": 31041.113,
+         "of_which_bm25_ms": 4329.878,
+         "of_which_semantic_ms": 16880.343,
+         "of_which_provider_index_ms": 3016.758,
+         "of_which_repo_graph_ms": 1596.271,
+         "of_which_function_graph_ms": 615.211,
+         "of_which_abstainer_ms": 4599.928,
+         "persist_ms": 14889.913,
+         "write_artifacts_ms": 2312.861,
+         "publish_ms": 1557.935,
+         "gc_ms": 318.602,
+         "maintenance_ms": 1.913,
+         "total_ms": 50875.006
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 13439.249,
+          "feature_counting_ms": 2236.846,
+          "vocabulary_selection_ms": 37.963,
+          "idf_ms": 2.622,
+          "matrix_assembly_ms": 853.351,
+          "normalisation_ms": 289.161,
+          "fit_ms": 16880.307,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 2234613760,
+       "peak_committed_bytes": 3374993408,
+       "available_physical_bytes_at_start": 4560289792,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.88,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 13439.249,
+          "feature_counting_ms": 2236.846,
+          "vocabulary_selection_ms": 37.963,
+          "idf_ms": 2.622,
+          "matrix_assembly_ms": 853.351,
+          "normalisation_ms": 289.161,
+          "fit_ms": 16880.307
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.301,
+       "started_utc": "2026-11-21T11:50:15.896036Z",
+       "ended_utc": "2026-11-21T11:51:08.925732Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 21.757,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 8715.229,
+         "scan_ms": 2957.499,
+         "of_which_hashing_ms": 57.169,
+         "seed_ms": 466.117,
+         "fit_ms": 6685.143,
+         "of_which_bm25_ms": 1111.816,
+         "of_which_semantic_ms": 3463.469,
+         "of_which_provider_index_ms": 109.139,
+         "of_which_repo_graph_ms": 822.151,
+         "of_which_function_graph_ms": 971.327,
+         "of_which_abstainer_ms": 203.263,
+         "persist_ms": 2923.369,
+         "write_artifacts_ms": 2.043,
+         "publish_ms": 2350.723,
+         "gc_ms": 323.094,
+         "maintenance_ms": 4.566,
+         "total_ms": 21747.357
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 47.561,
+          "feature_counting_ms": 2097.041,
+          "vocabulary_selection_ms": 38.835,
+          "idf_ms": 3.057,
+          "matrix_assembly_ms": 926.955,
+          "normalisation_ms": 329.656,
+          "fit_ms": 3463.428,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        34.798,
+        41.061,
+        34.112,
+        29.857,
+        43.867,
+        39.676,
+        37.02,
+        37.05,
+        37.913,
+        32.91,
+        37.382,
+        718.882,
+        39.761,
+        38.71,
+        38.244,
+        37.418,
+        41.025,
+        59.034,
+        44.735,
+        24.267,
+        33.768,
+        35.547,
+        36.216,
+        38.399,
+        18.952
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 2541494272,
+       "peak_committed_bytes": 3679191040,
+       "available_physical_bytes_at_start": 4553822208,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 3.463,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 47.561,
+          "feature_counting_ms": 2097.041,
+          "vocabulary_selection_ms": 38.835,
+          "idf_ms": 3.057,
+          "matrix_assembly_ms": 926.955,
+          "normalisation_ms": 329.656,
+          "fit_ms": 3463.428
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.713,
+       "started_utc": "2026-11-21T11:51:39.320026Z",
+       "ended_utc": "2026-11-21T11:52:05.192546Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "verification": {
+      "digests": [
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      ],
+      "identical": true
+     }
+    },
+    {
+     "candidate": {
+      "uncached": {
+       "seconds_to_ready_engine": 34.812,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 1166282752,
+       "peak_committed_bytes": 2297704448,
+       "available_physical_bytes_at_start": 4567035904,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.656,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15274.609,
+          "feature_counting_ms": 246.957,
+          "vocabulary_selection_ms": 36.003,
+          "idf_ms": 2.382,
+          "matrix_assembly_ms": 818.609,
+          "normalisation_ms": 268.833,
+          "fit_ms": 16655.722
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.3,
+       "started_utc": "2026-11-21T11:55:03.536892Z",
+       "ended_utc": "2026-11-21T11:55:40.287235Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 47.315,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 2.429,
+         "scan_ms": 5018.92,
+         "of_which_hashing_ms": 58.904,
+         "seed_ms": 0.012,
+         "fit_ms": 30487.134,
+         "of_which_bm25_ms": 4269.842,
+         "of_which_semantic_ms": 16802.842,
+         "of_which_provider_index_ms": 3003.202,
+         "of_which_repo_graph_ms": 1537.311,
+         "of_which_function_graph_ms": 338.241,
+         "of_which_abstainer_ms": 4533.3,
+         "persist_ms": 11795.168,
+         "write_artifacts_ms": 2146.301,
+         "publish_ms": 1572.876,
+         "gc_ms": 325.273,
+         "maintenance_ms": 1.999,
+         "total_ms": 47303.663
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15427.616,
+          "feature_counting_ms": 251.833,
+          "vocabulary_selection_ms": 36.686,
+          "idf_ms": 2.418,
+          "matrix_assembly_ms": 814.064,
+          "normalisation_ms": 261.788,
+          "fit_ms": 16802.814,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 1228787712,
+       "peak_committed_bytes": 2366861312,
+       "available_physical_bytes_at_start": 4548603904,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.803,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 15427.616,
+          "feature_counting_ms": 251.833,
+          "vocabulary_selection_ms": 36.686,
+          "idf_ms": 2.418,
+          "matrix_assembly_ms": 814.064,
+          "normalisation_ms": 261.788,
+          "fit_ms": 16802.814
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.346,
+       "started_utc": "2026-11-21T11:56:10.303758Z",
+       "ended_utc": "2026-11-21T11:56:59.806865Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 21.939,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 10963.153,
+         "scan_ms": 2962.992,
+         "of_which_hashing_ms": 56.759,
+         "seed_ms": 460.925,
+         "fit_ms": 4108.18,
+         "of_which_bm25_ms": 1099.538,
+         "of_which_semantic_ms": 1470.543,
+         "of_which_provider_index_ms": 88.273,
+         "of_which_repo_graph_ms": 781.805,
+         "of_which_function_graph_ms": 462.31,
+         "of_which_abstainer_ms": 201.912,
+         "persist_ms": 3433.685,
+         "write_artifacts_ms": 2.026,
+         "publish_ms": 2334.221,
+         "gc_ms": 329.776,
+         "maintenance_ms": 4.467,
+         "total_ms": 21928.935
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 48.857,
+          "feature_counting_ms": 278.613,
+          "vocabulary_selection_ms": 40.041,
+          "idf_ms": 2.347,
+          "matrix_assembly_ms": 834.638,
+          "normalisation_ms": 257.254,
+          "fit_ms": 1470.511,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        36.439,
+        40.849,
+        32.897,
+        31.393,
+        43.159,
+        37.703,
+        35.362,
+        37.251,
+        36.247,
+        33.098,
+        37.352,
+        28.686,
+        31.774,
+        724.585,
+        39.874,
+        36.629,
+        44.972,
+        57.4,
+        39.867,
+        24.311,
+        34.614,
+        37.241,
+        36.565,
+        37.093,
+        18.815
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 1534902272,
+       "peak_committed_bytes": 2669125632,
+       "available_physical_bytes_at_start": 4537270272,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 1.471,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 48.857,
+          "feature_counting_ms": 278.613,
+          "vocabulary_selection_ms": 40.041,
+          "idf_ms": 2.347,
+          "matrix_assembly_ms": 834.638,
+          "normalisation_ms": 257.254,
+          "fit_ms": 1470.511
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.765,
+       "started_utc": "2026-11-21T11:57:30.205251Z",
+       "ended_utc": "2026-11-21T11:57:56.153168Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "baseline": {
+      "uncached": {
+       "seconds_to_ready_engine": 34.738,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 2199384064,
+       "peak_committed_bytes": 3332243456,
+       "available_physical_bytes_at_start": 4593278976,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.563,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 13054.596,
+          "feature_counting_ms": 2257.667,
+          "vocabulary_selection_ms": 45.041,
+          "idf_ms": 2.795,
+          "matrix_assembly_ms": 891.613,
+          "normalisation_ms": 293.028,
+          "fit_ms": 16562.859
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.327,
+       "started_utc": "2026-11-21T12:00:55.255092Z",
+       "ended_utc": "2026-11-21T12:01:31.932078Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 50.208,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 3.559,
+         "scan_ms": 4935.035,
+         "of_which_hashing_ms": 57.31,
+         "seed_ms": 0.012,
+         "fit_ms": 30882.613,
+         "of_which_bm25_ms": 4341.034,
+         "of_which_semantic_ms": 16717.579,
+         "of_which_provider_index_ms": 3037.672,
+         "of_which_repo_graph_ms": 1584.913,
+         "of_which_function_graph_ms": 623.001,
+         "of_which_abstainer_ms": 4575.659,
+         "persist_ms": 14376.514,
+         "write_artifacts_ms": 2196.689,
+         "publish_ms": 1592.42,
+         "gc_ms": 310.424,
+         "maintenance_ms": 1.852,
+         "total_ms": 50197.733
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 13315.111,
+          "feature_counting_ms": 2245.025,
+          "vocabulary_selection_ms": 41.041,
+          "idf_ms": 2.549,
+          "matrix_assembly_ms": 834.453,
+          "normalisation_ms": 261.037,
+          "fit_ms": 16717.537,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 2231136256,
+       "peak_committed_bytes": 3370799104,
+       "available_physical_bytes_at_start": 4601004032,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 16.718,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 13315.111,
+          "feature_counting_ms": 2245.025,
+          "vocabulary_selection_ms": 41.041,
+          "idf_ms": 2.549,
+          "matrix_assembly_ms": 834.453,
+          "normalisation_ms": 261.037,
+          "fit_ms": 16717.537
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.316,
+       "started_utc": "2026-11-21T12:02:01.946345Z",
+       "ended_utc": "2026-11-21T12:02:54.398326Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 21.587,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 8714.575,
+         "scan_ms": 2926.263,
+         "of_which_hashing_ms": 57.416,
+         "seed_ms": 466.091,
+         "fit_ms": 6489.504,
+         "of_which_bm25_ms": 1103.461,
+         "of_which_semantic_ms": 3352.674,
+         "of_which_provider_index_ms": 579.221,
+         "of_which_repo_graph_ms": 278.143,
+         "of_which_function_graph_ms": 969.481,
+         "of_which_abstainer_ms": 202.217,
+         "persist_ms": 2980.284,
+         "write_artifacts_ms": 3.014,
+         "publish_ms": 2391.436,
+         "gc_ms": 328.553,
+         "maintenance_ms": 4.531,
+         "total_ms": 21576.717
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 46.03,
+          "feature_counting_ms": 2086.341,
+          "vocabulary_selection_ms": 39.493,
+          "idf_ms": 2.388,
+          "matrix_assembly_ms": 846.883,
+          "normalisation_ms": 308.572,
+          "fit_ms": 3352.636,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        36.905,
+        41.505,
+        32.879,
+        32.958,
+        44.639,
+        38.689,
+        38.603,
+        38.916,
+        33.597,
+        36.196,
+        34.954,
+        718.465,
+        35.68,
+        40.819,
+        39.058,
+        39.214,
+        41.73,
+        60.111,
+        40.677,
+        25.146,
+        34.109,
+        35.643,
+        35.913,
+        36.004,
+        21.177
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 2541350912,
+       "peak_committed_bytes": 3677310976,
+       "available_physical_bytes_at_start": 4556525568,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 3.353,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 46.03,
+          "feature_counting_ms": 2086.341,
+          "vocabulary_selection_ms": 39.493,
+          "idf_ms": 2.388,
+          "matrix_assembly_ms": 846.883,
+          "normalisation_ms": 308.572,
+          "fit_ms": 3352.636
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.765,
+       "started_utc": "2026-11-21T12:03:24.781569Z",
+       "ended_utc": "2026-11-21T12:03:50.464227Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "intern": {
+      "uncached": {
+       "seconds_to_ready_engine": 38.376,
+       "files": 10000,
+       "peak_wal_bytes": 0,
+       "peak_rss_bytes": 1482047488,
+       "peak_committed_bytes": 2614484992,
+       "available_physical_bytes_at_start": 4478545920,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 20.255,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 17469.112,
+          "feature_counting_ms": 1616.467,
+          "vocabulary_selection_ms": 40.554,
+          "idf_ms": 2.492,
+          "matrix_assembly_ms": 829.943,
+          "normalisation_ms": 280.716,
+          "fit_ms": 20255.146
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.268,
+       "started_utc": "2026-11-21T12:06:49.094005Z",
+       "ended_utc": "2026-11-21T12:07:29.377666Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "cold_cached": {
+       "seconds_to_ready_engine": 55.572,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 1,
+        "files_reused": 0,
+        "files_extracted": 10000,
+        "artifacts_written": 90000,
+        "artifacts_reused": 0,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 4.133,
+         "scan_ms": 4899.473,
+         "of_which_hashing_ms": 57.769,
+         "seed_ms": 0.011,
+         "fit_ms": 34426.214,
+         "of_which_bm25_ms": 4296.073,
+         "of_which_semantic_ms": 20396.783,
+         "of_which_provider_index_ms": 2950.638,
+         "of_which_repo_graph_ms": 1547.321,
+         "of_which_function_graph_ms": 346.249,
+         "of_which_abstainer_ms": 4886.545,
+         "persist_ms": 16232.022,
+         "write_artifacts_ms": 2228.246,
+         "publish_ms": 1614.953,
+         "gc_ms": 320.39,
+         "maintenance_ms": 1.97,
+         "total_ms": 55561.853
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "recomputed_in_full",
+         "function_graph.call_resolution": "recomputed_in_full",
+         "abstainer": "recomputed_in_full"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)",
+         "repo_graph.import_edges": "no previous generation",
+         "function_graph.call_resolution": "no previous generation",
+         "abstainer": "no reference counts in the previous generation"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 17639.548,
+          "feature_counting_ms": 1613.502,
+          "vocabulary_selection_ms": 39.855,
+          "idf_ms": 2.865,
+          "matrix_assembly_ms": 813.37,
+          "normalisation_ms": 271.183,
+          "fit_ms": 20396.749,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 10000,
+          "files_reused": 0
+         },
+         "repo_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "edges_replayed": 9026,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "function_graph": {
+          "files_resolved": 10000,
+          "files_reused": 0,
+          "calls_resolved": 78582,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 0,
+          "files_own_changed": 10000,
+          "provider_keys_changed": 0,
+          "files_affected": 10000,
+          "files_affected_by_dependencies": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 0
+         },
+         "abstainer": {
+          "documents_added": 10000,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "peak_wal_bytes": 17946752,
+       "peak_rss_bytes": 1515786240,
+       "peak_committed_bytes": 2652815360,
+       "available_physical_bytes_at_start": 4492570624,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 20.397,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 0,
+          "feature_cache_misses": 10000,
+          "documents_reextracted": 10000,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 17639.548,
+          "feature_counting_ms": 1613.502,
+          "vocabulary_selection_ms": 39.855,
+          "idf_ms": 2.865,
+          "matrix_assembly_ms": 813.37,
+          "normalisation_ms": 271.183,
+          "fit_ms": 20396.749
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.351,
+       "started_utc": "2026-11-21T12:07:59.391074Z",
+       "ended_utc": "2026-11-21T12:08:57.170594Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "database_after_cold": {
+       "database_file_bytes": 128741376,
+       "page_size": 4096,
+       "page_count": 31431,
+       "freelist_pages": 0,
+       "artifacts": {
+        "abstainer": {
+         "rows": 10000,
+         "payload_bytes": 5255178
+        },
+        "doc_meta": {
+         "rows": 10000,
+         "payload_bytes": 1614244
+        },
+        "fg_edges": {
+         "rows": 10000,
+         "payload_bytes": 847002
+        },
+        "function_graph": {
+         "rows": 10000,
+         "payload_bytes": 4182671
+        },
+        "lexical": {
+         "rows": 10000,
+         "payload_bytes": 6759064
+        },
+        "provides": {
+         "rows": 10000,
+         "payload_bytes": 3379080
+        },
+        "repo_graph_facts": {
+         "rows": 10000,
+         "payload_bytes": 369033
+        },
+        "rg_edges": {
+         "rows": 10000,
+         "payload_bytes": 692590
+        },
+        "semantic": {
+         "rows": 10000,
+         "payload_bytes": 50031924
+        }
+       },
+       "manifest_rows": 10000,
+       "file_artifacts_rows": 90000,
+       "artifact_metadata_bytes": 15104254,
+       "wal_bytes_after": 0,
+       "global_state_bytes": 1319917
+      },
+      "warm_restart": {
+       "seconds_to_ready_engine": 26.402,
+       "files": 10000,
+       "report": {
+        "state": "published",
+        "reason": "",
+        "generation": 2,
+        "files_reused": 10000,
+        "files_extracted": 0,
+        "artifacts_written": 0,
+        "artifacts_reused": 90000,
+        "artifacts_collected": 0,
+        "timings_ms": {
+         "load_ms": 13300.141,
+         "scan_ms": 3100.759,
+         "of_which_hashing_ms": 58.585,
+         "seed_ms": 491.302,
+         "fit_ms": 6192.265,
+         "of_which_bm25_ms": 1148.675,
+         "of_which_semantic_ms": 2948.604,
+         "of_which_provider_index_ms": 86.222,
+         "of_which_repo_graph_ms": 784.209,
+         "of_which_function_graph_ms": 1000.268,
+         "of_which_abstainer_ms": 218.34,
+         "persist_ms": 3306.953,
+         "write_artifacts_ms": 1.975,
+         "publish_ms": 2706.517,
+         "gc_ms": 335.253,
+         "maintenance_ms": 4.867,
+         "total_ms": 26391.42
+        },
+        "global_structures": {
+         "semantic": "recomputed_in_full",
+         "repo_graph.maps_and_replay": "recomputed_in_full",
+         "repo_graph.test_links": "recomputed_in_full",
+         "repo_graph.class_to_test": "recomputed_in_full",
+         "repo_graph.degree_matched_control": "recomputed_in_full",
+         "repo_graph.pagerank": "recomputed_in_full",
+         "function_graph.maps_and_replay": "recomputed_in_full",
+         "bm25": "recomputed_in_full",
+         "repo_graph.import_edges": "incremental",
+         "function_graph.call_resolution": "incremental",
+         "abstainer": "incremental"
+        },
+        "fallbacks": {
+         "bm25": "no in-process index to update (first build or warm restart)"
+        },
+        "work_counters": {
+         "bm25": {
+          "terms_df_updated": 234111,
+          "idf_recomputed": 234111,
+          "idf_recomputed_full": true,
+          "doc_lengths_updated": 10000,
+          "avg_doc_len_recomputed": true,
+          "norms_recomputed": 10000,
+          "postings_entries_rewritten": 0,
+          "postings_rebuilt_full": true,
+          "documents_changed": 10000,
+          "order_groups_rebuilt": 0
+         },
+         "semantic": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 50.513,
+          "feature_counting_ms": 1718.171,
+          "vocabulary_selection_ms": 40.778,
+          "idf_ms": 2.662,
+          "matrix_assembly_ms": 831.223,
+          "normalisation_ms": 283.251,
+          "fit_ms": 2948.57,
+          "reason": "recomputed in full by design (V2 Stage 3: exact single-pass reconstruction; document frequencies, vocabulary, IDF and the matrix are not maintained incrementally)"
+         },
+         "provider_index": {
+          "files_derived": 0,
+          "files_reused": 10000
+         },
+         "repo_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "edges_replayed": 9026,
+          "edges_reused": 9026,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 4394
+         },
+         "function_graph": {
+          "files_resolved": 0,
+          "files_reused": 10000,
+          "calls_resolved": 0,
+          "calls_total": 78582,
+          "edges_replayed": 2137,
+          "edges_reused": 2137,
+          "files_own_changed": 0,
+          "provider_keys_changed": 0,
+          "files_affected": 0,
+          "files_affected_by_dependencies": 0,
+          "order_preserved": true,
+          "candidate_keys": 0,
+          "context_mismatches_outside_dependency_index": 0,
+          "dependency_keys_evaluated": 22979
+         },
+         "abstainer": {
+          "documents_added": 0,
+          "documents_removed": 0,
+          "tokens_incremented": 0,
+          "tokens_decremented": 0,
+          "tokens_entered_vocabulary": 0,
+          "tokens_left_vocabulary": 0
+         }
+        },
+        "added": 0,
+        "deleted": 0,
+        "renamed": 0,
+        "modified": 0
+       },
+       "query_latency_ms": [
+        38.421,
+        44.501,
+        37.227,
+        31.712,
+        47.343,
+        41.503,
+        40.492,
+        41.732,
+        39.029,
+        39.203,
+        42.376,
+        39.745,
+        37.051,
+        721.985,
+        45.672,
+        46.095,
+        47.2,
+        65.204,
+        52.064,
+        26.074,
+        35.044,
+        40.899,
+        39.817,
+        42.737,
+        22.462
+       ],
+       "peak_wal_bytes": 17963232,
+       "peak_rss_bytes": 1836933120,
+       "peak_committed_bytes": 2971168768,
+       "available_physical_bytes_at_start": 4480995328,
+       "paging_suspected": false,
+       "semantic_fit_calls": [
+        {
+         "s": 2.949,
+         "documents": 10000,
+         "stats": {
+          "documents": 10000,
+          "feature_cache_hits": 10000,
+          "feature_cache_misses": 0,
+          "documents_reextracted": 0,
+          "document_feature_pairs": 15300236,
+          "distinct_features": 433475,
+          "vocabulary_size": 15000,
+          "matrix_nnz": 13331476,
+          "idf_entries_computed": 15000,
+          "product_rule": "float32",
+          "product_self_check_values": 64,
+          "vocabulary_added": null,
+          "vocabulary_removed": null,
+          "feature_collection_ms": 50.513,
+          "feature_counting_ms": 1718.171,
+          "vocabulary_selection_ms": 40.778,
+          "idf_ms": 2.662,
+          "matrix_assembly_ms": 831.223,
+          "normalisation_ms": 283.251,
+          "fit_ms": 2948.57
+         }
+        }
+       ],
+       "max_heartbeat_gap_s": 0.754,
+       "started_utc": "2026-11-21T12:09:27.569074Z",
+       "ended_utc": "2026-11-21T12:09:58.042564Z",
+       "suspended_suspected": false,
+       "ac_power": [
+        true,
+        true
+       ],
+       "on_battery_suspected": false,
+       "waited_for_ac_s": 30.0
+      },
+      "verification_digests": {
+       "warm": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "uncached": "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      }
+     },
+     "verification": {
+      "digests": [
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced",
+       "55b48fb215d37950d0c7c3598cf34996df2762f9c57aa3190823f50e57c7cced"
+      ],
+      "identical": true
+     }
+    }
+   ],
+   "component_memory": {
+    "baseline": {
+     "documents": 10000,
+     "component_bytes": {
+      "documents_raw_text": 15959378,
+      "documents_metadata": 17390916,
+      "semantic_feature_cache": 1116656238,
+      "semantic_vocabulary_idf_matrix": 928564,
+      "lexical_term_cache": 103354717,
+      "lexical_index_rest": 111299912,
+      "abstainer": 114972428,
+      "function_graph": 80590082,
+      "repo_graph": 17334325,
+      "engine_rest": 313433
+     },
+     "semantic_pairs": 15300236,
+     "semantic_distinct_features": 433475,
+     "semantic_distinct_key_objects": 15300236,
+     "source_bytes": 15464202,
+     "max_heartbeat_gap_s": 2.824,
+     "started_utc": "2026-11-21T07:18:13.581939Z",
+     "ended_utc": "2026-11-21T07:21:08.730170Z",
+     "suspended_suspected": false
+    },
+    "intern": {
+     "documents": 10000,
+     "component_bytes": {
+      "documents_raw_text": 15959378,
+      "documents_metadata": 17390916,
+      "semantic_feature_cache": 442292968,
+      "semantic_vocabulary_idf_matrix": 928564,
+      "lexical_term_cache": 103354717,
+      "lexical_index_rest": 111299868,
+      "abstainer": 114972428,
+      "function_graph": 78843943,
+      "repo_graph": 17334279,
+      "engine_rest": 313341
+     },
+     "semantic_pairs": 15300236,
+     "semantic_distinct_features": 433475,
+     "semantic_distinct_key_objects": 433475,
+     "source_bytes": 15464202,
+     "max_heartbeat_gap_s": 0.735,
+     "started_utc": "2026-11-21T07:21:08.731740Z",
+     "ended_utc": "2026-11-21T07:24:04.328809Z",
+     "suspended_suspected": false
+    },
+    "candidate": {
+     "documents": 10000,
+     "component_bytes": {
+      "documents_raw_text": 15959378,
+      "documents_metadata": 17390916,
+      "semantic_feature_cache": 180712970,
+      "semantic_vocabulary_idf_matrix": 928536,
+      "lexical_term_cache": 103354717,
+      "lexical_index_rest": 111299912,
+      "abstainer": 114972428,
+      "function_graph": 80590082,
+      "repo_graph": 17334325,
+      "engine_rest": 313540
+     },
+     "semantic_pairs": 15300236,
+     "semantic_distinct_features": 433475,
+     "semantic_distinct_key_objects": 433475,
+     "source_bytes": 15464202,
+     "max_heartbeat_gap_s": 0.905,
+     "started_utc": "2026-11-21T07:24:04.335015Z",
+     "ended_utc": "2026-11-21T07:26:32.970411Z",
+     "suspended_suspected": false
+    }
+   },
+   "summary": {
+    "excluded_phases": [],
+    "failed_or_aborted": [],
+    "baseline": {
+     "uncached": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 34.895,
+       "min": 34.738,
+       "max": 63.655,
+       "stdev": 16.6501
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 16.649,
+       "min": 16.563,
+       "max": 28.581,
+       "stdev": 6.9139
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 2.0483,
+       "min": 2.0479,
+       "max": 2.0488,
+       "stdev": 0.0005
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 3.1034,
+       "min": 3.1033,
+       "max": 3.105,
+       "stdev": 0.0009
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 0.0,
+       "min": 0.0,
+       "max": 0.0,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 0
+      },
+      "load_ms": {
+       "n": 0
+      },
+      "fit_ms": {
+       "n": 0
+      },
+      "persist_ms": {
+       "n": 0
+      },
+      "query_latency_median_ms": {
+       "n": 0
+      }
+     },
+     "cold_cached": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 50.886,
+       "min": 50.208,
+       "max": 120.347,
+       "stdev": 40.3005
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 16.88,
+       "min": 16.718,
+       "max": 41.8,
+       "stdev": 14.4346
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 2.0811,
+       "min": 2.0779,
+       "max": 2.083,
+       "stdev": 0.0026
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 3.1432,
+       "min": 3.1393,
+       "max": 3.1439,
+       "stdev": 0.0025
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 17.1154,
+       "min": 17.1154,
+       "max": 17.1154,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 3,
+       "median": 4941.118,
+       "min": 4935.035,
+       "max": 8811.657,
+       "stdev": 2236.4148
+      },
+      "load_ms": {
+       "n": 3,
+       "median": 3.559,
+       "min": 2.851,
+       "max": 11.637,
+       "stdev": 4.8811
+      },
+      "fit_ms": {
+       "n": 3,
+       "median": 31041.113,
+       "min": 30882.613,
+       "max": 75442.409,
+       "stdev": 25680.9775
+      },
+      "persist_ms": {
+       "n": 3,
+       "median": 14889.913,
+       "min": 14376.514,
+       "max": 36062.392,
+       "stdev": 12374.8047
+      },
+      "query_latency_median_ms": {
+       "n": 0
+      }
+     },
+     "warm_restart": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 21.757,
+       "min": 21.587,
+       "max": 23.269,
+       "stdev": 0.9259
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 3.463,
+       "min": 3.353,
+       "max": 3.695,
+       "stdev": 0.1746
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 2.3668,
+       "min": 2.3645,
+       "max": 2.367,
+       "stdev": 0.0014
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 3.4248,
+       "min": 3.4224,
+       "max": 3.4265,
+       "stdev": 0.0021
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 17.1311,
+       "min": 17.1311,
+       "max": 17.1311,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 3,
+       "median": 2957.499,
+       "min": 2926.263,
+       "max": 3265.923,
+       "stdev": 187.7365
+      },
+      "load_ms": {
+       "n": 3,
+       "median": 8715.229,
+       "min": 8714.575,
+       "max": 9348.583,
+       "stdev": 365.856
+      },
+      "fit_ms": {
+       "n": 3,
+       "median": 6685.143,
+       "min": 6489.504,
+       "max": 7084.17,
+       "stdev": 303.0745
+      },
+      "persist_ms": {
+       "n": 3,
+       "median": 2980.284,
+       "min": 2923.369,
+       "max": 3050.574,
+       "stdev": 63.7196
+      },
+      "query_latency_median_ms": {
+       "n": 3,
+       "median": 37.031,
+       "min": 36.905,
+       "max": 37.418,
+       "stdev": 0.2673
+      }
+     }
+    },
+    "intern": {
+     "uncached": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 39.932,
+       "min": 38.376,
+       "max": 85.794,
+       "stdev": 26.9389
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 21.015,
+       "min": 20.255,
+       "max": 50.253,
+       "stdev": 17.1042
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 1.3809,
+       "min": 1.3803,
+       "max": 1.3815,
+       "stdev": 0.0006
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 2.4352,
+       "min": 2.4349,
+       "max": 2.436,
+       "stdev": 0.0005
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 0.0,
+       "min": 0.0,
+       "max": 0.0,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 0
+      },
+      "load_ms": {
+       "n": 0
+      },
+      "fit_ms": {
+       "n": 0
+      },
+      "persist_ms": {
+       "n": 0
+      },
+      "query_latency_median_ms": {
+       "n": 0
+      }
+     },
+     "cold_cached": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 57.017,
+       "min": 55.572,
+       "max": 57.748,
+       "stdev": 1.1074
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 20.904,
+       "min": 20.397,
+       "max": 21.019,
+       "stdev": 0.3309
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 1.4099,
+       "min": 1.4096,
+       "max": 1.4117,
+       "stdev": 0.0011
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 2.4686,
+       "min": 2.4685,
+       "max": 2.4706,
+       "stdev": 0.0012
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 17.1154,
+       "min": 17.1154,
+       "max": 17.1154,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 3,
+       "median": 5251.124,
+       "min": 4899.473,
+       "max": 5491.488,
+       "stdev": 297.7457
+      },
+      "load_ms": {
+       "n": 3,
+       "median": 5.147,
+       "min": 4.133,
+       "max": 8.388,
+       "stdev": 2.2225
+      },
+      "fit_ms": {
+       "n": 3,
+       "median": 35627.14,
+       "min": 34426.214,
+       "max": 35635.791,
+       "stdev": 695.8657
+      },
+      "persist_ms": {
+       "n": 3,
+       "median": 16232.022,
+       "min": 16114.673,
+       "max": 16601.542,
+       "stdev": 254.0857
+      },
+      "query_latency_median_ms": {
+       "n": 0
+      }
+     },
+     "warm_restart": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 26.846,
+       "min": 26.402,
+       "max": 27.361,
+       "stdev": 0.4799
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 3.117,
+       "min": 2.949,
+       "max": 3.15,
+       "stdev": 0.1078
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 1.7126,
+       "min": 1.7108,
+       "max": 1.7133,
+       "stdev": 0.0013
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 2.7685,
+       "min": 2.7671,
+       "max": 2.769,
+       "stdev": 0.001
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 17.1311,
+       "min": 17.1311,
+       "max": 17.1311,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 3,
+       "median": 3256.925,
+       "min": 3100.759,
+       "max": 3303.75,
+       "stdev": 106.2903
+      },
+      "load_ms": {
+       "n": 3,
+       "median": 13437.347,
+       "min": 13300.141,
+       "max": 13779.911,
+       "stdev": 247.1015
+      },
+      "fit_ms": {
+       "n": 3,
+       "median": 6192.265,
+       "min": 5976.696,
+       "max": 6405.143,
+       "stdev": 214.2249
+      },
+      "persist_ms": {
+       "n": 3,
+       "median": 3306.953,
+       "min": 3263.099,
+       "max": 3805.553,
+       "stdev": 301.3253
+      },
+      "query_latency_median_ms": {
+       "n": 3,
+       "median": 40.899,
+       "min": 40.313,
+       "max": 42.294,
+       "stdev": 1.0177
+      }
+     }
+    },
+    "candidate": {
+     "uncached": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 35.509,
+       "min": 34.812,
+       "max": 36.132,
+       "stdev": 0.6603
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 16.916,
+       "min": 16.656,
+       "max": 17.119,
+       "stdev": 0.2321
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 1.0862,
+       "min": 1.0858,
+       "max": 1.0869,
+       "stdev": 0.0006
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 2.1399,
+       "min": 2.1396,
+       "max": 2.1408,
+       "stdev": 0.0006
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 0.0,
+       "min": 0.0,
+       "max": 0.0,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 0
+      },
+      "load_ms": {
+       "n": 0
+      },
+      "fit_ms": {
+       "n": 0
+      },
+      "persist_ms": {
+       "n": 0
+      },
+      "query_latency_median_ms": {
+       "n": 0
+      }
+     },
+     "cold_cached": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 47.452,
+       "min": 47.315,
+       "max": 49.028,
+       "stdev": 0.9519
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 16.803,
+       "min": 16.615,
+       "max": 17.027,
+       "stdev": 0.2063
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 1.1444,
+       "min": 1.1439,
+       "max": 1.1467,
+       "stdev": 0.0015
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 2.2043,
+       "min": 2.2037,
+       "max": 2.206,
+       "stdev": 0.0012
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 17.1154,
+       "min": 17.1154,
+       "max": 17.1154,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 3,
+       "median": 5159.886,
+       "min": 5018.92,
+       "max": 5254.624,
+       "stdev": 118.6051
+      },
+      "load_ms": {
+       "n": 3,
+       "median": 2.581,
+       "min": 2.429,
+       "max": 3.347,
+       "stdev": 0.492
+      },
+      "fit_ms": {
+       "n": 3,
+       "median": 30697.124,
+       "min": 30487.134,
+       "max": 32131.978,
+       "stdev": 895.2107
+      },
+      "persist_ms": {
+       "n": 3,
+       "median": 11714.259,
+       "min": 11486.374,
+       "max": 11795.168,
+       "stdev": 160.1206
+      },
+      "query_latency_median_ms": {
+       "n": 0
+      }
+     },
+     "warm_restart": {
+      "ready_engine_s": {
+       "n": 3,
+       "median": 21.939,
+       "min": 21.924,
+       "max": 22.58,
+       "stdev": 0.3745
+      },
+      "semantic_fit_s": {
+       "n": 3,
+       "median": 1.472,
+       "min": 1.471,
+       "max": 1.534,
+       "stdev": 0.0361
+      },
+      "peak_working_set_gb": {
+       "n": 3,
+       "median": 1.4295,
+       "min": 1.4285,
+       "max": 1.4302,
+       "stdev": 0.0009
+      },
+      "peak_committed_gb": {
+       "n": 3,
+       "median": 2.4855,
+       "min": 2.4841,
+       "max": 2.4858,
+       "stdev": 0.0009
+      },
+      "peak_wal_mb": {
+       "n": 3,
+       "median": 17.1311,
+       "min": 17.1311,
+       "max": 17.1311,
+       "stdev": 0.0
+      },
+      "scan_ms": {
+       "n": 3,
+       "median": 2962.992,
+       "min": 2894.248,
+       "max": 3198.189,
+       "stdev": 159.3861
+      },
+      "load_ms": {
+       "n": 3,
+       "median": 10975.583,
+       "min": 10963.153,
+       "max": 11178.437,
+       "stdev": 120.8659
+      },
+      "fit_ms": {
+       "n": 3,
+       "median": 4651.947,
+       "min": 4108.18,
+       "max": 4759.274,
+       "stdev": 349.0762
+      },
+      "persist_ms": {
+       "n": 3,
+       "median": 2961.625,
+       "min": 2926.229,
+       "max": 3433.685,
+       "stdev": 283.3152
+      },
+      "query_latency_median_ms": {
+       "n": 3,
+       "median": 36.629,
+       "min": 36.051,
+       "max": 37.462,
+       "stdev": 0.7093
+      }
+     }
+    },
+    "per_round_ratio_baseline_over_candidate": {
+     "uncached": {
+      "ready_engine_s": [
+       1.762,
+       0.983,
+       0.998
+      ],
+      "semantic_fit_s": [
+       1.67,
+       0.984,
+       0.994
+      ],
+      "peak_working_set_gb": [
+       1.885,
+       1.886,
+       1.886
+      ],
+      "peak_committed_gb": [
+       1.45,
+       1.45,
+       1.45
+      ]
+     },
+     "cold_cached": {
+      "ready_engine_s": [
+       2.455,
+       1.072,
+       1.061
+      ],
+      "semantic_fit_s": [
+       2.455,
+       1.016,
+       0.995
+      ],
+      "peak_working_set_gb": [
+       1.817,
+       1.819,
+       1.816
+      ],
+      "peak_committed_gb": [
+       1.425,
+       1.426,
+       1.424
+      ]
+     },
+     "warm_restart": {
+      "ready_engine_s": [
+       1.031,
+       0.992,
+       0.984
+      ],
+      "semantic_fit_s": [
+       2.409,
+       2.353,
+       2.279
+      ],
+      "peak_working_set_gb": [
+       1.653,
+       1.657,
+       1.656
+      ],
+      "peak_committed_gb": [
+       1.377,
+       1.379,
+       1.378
+      ]
+     }
+    },
+    "per_round_ratio_intern_over_candidate": {
+     "uncached": {
+      "ready_engine_s": [
+       2.374,
+       1.125,
+       1.102
+      ],
+      "semantic_fit_s": [
+       2.936,
+       1.242,
+       1.216
+      ],
+      "peak_working_set_gb": [
+       1.271,
+       1.272,
+       1.271
+      ],
+      "peak_committed_gb": [
+       1.138,
+       1.138,
+       1.138
+      ]
+     },
+     "cold_cached": {
+      "ready_engine_s": [
+       1.178,
+       1.202,
+       1.175
+      ],
+      "semantic_fit_s": [
+       1.228,
+       1.265,
+       1.214
+      ],
+      "peak_working_set_gb": [
+       1.23,
+       1.232,
+       1.234
+      ],
+      "peak_committed_gb": [
+       1.119,
+       1.12,
+       1.121
+      ]
+     },
+     "warm_restart": {
+      "ready_engine_s": [
+       1.212,
+       1.225,
+       1.203
+      ],
+      "semantic_fit_s": [
+       2.053,
+       2.118,
+       2.005
+      ],
+      "peak_working_set_gb": [
+       1.198,
+       1.199,
+       1.197
+      ],
+      "peak_committed_gb": [
+       1.114,
+       1.115,
+       1.113
+      ]
+     }
+    },
+    "verification": [
+     true,
+     true,
+     true
+    ]
+   },
+   "conditions": {
+    "started_utc": "2026-11-21T07:17:52.510001Z",
+    "ended_utc": "2026-11-21T12:12:29.106321Z",
+    "keep_awake_requested": true,
+    "sleep_or_standby_events_during_workload": [
+     "2026-11-21T13:04:32.5820000Z",
+     "2026-11-21T16:45:19.2170000Z"
+    ]
+   }
+  }
+ },
+ "environment": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10",
+  "sqlite": "3.49.1",
+  "cpu": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+  "logical_cpus": 18,
+  "argv": [
+   "--baseline-root",
+   "stage3_merged_tree",
+   "--extra-root",
+   "tree_643fa22",
+   "--files",
+   "10000",
+   "--profile",
+   "reduced",
+   "--rounds",
+   "3",
+   "--verify",
+   "--component-memory",
+   "--require-ac",
+   "--out",
+   "stage4_1_benchmark.json"
+  ],
+  "numpy": "2.5.2",
+  "scipy": "1.18.1",
+  "networkx": "3.6.1",
+  "pydantic": "2.13.5",
+  "pathspec": "1.1.1",
+  "ram_total_bytes": 16660357120,
+  "ram_available_bytes_at_start": 4896821248
+ },
+ "revisions": {
+  "baseline": {
+   "commit": "60fbfc072dcb35209aaea113ecd4162a9092a432",
+   "tree_clean": true,
+   "package_version": "1.2.0"
+  },
+  "intern": {
+   "commit": "643fa228a9ca01cf0088aa078f20856d77a4790e",
+   "tree_clean": true,
+   "package_version": "1.2.0"
+  },
+  "candidate": {
+   "commit": "41991e870c32009a5625c534d2100ff534097b79",
+   "tree_clean": true,
+   "package_version": "1.2.0"
+  }
+ },
+ "json_name": "stage4_1_benchmark.json",
+ "stage4_1_note": "Authoritative Stage 4.1 run. --require-ac waited for 30 s of mains power before every phase; the machine slept (low battery) from about 13:04 to 16:45 local time while waiting before round 1's first phase, outside every measured phase (see waited_for_ac_s and max_heartbeat_gap_s). Component memory was measured before that wait, on battery power (deep object sizes, independent of CPU speed)."
+}
