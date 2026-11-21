@@ -18,8 +18,9 @@ restart and the uncached build of BOTH revisions produce one digest of the compl
 (PYTHONHASHSEED=0). Every result records both revisions' commit SHAs and whether their trees were clean.
 
 A phase whose committed memory exceeded the memory available when it started is ``paging_suspected``; one whose
-heartbeat gap exceeded 5 s is ``suspended_suspected``. Both stay in the raw data and are excluded from the summary
-statistics, which list them. Nothing is extrapolated.
+heartbeat gap exceeded 5 s is ``suspended_suspected``; one that started or ended on battery power (Windows
+``GetSystemPowerStatus``; a laptop on battery is CPU-throttled) is ``on_battery_suspected``. All stay in the raw data
+and are excluded from the summary statistics, which list them. Nothing is extrapolated.
 """
 
 import argparse
@@ -103,6 +104,11 @@ def deep(obj):
             stack.extend(o)
         elif hasattr(o, "__dict__"):
             stack.append(vars(o))
+        for klass in type(o).__mro__:
+            slots = klass.__dict__.get("__slots__", ())
+            for name in (slots,) if isinstance(slots, str) else slots:
+                if name not in ("__dict__", "__weakref__") and hasattr(o, name):
+                    stack.append(getattr(o, name))
     return total
 gc.collect()
 sem, lex = engine.semantic_index, engine.lexical_index
@@ -220,8 +226,29 @@ def dataset_manifest(root: Path, n_files: int, profile: str, generation: dict) -
 PHASES = ("uncached", "cold_cached", "warm_restart")
 
 
+def ac_power():
+    """True on mains power, False on battery, None when unknown (non-Windows or no answer)."""
+    if sys.platform != "win32":
+        return None
+    import ctypes
+
+    class _Status(ctypes.Structure):
+        _fields_ = [("ACLineStatus", ctypes.c_ubyte), ("BatteryFlag", ctypes.c_ubyte),
+                    ("BatteryLifePercent", ctypes.c_ubyte), ("SystemStatusFlag", ctypes.c_ubyte),
+                    ("BatteryLifeTime", ctypes.c_ulong), ("BatteryFullLifeTime", ctypes.c_ulong)]
+    st = _Status()
+    if not ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(st)) or st.ACLineStatus not in (0, 1):
+        return None
+    return st.ACLineStatus == 1
+
+
 def run_phase(code_root: Path, repo: Path, cache_dir: Path, mode: str, limit: int, timeout, env=None) -> dict:
-    return s3.run_child(CHILD, code_root, [repo, cache_dir, mode, limit], timeout, env)
+    before = ac_power()
+    out = s3.run_child(CHILD, code_root, [repo, cache_dir, mode, limit], timeout, env)
+    after = ac_power()
+    out["ac_power"] = [before, after]
+    out["on_battery_suspected"] = before is False or after is False
+    return out
 
 
 def variants_of(keys) -> list:
@@ -272,7 +299,7 @@ def one_round(pristine: Path, work: Path, roots: dict, limit: int, timeout, firs
 
 def _clean(x) -> bool:
     return isinstance(x, dict) and "seconds_to_ready_engine" in x and not x.get("paging_suspected") \
-        and not x.get("suspended_suspected")
+        and not x.get("suspended_suspected") and not x.get("on_battery_suspected")
 
 
 def stats(values) -> dict:
@@ -305,10 +332,12 @@ def summarise(rounds) -> dict:
     out = {"excluded_phases": [{"round": i + 1, "variant": v, "phase": p,
                                 "paging_suspected": bool(x.get("paging_suspected")),
                                 "suspended_suspected": bool(x.get("suspended_suspected")),
+                                "on_battery_suspected": bool(x.get("on_battery_suspected")),
                                 "seconds_to_ready_engine": x.get("seconds_to_ready_engine")}
                                for i, r in enumerate(rounds) for v in names
                                for p, x in r.get(v, {}).items()
-                               if isinstance(x, dict) and (x.get("paging_suspected") or x.get("suspended_suspected"))],
+                               if isinstance(x, dict) and (x.get("paging_suspected") or x.get("suspended_suspected")
+                                                           or x.get("on_battery_suspected"))],
            "failed_or_aborted": [{"round": i + 1, "variant": v, "phase": p, "detail": x.get("aborted") or x.get("failed")}
                                  for i, r in enumerate(rounds) for v in names
                                  for p, x in r.get(v, {}).items() if isinstance(x, dict) and ("aborted" in x or "failed" in x)]}

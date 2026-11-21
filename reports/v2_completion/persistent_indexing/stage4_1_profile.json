@@ -1,0 +1,504 @@
+{
+ "description": "Stage 4.1 Phase A: per-step cost of semantic per-document representations at 10,000 reduced files, one variant per fresh process (stage4_1_profile.py). Round 1 ran every variant (plain, intern, pool, ids, ids_bin, in that order); round 2 was stopped after its first variant (ids_bin) so that test runs would not overlap it. Memory probes are Windows process counters.",
+ "code_revision": {
+  "commit": "643fa228a9ca01cf0088aa078f20856d77a4790e",
+  "tree_clean": true,
+  "package_version": "1.2.0"
+ },
+ "dataset": {
+  "dataset_id": "stage1-generator/reduced/10000/seed-7",
+  "generator_version": "stage1_benchmark.generate/seed-7 + stage4-manifest/1",
+  "seed": 7,
+  "profile": "reduced",
+  "requested_files": 10000,
+  "file_count": 10000,
+  "manifest_sha256": "4d7140fe8cdafc4785fa7d2f0733e7b6c1a87e22a4811e15d9cfe72d3577c1d6",
+  "generated_utc": "2026-11-21T05:14:39.714614Z",
+  "generation_seconds": null,
+  "language_distribution": {
+   ".go": 663,
+   ".java": 466,
+   ".json": 776,
+   ".md": 1578,
+   ".py": 4478,
+   ".rs": 513,
+   ".ts": 1526
+  },
+  "size_bytes": {
+   "total": 15464202,
+   "mean": 1546,
+   "min": 153,
+   "p10": 443,
+   "p50": 1140,
+   "p90": 2984,
+   "p99": 7340,
+   "max": 23922
+  },
+  "directories": {
+   "count": 4000,
+   "max_depth": 2,
+   "files_per_directory_median": 3,
+   "files_per_directory_max": 3
+  },
+  "test_files": 0,
+  "import_lines": 16144,
+  "generator_config": {
+   "languages_weighted": [
+    [
+     "py",
+     45
+    ],
+    [
+     "ts",
+     15
+    ],
+    [
+     "md",
+     15
+    ],
+    [
+     "json",
+     8
+    ],
+    [
+     "go",
+     7
+    ],
+    [
+     "rs",
+     5
+    ],
+    [
+     "java",
+     5
+    ]
+   ],
+   "realistic_median_bytes": 6442,
+   "size_scale": 0.16666666666666666,
+   "lognormal_sigma": 0.79,
+   "max_file_bytes": 33333,
+   "packages": "pkg{i % 200}/sub{(i // 200) % 20}",
+   "identifier_pool": "Zipf s=1.1, 60,000 words"
+  }
+ },
+ "environment": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10",
+  "sqlite": "3.49.1",
+  "cpu": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+  "logical_cpus": 18,
+  "numpy": "2.5.2",
+  "scipy": "1.18.1",
+  "networkx": "3.6.1",
+  "pydantic": "2.13.5",
+  "pathspec": "1.1.1",
+  "ram_total_bytes": 16660357120,
+  "ram_available_bytes_at_start": 4404629504
+ },
+ "pythonhashseed": "0",
+ "runs": [
+  {
+   "variant": "ids_bin",
+   "mem_docs_loaded": {
+    "private_mb": 642.6,
+    "ws_mb": 110.7,
+    "peak_ws_mb": 110.7
+   },
+   "pairs": 15300236,
+   "intern_or_pool_calls_on_extraction": 15300236,
+   "mem_after_extraction": {
+    "private_mb": 1526.7,
+    "ws_mb": 986.4,
+    "peak_ws_mb": 1385.5
+   },
+   "retained_repr_mb_extraction": 159.1,
+   "fit_stats": {
+    "distinct_features": 433475,
+    "document_feature_pairs": 15300236,
+    "feature_collection_ms": null,
+    "feature_counting_ms": null,
+    "vocabulary_selection_ms": null,
+    "matrix_assembly_ms": null,
+    "normalisation_ms": null
+   },
+   "digest_fit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "payload_mb": 47.7,
+   "bin_payload_mb": 43.0,
+   "mem_before_decode": {
+    "private_mb": 2109.9,
+    "ws_mb": 978.6,
+    "peak_ws_mb": 2070.0
+   },
+   "intern_or_pool_calls_on_decode": 0,
+   "mem_after_decode": {
+    "private_mb": 1912.4,
+    "ws_mb": 823.1,
+    "peak_ws_mb": 2070.0
+   },
+   "retained_repr_mb_decode": 42.4,
+   "digest_refit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "refit_stats": {
+    "feature_collection_ms": null,
+    "feature_counting_ms": null
+   },
+   "semantic_score_ms": {
+    "n": 125,
+    "median": 23.006,
+    "p90": 27.678,
+    "max": 58.494
+   },
+   "gc_tracked_objects": 116782,
+   "mem_end": {
+    "private_mb": 2078.0,
+    "ws_mb": 988.2,
+    "peak_ws_mb": 2070.0
+   },
+   "timings_s": {
+    "extract_s": 17.979,
+    "convert_s": 3.206,
+    "fit_s": 1.876,
+    "encode_s": 6.915,
+    "encode_bin_s": 2.382,
+    "decode_convert_s": 1.242,
+    "refit_after_decode_s": 1.649,
+    "gc_collect_s": 0.053
+   },
+   "round": 1
+  },
+  {
+   "variant": "ids_bin",
+   "mem_docs_loaded": {
+    "private_mb": 642.7,
+    "ws_mb": 110.6,
+    "peak_ws_mb": 110.6
+   },
+   "pairs": 15300236,
+   "intern_or_pool_calls_on_extraction": 15300236,
+   "mem_after_extraction": {
+    "private_mb": 1525.8,
+    "ws_mb": 987.6,
+    "peak_ws_mb": 1383.2
+   },
+   "retained_repr_mb_extraction": 159.1,
+   "fit_stats": {
+    "distinct_features": 433475,
+    "document_feature_pairs": 15300236,
+    "feature_collection_ms": null,
+    "feature_counting_ms": null,
+    "vocabulary_selection_ms": null,
+    "matrix_assembly_ms": null,
+    "normalisation_ms": null
+   },
+   "digest_fit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "payload_mb": 47.7,
+   "bin_payload_mb": 43.0,
+   "mem_before_decode": {
+    "private_mb": 2095.3,
+    "ws_mb": 977.2,
+    "peak_ws_mb": 2070.3
+   },
+   "intern_or_pool_calls_on_decode": 0,
+   "mem_after_decode": {
+    "private_mb": 1909.3,
+    "ws_mb": 824.1,
+    "peak_ws_mb": 2070.3
+   },
+   "retained_repr_mb_decode": 42.4,
+   "digest_refit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "refit_stats": {
+    "feature_collection_ms": null,
+    "feature_counting_ms": null
+   },
+   "semantic_score_ms": {
+    "n": 125,
+    "median": 22.683,
+    "p90": 28.887,
+    "max": 37.714
+   },
+   "gc_tracked_objects": 116782,
+   "mem_end": {
+    "private_mb": 2077.2,
+    "ws_mb": 990.3,
+    "peak_ws_mb": 2070.3
+   },
+   "timings_s": {
+    "extract_s": 18.186,
+    "convert_s": 2.787,
+    "fit_s": 1.917,
+    "encode_s": 6.974,
+    "encode_bin_s": 2.564,
+    "decode_convert_s": 1.128,
+    "refit_after_decode_s": 1.732,
+    "gc_collect_s": 0.047
+   },
+   "round": 2
+  },
+  {
+   "variant": "ids",
+   "mem_docs_loaded": {
+    "private_mb": 642.8,
+    "ws_mb": 110.8,
+    "peak_ws_mb": 110.8
+   },
+   "pairs": 15300236,
+   "intern_or_pool_calls_on_extraction": 15300236,
+   "mem_after_extraction": {
+    "private_mb": 1526.9,
+    "ws_mb": 987.9,
+    "peak_ws_mb": 1384.4
+   },
+   "retained_repr_mb_extraction": 159.1,
+   "fit_stats": {
+    "distinct_features": 433475,
+    "document_feature_pairs": 15300236,
+    "feature_collection_ms": null,
+    "feature_counting_ms": null,
+    "vocabulary_selection_ms": null,
+    "matrix_assembly_ms": null,
+    "normalisation_ms": null
+   },
+   "digest_fit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "payload_mb": 47.7,
+   "mem_before_decode": {
+    "private_mb": 2010.5,
+    "ws_mb": 929.0,
+    "peak_ws_mb": 2070.3
+   },
+   "intern_or_pool_calls_on_decode": 15300236,
+   "mem_after_decode": {
+    "private_mb": 2091.5,
+    "ws_mb": 1003.0,
+    "peak_ws_mb": 2070.3
+   },
+   "retained_repr_mb_decode": 159.1,
+   "digest_refit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "refit_stats": {
+    "feature_collection_ms": null,
+    "feature_counting_ms": null
+   },
+   "semantic_score_ms": {
+    "n": 125,
+    "median": 22.732,
+    "p90": 27.711,
+    "max": 44.344
+   },
+   "gc_tracked_objects": 116781,
+   "mem_end": {
+    "private_mb": 2256.9,
+    "ws_mb": 1168.4,
+    "peak_ws_mb": 2077.3
+   },
+   "timings_s": {
+    "extract_s": 18.955,
+    "convert_s": 2.737,
+    "fit_s": 2.024,
+    "encode_s": 6.787,
+    "decode_convert_s": 8.407,
+    "refit_after_decode_s": 1.745,
+    "gc_collect_s": 0.053
+   },
+   "round": 1
+  },
+  {
+   "variant": "intern",
+   "mem_docs_loaded": {
+    "private_mb": 642.4,
+    "ws_mb": 110.6,
+    "peak_ws_mb": 110.6
+   },
+   "pairs": 15300236,
+   "intern_or_pool_calls_on_extraction": 15300236,
+   "mem_after_extraction": {
+    "private_mb": 1774.7,
+    "ws_mb": 1239.1,
+    "peak_ws_mb": 1673.6
+   },
+   "retained_repr_mb_extraction": 422.5,
+   "fit_stats": {
+    "distinct_features": 433475,
+    "document_feature_pairs": 15300236,
+    "feature_collection_ms": 63.739,
+    "feature_counting_ms": 2620.362,
+    "vocabulary_selection_ms": 74.882,
+    "matrix_assembly_ms": 1294.353,
+    "normalisation_ms": 324.459
+   },
+   "digest_fit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "payload_mb": 47.7,
+   "mem_before_decode": {
+    "private_mb": 1296.0,
+    "ws_mb": 218.7,
+    "peak_ws_mb": 1835.2
+   },
+   "intern_or_pool_calls_on_decode": 15300236,
+   "mem_after_decode": {
+    "private_mb": 1656.3,
+    "ws_mb": 574.5,
+    "peak_ws_mb": 1835.2
+   },
+   "retained_repr_mb_decode": 422.5,
+   "digest_refit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "refit_stats": {
+    "feature_collection_ms": 69.352,
+    "feature_counting_ms": 2526.357
+   },
+   "semantic_score_ms": {
+    "n": 125,
+    "median": 21.993,
+    "p90": 26.761,
+    "max": 33.506
+   },
+   "gc_tracked_objects": 126782,
+   "mem_end": {
+    "private_mb": 1826.4,
+    "ws_mb": 744.9,
+    "peak_ws_mb": 1835.2
+   },
+   "timings_s": {
+    "extract_s": 17.648,
+    "convert_s": 4.895,
+    "fit_s": 4.403,
+    "encode_s": 4.29,
+    "decode_convert_s": 10.738,
+    "decode_only_2000_s": 1.24,
+    "refit_after_decode_s": 4.004,
+    "gc_collect_s": 0.038
+   },
+   "round": 1
+  },
+  {
+   "variant": "plain",
+   "mem_docs_loaded": {
+    "private_mb": 642.4,
+    "ws_mb": 110.6,
+    "peak_ws_mb": 110.6
+   },
+   "pairs": 15300236,
+   "intern_or_pool_calls_on_extraction": 0,
+   "mem_after_extraction": {
+    "private_mb": 1788.4,
+    "ws_mb": 1254.0,
+    "peak_ws_mb": 1254.0
+   },
+   "retained_repr_mb_extraction": 1063.2,
+   "fit_stats": {
+    "distinct_features": 433475,
+    "document_feature_pairs": 15300236,
+    "feature_collection_ms": 65.045,
+    "feature_counting_ms": 4099.556,
+    "vocabulary_selection_ms": 67.701,
+    "matrix_assembly_ms": 1196.042,
+    "normalisation_ms": 415.792
+   },
+   "digest_fit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "payload_mb": 47.7,
+   "mem_before_decode": {
+    "private_mb": 1266.7,
+    "ws_mb": 188.0,
+    "peak_ws_mb": 2331.0
+   },
+   "intern_or_pool_calls_on_decode": 0,
+   "mem_after_decode": {
+    "private_mb": 2317.5,
+    "ws_mb": 1238.1,
+    "peak_ws_mb": 2331.0
+   },
+   "retained_repr_mb_decode": 1062.9,
+   "digest_refit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "refit_stats": {
+    "feature_collection_ms": 74.76,
+    "feature_counting_ms": 3521.981
+   },
+   "semantic_score_ms": {
+    "n": 125,
+    "median": 22.097,
+    "p90": 27.535,
+    "max": 49.163
+   },
+   "gc_tracked_objects": 126781,
+   "mem_end": {
+    "private_mb": 2492.7,
+    "ws_mb": 1410.3,
+    "peak_ws_mb": 2331.0
+   },
+   "timings_s": {
+    "extract_s": 19.342,
+    "convert_s": 0.001,
+    "fit_s": 5.871,
+    "encode_s": 4.826,
+    "decode_convert_s": 5.615,
+    "decode_only_2000_s": 1.222,
+    "refit_after_decode_s": 5.198,
+    "gc_collect_s": 0.041
+   },
+   "round": 1
+  },
+  {
+   "variant": "pool",
+   "mem_docs_loaded": {
+    "private_mb": 642.6,
+    "ws_mb": 110.6,
+    "peak_ws_mb": 110.6
+   },
+   "pairs": 15300236,
+   "intern_or_pool_calls_on_extraction": 15300236,
+   "mem_after_extraction": {
+    "private_mb": 1777.6,
+    "ws_mb": 1242.5,
+    "peak_ws_mb": 1677.3
+   },
+   "retained_repr_mb_extraction": 437.2,
+   "fit_stats": {
+    "distinct_features": 433475,
+    "document_feature_pairs": 15300236,
+    "feature_collection_ms": 66.783,
+    "feature_counting_ms": 2762.069,
+    "vocabulary_selection_ms": 70.177,
+    "matrix_assembly_ms": 1178.856,
+    "normalisation_ms": 453.97
+   },
+   "digest_fit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "payload_mb": 47.7,
+   "mem_before_decode": {
+    "private_mb": 1980.3,
+    "ws_mb": 900.6,
+    "peak_ws_mb": 1839.4
+   },
+   "intern_or_pool_calls_on_decode": 15300236,
+   "mem_after_decode": {
+    "private_mb": 2339.4,
+    "ws_mb": 1256.5,
+    "peak_ws_mb": 1839.4
+   },
+   "retained_repr_mb_decode": 437.2,
+   "digest_refit": "e0f805216bd89bf1d841062a66b773d4337ef92056051ca589875368277f8d98",
+   "refit_stats": {
+    "feature_collection_ms": 79.624,
+    "feature_counting_ms": 3054.41
+   },
+   "semantic_score_ms": {
+    "n": 125,
+    "median": 22.822,
+    "p90": 30.261,
+    "max": 40.96
+   },
+   "gc_tracked_objects": 126781,
+   "mem_end": {
+    "private_mb": 2506.0,
+    "ws_mb": 1424.4,
+    "peak_ws_mb": 1852.8
+   },
+   "timings_s": {
+    "extract_s": 17.45,
+    "convert_s": 3.862,
+    "fit_s": 4.559,
+    "encode_s": 4.478,
+    "decode_convert_s": 10.49,
+    "decode_only_2000_s": 1.315,
+    "refit_after_decode_s": 4.718,
+    "gc_collect_s": 0.042
+   },
+   "round": 1
+  }
+ ]
+}
