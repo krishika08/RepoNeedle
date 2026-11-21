@@ -103,6 +103,7 @@ class FeatureCounts(Mapping):
         return list(zip(self, self.counts.tolist()))
 
     def __getitem__(self, feature: str) -> int:
+        """A linear search (fit and persistence never look features up; they iterate)."""
         i = self.pool.get(feature) if isinstance(feature, str) else None
         pos = np.flatnonzero(self.ids == i) if i is not None else ()
         if len(pos) == 0:
@@ -113,12 +114,7 @@ class FeatureCounts(Mapping):
         i = self.pool.get(feature) if isinstance(feature, str) else None
         return i is not None and bool((self.ids == i).any())
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Mapping):
-            return NotImplemented
-        return self.items() == list(other.items())
-
-    __hash__ = None  # type: ignore[assignment]
+    __hash__ = None  # type: ignore[assignment]   (Mapping.__eq__ compares like a dict: order-insensitive)
 
     def __repr__(self) -> str:
         return f"FeatureCounts({dict(self.items())!r})"

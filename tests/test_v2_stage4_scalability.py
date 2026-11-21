@@ -74,7 +74,9 @@ def test_feature_counts_behave_exactly_like_the_dict():
         with pytest.raises(KeyError):
             fc[missing]
     assert fc.get("zzz", 7) == 7 and dict(fc) == counts
-    assert fc != {"abc": 2, "<ab": 1} and fc != {"<ab": 1, "abc": 2, "xyz": 5}, "order is part of equality"
+    assert fc != {"abc": 2, "<ab": 1} and fc != {"abc": 2, "<ab": 1, "xyz": 6}
+    assert fc == {"<ab": 1, "abc": 2, "xyz": 5}, "equality is the dict's (order-insensitive); order is checked by items()"
+    assert fc.items() != [("<ab", 1), ("abc", 2), ("xyz", 5)]
     assert list(counts) == ["abc", "<ab", "xyz"], "the source dict is not modified"
     empty = FeatureCounts.from_counts(FeaturePool(), {})
     assert empty == {} and len(empty) == 0 and list(empty) == [] and empty.values() == []
@@ -345,6 +347,23 @@ def test_three_revisions_rotate_and_are_summarised_per_revision():
     assert out["per_round_ratio_baseline_over_candidate"]["uncached"]["ready_engine_s"] == [3.0]
 
 
+def test_phases_on_battery_are_recorded_and_excluded(monkeypatch):
+    states = iter([True, False])
+    monkeypatch.setattr(s4, "ac_power", lambda: next(states))
+    monkeypatch.setattr(s4.s3, "run_child", lambda *a, **k: {"seconds_to_ready_engine": 1.0})
+    r = s4.run_phase(Path("."), Path("."), Path("."), "cached", 1, None)
+    assert r["ac_power"] == [True, False] and r["on_battery_suspected"] is True
+    assert not s4._clean(r) and s4._clean({"seconds_to_ready_engine": 1.0, "ac_power": [None, None]})
+    rnd = {v: {p: dict(r, semantic_fit_calls=[], peak_rss_bytes=1, peak_committed_bytes=1, peak_wal_bytes=0)
+               for p in s4.PHASES} for v in ("baseline", "candidate")}
+    out = s4.summarise([rnd])
+    assert len(out["excluded_phases"]) == 6 and all(e["on_battery_suspected"] for e in out["excluded_phases"])
+
+
+def test_component_memory_follows_slotted_objects():
+    assert "__slots__" in s4.MEMORY_CHILD and "klass.__dict__.get" in s4.MEMORY_CHILD
+
+
 def test_environment_probe_tolerates_missing_sysconf_names(monkeypatch):
     """macOS has no SC_AVPHYS_PAGES: the probe and the child record unknown memory instead of failing."""
     import os
@@ -389,5 +408,7 @@ def test_end_to_end_tiny_run_writes_the_documented_schema(tmp_path):
         assert len(rnd[v]["warm_restart"]["query_latency_ms"]) == s4.QUERY_SAMPLE
         mem = run["component_memory"][v]
         assert mem["semantic_distinct_key_objects"] == mem["semantic_distinct_features"] < mem["semantic_pairs"]
-    assert run["summary"]["candidate"]["warm_restart"]["ready_engine_s"]["n"] == 1
+    on_battery = rnd["candidate"]["warm_restart"]["on_battery_suspected"]
+    assert isinstance(on_battery, bool) and len(rnd["candidate"]["warm_restart"]["ac_power"]) == 2
+    assert run["summary"]["candidate"]["warm_restart"]["ready_engine_s"]["n"] == (0 if on_battery else 1)
     assert "conditions" in run and out.with_suffix(".md").exists()
