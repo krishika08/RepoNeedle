@@ -21,6 +21,7 @@ from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from reponeedle.core.index_cache import codecs
 from reponeedle.core.index_cache.errors import CacheUnusable, PersistenceUnavailable
+from reponeedle.core.semantic import FeatureCounts, FeaturePool
 from reponeedle.core.index_cache.lease import CacheLease
 from reponeedle.core.index_cache.schema import (APPLICATION_ID, KINDS, MIGRATABLE_VERSIONS, SCHEMA_VERSION, TABLES,
                                                 artifact_checksum, artifact_key, doc_meta_digest, global_checksum,
@@ -181,6 +182,7 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
     if len(joined) != len(fa_rows):
         raise CacheUnusable("a referenced artifact is missing")
     artifacts: Dict[bytes, LoadedArtifact] = {}
+    semantic_pool = FeaturePool()
     for fa_path, fa_kind, key, kind, fp, a_path, input_sig, codec, payload, checksum in joined:
         entry = manifest.get(fa_path)
         if entry is None or fa_kind not in KINDS or kind != fa_kind or a_path != fa_path:
@@ -195,6 +197,11 @@ def _load(conn, repo_root, repo_id, current_fps, verify) -> LoadedGeneration:
                 data = codecs.decode(kind, codec, payload)
             except codecs.CodecError as exc:
                 raise CacheUnusable(f"artifact payload does not decode: {exc}") from exc
+            if kind == "semantic":
+                # V2 Stage 4.1: one string per distinct feature across all decoded documents (a pool for this
+                # load), from the moment each artifact is decoded: the generation is loaded at once, so this bounds
+                # the load-time peak. The decoded strings are released here; the semantic index adopts the pool.
+                data = FeatureCounts.from_counts(semantic_pool, data)
         if kind == "doc_meta" and data is not None:
             if (doc_meta_digest(data) != entry.doc_meta_sha256 or data["language"] != entry.language
                     or data["is_test"] != entry.is_test or data["line_count"] != entry.line_count

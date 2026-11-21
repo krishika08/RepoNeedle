@@ -1,0 +1,213 @@
+{
+ "revisions": {
+  "stage3": {
+   "commit": "60fbfc072dcb35209aaea113ecd4162a9092a432",
+   "tree_clean": true,
+   "package_version": "1.2.0"
+  },
+  "intern": {
+   "commit": "643fa228a9ca01cf0088aa078f20856d77a4790e",
+   "tree_clean": true,
+   "package_version": "1.2.0"
+  },
+  "candidate": {
+   "commit": "e4969e94d3b147d077df01311d91ecc9bc230008",
+   "tree_clean": true,
+   "package_version": "1.2.0"
+  }
+ },
+ "dataset": {
+  "dataset_id": "stage1-generator/reduced/1000/seed-7",
+  "generator_version": "stage1_benchmark.generate/seed-7 + stage4-manifest/1",
+  "seed": 7,
+  "profile": "reduced",
+  "requested_files": 1000,
+  "file_count": 1000,
+  "manifest_sha256": "ff790f497c52596fab20e540e25f250ae7ffcb0927e3b272d058a409215209ea",
+  "generated_utc": "2026-11-21T06:16:31.185179Z",
+  "generation_seconds": null,
+  "language_distribution": {
+   ".go": 66,
+   ".java": 48,
+   ".json": 84,
+   ".md": 172,
+   ".py": 446,
+   ".rs": 48,
+   ".ts": 136
+  },
+  "size_bytes": {
+   "total": 1558704,
+   "mean": 1558,
+   "min": 180,
+   "p10": 434,
+   "p50": 1112,
+   "p90": 2931,
+   "p99": 8297,
+   "max": 14758
+  },
+  "directories": {
+   "count": 1000,
+   "max_depth": 2,
+   "files_per_directory_median": 1,
+   "files_per_directory_max": 1
+  },
+  "test_files": 0,
+  "import_lines": 1578,
+  "generator_config": {
+   "languages_weighted": [
+    [
+     "py",
+     45
+    ],
+    [
+     "ts",
+     15
+    ],
+    [
+     "md",
+     15
+    ],
+    [
+     "json",
+     8
+    ],
+    [
+     "go",
+     7
+    ],
+    [
+     "rs",
+     5
+    ],
+    [
+     "java",
+     5
+    ]
+   ],
+   "realistic_median_bytes": 6442,
+   "size_scale": 0.16666666666666666,
+   "lognormal_sigma": 0.79,
+   "max_file_bytes": 33333,
+   "packages": "pkg{i % 200}/sub{(i // 200) % 20}",
+   "identifier_pool": "Zipf s=1.1, 60,000 words"
+  }
+ },
+ "uncached": {
+  "stage3": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+  "intern": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+  "candidate": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c"
+ },
+ "cells": {
+  "stage3->stage3": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "stage3->intern": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "stage3->candidate": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "intern->stage3": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "intern->intern": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "intern->candidate": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "candidate->stage3": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "candidate->intern": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  },
+  "candidate->candidate": {
+   "writer_state": "published",
+   "state": "published",
+   "files": 1000,
+   "files_reused": 1000,
+   "files_extracted": 0,
+   "artifacts_written": 0,
+   "semantic_feature_cache_hits": 1000,
+   "semantic_documents_reextracted": 0,
+   "digest": "c2143eb71456a81f9b86e7d957c07932a0ec30b5b18bc73e0e071e283c19d27c",
+   "error": null
+  }
+ },
+ "all_digests_identical": true,
+ "full_reuse_everywhere": true,
+ "description": "Stage 4.1 cache compatibility at 1,000 reduced files: a cache written (cold build) by each revision is read (warm restart, PYTHONHASHSEED=0) by each revision, on a copy; plus every revision's uncached digest. Run on battery power: timings were not recorded and none are claimed."
+}
