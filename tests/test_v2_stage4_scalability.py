@@ -360,6 +360,44 @@ def test_phases_on_battery_are_recorded_and_excluded(monkeypatch):
     assert len(out["excluded_phases"]) == 6 and all(e["on_battery_suspected"] for e in out["excluded_phases"])
 
 
+def test_the_child_memory_probe_is_safe_across_threads():
+    """The Stage 2 probe redefines its ctypes types per call; main and watchdog threads must not interleave it."""
+    import threading
+
+    src = s4.CHILD
+    start = src.index("import threading as _mem_threading")
+    end = src.index("available_at_start = memory()")
+    ns = {"sys": sys, "os": __import__("os")}
+    exec(src[start:end], ns)
+    errors = []
+
+    def hammer():
+        try:
+            for _ in range(300):
+                peak, committed, avail = ns["memory"]()
+                assert peak >= 0 and committed >= 0 and avail >= 0
+        except Exception as exc:  # noqa: BLE001
+            errors.append(repr(exc))
+
+    threads = [threading.Thread(target=hammer) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert not errors, errors[:3]
+
+
+def test_require_ac_waits_for_stable_mains_power(monkeypatch):
+    states = iter([False, False, True, True, True])   # waits through two battery readings, then mains
+    monkeypatch.setattr(s4, "ac_power", lambda: next(states, True))
+    monkeypatch.setattr(s4, "REQUIRE_AC", {"enabled": True, "stable_s": 0.0, "poll_s": 0.0})
+    monkeypatch.setattr(s4.s3, "run_child", lambda *a, **k: {"seconds_to_ready_engine": 1.0})
+    r = s4.run_phase(Path("."), Path("."), Path("."), "cached", 1, None)
+    assert r["ac_power"] == [True, True] and r["on_battery_suspected"] is False and r["waited_for_ac_s"] >= 0
+    monkeypatch.setattr(s4, "REQUIRE_AC", {"enabled": False, "stable_s": 30.0, "poll_s": 5.0})
+    assert "waited_for_ac_s" not in s4.run_phase(Path("."), Path("."), Path("."), "cached", 1, None)
+
+
 def test_component_memory_follows_slotted_objects():
     assert "__slots__" in s4.MEMORY_CHILD and "klass.__dict__.get" in s4.MEMORY_CHILD
 

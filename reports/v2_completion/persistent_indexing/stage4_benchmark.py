@@ -69,6 +69,14 @@ _AVAIL = 'avail = os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE") if 
 assert _AVAIL in CHILD, "the Stage 2 child changed: available-memory probe not found"
 CHILD = CHILD.replace(_AVAIL, 'try:\n        ' + _AVAIL.split(" if ")[0] +
                       '\n    except (AttributeError, ValueError, OSError):\n        avail = 0', 1)
+# The Stage 2 child's memory() redefines its ctypes structures and sets GetProcessMemoryInfo.argtypes on every call,
+# from the main thread and from its watchdog thread: concurrent calls can pass one call's structure to the other's
+# argtypes (ctypes.ArgumentError, which failed a phase). Calls are serialised here; the measurement is unchanged.
+_MEMORY_DEF = "def memory():\n"
+assert CHILD.count(_MEMORY_DEF) == 1, "the Stage 2 child changed: memory() not found"
+CHILD = CHILD.replace(_MEMORY_DEF, "import threading as _mem_threading\n_MEMORY_LOCK = _mem_threading.Lock()\n\n\n"
+                      "def memory():\n    with _MEMORY_LOCK:\n        return _memory_unlocked()\n\n\n"
+                      "def _memory_unlocked():\n", 1)
 compile(CHILD, "<stage4 child>", "exec")
 
 # Retained memory per engine component of an uncached build (each object counted once, in this order).
@@ -242,12 +250,33 @@ def ac_power():
     return st.ACLineStatus == 1
 
 
+REQUIRE_AC = {"enabled": False, "stable_s": 30.0, "poll_s": 5.0}
+
+
+def wait_for_ac() -> float:
+    """With --require-ac: blocks until mains power has been on for ``stable_s`` seconds. Returns seconds waited."""
+    t0, since = time.monotonic(), None
+    while REQUIRE_AC["enabled"]:
+        now = time.monotonic()
+        if ac_power() is False:
+            since = None
+        else:
+            since = since if since is not None else now
+            if now - since >= REQUIRE_AC["stable_s"]:
+                break
+        time.sleep(REQUIRE_AC["poll_s"])
+    return round(time.monotonic() - t0, 1)
+
+
 def run_phase(code_root: Path, repo: Path, cache_dir: Path, mode: str, limit: int, timeout, env=None) -> dict:
+    waited = wait_for_ac() if REQUIRE_AC["enabled"] else None
     before = ac_power()
     out = s3.run_child(CHILD, code_root, [repo, cache_dir, mode, limit], timeout, env)
     after = ac_power()
     out["ac_power"] = [before, after]
     out["on_battery_suspected"] = before is False or after is False
+    if waited is not None:
+        out["waited_for_ac_s"] = waited
     return out
 
 
@@ -404,8 +433,11 @@ def main():
     ap.add_argument("--phase-timeout-s", type=float, default=None)
     ap.add_argument("--verify", action="store_true")
     ap.add_argument("--component-memory", action="store_true", help="retained memory per component, once per revision")
+    ap.add_argument("--require-ac", action="store_true",
+                    help="before each phase, wait until mains power has been on for 30 s (laptops: no throttled phases)")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
+    REQUIRE_AC["enabled"] = args.require_ac
     roots = {"baseline": Path(args.baseline_root).resolve()}
     for spec in args.extra_root:
         name, _, path = spec.partition("=")
